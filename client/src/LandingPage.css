@@ -281,6 +281,250 @@
 
 .door-half-panel.no-clip {
   clip-path: none !important;
+  transform: none !important;
+  width: 50.1% !important;
+  background: #ffcc00 !important;
+}
+
+/* JAPANESE INK WHEELS STAGE ON YELLOW CANVAS */
+.japanese-ink-wheels-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: #ffcc00;
+  color: #111111;
+  pointer-events: auto;
+}
+
+.ink-wheels-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.ink-eyebrow-stamp {
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  display: inline-block;
+  background: #111111;
+  color: #ffcc00;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 4px 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.ink-title-kanji {
+  font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
+  font-size: clamp(28px, 4vw, 44px);
+  letter-spacing: 2px;
+  color: #111111;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.ink-subtitle {
+  font-size: 13px;
+  color: #333333;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* 3 WHEELS GRID */
+.ink-wheels-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  max-width: 1260px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .ink-wheels-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.ink-wheel-card {
+  background: rgba(255, 255, 255, 0.45);
+  border: 3px solid #111111;
+  border-radius: 28px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.ink-wheel-card:hover {
+  transform: translateY(-6px);
+  background: #ffffff;
+}
+
+/* ENSO RING WHEEL STAGE */
+.enso-ring-wheel-wrapper {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.wheel-spin-slow {
+  animation: spinSlow 35s linear infinite;
+}
+
+.wheel-spin-reverse {
+  animation: spinReverse 40s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.enso-ink-circle-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+}
+
+.wheel-spoke-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -16px;
+  margin-left: -40px;
+  width: 80px;
+  height: 32px;
+  cursor: pointer;
+  z-index: 15;
+}
+
+.spoke-icon-pill {
+  background: #ffffff;
+  border: 2px solid #111111;
+  border-radius: 20px;
+  padding: 3px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.spoke-icon-pill:hover {
+  transform: scale(1.15);
+  background: #ffcc00;
+}
+
+.spoke-icon-pill img {
+  height: 14px;
+  width: auto;
+  max-width: 32px;
+  object-fit: contain;
+}
+
+.spoke-icon-pill span {
+  font-size: 9px;
+  font-weight: 800;
+  color: #111111;
+  white-space: nowrap;
+}
+
+.wheel-center-kanji-hub {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #111111;
+  color: #ffcc00;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.wheel-center-kanji-hub:hover {
+  transform: scale(1.1);
+}
+
+.kanji-symbol {
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.hub-label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.ink-wheel-footer-title {
+  text-align: center;
+  width: 100%;
+}
+
+.ink-wheel-footer-title h3 {
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  color: #111111;
+  margin: 0 0 4px 0;
+}
+
+.ink-wheel-footer-title p {
+  font-size: 11px;
+  color: #444444;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.btn-ink-launch {
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-ink-launch:hover {
+  background: #e50914;
+  transform: translateY(-2px);
 }
 
 /* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */
