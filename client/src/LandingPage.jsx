@@ -138,8 +138,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const isYellowCanvas = spinProgress > 0.45;
   const isFullyLockedYellow = spinProgress >= 0.94;
 
-  // WHITE ZIGZAG CRACK SEAM LINE: Visible as soon as Red Stage appears (scrollProgress >= 0.22) UNTIL door spin starts (spinProgress <= 0.05)!
-  const showWhiteLine = scrollProgress >= 0.22 && spinProgress <= 0.05;
+  // PERFECT DISAPPEARING TIMING:
+  // The White ZigZag Crack Seam Line is visible ONLY when doors are 100% CLOSED (spinProgress < 0.005)!
+  // THE EXACT MILLISECOND doors start opening (spinProgress >= 0.005), the White ZigZag Line VANISHES INSTANTLY!
+  const showWhiteLine = scrollProgress >= 0.20 && spinProgress < 0.005;
 
   // STEP 3: 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.72)
   const bulletProgress = Math.min(Math.max((scrollProgress - 0.72) * 3.5, 0), 1);
@@ -420,7 +422,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             </div>
           )}
 
-          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY (VISIBLE AS SOON AS RED STAGE APPEARS: scrollProgress >= 0.22 UNTIL spinProgress > 0.05) */}
+          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY (VANISHES THE EXACT MILLISECOND DOORS START OPENING spinProgress >= 0.005) */}
           <div
             className="vertical-zigzag-crack-container"
             style={{
