@@ -256,10 +256,12 @@
   color: #ffffff;
 }
 
-.door-half-panel.bg-yellow,
-.door-half-panel.no-clip {
+.door-half-panel.bg-yellow {
   background: #ffcc00;
   color: #111111;
+}
+
+.door-half-panel.no-clip {
   clip-path: none !important;
   width: 50.1% !important;
 }

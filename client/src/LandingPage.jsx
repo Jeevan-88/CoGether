@@ -128,23 +128,24 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.38) * Math.PI) : 0;
   const crossScale = Math.min((scrollProgress - 0.02) * 3.5, 1);
 
-  // STEP 2: Red Stage appears with WHITE ZIGZAG CRACK SEAM LINE VISIBLE (scrollProgress 0.20 -> 0.35)
-  // Door spin runs smoothly from 0.35 -> 0.65 (Multiplier 3.3 for snappy 360deg spin!)
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.35) * 3.3, 0), 1);
+  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) (scrollProgress 0.30 -> 0.72)
+  // Zigzag teeth cut edges stay active ALL THE WAY through the 360deg spin until doors interlock at 360deg!
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.30) * 2.4, 0), 1); // 0.0 -> 1.0
   const doorSpinAngle = spinProgress * 360;
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
-  const isYellowCanvas = spinProgress > 0.40;
+  const isYellowCanvas = spinProgress > 0.45;
 
-  // PERFECT CLOSING LOCK: When spin reaches >= 0.85 (or scrollProgress >= 0.65), LOCK 100% FLAT SEAMLESS YELLOW CANVAS!
-  const isFullyLockedYellow = spinProgress >= 0.85 || scrollProgress >= 0.65;
+  // SOLID YELLOW LOCK: Locks flat ONLY when spinProgress reaches >= 0.98 (353° -> 360° full closure)!
+  // This allows the yellow doors with their zigzag teeth cuts to come back together, interlock 100% flat, and THEN flatten into solid yellow canvas!
+  const isFullyLockedYellow = spinProgress >= 0.98;
 
   // WHITE ZIGZAG CRACK SEAM LINE OVERLAY:
   // Visible when Red stage appears (scrollProgress >= 0.20) UNTIL exact millisecond door spin starts (spinProgress < 0.005)!
   const showWhiteLine = scrollProgress >= 0.20 && spinProgress < 0.005;
 
-  // STEP 3: 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.65)
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.65) * 3.2, 0), 1);
+  // STEP 3: 1-SEC SCROLL PAUSE -> 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.78)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.78) * 2.2, 0), 1);
 
   return (
     <div className="landing-page-official fade-in">
