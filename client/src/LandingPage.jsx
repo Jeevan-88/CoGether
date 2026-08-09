@@ -10,7 +10,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [camBoxSize, setCamBoxSize] = useState('md');
   const [tutorialStep, setTutorialStep] = useState(1);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const heroImgRef = useRef(null);
 
   const TUTORIAL_MESSAGES = [
     { sender: 'Alex', text: 'CoGether makes Co-Watch & Co-Play feel like real life! 🍿', color: '#a855f7' },
@@ -22,7 +21,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 0.6;
+      const heroHeight = window.innerHeight * 0.55;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };
@@ -65,35 +64,65 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Target: navbar logo center coordinates (left-aligned inside 1400px container with 40px padding, 58px tall)
-  const containerOffset = Math.max((window.innerWidth - 1400) / 2, 0);
-  const navPaddingLeft = 40;
-  const navLogoWidth = (58 / (3840 / 6824)); // ~103.1px width for 58px height
-  const navLogoTargetX = containerOffset + navPaddingLeft + (navLogoWidth / 2);
-  const navLogoTargetY = 40; // center of 80px fixed header
-
-  const heroImgCenterX = window.innerWidth / 2;
-  const heroImgCenterY = window.innerHeight / 2;
-
-  // X & Y offsets from 50vw, 50vh to navbar target center
-  const deltaX = navLogoTargetX - heroImgCenterX;
-  const deltaY = navLogoTargetY - heroImgCenterY;
-
-  const currentX = scrollProgress * deltaX;
-  const currentY = scrollProgress * deltaY;
-
-  // Scale from full hero width to 58px header logo height
-  const heroImgHeight = (3840 / 6824) * window.innerWidth;
-  const targetScale = 58 / heroImgHeight;
-  const logoScale = 1 - (scrollProgress * (1 - targetScale));
-
   return (
     <div className="landing-page-official fade-in">
-      {/* 1. FULLSCREEN HERO SECTION */}
-      <section className="fullscreen-pure-black-hero" />
+      {/* 1. FULLSCREEN HERO SECTION WITH GENZ TAGLINE & COSMIC STARBURST EXPLOSION */}
+      <section className="fullscreen-pure-black-hero">
+        <div className="hero-center-content-wrapper">
+          {/* Gen-Z Tagline underneath the 3D logo in Pixar-style uppercase font */}
+          <div
+            className="genz-tagline-container"
+            style={{
+              opacity: Math.max(1 - scrollProgress * 1.8, 0),
+              transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * 40}px)`
+            }}
+          >
+            <p className="genz-tagline-text">
+              WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
+            </p>
+          </div>
 
-      {/* 2. BOLD RED SECTION: CO-WATCH HUB */}
-      <section className="official-red-section">
+          {/* Cosmic Starburst Bursting Flare Overlay on Scroll */}
+          <div
+            className="starburst-flare-overlay"
+            style={{
+              opacity: scrollProgress > 0.1 ? Math.min((scrollProgress - 0.1) * 3, 1) : 0,
+              transform: `translate(-50%, -50%) scale(${0.5 + scrollProgress * 2.8}) rotate(${scrollProgress * 90}deg)`,
+              pointerEvents: 'none'
+            }}
+          >
+            <img src="/starburst.png" alt="Starburst Burst" className="starburst-flare-img" />
+            <div className="horizontal-laser-beam" />
+            <div className="vertical-laser-beam" />
+          </div>
+        </div>
+      </section>
+
+      {/* WHITE ZIG-ZAG TORN PAGE DIVIDER SEAM */}
+      <div className="zigzag-torn-divider-wrapper">
+        <svg className="zigzag-torn-svg" viewBox="0 0 1440 60" preserveAspectRatio="none">
+          <path
+            d="M0,0 L30,30 L60,5 L90,38 L120,10 L150,34 L180,8 L210,42 L240,14 L270,36 L300,12 L330,40 L360,16 L390,44 L420,18 L450,46 L480,20 L510,48 L540,22 L570,50 L600,24 L630,52 L660,26 L690,54 L720,22 L750,50 L780,24 L810,52 L840,26 L870,54 L900,22 L930,50 L960,24 L990,52 L1020,26 L1050,54 L1080,22 L1110,50 L1140,24 L1170,52 L1200,26 L1230,54 L1260,22 L1290,50 L1320,24 L1350,52 L1380,26 L1410,54 L1440,28 L1440,60 L0,60 Z"
+            fill="#e50914"
+          />
+          <path
+            d="M0,0 L30,30 L60,5 L90,38 L120,10 L150,34 L180,8 L210,42 L240,14 L270,36 L300,12 L330,40 L360,16 L390,44 L420,18 L450,46 L480,20 L510,48 L540,22 L570,50 L600,24 L630,52 L660,26 L690,54 L720,22 L750,50 L780,24 L810,52 L840,26 L870,54 L900,22 L930,50 L960,24 L990,52 L1020,26 L1050,54 L1080,22 L1110,50 L1140,24 L1170,52 L1200,26 L1230,54 L1260,22 L1290,50 L1320,24 L1350,52 L1380,26 L1410,54 L1440,28"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="5"
+            filter="drop-shadow(0 0 12px #ffffff)"
+          />
+        </svg>
+      </div>
+
+      {/* 2. BOLD RED SECTION: CO-WATCH HUB WITH 3D PAGE FLIP UNFOLD TRANSITION */}
+      <section
+        className="official-red-section 3d-page-flip-stage"
+        style={{
+          transform: scrollProgress > 0.45 ? `rotateX(${(1 - scrollProgress) * 35}deg)` : 'rotateX(35deg)',
+          opacity: Math.min(scrollProgress * 1.5, 1)
+        }}
+      >
         <div className="red-section-container">
           <div className="red-left-content">
             <div className="watch-together-badge">CO-WATCH HUB</div>
