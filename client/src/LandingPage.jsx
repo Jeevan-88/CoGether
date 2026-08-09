@@ -68,11 +68,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         const totalHeight = stageWrapper.clientHeight;
         
         if (scrollY < stageTopOffset) {
-          target = (scrollY / stageTopOffset) * 0.28;
+          target = (scrollY / stageTopOffset) * 0.22;
         } else {
           const stageScroll = scrollY - stageTopOffset;
           const stageMaxScroll = totalHeight - vh;
-          target = 0.28 + Math.min(Math.max(stageScroll / stageMaxScroll, 0), 1) * 0.72;
+          target = 0.22 + Math.min(Math.max(stageScroll / stageMaxScroll, 0), 1) * 0.78;
         }
       } else {
         target = Math.min(scrollY / (vh * 2), 1);
@@ -123,27 +123,29 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
   // STEP 1: INITIAL HERO STATE IS 100% PLAIN CLEAN BLACK (scrollProgress <= 0.02)
-  // AS USER SCROLLS DOWN (0.02 -> 0.35), STARBURST CROSS LASER FLARE PULSES
-  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.38;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.36) * Math.PI) : 0;
-  const crossScale = Math.min((scrollProgress - 0.02) * 3.5, 1);
+  // AS USER SCROLLS DOWN (0.02 -> 0.25), STARBURST CROSS LASER FLARE PULSES
+  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.30;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.28) * Math.PI) : 0;
+  const crossScale = Math.min((scrollProgress - 0.02) * 4.0, 1);
 
-  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) (scrollProgress 0.28 -> 0.52)
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.28) * 4.0, 0), 1);
+  // STEP 2: 360-DEGREE INWARD DOOR FLIP (Red -> Yellow) (scrollProgress 0.22 -> 0.40)
+  // Multiplier 5.8 ensures the 360deg spin completes & yellow doors interlock 100% flat with zero gap early!
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.22) * 5.8, 0), 1);
   const doorSpinAngle = spinProgress * 360;
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
   const isYellowCanvas = spinProgress > 0.40;
 
-  // SOLID YELLOW LOCK: Locks flat smoothly when spinProgress >= 0.88 or scrollProgress >= 0.52!
-  const isFullyLockedYellow = spinProgress >= 0.88 || scrollProgress >= 0.52;
+  // SOLID YELLOW LOCK: Locks flat smoothly when spinProgress >= 0.85 or scrollProgress >= 0.38!
+  const isFullyLockedYellow = spinProgress >= 0.85 || scrollProgress >= 0.38;
 
   // WHITE ZIGZAG CRACK SEAM LINE OVERLAY:
-  // Visible when Red stage appears (scrollProgress >= 0.18) UNTIL exact millisecond door spin starts (spinProgress < 0.005)!
-  const showWhiteLine = scrollProgress >= 0.18 && spinProgress < 0.005;
+  // Visible when Red stage appears (scrollProgress >= 0.15) UNTIL exact millisecond door spin starts (spinProgress < 0.005)!
+  const showWhiteLine = scrollProgress >= 0.15 && spinProgress < 0.005;
 
-  // STEP 3: 3 BULLETS SHOOT OUT OF GUN BARRELS ONCE YELLOW STAGE LOCKS FLAT (scrollProgress > 0.52)
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.52) * 2.2, 0), 1);
+  // STEP 3: BULLET STRIKES SHOOT OUT OF BARRELS (scrollProgress > 0.45)
+  // Multiplier 2.5 ensures bullets travel across screen smoothly as you scroll!
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.45) * 2.5, 0), 1);
 
   return (
     <div className="landing-page-official fade-in">
@@ -154,7 +156,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.35 ? 1 : 0,
+                opacity: scrollProgress < 0.30 ? 1 : 0,
                 filter: burstOpacity > 0 ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
               }}
             >
