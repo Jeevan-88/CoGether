@@ -387,27 +387,27 @@
 
 .pistol-static-wrapper {
   flex-shrink: 0;
-  width: 260px;
-  height: 160px;
+  width: 140px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .pistol-ink-img {
-  width: 250px;
+  width: 130px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.45));
+  filter: none !important;
   transition: transform 0.2s ease;
 }
 
 .pistol-ink-img.facing-right {
-  transform: scale(1);
+  transform: none;
 }
 
 .pistol-ink-img.facing-left {
-  transform: scaleX(-1) scale(1);
+  transform: scaleX(-1);
 }
 
 /* TORN PAPER WHITE BANNER MATCHING USER SCREENSHOT */
