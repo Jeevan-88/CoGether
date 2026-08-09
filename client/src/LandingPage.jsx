@@ -21,7 +21,7 @@ const SPORTS_CHANNELS = [
   { name: 'Sony Sports', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/SonyLIV_logo.png', color: '#0055FF' },
   { name: 'Star Sports', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney%2B_Hotstar_logo.svg', color: '#1E3A8A' },
   { name: 'Eurosport', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/06/Eurosport_logo.svg', color: '#1E293B' },
-  { name: 'NBA League Pass', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/NBA_TV.svg', color: '#C8102E' },
+  { name: 'NBA TV', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/NBA_TV.svg', color: '#C8102E' },
   { name: 'Willow HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Willow_TV_logo.svg', color: '#059669' }
 ];
 
@@ -29,7 +29,7 @@ const ANIME_NETWORKS = [
   { name: 'Crunchyroll', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Crunchyroll_Logo.svg', color: '#F47521' },
   { name: 'Funimation', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b7/Funimation_Logo.svg', color: '#5C2D91' },
   { name: 'HiDive', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/HiDive_logo.svg', color: '#00A3E0' },
-  { name: 'Ani-One', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/14/Ani-One_Asia.png', color: '#EA580C' },
+  { name: 'Ani-One Asia', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/14/Ani-One_Asia.png', color: '#EA580C' },
   { name: 'Muse Asia', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/52/Muse_Asia_Logo.png', color: '#E11D48' },
   { name: 'Netflix Anime', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg', color: '#E50914' },
   { name: 'Toonami', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Toonami_2012_logo.png', color: '#000000' },
@@ -43,6 +43,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [camBoxSize, setCamBoxSize] = useState('md');
   const [tutorialStep, setTutorialStep] = useState(1);
   const [scrollProgress, setScrollProgress] = useState(0);
+
+  const [activeMovieIdx, setActiveMovieIdx] = useState(0);
+  const [activeSportsIdx, setActiveSportsIdx] = useState(0);
+  const [activeAnimeIdx, setActiveAnimeIdx] = useState(0);
 
   const TUTORIAL_MESSAGES = [
     { sender: 'Alex', text: 'CoGether makes Co-Watch & Co-Play feel like real life! 🍿', color: '#a855f7' },
@@ -66,7 +70,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     const timer = setInterval(() => {
       setActiveMsgIdx((prev) => (prev + 1) % TUTORIAL_MESSAGES.length);
       setTutorialStep((prev) => (prev % 3) + 1);
-    }, 3500);
+      setActiveMovieIdx((prev) => (prev + 1) % MOVIE_STREAMING_APPS.length);
+      setActiveSportsIdx((prev) => (prev + 1) % SPORTS_CHANNELS.length);
+      setActiveAnimeIdx((prev) => (prev + 1) % ANIME_NETWORKS.length);
+    }, 3200);
     return () => clearInterval(timer);
   }, []);
 
@@ -254,133 +261,145 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* JAPANESE INK WHEELS OVERLAY ON FULLY LOCKED YELLOW CANVAS */}
+          {/* JAPANESE INK SCANNER WHEELS STAGE ON YELLOW CANVAS */}
           {isYellowCanvas && (
             <div className="japanese-ink-wheels-stage fade-in">
               <div className="ink-wheels-header">
-                <span className="ink-eyebrow-stamp">墨絵 • STREAMING HUBS</span>
-                <h2 className="ink-title-kanji">SELECT STREAMING DESTINATION</h2>
-                <p className="ink-subtitle">3 Japanese Ink-Drawn Wheels • Spin & Click to Launch Co-Watch Party</p>
+                <span className="ink-eyebrow-stamp">墨絵 • STREAMING PLATFORMS</span>
+                <h2 className="ink-title-kanji">STREAMING HUBS ROTATING SCANNER</h2>
               </div>
 
-              <div className="ink-wheels-grid-3">
+              {/* FULL-WIDTH HORIZONTAL WHITE SCANNER / READER BAR (STRETCHES ACROSS SCREEN) */}
+              <div className="horizontal-scanner-bar">
+                <div className="scanner-slot-item">
+                  <span className="slot-channel-tag">MOVIES HUB</span>
+                  <div className="slot-platform-display">
+                    <img src={MOVIE_STREAMING_APPS[activeMovieIdx].logo} alt={MOVIE_STREAMING_APPS[activeMovieIdx].name} />
+                    <strong>{MOVIE_STREAMING_APPS[activeMovieIdx].name}</strong>
+                  </div>
+                </div>
+
+                <div className="scanner-slot-item">
+                  <span className="slot-channel-tag">SPORTS HUB</span>
+                  <div className="slot-platform-display">
+                    <img src={SPORTS_CHANNELS[activeSportsIdx].logo} alt={SPORTS_CHANNELS[activeSportsIdx].name} />
+                    <strong>{SPORTS_CHANNELS[activeSportsIdx].name}</strong>
+                  </div>
+                </div>
+
+                <div className="scanner-slot-item">
+                  <span className="slot-channel-tag">ANIME HUB</span>
+                  <div className="slot-platform-display">
+                    <img src={ANIME_NETWORKS[activeAnimeIdx].logo} alt={ANIME_NETWORKS[activeAnimeIdx].name} />
+                    <strong>{ANIME_NETWORKS[activeAnimeIdx].name}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3 GIANT PURE INK-DRAWN JAPANESE WHEELS PASSING THROUGH THE WHITE SCANNER BAR */}
+              <div className="pure-ink-wheels-row-3">
                 {/* WHEEL 1: MOVIES & TV */}
-                <div className="ink-wheel-card">
-                  <div className="enso-ring-wheel-wrapper wheel-spin-slow">
-                    <svg className="enso-ink-circle-svg" viewBox="0 0 300 300">
-                      <circle cx="150" cy="150" r="130" fill="none" stroke="#111111" strokeWidth="18" strokeDasharray="18 12 30 8 45 15" strokeLinecap="round" />
-                      <circle cx="150" cy="150" r="95" fill="none" stroke="#111111" strokeWidth="4" strokeDasharray="6 8" />
+                <div className="pure-wheel-column" onClick={() => handleLaunch('watch')}>
+                  <div className="pure-enso-wheel-wrapper wheel-spin-slow">
+                    <svg className="enso-ink-circle-svg" viewBox="0 0 320 320">
+                      <circle cx="160" cy="160" r="140" fill="none" stroke="#111111" strokeWidth="20" strokeDasharray="22 14 35 10 50 18" strokeLinecap="round" />
+                      <circle cx="160" cy="160" r="100" fill="none" stroke="#111111" strokeWidth="5" strokeDasharray="8 8" />
                     </svg>
 
-                    {MOVIE_STREAMING_APPS.slice(0, 8).map((app, idx) => {
-                      const angle = (idx * 360) / 8;
+                    {MOVIE_STREAMING_APPS.map((app, idx) => {
+                      const angle = (idx * 360) / MOVIE_STREAMING_APPS.length;
                       return (
                         <div
                           key={app.name}
-                          className="wheel-spoke-item"
+                          className={`pure-wheel-spoke ${activeMovieIdx === idx ? 'active-top-spoke' : ''}`}
                           style={{
-                            transform: `rotate(${angle}deg) translateY(-105px) rotate(-${angle}deg)`
+                            transform: `rotate(${angle}deg) translateY(-118px) rotate(-${angle}deg)`
                           }}
-                          title={app.name}
-                          onClick={() => handleLaunch('watch')}
                         >
-                          <div className="spoke-icon-pill" style={{ borderColor: app.color }}>
-                            <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
-                            <span>{app.name.slice(0, 6)}</span>
-                          </div>
+                          <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
                         </div>
                       );
                     })}
 
-                    <div className="wheel-center-kanji-hub" onClick={() => handleLaunch('watch')}>
+                    <div className="pure-kanji-center-hub">
                       <span className="kanji-symbol">映画</span>
                       <span className="hub-label">MOVIES</span>
                     </div>
                   </div>
-                  <div className="ink-wheel-footer-title">
+
+                  <div className="pure-wheel-ink-label">
                     <h3>🎬 MOVIES & TV SHOWS</h3>
-                    <p>16+ Apps (Netflix, Hotstar, Prime & More)</p>
-                    <button className="btn-ink-launch" onClick={() => handleLaunch('watch')}>Launch Movies Room <ArrowRight size={14} /></button>
+                    <p>Netflix • Hotstar • Prime • HBO Max</p>
                   </div>
                 </div>
 
                 {/* WHEEL 2: LIVE SPORTS */}
-                <div className="ink-wheel-card">
-                  <div className="enso-ring-wheel-wrapper wheel-spin-reverse">
-                    <svg className="enso-ink-circle-svg" viewBox="0 0 300 300">
-                      <circle cx="150" cy="150" r="130" fill="none" stroke="#111111" strokeWidth="18" strokeDasharray="24 10 15 12 50 20" strokeLinecap="round" />
-                      <circle cx="150" cy="150" r="95" fill="none" stroke="#111111" strokeWidth="4" strokeDasharray="8 6" />
+                <div className="pure-wheel-column" onClick={() => handleLaunch('watch')}>
+                  <div className="pure-enso-wheel-wrapper wheel-spin-reverse">
+                    <svg className="enso-ink-circle-svg" viewBox="0 0 320 320">
+                      <circle cx="160" cy="160" r="140" fill="none" stroke="#111111" strokeWidth="20" strokeDasharray="28 12 18 14 55 22" strokeLinecap="round" />
+                      <circle cx="160" cy="160" r="100" fill="none" stroke="#111111" strokeWidth="5" strokeDasharray="10 8" />
                     </svg>
 
-                    {SPORTS_CHANNELS.slice(0, 8).map((app, idx) => {
-                      const angle = (idx * 360) / 8;
+                    {SPORTS_CHANNELS.map((app, idx) => {
+                      const angle = (idx * 360) / SPORTS_CHANNELS.length;
                       return (
                         <div
                           key={app.name}
-                          className="wheel-spoke-item"
+                          className={`pure-wheel-spoke ${activeSportsIdx === idx ? 'active-top-spoke' : ''}`}
                           style={{
-                            transform: `rotate(${angle}deg) translateY(-105px) rotate(-${angle}deg)`
+                            transform: `rotate(${angle}deg) translateY(-118px) rotate(-${angle}deg)`
                           }}
-                          title={app.name}
-                          onClick={() => handleLaunch('watch')}
                         >
-                          <div className="spoke-icon-pill" style={{ borderColor: app.color }}>
-                            <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
-                            <span>{app.name.slice(0, 6)}</span>
-                          </div>
+                          <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
                         </div>
                       );
                     })}
 
-                    <div className="wheel-center-kanji-hub" onClick={() => handleLaunch('watch')}>
+                    <div className="pure-kanji-center-hub">
                       <span className="kanji-symbol">体育</span>
                       <span className="hub-label">SPORTS</span>
                     </div>
                   </div>
-                  <div className="ink-wheel-footer-title">
-                    <h3>⚽ LIVE SPORTS</h3>
-                    <p>13+ Channels (ESPN, Sky Sports, DAZN & More)</p>
-                    <button className="btn-ink-launch" onClick={() => handleLaunch('watch')}>Launch Sports Sync <ArrowRight size={14} /></button>
+
+                  <div className="pure-wheel-ink-label">
+                    <h3>⚽ LIVE SPORTS CHANNELS</h3>
+                    <p>ESPN+ • Sky Sports • DAZN • Sony</p>
                   </div>
                 </div>
 
                 {/* WHEEL 3: ANIME HUB */}
-                <div className="ink-wheel-card">
-                  <div className="enso-ring-wheel-wrapper wheel-spin-slow">
-                    <svg className="enso-ink-circle-svg" viewBox="0 0 300 300">
-                      <circle cx="150" cy="150" r="130" fill="none" stroke="#111111" strokeWidth="18" strokeDasharray="30 15 10 8 40 18" strokeLinecap="round" />
-                      <circle cx="150" cy="150" r="95" fill="none" stroke="#111111" strokeWidth="4" strokeDasharray="5 10" />
+                <div className="pure-wheel-column" onClick={() => handleLaunch('watch')}>
+                  <div className="pure-enso-wheel-wrapper wheel-spin-slow">
+                    <svg className="enso-ink-circle-svg" viewBox="0 0 320 320">
+                      <circle cx="160" cy="160" r="140" fill="none" stroke="#111111" strokeWidth="20" strokeDasharray="32 16 12 10 42 20" strokeLinecap="round" />
+                      <circle cx="160" cy="160" r="100" fill="none" stroke="#111111" strokeWidth="5" strokeDasharray="6 10" />
                     </svg>
 
-                    {ANIME_NETWORKS.slice(0, 8).map((app, idx) => {
-                      const angle = (idx * 360) / 8;
+                    {ANIME_NETWORKS.map((app, idx) => {
+                      const angle = (idx * 360) / ANIME_NETWORKS.length;
                       return (
                         <div
                           key={app.name}
-                          className="wheel-spoke-item"
+                          className={`pure-wheel-spoke ${activeAnimeIdx === idx ? 'active-top-spoke' : ''}`}
                           style={{
-                            transform: `rotate(${angle}deg) translateY(-105px) rotate(-${angle}deg)`
+                            transform: `rotate(${angle}deg) translateY(-118px) rotate(-${angle}deg)`
                           }}
-                          title={app.name}
-                          onClick={() => handleLaunch('watch')}
                         >
-                          <div className="spoke-icon-pill" style={{ borderColor: app.color }}>
-                            <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
-                            <span>{app.name.slice(0, 6)}</span>
-                          </div>
+                          <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
                         </div>
                       );
                     })}
 
-                    <div className="wheel-center-kanji-hub" onClick={() => handleLaunch('watch')}>
+                    <div className="pure-kanji-center-hub">
                       <span className="kanji-symbol">アニメ</span>
                       <span className="hub-label">ANIME</span>
                     </div>
                   </div>
-                  <div className="ink-wheel-footer-title">
-                    <h3>⛩️ ANIME HUB</h3>
-                    <p>10+ Streams (Crunchyroll, Funimation & More)</p>
-                    <button className="btn-ink-launch" onClick={() => handleLaunch('watch')}>Launch Anime Room <ArrowRight size={14} /></button>
+
+                  <div className="pure-wheel-ink-label">
+                    <h3>⛩️ ANIME STREAMING HUB</h3>
+                    <p>Crunchyroll • Funimation • HiDive</p>
                   </div>
                 </div>
               </div>

@@ -337,49 +337,113 @@
   margin-top: 4px;
 }
 
-/* 3 WHEELS GRID */
-.ink-wheels-grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-  max-width: 1260px;
-  width: 100%;
-  margin: 0 auto;
+/* FULL-WIDTH HORIZONTAL WHITE SCANNER / READER BAR (STRETCHES ACROSS SCREEN) */
+.horizontal-scanner-bar {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  height: 72px;
+  background: #ffffff;
+  border-top: 3.5px solid #111111;
+  border-bottom: 3.5px solid #111111;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 35;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: -35px; /* Top part of wheels passes directly inside this white bar */
+  padding: 0 40px;
 }
 
-@media (max-width: 1024px) {
-  .ink-wheels-grid-3 {
-    grid-template-columns: 1fr;
-    gap: 24px;
+@media (max-width: 900px) {
+  .horizontal-scanner-bar {
+    flex-direction: column;
+    height: auto;
+    padding: 12px;
+    gap: 8px;
+    margin-bottom: 12px;
   }
 }
 
-.ink-wheel-card {
-  background: rgba(255, 255, 255, 0.45);
-  border: 3px solid #111111;
-  border-radius: 28px;
-  padding: 24px 16px;
+.scanner-slot-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #ffcc00;
+  border: 2.5px solid #111111;
+  padding: 6px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  min-width: 260px;
+  justify-content: center;
+}
+
+.slot-channel-tag {
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: #111111;
+  background: #ffffff;
+  padding: 3px 10px;
+  border-radius: 10px;
+  border: 1.5px solid #111111;
+}
+
+.slot-platform-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slot-platform-display img {
+  height: 22px;
+  width: auto;
+  max-width: 80px;
+  object-fit: contain;
+}
+
+.slot-platform-display strong {
+  font-size: 14px;
+  font-weight: 900;
+  color: #111111;
+  white-space: nowrap;
+}
+
+/* 3 GIANT PURE JAPANESE INKED WHEELS ROW */
+.pure-ink-wheels-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  z-index: 25;
+}
+
+@media (max-width: 1024px) {
+  .pure-ink-wheels-row-3 {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+.pure-wheel-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
-  transition: transform 0.3s ease, background 0.3s ease;
+  cursor: pointer;
 }
 
-.ink-wheel-card:hover {
-  transform: translateY(-6px);
-  background: #ffffff;
-}
-
-/* ENSO RING WHEEL STAGE */
-.enso-ring-wheel-wrapper {
+.pure-enso-wheel-wrapper {
   position: relative;
-  width: 250px;
-  height: 250px;
+  width: 320px;
+  height: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
 }
 
 .wheel-spin-slow {
@@ -406,56 +470,46 @@
   left: 0;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.18));
 }
 
-.wheel-spoke-item {
+.pure-wheel-spoke {
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: -16px;
-  margin-left: -40px;
-  width: 80px;
-  height: 32px;
-  cursor: pointer;
+  margin-top: -18px;
+  margin-left: -18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, background 0.2s ease;
   z-index: 15;
 }
 
-.spoke-icon-pill {
-  background: #ffffff;
-  border: 2px solid #111111;
-  border-radius: 20px;
-  padding: 3px 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.spoke-icon-pill:hover {
-  transform: scale(1.15);
-  background: #ffcc00;
-}
-
-.spoke-icon-pill img {
-  height: 14px;
-  width: auto;
-  max-width: 32px;
+.pure-wheel-spoke img {
+  max-width: 24px;
+  max-height: 24px;
   object-fit: contain;
 }
 
-.spoke-icon-pill span {
-  font-size: 9px;
-  font-weight: 800;
-  color: #111111;
-  white-space: nowrap;
+.pure-wheel-spoke.active-top-spoke {
+  transform: scale(1.3) !important;
+  background: #ffcc00;
+  border-color: #e50914;
+  z-index: 20;
 }
 
-.wheel-center-kanji-hub {
+.pure-kanji-center-hub {
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: #111111;
   color: #ffcc00;
@@ -464,67 +518,32 @@
   align-items: center;
   justify-content: center;
   z-index: 20;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border: 3px solid #ffcc00;
   transition: transform 0.2s ease;
 }
 
-.wheel-center-kanji-hub:hover {
-  transform: scale(1.1);
+.pure-wheel-column:hover .pure-kanji-center-hub {
+  transform: scale(1.08);
 }
 
-.kanji-symbol {
-  font-family: 'Bebas Neue', 'Anton', sans-serif;
-  font-size: 20px;
-  line-height: 1;
-  font-weight: 900;
-}
-
-.hub-label {
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  margin-top: 2px;
-}
-
-.ink-wheel-footer-title {
+.pure-wheel-ink-label {
   text-align: center;
-  width: 100%;
+  margin-top: 16px;
 }
 
-.ink-wheel-footer-title h3 {
+.pure-wheel-ink-label h3 {
   font-family: 'Bebas Neue', 'Anton', sans-serif;
-  font-size: 22px;
-  letter-spacing: 1.5px;
+  font-size: 26px;
+  letter-spacing: 2px;
   color: #111111;
-  margin: 0 0 4px 0;
+  margin: 0 0 2px 0;
 }
 
-.ink-wheel-footer-title p {
-  font-size: 11px;
-  color: #444444;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.btn-ink-launch {
-  background: #111111;
-  color: #ffffff;
-  border: none;
-  padding: 9px 18px;
-  border-radius: 14px;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.btn-ink-launch:hover {
-  background: #e50914;
-  transform: translateY(-2px);
+.pure-wheel-ink-label p {
+  font-size: 13px;
+  color: #222222;
+  font-weight: 700;
 }
 
 /* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */
