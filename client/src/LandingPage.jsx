@@ -21,7 +21,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 1.2;
+      const heroHeight = window.innerHeight * 1.8;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };
@@ -64,17 +64,19 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Light burst active during scrollProgress 0.35 -> 0.70
-  const isBurstActive = scrollProgress > 0.35 && scrollProgress < 0.70;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.35) / 0.35) * Math.PI) : 0;
+  // Phase 2 Light burst active during scrollProgress 0.30 -> 0.60
+  const isBurstActive = scrollProgress > 0.30 && scrollProgress < 0.60;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.30) / 0.30) * Math.PI) : 0;
 
-  // Phase 3 Screen shake during impact (scrollProgress 0.65 -> 0.78)
-  const isShaking = scrollProgress > 0.65 && scrollProgress < 0.78;
+  // Phase 3 Screen shake during impact (scrollProgress 0.55 -> 0.66)
+  const isShaking = scrollProgress > 0.55 && scrollProgress < 0.66;
   const shakeX = isShaking ? Math.sin(scrollProgress * 120) * 10 : 0;
   const shakeY = isShaking ? Math.cos(scrollProgress * 120) * 10 : 0;
 
-  // Red Section reveal progress (scrollProgress 0.70 -> 1.0)
-  const redRevealProgress = scrollProgress > 0.70 ? Math.min((scrollProgress - 0.70) * 3.3, 1) : 0;
+  // Pinned 360-Degree Inward Door Flip Progress while sticky pinned (scrollProgress 0.65 -> 1.0)
+  const spinProgress = scrollProgress > 0.65 ? Math.min((scrollProgress - 0.65) * 3.2, 1) : 0;
+  const doorSpinAngle = spinProgress * 360; // 0deg -> 360deg spin inwards
+  const isYellowCanvas = spinProgress > 0.45;
 
   return (
     <div
@@ -91,7 +93,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.75 ? Math.max(1 - (scrollProgress - 0.35) * 3, 0) : 0,
+                opacity: scrollProgress < 0.60 ? Math.max(1 - (scrollProgress - 0.30) * 3, 0) : 0,
                 filter: isBurstActive ? `brightness(${1 + burstOpacity * 3})` : 'none'
               }}
             >
@@ -117,96 +119,113 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. BOLD FULL-HEIGHT RED SECTION: CO-WATCH HUB MATCHING USER SCREENSHOT */}
-      <section
-        className="official-red-section full-red-canvas-stage"
-        style={{
-          opacity: Math.min(redRevealProgress * 1.5, 1)
-        }}
-      >
-        {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */}
-        <div
-          className="vertical-zigzag-crack-container"
-          style={{
-            opacity: redRevealProgress > 0.2 ? 1 : 0
-          }}
-        >
-          <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
-            <path
-              d="M20,0 L5,60 L35,120 L5,180 L35,240 L5,300 L35,360 L5,420 L35,480 L5,540 L35,600 L5,660 L35,720 L5,780 L35,840 L5,900 L35,960 L5,1020 L35,1080 L5,1140 L20,1200"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth="4"
-            />
-          </svg>
-        </div>
-
-        <div className="red-section-container">
-          {/* LEFT CONTENT: CO-WATCH TEXT PANEL */}
-          <div className="red-left-content">
-            <div className="watch-together-badge">CO-WATCH HUB</div>
-            <h2 className="red-section-headline">Synchronized Movies & TV Shows</h2>
-            <p className="red-section-sub">
-              Stream movies, TV shows, and videos synchronized to the exact millisecond with integrated real-time video calls.
-            </p>
-            <div className="how-it-works-switcher-box">
-              <span className="switcher-label">CAMERA RESIZER (CoGether Room):</span>
-              <div className="switcher-btns-row">
-                <button className={`switch-btn ${camBoxSize === 'sm' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('sm')}>Small</button>
-                <button className={`switch-btn ${camBoxSize === 'md' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('md')}>Medium</button>
-                <button className={`switch-btn ${camBoxSize === 'lg' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('lg')}>Large</button>
+      {/* 2. STICKY PINNED 3D 360-DEGREE INWARD DOOR SPIN STAGE */}
+      <section className="sticky-pinned-red-stage-wrapper">
+        <div className="sticky-pinned-red-stage-inner">
+          {/* LEFT DOOR PANEL (Left text content rotates 360deg inwards) */}
+          <div
+            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
+            style={{
+              transform: `rotateY(${-doorSpinAngle}deg)`
+            }}
+          >
+            {!isYellowCanvas ? (
+              <div className="door-content-left-red">
+                <div className="watch-together-badge">CO-WATCH HUB</div>
+                <h2 className="red-section-headline">Synchronized Movies & TV Shows</h2>
+                <p className="red-section-sub">
+                  Stream movies, TV shows, and videos synchronized to the exact millisecond with integrated real-time video calls.
+                </p>
+                <div className="how-it-works-switcher-box">
+                  <span className="switcher-label">CAMERA RESIZER (CoGether Room):</span>
+                  <div className="switcher-btns-row">
+                    <button className={`switch-btn ${camBoxSize === 'sm' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('sm')}>Small</button>
+                    <button className={`switch-btn ${camBoxSize === 'md' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('md')}>Medium</button>
+                    <button className={`switch-btn ${camBoxSize === 'lg' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('lg')}>Large</button>
+                  </div>
+                </div>
+                <button className="btn-black-launch-party" onClick={() => handleLaunch('watch')}>
+                  Launch Co-Watch Room <ArrowRight size={18} />
+                </button>
               </div>
-            </div>
-            <button className="btn-black-launch-party" onClick={() => handleLaunch('watch')}>
-              Launch Co-Watch Room <ArrowRight size={18} />
-            </button>
+            ) : (
+              <div className="plain-yellow-half" />
+            )}
           </div>
 
-          {/* RIGHT CONTENT: VIDEO PLAYER FRAME */}
-          <div className="red-right-video-frame">
-            <div className="video-player-box-red">
-              <div className="video-overlay-bar">
-                <span className="live-sync-pill"><span className="red-live-dot" /> CoGether Live Room</span>
-                <div className="overlay-actions-right">
-                  <button className="resize-cam-btn-icon" onClick={cycleCamSize}><Maximize2 size={14} /> Resize</button>
-                  <button className="mute-toggle-ic-btn" onClick={() => setIsMuted(!isMuted)}>
-                    {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-                  </button>
-                </div>
-              </div>
-              <video autoPlay loop muted={isMuted} playsInline className="commercial-cinematic-video">
-                <source src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4" />
-              </video>
-              <div className="live-chat-video-overlay fade-in">
-                <div className="chat-bubble-card">
-                  <div className="bubble-sender" style={{ color: TUTORIAL_MESSAGES[activeMsgIdx].color }}>
-                    <MessageSquare size={12} /> {TUTORIAL_MESSAGES[activeMsgIdx].sender}
+          {/* RIGHT DOOR PANEL (Right video frame rotates 360deg inwards) */}
+          <div
+            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
+            style={{
+              transform: `rotateY(${doorSpinAngle}deg)`
+            }}
+          >
+            {!isYellowCanvas ? (
+              <div className="door-content-right-red">
+                <div className="video-player-box-red">
+                  <div className="video-overlay-bar">
+                    <span className="live-sync-pill"><span className="red-live-dot" /> CoGether Live Room</span>
+                    <div className="overlay-actions-right">
+                      <button className="resize-cam-btn-icon" onClick={cycleCamSize}><Maximize2 size={14} /> Resize</button>
+                      <button className="mute-toggle-ic-btn" onClick={() => setIsMuted(!isMuted)}>
+                        {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                      </button>
+                    </div>
                   </div>
-                  <div className="bubble-text">{TUTORIAL_MESSAGES[activeMsgIdx].text}</div>
-                </div>
-              </div>
-              <div className={`teleparty-merged-view-box zero-center-line size-${camBoxSize} fade-in`}>
-                <div className="teleparty-header-strip">
-                  <span className="good-icon">✓</span> CoGether Merged Room
-                  <button className="quick-resize-ic" onClick={cycleCamSize}><Move size={11} /></button>
-                </div>
-                <div className="merged-shared-room-stage zero-line-stage">
-                  <div className="guy-merged-side">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Alex" />
-                    <span className="guy-tag-badge"><span className="dot-green" /> Alex</span>
+                  <video autoPlay loop muted={isMuted} playsInline className="commercial-cinematic-video">
+                    <source src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4" />
+                  </video>
+                  <div className="live-chat-video-overlay fade-in">
+                    <div className="chat-bubble-card">
+                      <div className="bubble-sender" style={{ color: TUTORIAL_MESSAGES[activeMsgIdx].color }}>
+                        <MessageSquare size={12} /> {TUTORIAL_MESSAGES[activeMsgIdx].sender}
+                      </div>
+                      <div className="bubble-text">{TUTORIAL_MESSAGES[activeMsgIdx].text}</div>
+                    </div>
                   </div>
-                  <div className="guy-merged-side">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" alt="Sam" />
-                    <span className="guy-tag-badge"><span className="dot-blue" /> Sam</span>
+                  <div className={`teleparty-merged-view-box zero-center-line size-${camBoxSize} fade-in`}>
+                    <div className="teleparty-header-strip">
+                      <span className="good-icon">✓</span> CoGether Merged Room
+                      <button className="quick-resize-ic" onClick={cycleCamSize}><Move size={11} /></button>
+                    </div>
+                    <div className="merged-shared-room-stage zero-line-stage">
+                      <div className="guy-merged-side">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Alex" />
+                        <span className="guy-tag-badge"><span className="dot-green" /> Alex</span>
+                      </div>
+                      <div className="guy-merged-side">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" alt="Sam" />
+                        <span className="guy-tag-badge"><span className="dot-blue" /> Sam</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="app-tutorial-bottom-banner">
+                    <div className={`tutorial-step-item ${tutorialStep === 1 ? 'active' : ''}`}><span className="step-num">1</span> Pick Co-Watch or Co-Play</div>
+                    <div className={`tutorial-step-item ${tutorialStep === 2 ? 'active' : ''}`}><span className="step-num">2</span> Share Invite Link</div>
+                    <div className={`tutorial-step-item ${tutorialStep === 3 ? 'active' : ''}`}><span className="step-num">3</span> Hang Out Together Live</div>
                   </div>
                 </div>
               </div>
-              <div className="app-tutorial-bottom-banner">
-                <div className={`tutorial-step-item ${tutorialStep === 1 ? 'active' : ''}`}><span className="step-num">1</span> Pick Co-Watch or Co-Play</div>
-                <div className={`tutorial-step-item ${tutorialStep === 2 ? 'active' : ''}`}><span className="step-num">2</span> Share Invite Link</div>
-                <div className={`tutorial-step-item ${tutorialStep === 3 ? 'active' : ''}`}><span className="step-num">3</span> Hang Out Together Live</div>
-              </div>
-            </div>
+            ) : (
+              <div className="plain-yellow-half" />
+            )}
+          </div>
+
+          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */}
+          <div
+            className="vertical-zigzag-crack-container"
+            style={{
+              opacity: scrollProgress > 0.60 && spinProgress < 0.98 ? 1 : 0
+            }}
+          >
+            <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
+              <path
+                d="M20,0 L5,60 L35,120 L5,180 L35,240 L5,300 L35,360 L5,420 L35,480 L5,540 L35,600 L5,660 L35,720 L5,780 L35,840 L5,900 L35,960 L5,1020 L35,1080 L5,1140 L20,1200"
+                fill="none"
+                stroke="#ffffff"
+                strokeWidth="4"
+              />
+            </svg>
           </div>
         </div>
       </section>

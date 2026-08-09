@@ -118,22 +118,78 @@
   transform: translateY(-50%) rotate(-45deg);
 }
 
-/* 2. BOLD FULL-HEIGHT RED SECTION: CO-WATCH HUB MATCHING USER SCREENSHOT */
-.official-red-section {
-  background: #e50914;
-  color: #ffffff;
-  min-height: 100vh;
-  padding: 80px 48px;
+/* 2. STICKY PINNED 3D 360-DEGREE INWARD DOOR SPIN STAGE */
+.sticky-pinned-red-stage-wrapper {
   position: relative;
-  overflow: hidden;
+  width: 100%;
+  height: 260vh;
+  background: #000000;
   z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s ease;
 }
 
-/* CLEAN WHITE VERTICAL ZIGZAG CRACK SEAM IN THE CENTER */
+.sticky-pinned-red-stage-inner {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  perspective: 1400px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background: #000000;
+}
+
+.door-half-panel {
+  width: 50%;
+  height: 100%;
+  min-height: 100vh;
+  position: relative;
+  backface-visibility: hidden;
+  transition: background 0.3s ease, transform 0.05s linear;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.door-panel-left {
+  transform-origin: left center;
+}
+
+.door-panel-right {
+  transform-origin: right center;
+}
+
+.door-half-panel.bg-red {
+  background: #e50914;
+  color: #ffffff;
+}
+
+.door-half-panel.bg-yellow {
+  background: #ffcc00;
+  color: #111111;
+}
+
+.door-content-left-red {
+  padding: 80px 48px;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+}
+
+.door-content-right-red {
+  padding: 80px 48px;
+  width: 100%;
+  max-width: 600px;
+  margin-right: auto;
+}
+
+.plain-yellow-half {
+  width: 100%;
+  height: 100%;
+  background: #ffcc00;
+}
+
+/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */
 .vertical-zigzag-crack-container {
   position: absolute;
   top: 0;
