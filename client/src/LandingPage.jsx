@@ -69,31 +69,33 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
       {/* 1. FULLSCREEN HERO SECTION WITH GENZ TAGLINE & COSMIC STARBURST EXPLOSION */}
       <section className="fullscreen-pure-black-hero">
         <div className="hero-center-content-wrapper">
-          {/* Gen-Z Tagline underneath the 3D logo in Pixar-style uppercase font */}
-          <div
-            className="genz-tagline-container"
-            style={{
-              opacity: Math.max(1 - scrollProgress * 1.8, 0),
-              transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * 40}px)`
-            }}
-          >
-            <p className="genz-tagline-text">
+          {/* Gen-Z Tagline: Text turns into pure glowing light on scroll */}
+          <div className="genz-tagline-container">
+            <p
+              className="genz-tagline-text"
+              style={{
+                opacity: Math.max(1 - scrollProgress * 1.6, 0),
+                filter: `brightness(${1 + scrollProgress * 5}) drop-shadow(0 0 ${scrollProgress * 50}px #ffffff)`
+              }}
+            >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
-          </div>
 
-          {/* Cosmic Starburst Bursting Flare Overlay on Scroll */}
-          <div
-            className="starburst-flare-overlay"
-            style={{
-              opacity: scrollProgress > 0.1 ? Math.min((scrollProgress - 0.1) * 3, 1) : 0,
-              transform: `translate(-50%, -50%) scale(${0.5 + scrollProgress * 2.8}) rotate(${scrollProgress * 90}deg)`,
-              pointerEvents: 'none'
-            }}
-          >
-            <img src="/starburst.png" alt="Starburst Burst" className="starburst-flare-img" />
-            <div className="horizontal-laser-beam" />
-            <div className="vertical-laser-beam" />
+            {/* Pure Procedural Lightburst Flare on Scroll */}
+            <div
+              className="procedural-lightburst-flare"
+              style={{
+                opacity: scrollProgress > 0.05 ? Math.min((scrollProgress - 0.05) * 2.5, 1) : 0,
+                transform: `translate(-50%, -50%) scale(${0.2 + scrollProgress * 3.5})`,
+                pointerEvents: 'none'
+              }}
+            >
+              <div className="flare-core-burst" />
+              <div className="horizontal-laser-beam" />
+              <div className="vertical-laser-beam" />
+              <div className="diagonal-laser-beam-1" />
+              <div className="diagonal-laser-beam-2" />
+            </div>
           </div>
         </div>
       </section>

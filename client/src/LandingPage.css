@@ -48,46 +48,74 @@
   text-shadow: 0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(168, 85, 247, 0.4);
 }
 
-/* Cosmic Starburst Flare Overlay */
-.starburst-flare-overlay {
+/* Pure Procedural Lightburst Flare Overlay */
+.procedural-lightburst-flare {
   position: fixed;
-  top: 50vh;
+  top: 68vh;
   left: 50vw;
-  width: 800px;
-  height: 450px;
+  width: 600px;
+  height: 300px;
   pointer-events: none;
   z-index: 240;
   mix-blend-mode: screen;
   transition: transform 0.1s linear, opacity 0.1s linear;
 }
 
-.starburst-flare-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: brightness(1.4) drop-shadow(0 0 30px #a855f7);
+.flare-core-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #d8b4fe 40%, #a855f7 70%, transparent 100%);
+  box-shadow: 0 0 60px #ffffff, 0 0 120px #c084fc, 0 0 180px #a855f7;
+  transform: translate(-50%, -50%);
+  filter: blur(4px);
 }
 
 .horizontal-laser-beam {
   position: absolute;
   top: 50%;
-  left: -50%;
-  right: -50%;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, #ffffff, #c084fc, #ffffff, transparent);
-  box-shadow: 0 0 20px #c084fc, 0 0 40px #ffffff;
+  left: -100vw;
+  right: -100vw;
+  height: 6px;
+  background: linear-gradient(90deg, transparent 0%, #c084fc 25%, #ffffff 50%, #c084fc 75%, transparent 100%);
+  box-shadow: 0 0 30px #ffffff, 0 0 60px #c084fc, 0 0 100px #a855f7;
   transform: translateY(-50%);
 }
 
 .vertical-laser-beam {
   position: absolute;
   left: 50%;
-  top: -50%;
-  bottom: -50%;
-  width: 4px;
-  background: linear-gradient(180deg, transparent, #ffffff, #c084fc, #ffffff, transparent);
-  box-shadow: 0 0 20px #c084fc, 0 0 40px #ffffff;
+  top: -100vh;
+  bottom: -100vh;
+  width: 6px;
+  background: linear-gradient(180deg, transparent 0%, #c084fc 25%, #ffffff 50%, #c084fc 75%, transparent 100%);
+  box-shadow: 0 0 30px #ffffff, 0 0 60px #c084fc, 0 0 100px #a855f7;
   transform: translateX(-50%);
+}
+
+.diagonal-laser-beam-1 {
+  position: absolute;
+  top: 50%;
+  left: -80vw;
+  right: -80vw;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, #d8b4fe 30%, #ffffff 50%, #d8b4fe 70%, transparent 100%);
+  box-shadow: 0 0 25px #ffffff, 0 0 50px #c084fc;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.diagonal-laser-beam-2 {
+  position: absolute;
+  top: 50%;
+  left: -80vw;
+  right: -80vw;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, #d8b4fe 30%, #ffffff 50%, #d8b4fe 70%, transparent 100%);
+  box-shadow: 0 0 25px #ffffff, 0 0 50px #c084fc;
+  transform: translateY(-50%) rotate(-45deg);
 }
 
 /* WHITE ZIGZAG TORN PAGE DIVIDER */
