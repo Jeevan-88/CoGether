@@ -21,7 +21,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 1.5;
+      const heroHeight = window.innerHeight * 1.2;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };
@@ -64,22 +64,17 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Light burst active during scrollProgress 0.30 -> 0.65
-  const isBurstActive = scrollProgress > 0.30 && scrollProgress < 0.65;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.30) / 0.35) * Math.PI) : 0;
+  // Phase 2 Light burst active during scrollProgress 0.35 -> 0.70
+  const isBurstActive = scrollProgress > 0.35 && scrollProgress < 0.70;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.35) / 0.35) * Math.PI) : 0;
 
-  // Phase 3 Screen shake during impact (scrollProgress 0.60 -> 0.72)
-  const isShaking = scrollProgress > 0.60 && scrollProgress < 0.72;
+  // Phase 3 Screen shake during impact (scrollProgress 0.65 -> 0.78)
+  const isShaking = scrollProgress > 0.65 && scrollProgress < 0.78;
   const shakeX = isShaking ? Math.sin(scrollProgress * 120) * 10 : 0;
   const shakeY = isShaking ? Math.cos(scrollProgress * 120) * 10 : 0;
 
-  // 360-Degree Inward Door Flip Progress (scrollProgress 0.72 -> 1.0)
-  const doorSpinProgress = scrollProgress > 0.72 ? Math.min((scrollProgress - 0.72) * 3.6, 1) : 0;
-  const doorAngleLeft = doorSpinProgress * 360; // 0deg -> 360deg spin inwards
-  const doorAngleRight = doorSpinProgress * 360;
-
-  // Color transition from RED to VIBRANT PLAIN YELLOW (#FFCC00) at 180deg flip mid-point
-  const isPlainYellowCanvas = doorSpinProgress > 0.45;
+  // Red Section reveal progress (scrollProgress 0.70 -> 1.0)
+  const redRevealProgress = scrollProgress > 0.70 ? Math.min((scrollProgress - 0.70) * 3.3, 1) : 0;
 
   return (
     <div
@@ -96,7 +91,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.65 ? Math.max(1 - (scrollProgress - 0.30) * 3, 0) : 0,
+                opacity: scrollProgress < 0.75 ? Math.max(1 - (scrollProgress - 0.35) * 3, 0) : 0,
                 filter: isBurstActive ? `brightness(${1 + burstOpacity * 3})` : 'none'
               }}
             >
@@ -122,101 +117,18 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. 3D 360-DEGREE INWARD DOOR FLIP STAGE (ORIGINAL RED CO-WATCH LAYOUT TRANSITIONING TO PLAIN YELLOW CANVAS) */}
-      <section className="3d-360-doors-stage">
-        {/* LEFT DOOR HALF (Left Text Panel rotates 360deg inwards) */}
-        <div
-          className={`door-half-panel door-panel-left ${isPlainYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
-          style={{
-            transform: `rotateY(${-doorAngleLeft}deg)`
-          }}
-        >
-          {!isPlainYellowCanvas ? (
-            <div className="door-content-left-red">
-              <div className="watch-together-badge">CO-WATCH HUB</div>
-              <h2 className="red-section-headline">Synchronized Movies & TV Shows</h2>
-              <p className="red-section-sub">
-                Stream movies, TV shows, and videos synchronized to the exact millisecond with integrated real-time video calls.
-              </p>
-              <div className="how-it-works-switcher-box">
-                <span className="switcher-label">CAMERA RESIZER (CoGether Room):</span>
-                <div className="switcher-btns-row">
-                  <button className={`switch-btn ${camBoxSize === 'sm' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('sm')}>Small</button>
-                  <button className={`switch-btn ${camBoxSize === 'md' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('md')}>Medium</button>
-                  <button className={`switch-btn ${camBoxSize === 'lg' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('lg')}>Large</button>
-                </div>
-              </div>
-              <button className="btn-black-launch-party" onClick={() => handleLaunch('watch')}>
-                Launch Co-Watch Room <ArrowRight size={18} />
-              </button>
-            </div>
-          ) : (
-            <div className="door-content-left-yellow plain-yellow-content">
-              {/* Plain Yellow Canvas Left Side */}
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT DOOR HALF (Right Video Frame rotates 360deg inwards) */}
-        <div
-          className={`door-half-panel door-panel-right ${isPlainYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
-          style={{
-            transform: `rotateY(${doorAngleRight}deg)`
-          }}
-        >
-          {!isPlainYellowCanvas ? (
-            <div className="door-content-right-red">
-              <div className="video-player-box-red">
-                <div className="video-overlay-bar">
-                  <span className="live-sync-pill"><span className="red-live-dot" /> CoGether Live Room</span>
-                  <div className="overlay-actions-right">
-                    <button className="resize-cam-btn-icon" onClick={cycleCamSize}><Maximize2 size={14} /> Resize</button>
-                    <button className="mute-toggle-ic-btn" onClick={() => setIsMuted(!isMuted)}>
-                      {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-                    </button>
-                  </div>
-                </div>
-                <video autoPlay loop muted={isMuted} playsInline className="commercial-cinematic-video">
-                  <source src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4" />
-                </video>
-                <div className="live-chat-video-overlay fade-in">
-                  <div className="chat-bubble-card">
-                    <div className="bubble-sender" style={{ color: TUTORIAL_MESSAGES[activeMsgIdx].color }}>
-                      <MessageSquare size={12} /> {TUTORIAL_MESSAGES[activeMsgIdx].sender}
-                    </div>
-                    <div className="bubble-text">{TUTORIAL_MESSAGES[activeMsgIdx].text}</div>
-                  </div>
-                </div>
-                <div className={`teleparty-merged-view-box zero-center-line size-${camBoxSize} fade-in`}>
-                  <div className="teleparty-header-strip">
-                    <span className="good-icon">✓</span> CoGether Merged Room
-                    <button className="quick-resize-ic" onClick={cycleCamSize}><Move size={11} /></button>
-                  </div>
-                  <div className="merged-shared-room-stage zero-line-stage">
-                    <div className="guy-merged-side">
-                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Alex" />
-                      <span className="guy-tag-badge"><span className="dot-green" /> Alex</span>
-                    </div>
-                    <div className="guy-merged-side">
-                      <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" alt="Sam" />
-                      <span className="guy-tag-badge"><span className="dot-blue" /> Sam</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="door-content-right-yellow plain-yellow-content">
-              {/* Plain Yellow Canvas Right Side */}
-            </div>
-          )}
-        </div>
-
-        {/* CLEAN WHITE VERTICAL ZIGZAG CUT SEAM LINE IN THE CENTER */}
+      {/* 2. BOLD FULL-HEIGHT RED SECTION: CO-WATCH HUB MATCHING USER SCREENSHOT */}
+      <section
+        className="official-red-section full-red-canvas-stage"
+        style={{
+          opacity: Math.min(redRevealProgress * 1.5, 1)
+        }}
+      >
+        {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */}
         <div
           className="vertical-zigzag-crack-container"
           style={{
-            opacity: scrollProgress > 0.68 && doorSpinProgress < 0.98 ? 1 : 0
+            opacity: redRevealProgress > 0.2 ? 1 : 0
           }}
         >
           <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
@@ -227,6 +139,75 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               strokeWidth="4"
             />
           </svg>
+        </div>
+
+        <div className="red-section-container">
+          {/* LEFT CONTENT: CO-WATCH TEXT PANEL */}
+          <div className="red-left-content">
+            <div className="watch-together-badge">CO-WATCH HUB</div>
+            <h2 className="red-section-headline">Synchronized Movies & TV Shows</h2>
+            <p className="red-section-sub">
+              Stream movies, TV shows, and videos synchronized to the exact millisecond with integrated real-time video calls.
+            </p>
+            <div className="how-it-works-switcher-box">
+              <span className="switcher-label">CAMERA RESIZER (CoGether Room):</span>
+              <div className="switcher-btns-row">
+                <button className={`switch-btn ${camBoxSize === 'sm' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('sm')}>Small</button>
+                <button className={`switch-btn ${camBoxSize === 'md' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('md')}>Medium</button>
+                <button className={`switch-btn ${camBoxSize === 'lg' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('lg')}>Large</button>
+              </div>
+            </div>
+            <button className="btn-black-launch-party" onClick={() => handleLaunch('watch')}>
+              Launch Co-Watch Room <ArrowRight size={18} />
+            </button>
+          </div>
+
+          {/* RIGHT CONTENT: VIDEO PLAYER FRAME */}
+          <div className="red-right-video-frame">
+            <div className="video-player-box-red">
+              <div className="video-overlay-bar">
+                <span className="live-sync-pill"><span className="red-live-dot" /> CoGether Live Room</span>
+                <div className="overlay-actions-right">
+                  <button className="resize-cam-btn-icon" onClick={cycleCamSize}><Maximize2 size={14} /> Resize</button>
+                  <button className="mute-toggle-ic-btn" onClick={() => setIsMuted(!isMuted)}>
+                    {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                  </button>
+                </div>
+              </div>
+              <video autoPlay loop muted={isMuted} playsInline className="commercial-cinematic-video">
+                <source src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4" />
+              </video>
+              <div className="live-chat-video-overlay fade-in">
+                <div className="chat-bubble-card">
+                  <div className="bubble-sender" style={{ color: TUTORIAL_MESSAGES[activeMsgIdx].color }}>
+                    <MessageSquare size={12} /> {TUTORIAL_MESSAGES[activeMsgIdx].sender}
+                  </div>
+                  <div className="bubble-text">{TUTORIAL_MESSAGES[activeMsgIdx].text}</div>
+                </div>
+              </div>
+              <div className={`teleparty-merged-view-box zero-center-line size-${camBoxSize} fade-in`}>
+                <div className="teleparty-header-strip">
+                  <span className="good-icon">✓</span> CoGether Merged Room
+                  <button className="quick-resize-ic" onClick={cycleCamSize}><Move size={11} /></button>
+                </div>
+                <div className="merged-shared-room-stage zero-line-stage">
+                  <div className="guy-merged-side">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Alex" />
+                    <span className="guy-tag-badge"><span className="dot-green" /> Alex</span>
+                  </div>
+                  <div className="guy-merged-side">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" alt="Sam" />
+                    <span className="guy-tag-badge"><span className="dot-blue" /> Sam</span>
+                  </div>
+                </div>
+              </div>
+              <div className="app-tutorial-bottom-banner">
+                <div className={`tutorial-step-item ${tutorialStep === 1 ? 'active' : ''}`}><span className="step-num">1</span> Pick Co-Watch or Co-Play</div>
+                <div className={`tutorial-step-item ${tutorialStep === 2 ? 'active' : ''}`}><span className="step-num">2</span> Share Invite Link</div>
+                <div className={`tutorial-step-item ${tutorialStep === 3 ? 'active' : ''}`}><span className="step-num">3</span> Hang Out Together Live</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
