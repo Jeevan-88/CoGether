@@ -52,7 +52,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // ULTRA SMOOTH LERP SCROLL ANIMATION LOOP (SENSITIVE & SMOOTH MOTION)
+  // ULTRA SMOOTH LERP SCROLL ANIMATION LOOP
   useEffect(() => {
     let animId;
     let currVal = 0;
@@ -64,7 +64,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         const totalScroll = stageWrapper.clientHeight - window.innerHeight;
         const target = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
 
-        // Smooth Lerp factor (0.08) for silky sensitive control
         currVal += (target - currVal) * 0.08;
         setScrollProgress(currVal);
       }
@@ -110,7 +109,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Lightburst & Thunder Lightning effect active during scrollProgress 0.12 -> 0.38
+  // Phase 2 Starburst / Lightburst Flare active during scrollProgress 0.12 -> 0.38
   const isBurstActive = scrollProgress > 0.12 && scrollProgress < 0.38;
   const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.12) / 0.26) * Math.PI) : 0;
 
@@ -130,7 +129,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // SIMULTANEOUS Scroll-Driven Bullet Strike for All 3 Guns (scrollProgress 0.46 -> 1.0)
   const bulletProgress = Math.min(Math.max((scrollProgress - 0.46) * 1.85, 0), 1);
 
-  const showWhiteLine = scrollProgress > 0.10 && doorSpinAngle <= 2;
+  const showWhiteLine = scrollProgress > 0.08 && doorSpinAngle <= 2;
 
   return (
     <div
@@ -153,7 +152,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
 
-            {/* LIGHTNING THUNDER LASER RAYS BURST */}
+            {/* STARBURST LIGHTNING THUNDER LASER RAYS BURST */}
             <div
               className="procedural-lightburst-flare"
               style={{
@@ -269,7 +268,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* SIMULTANEOUS 3-BULLET STRIKE OUT OF GUN BARRELS ON FULLY LOCKED YELLOW CANVAS */}
+          {/* SIMULTANEOUS 3-BULLET STRIKE: 1 BULLET PER ROW (TOP, MIDDLE, BOTTOM) MOVES & VANISHES OUT OF SCREEN */}
           {isFullyLockedYellow && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
@@ -278,24 +277,24 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               </div>
 
               <div className="torn-banners-container-3">
-                {/* ROW 1: GUN 1 (LEFT) -> SHOOTS BULLET 1 OUT OF BARREL (LEFT TO RIGHT OUT OF PAGE) */}
+                {/* ROW 1 (TOP): GUN 1 (LEFT) -> BULLET 1 (TOP ROW LEFT TO RIGHT OUT OF SCREEN) */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                   </div>
 
-                  {/* Bullet 1 Shoots Exactly Out of Gun 1 Barrel from Left -> Right */}
+                  {/* Bullet 1 (Top Row Only): Moves from Gun 1 barrel & vanishes out of screen */}
                   <div
-                    className="bullet-flying-wrapper left-to-right-bullet"
+                    className="bullet-flying-wrapper bullet-row-1"
                     style={{
-                      left: `calc(195px + ${bulletProgress * 78}%)`,
-                      opacity: bulletProgress > 0 ? 1 : 0
+                      left: `calc(210px + ${bulletProgress * 110}vw)`,
+                      opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0
                     }}
                   >
                     <img src="/bullet_artwork.png" alt="Bullet 1" className="bullet-img facing-right" />
                   </div>
 
-                  {/* Torn White Paper Banner 1 Unrolling Behind Bullet */}
+                  {/* Torn White Paper Banner 1 Unrolling Behind Bullet 1 */}
                   <div
                     className="torn-paper-white-banner"
                     style={{
@@ -317,9 +316,24 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
 
-                {/* ROW 2: GUN 2 (RIGHT FLIPPED) -> SHOOTS BULLET 2 OUT OF BARREL (RIGHT TO LEFT OUT OF PAGE) */}
+                {/* ROW 2 (MIDDLE): GUN 2 (RIGHT FLIPPED) -> BULLET 2 (MIDDLE ROW RIGHT TO LEFT OUT OF SCREEN) */}
                 <div className="pistol-banner-row row-right">
-                  {/* Torn White Paper Banner 2 Unrolling Reverse Behind Bullet */}
+                  <div className="pistol-static-wrapper pistol-right">
+                    <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
+                  </div>
+
+                  {/* Bullet 2 (Middle Row Only): Moves from Gun 2 barrel & vanishes out of screen */}
+                  <div
+                    className="bullet-flying-wrapper bullet-row-2"
+                    style={{
+                      right: `calc(210px + ${bulletProgress * 110}vw)`,
+                      opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0
+                    }}
+                  >
+                    <img src="/bullet_artwork.png" alt="Bullet 2" className="bullet-img facing-left" />
+                  </div>
+
+                  {/* Torn White Paper Banner 2 Unrolling Reverse Behind Bullet 2 */}
                   <div
                     className="torn-paper-white-banner"
                     style={{
@@ -339,41 +353,26 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       </div>
                     </div>
                   </div>
-
-                  {/* Bullet 2 (Flipped Facing Left) Shoots Exactly Out of Gun 2 Barrel from Right -> Left */}
-                  <div
-                    className="bullet-flying-wrapper right-to-left-bullet"
-                    style={{
-                      right: `calc(195px + ${bulletProgress * 78}%)`,
-                      opacity: bulletProgress > 0 ? 1 : 0
-                    }}
-                  >
-                    <img src="/bullet_artwork.png" alt="Bullet 2" className="bullet-img facing-left" />
-                  </div>
-
-                  <div className="pistol-static-wrapper pistol-right">
-                    <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
-                  </div>
                 </div>
 
-                {/* ROW 3: GUN 3 (LEFT) -> SHOOTS BULLET 3 OUT OF BARREL (LEFT TO RIGHT OUT OF PAGE) */}
+                {/* ROW 3 (BOTTOM): GUN 3 (LEFT) -> BULLET 3 (BOTTOM ROW LEFT TO RIGHT OUT OF SCREEN) */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
                   </div>
 
-                  {/* Bullet 3 Shoots Exactly Out of Gun 3 Barrel from Left -> Right */}
+                  {/* Bullet 3 (Bottom Row Only): Moves from Gun 3 barrel & vanishes out of screen */}
                   <div
-                    className="bullet-flying-wrapper left-to-right-bullet"
+                    className="bullet-flying-wrapper bullet-row-3"
                     style={{
-                      left: `calc(195px + ${bulletProgress * 78}%)`,
-                      opacity: bulletProgress > 0 ? 1 : 0
+                      left: `calc(210px + ${bulletProgress * 110}vw)`,
+                      opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0
                     }}
                   >
                     <img src="/bullet_artwork.png" alt="Bullet 3" className="bullet-img facing-right" />
                   </div>
 
-                  {/* Torn White Paper Banner 3 Unrolling Behind Bullet */}
+                  {/* Torn White Paper Banner 3 Unrolling Behind Bullet 3 */}
                   <div
                     className="torn-paper-white-banner"
                     style={{
