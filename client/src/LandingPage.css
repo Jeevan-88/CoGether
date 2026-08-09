@@ -118,7 +118,215 @@
   transform: translateY(-50%) rotate(-45deg);
 }
 
-/* CLEAN WHITE VERTICAL ZIGZAG CRACK LINE CONFINED ONLY TO RED CANVAS */
+/* 2. 3D INWARD DOOR FLIP STAGE & VIBRANT YELLOW CANVAS */
+.3d-doors-container-stage {
+  perspective: 1400px;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #000000;
+}
+
+/* VIBRANT YELLOW CANVAS REVEALED BEHIND DOORS */
+.yellow-canvas-behind-doors {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffcc00;
+  color: #111111;
+  padding: 80px 48px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.yellow-canvas-header {
+  text-align: center;
+  max-width: 800px;
+  margin-bottom: 40px;
+}
+
+.yellow-eyebrow-badge {
+  display: inline-block;
+  background: #111111;
+  color: #ffcc00;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+
+.yellow-canvas-headline {
+  font-size: 38px;
+  font-weight: 900;
+  color: #111111;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.yellow-canvas-sub {
+  font-size: 16px;
+  color: #333333;
+  line-height: 1.5;
+}
+
+/* 4 CATEGORY WHEEL CARDS GRID */
+.yellow-wheels-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 1320px;
+}
+
+.wheel-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 24px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+  border: 3px solid #111111;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wheel-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 28px 55px rgba(0, 0, 0, 0.25);
+}
+
+.wheel-badge-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.wheel-badge-tag.red-badge {
+  background: #e50914;
+  color: #ffffff;
+}
+
+.wheel-icon-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: #fff5f5;
+  border: 2px solid #fee2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.wheel-card h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111111;
+  margin-bottom: 8px;
+}
+
+.wheel-card p {
+  font-size: 13px;
+  color: #555555;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.legal-sync-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.sync-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-wheel-launch {
+  width: 100%;
+  background: #111111;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-wheel-launch:hover {
+  background: #e50914;
+}
+
+/* 3D RED DOORS THAT FLIP INWARDS */
+.red-door-panel {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: #e50914;
+  color: #ffffff;
+  overflow: hidden;
+  z-index: 20;
+  backface-visibility: hidden;
+  transition: transform 0.1s linear;
+}
+
+.red-door-left {
+  left: 0;
+  transform-origin: left center;
+}
+
+.red-door-right {
+  right: 0;
+  transform-origin: right center;
+}
+
+.red-door-content-left {
+  padding: 80px 48px;
+  width: 200%;
+}
+
+.red-door-content-right {
+  padding: 80px 48px;
+  width: 200%;
+  margin-left: -100%;
+}
+
+/* CLEAN WHITE VERTICAL ZIGZAG CRACK LINE CONFINED ONLY TO RED DOORS */
 .vertical-zigzag-crack-container {
   position: absolute;
   top: 0;
@@ -126,7 +334,7 @@
   left: 50%;
   width: 40px;
   height: 100%;
-  z-index: 15;
+  z-index: 30;
   pointer-events: none;
   transform: translateX(-50%);
   transition: opacity 0.3s ease;
@@ -136,16 +344,6 @@
   width: 100%;
   height: 100%;
   display: block;
-}
-
-/* 2. BOLD RED SECTION */
-.official-red-section {
-  background: #e50914;
-  color: #ffffff;
-  padding: 80px 48px;
-  position: relative;
-  overflow: hidden;
-  z-index: 20;
 }
 
 .red-section-container {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { POKI_TOP_TRENDING, POKI_WEB_EXCLUSIVES } from './pokiCatalog.js';
-import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move } from 'lucide-react';
+import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, Film, ShieldCheck, Share2, Radio, Clapperboard } from 'lucide-react';
 import './LandingPage.css';
 
 export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing }) {
@@ -21,7 +21,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 1.2;
+      const heroHeight = window.innerHeight * 1.5;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };
@@ -64,14 +64,19 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Light burst active during scrollProgress 0.35 -> 0.72
-  const isBurstActive = scrollProgress > 0.35 && scrollProgress < 0.72;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.35) / 0.37) * Math.PI) : 0;
+  // Phase 2 Light burst active during scrollProgress 0.30 -> 0.65
+  const isBurstActive = scrollProgress > 0.30 && scrollProgress < 0.65;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.30) / 0.35) * Math.PI) : 0;
 
-  // Phase 3 Screen shake during impact (scrollProgress 0.65 -> 0.80)
-  const isShaking = scrollProgress > 0.65 && scrollProgress < 0.80;
+  // Phase 3 Screen shake during impact (scrollProgress 0.60 -> 0.72)
+  const isShaking = scrollProgress > 0.60 && scrollProgress < 0.72;
   const shakeX = isShaking ? Math.sin(scrollProgress * 120) * 10 : 0;
   const shakeY = isShaking ? Math.cos(scrollProgress * 120) * 10 : 0;
+
+  // 3D Door Flip Angle on Red Section (scrollProgress 0.75 -> 1.0)
+  const doorFlipProgress = scrollProgress > 0.75 ? Math.min((scrollProgress - 0.75) * 4, 1) : 0;
+  const doorAngleLeft = doorFlipProgress * 85; // rotateY(-85deg)
+  const doorAngleRight = doorFlipProgress * 85; // rotateY(85deg)
 
   return (
     <div
@@ -80,7 +85,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         transform: isShaking ? `translate(${shakeX}px, ${shakeY}px)` : 'none'
       }}
     >
-      {/* 1. TALL FULLSCREEN BLACK HERO SECTION (160vh) */}
+      {/* 1. TALL FULLSCREEN BLACK HERO SECTION */}
       <section className="fullscreen-pure-black-hero">
         <div className="hero-center-content-wrapper">
           {/* Gen-Z Tagline: Positioned below 3D logo, scrolls up into lightburst during Phase 2 */}
@@ -88,7 +93,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.75 ? Math.max(1 - (scrollProgress - 0.35) * 3, 0) : 0,
+                opacity: scrollProgress < 0.65 ? Math.max(1 - (scrollProgress - 0.30) * 3, 0) : 0,
                 filter: isBurstActive ? `brightness(${1 + burstOpacity * 3})` : 'none'
               }}
             >
@@ -114,27 +119,82 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. BOLD RED SECTION: CO-WATCH HUB WITH VERTICAL ZIGZAG CRACK CONFINED TO RED CANVAS ONLY */}
-      <section className="official-red-section">
-        {/* CLEAN WHITE VERTICAL ZIGZAG CRACK LINE — ONLY ON RED CANVAS & ENABLED AFTER PHASE 2 (scrollProgress > 0.75) */}
-        <div
-          className="vertical-zigzag-crack-container"
-          style={{
-            opacity: scrollProgress > 0.72 ? Math.min((scrollProgress - 0.72) * 4, 1) : 0
-          }}
-        >
-          <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
-            <path
-              d="M20,0 L5,60 L35,120 L5,180 L35,240 L5,300 L35,360 L5,420 L35,480 L5,540 L35,600 L5,660 L35,720 L5,780 L35,840 L5,900 L35,960 L5,1020 L35,1080 L5,1140 L20,1200"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth="4"
-            />
-          </svg>
+      {/* 2. BOLD RED SECTION & 3D INWARD DOOR FLIP STAGE */}
+      <section className="3d-doors-container-stage">
+        {/* VIBRANT YELLOW CANVAS REVEALED BEHIND INWARD OPENING RED DOORS */}
+        <div className="yellow-canvas-behind-doors">
+          <div className="yellow-canvas-header">
+            <span className="yellow-eyebrow-badge">CO-WATCH CATEGORY WHEELS</span>
+            <h2 className="yellow-canvas-headline">WHAT ARE YOU CO-WATCHING TODAY?</h2>
+            <p className="yellow-canvas-sub">
+              Stream Anime, Movies, Live Sports & YouTube with millisecond sync. Legal Screen Sharing & Embedded Video Links supported!
+            </p>
+          </div>
+
+          {/* 4 CATEGORY WHEEL CARDS (WHITE CARDS WITH RED WHEEL ACCENTS) */}
+          <div className="yellow-wheels-grid">
+            {/* WHEEL 1: ANIME HUB */}
+            <div className="wheel-card anime-wheel-card" onClick={() => handleLaunch('watch')}>
+              <div className="wheel-badge-tag red-badge">LEGAL ANIME SYNC</div>
+              <div className="wheel-icon-box"><Clapperboard size={36} color="#e50914" /></div>
+              <h3>⛩️ Anime Hub</h3>
+              <p>Watch Crunchyroll, Funimation & Japanese Releases together with friends.</p>
+              <div className="legal-sync-options">
+                <span className="sync-chip"><ShieldCheck size={12} /> Legal Screen Share</span>
+                <span className="sync-chip"><Share2 size={12} /> Embedded Link</span>
+              </div>
+              <button className="btn-wheel-launch">Co-Watch Anime <ArrowRight size={14} /></button>
+            </div>
+
+            {/* WHEEL 2: MOVIES & TV SHOWS */}
+            <div className="wheel-card movies-wheel-card" onClick={() => handleLaunch('watch')}>
+              <div className="wheel-badge-tag red-badge">CINEMATIC SYNC</div>
+              <div className="wheel-icon-box"><Film size={36} color="#e50914" /></div>
+              <h3>🎬 Movies & Shows</h3>
+              <p>Synchronize Netflix, Disney+, Prime Video & Web streams in 4K HD quality.</p>
+              <div className="legal-sync-options">
+                <span className="sync-chip"><Radio size={12} /> 4K Stream Sync</span>
+                <span className="sync-chip"><Video size={12} /> Cam Overlay</span>
+              </div>
+              <button className="btn-wheel-launch">Co-Watch Movies <ArrowRight size={14} /></button>
+            </div>
+
+            {/* WHEEL 3: LIVE SPORTS */}
+            <div className="wheel-card sports-wheel-card" onClick={() => handleLaunch('watch')}>
+              <div className="wheel-badge-tag red-badge">STADIUM LIVE</div>
+              <div className="wheel-icon-box"><Tv size={36} color="#e50914" /></div>
+              <h3>⚽ Sports & Live TV</h3>
+              <p>Stadium energy watch parties for Cricket, Football, F1 & Live Broadcasts.</p>
+              <div className="legal-sync-options">
+                <span className="sync-chip"><Flame size={12} /> Zero Latency</span>
+                <span className="sync-chip"><Users size={12} /> Group Cheer</span>
+              </div>
+              <button className="btn-wheel-launch">Co-Watch Sports <ArrowRight size={14} /></button>
+            </div>
+
+            {/* WHEEL 4: YOUTUBE & REELS */}
+            <div className="wheel-card youtube-wheel-card" onClick={() => handleLaunch('watch')}>
+              <div className="wheel-badge-tag red-badge">INSTANT QUEUE</div>
+              <div className="wheel-icon-box"><Play size={36} color="#e50914" fill="#e50914" /></div>
+              <h3>🍿 YouTube & Shorts</h3>
+              <p>Shared room video queues, viral shorts, and trending YouTube channels.</p>
+              <div className="legal-sync-options">
+                <span className="sync-chip"><CheckCircle2 size={12} /> Shared Queue</span>
+                <span className="sync-chip"><Sparkles size={12} /> Instant Play</span>
+              </div>
+              <button className="btn-wheel-launch">Co-Watch YouTube <ArrowRight size={14} /></button>
+            </div>
+          </div>
         </div>
 
-        <div className="red-section-container">
-          <div className="red-left-content">
+        {/* 3D RED DOORS THAT FLIP INWARDS ON SCROLL */}
+        <div
+          className="red-door-panel red-door-left"
+          style={{
+            transform: `rotateY(${-doorAngleLeft}deg)`
+          }}
+        >
+          <div className="red-door-content-left">
             <div className="watch-together-badge">CO-WATCH HUB</div>
             <h2 className="red-section-headline">Synchronized Movies & TV Shows</h2>
             <p className="red-section-sub">
@@ -152,8 +212,15 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               Launch Co-Watch Room <ArrowRight size={18} />
             </button>
           </div>
+        </div>
 
-          <div className="red-right-video-frame">
+        <div
+          className="red-door-panel red-door-right"
+          style={{
+            transform: `rotateY(${doorAngleRight}deg)`
+          }}
+        >
+          <div className="red-door-content-right">
             <div className="video-player-box-red">
               <div className="video-overlay-bar">
                 <span className="live-sync-pill"><span className="red-live-dot" /> CoGether Live Room</span>
@@ -191,13 +258,25 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
               </div>
-              <div className="app-tutorial-bottom-banner">
-                <div className={`tutorial-step-item ${tutorialStep === 1 ? 'active' : ''}`}><span className="step-num">1</span> Pick Co-Watch or Co-Play</div>
-                <div className={`tutorial-step-item ${tutorialStep === 2 ? 'active' : ''}`}><span className="step-num">2</span> Share Invite Link</div>
-                <div className={`tutorial-step-item ${tutorialStep === 3 ? 'active' : ''}`}><span className="step-num">3</span> Hang Out Together Live</div>
-              </div>
             </div>
           </div>
+        </div>
+
+        {/* CLEAN WHITE VERTICAL ZIGZAG CRACK SEAM ON THE RED DOORS */}
+        <div
+          className="vertical-zigzag-crack-container"
+          style={{
+            opacity: scrollProgress > 0.68 && doorFlipProgress < 0.95 ? 1 : 0
+          }}
+        >
+          <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
+            <path
+              d="M20,0 L5,60 L35,120 L5,180 L35,240 L5,300 L35,360 L5,420 L35,480 L5,540 L35,600 L5,660 L35,720 L5,780 L35,840 L5,900 L35,960 L5,1020 L35,1080 L5,1140 L20,1200"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth="4"
+            />
+          </svg>
         </div>
       </section>
 
