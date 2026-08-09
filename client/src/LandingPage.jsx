@@ -108,30 +108,25 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // STEP 1: Plain Horizontal Laser Line (scrollProgress 0.00 -> 0.20)
-  const horizontalScale = Math.min(scrollProgress / 0.15, 1);
+  // STEP 1: Tagline turns into Horizontal & Vertical Cross Laser + Center Starburst Flare (scrollProgress 0.0 -> 0.45)
+  const isHeroActive = scrollProgress < 0.45;
+  const starOpacity = isHeroActive ? Math.sin((scrollProgress / 0.45) * Math.PI) : 0;
+  const crossScale = Math.min(scrollProgress * 2.8, 1);
 
-  // STEP 2: Starburst Flare Formation (scrollProgress 0.15 -> 0.35)
-  const isStarActive = scrollProgress >= 0.12 && scrollProgress < 0.45;
-  const starOpacity = isStarActive ? Math.sin(((scrollProgress - 0.12) / 0.33) * Math.PI) : 0;
-
-  // STEP 3: Vertical Laser Line Hitting Red Canvas (scrollProgress 0.30 -> 0.50)
-  const verticalProgress = Math.min(Math.max((scrollProgress - 0.28) / 0.18, 0), 1);
-  const showVerticalLaser = scrollProgress >= 0.28 && scrollProgress < 0.52;
-
-  // STEP 4 & 5: 360-Degree Inward Door Flip (Red -> Yellow) (scrollProgress 0.48 -> 0.85)
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.48) * 2.6, 0), 1);
+  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) runs smoothly from 0.05 -> 0.85
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.05) * 2.1, 0), 1);
   const doorSpinAngle = spinProgress * 360;
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
   const isYellowCanvas = spinProgress > 0.45;
   const isFullyLockedYellow = spinProgress >= 0.94;
 
-  // STEP 4: White ZigZag Crack Seam Line Overlay (visible right when vertical laser hits red canvas: 0.42 -> door spin starts 0.55)
-  const showZigZagLine = scrollProgress >= 0.42 && spinProgress < 0.15;
+  // STEP 2: White Zigzag Line appears ON Red Doors ONLY BEFORE they spin open (spinProgress <= 0.05)!
+  // As soon as doors spin open (spinProgress > 0.05), white line VANISHES COMPLETELY revealing black void!
+  const showWhiteLine = !isYellowCanvas && spinProgress <= 0.05;
 
-  // STEP 6: Bullet Strikes (scrollProgress > 0.86)
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.86) * 7.5, 0), 1);
+  // STEP 3: 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.50)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.50) * 2.1, 0), 1);
 
   return (
     <div className="landing-page-official fade-in">
@@ -143,46 +138,28 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               className="genz-tagline-text"
               style={{
                 opacity: scrollProgress < 0.45 ? 1 : 0,
-                filter: starOpacity > 0.1 ? `brightness(${1 + starOpacity * 3.5})` : 'none'
+                filter: `brightness(${1 + (1 - scrollProgress) * 2.5})`
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
 
-            {/* STEP 1: PLAIN HORIZONTAL LASER BEAM */}
-            <div
-              className="horizontal-laser-beam"
-              style={{
-                transform: `translateY(-50%) scaleX(${horizontalScale})`,
-                opacity: scrollProgress < 0.45 ? 1 : 0
-              }}
-            />
-
-            {/* STEP 2: STARBURST FLARE & DIAGONAL LASER RAYS */}
+            {/* HORIZONTAL & VERTICAL CROSS LASER BEAMS + CENTER STARBURST FLARE */}
             <div
               className="procedural-lightburst-flare"
               style={{
-                opacity: starOpacity,
-                transform: `translate(-50%, -50%) scale(${0.5 + starOpacity * 2.8})`,
+                opacity: scrollProgress < 0.45 ? Math.max(1 - scrollProgress * 1.5, 0.4) : 0,
+                transform: `translate(-50%, -50%) scale(${0.7 + scrollProgress * 2.2})`,
                 pointerEvents: 'none',
                 display: 'block'
               }}
             >
               <div className="flare-core-burst" />
+              <div className="horizontal-laser-beam" style={{ transform: `translateY(-50%) scaleX(${1 + crossScale * 2})` }} />
+              <div className="vertical-laser-beam" style={{ transform: `translateX(-50%) scaleY(${1 + crossScale * 2})` }} />
               <div className="diagonal-laser-beam-1" />
               <div className="diagonal-laser-beam-2" />
             </div>
-
-            {/* STEP 3: VERTICAL LASER LINE HITTING RED CANVAS */}
-            {showVerticalLaser && (
-              <div
-                className="vertical-laser-beam"
-                style={{
-                  height: `${verticalProgress * 100}%`,
-                  opacity: verticalProgress
-                }}
-              />
-            )}
           </div>
         </div>
       </section>
@@ -425,11 +402,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             </div>
           )}
 
-          {/* STEP 4: CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY */}
+          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY (VANISHES INSTANTLY WHEN DOORS SPIN OPEN AT spinProgress > 0.05) */}
           <div
             className="vertical-zigzag-crack-container"
             style={{
-              opacity: showZigZagLine ? 1 : 0,
+              opacity: showWhiteLine ? 1 : 0,
               zIndex: 100
             }}
           >
