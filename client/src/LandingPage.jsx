@@ -113,11 +113,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
   const isYellowCanvas = spinProgress > 0.45;
-  const isFullyLockedYellow = spinProgress >= 0.94; // Perfect lock into flat yellow canvas at end of spin
+  const isFullyLockedYellow = spinProgress >= 0.94; // 360deg spin completes flat into yellow canvas first!
   const showWhiteLine = scrollProgress > 0.50 && doorSpinAngle <= 2;
 
-  // Real-time Bullet & Piercing Paper Unrolling progress driven by scrolling down (scrollProgress 0.82 -> 1.0)
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.82) * 5.5, 0), 1);
+  // Real-time Bullet & Piercing Paper Unrolling progress driven by scrolling down (scrollProgress 0.85 -> 1.0)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.85) * 6.5, 0), 1);
 
   return (
     <div
@@ -160,7 +160,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. STICKY PINNED RED CO-WATCH SECTION */}
+      {/* 2. STICKY PINNED RED CO-WATCH SECTION WITH 360-DEGREE INWARD ZIGZAG DOOR SPIN */}
       <section className="sticky-pinned-red-stage-wrapper">
         <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
           {/* BACKGROUND VOID BOLD CONDENSED REVEAL TYPOGRAPHY (Z-INDEX 1 BEHIND DOORS) */}
@@ -257,8 +257,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* SCROLL-DRIVEN BULLET SHOOTING & PIERCING PAPER UNROLLING STAGE */}
-          {isYellowCanvas && (
+          {/* 3 SCROLL-DRIVEN BULLETS SHOOTING EXACTLY OUT OF 3 GUNS ON FULLY LOCKED YELLOW CANVAS */}
+          {isFullyLockedYellow && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
                 <span className="ink-eyebrow-stamp">墨絵 • STREAMING HUBS</span>
@@ -266,17 +266,17 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               </div>
 
               <div className="torn-banners-container-3">
-                {/* ROW 1: GUN 1 (LEFT) -> SHOOTS BULLET 1 (LEFT TO RIGHT) -> UNROLLS MOVIES BANNER */}
+                {/* ROW 1: GUN 1 (LEFT) -> SHOOTS BULLET 1 OUT OF BARREL (LEFT TO RIGHT OUT OF PAGE) */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                   </div>
 
-                  {/* Dynamic Bullet 1 Travelling Left to Right as User Scrolls */}
+                  {/* Bullet 1 Shoots Exactly Out of Gun 1 Barrel from Left -> Right Out of Page */}
                   <div
                     className="bullet-flying-wrapper left-to-right-bullet"
                     style={{
-                      left: `calc(130px + ${bulletProgress * 78}%)`,
+                      left: `calc(210px + ${bulletProgress * 95}vw)`,
                       opacity: bulletProgress > 0 ? 1 : 0
                     }}
                   >
@@ -305,7 +305,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
 
-                {/* ROW 2: GUN 2 (RIGHT FLIPPED) -> SHOOTS BULLET 2 (RIGHT TO LEFT) -> UNROLLS SPORTS BANNER */}
+                {/* ROW 2: GUN 2 (RIGHT FLIPPED) -> SHOOTS BULLET 2 OUT OF BARREL (RIGHT TO LEFT OUT OF PAGE) */}
                 <div className="pistol-banner-row row-right">
                   {/* Torn White Paper Banner 2 Unrolling Reverse Behind Bullet */}
                   <div
@@ -328,11 +328,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                   </div>
 
-                  {/* Dynamic Bullet 2 Travelling Right to Left as User Scrolls */}
+                  {/* Bullet 2 Shoots Exactly Out of Gun 2 Barrel from Right -> Left Out of Page */}
                   <div
                     className="bullet-flying-wrapper right-to-left-bullet"
                     style={{
-                      right: `calc(130px + ${bulletProgress * 78}%)`,
+                      right: `calc(210px + ${bulletProgress * 95}vw)`,
                       opacity: bulletProgress > 0 ? 1 : 0
                     }}
                   >
@@ -344,17 +344,17 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
 
-                {/* ROW 3: GUN 3 (LEFT) -> SHOOTS BULLET 3 (LEFT TO RIGHT) -> UNROLLS ANIME BANNER */}
+                {/* ROW 3: GUN 3 (LEFT) -> SHOOTS BULLET 3 OUT OF BARREL (LEFT TO RIGHT OUT OF PAGE) */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
                   </div>
 
-                  {/* Dynamic Bullet 3 Travelling Left to Right as User Scrolls */}
+                  {/* Bullet 3 Shoots Exactly Out of Gun 3 Barrel from Left -> Right Out of Page */}
                   <div
                     className="bullet-flying-wrapper left-to-right-bullet"
                     style={{
-                      left: `calc(130px + ${bulletProgress * 78}%)`,
+                      left: `calc(210px + ${bulletProgress * 95}vw)`,
                       opacity: bulletProgress > 0 ? 1 : 0
                     }}
                   >
