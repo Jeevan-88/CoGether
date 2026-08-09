@@ -124,27 +124,27 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   // STEP 1: INITIAL HERO STATE IS 100% PLAIN CLEAN BLACK (scrollProgress <= 0.02)
   // AS USER SCROLLS DOWN (0.02 -> 0.35), STARBURST CROSS LASER FLARE PULSES
-  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.42;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.40) * Math.PI) : 0;
+  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.40;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.38) * Math.PI) : 0;
   const crossScale = Math.min((scrollProgress - 0.02) * 3.5, 1);
 
-  // STEP 2: Red Stage appears with WHITE ZIGZAG CRACK SEAM LINE VISIBLE (scrollProgress 0.22 -> 0.42)
-  // Doors stay still while white crack seam line is displayed!
-  // Door spin starts ONLY after scrollProgress > 0.42!
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.42) * 2.3, 0), 1);
+  // STEP 2: Red Stage appears with WHITE ZIGZAG CRACK SEAM LINE VISIBLE (scrollProgress 0.20 -> 0.35)
+  // Door spin runs smoothly from 0.35 -> 0.65 (Multiplier 3.3 for snappy 360deg spin!)
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.35) * 3.3, 0), 1);
   const doorSpinAngle = spinProgress * 360;
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
-  const isYellowCanvas = spinProgress > 0.45;
-  const isFullyLockedYellow = spinProgress >= 0.94;
+  const isYellowCanvas = spinProgress > 0.40;
 
-  // PERFECT DISAPPEARING TIMING:
-  // The White ZigZag Crack Seam Line is visible ONLY when doors are 100% CLOSED (spinProgress < 0.005)!
-  // THE EXACT MILLISECOND doors start opening (spinProgress >= 0.005), the White ZigZag Line VANISHES INSTANTLY!
+  // PERFECT CLOSING LOCK: When spin reaches >= 0.85 (or scrollProgress >= 0.65), LOCK 100% FLAT SEAMLESS YELLOW CANVAS!
+  const isFullyLockedYellow = spinProgress >= 0.85 || scrollProgress >= 0.65;
+
+  // WHITE ZIGZAG CRACK SEAM LINE OVERLAY:
+  // Visible when Red stage appears (scrollProgress >= 0.20) UNTIL exact millisecond door spin starts (spinProgress < 0.005)!
   const showWhiteLine = scrollProgress >= 0.20 && spinProgress < 0.005;
 
-  // STEP 3: 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.72)
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.72) * 3.5, 0), 1);
+  // STEP 3: 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.65)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.65) * 3.2, 0), 1);
 
   return (
     <div className="landing-page-official fade-in">
@@ -155,7 +155,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.40 ? 1 : 0,
+                opacity: scrollProgress < 0.35 ? 1 : 0,
                 filter: burstOpacity > 0 ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
               }}
             >
@@ -422,7 +422,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             </div>
           )}
 
-          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY (VANISHES THE EXACT MILLISECOND DOORS START OPENING spinProgress >= 0.005) */}
+          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY */}
           <div
             className="vertical-zigzag-crack-container"
             style={{
