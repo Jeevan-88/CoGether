@@ -1,0 +1,137 @@
+import React, { useState, useEffect } from 'react';
+import Navbar from './Navbar.jsx';
+import LandingPage from './LandingPage.jsx';
+import VideoRoom from './VideoRoom.jsx';
+import WatchPartyRoom from './WatchPartyRoom.jsx';
+import GamePortal from './GamePortal.jsx';
+import MergedCameraView from './MergedCameraView.jsx';
+import AuthModal from './AuthModal.jsx';
+import PricingModal from './PricingModal.jsx';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+  const [user, setUser] = useState(null);
+  const [activeRoom, setActiveRoom] = useState(null);
+  const [showAuth, setShowAuth] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroHeight = window.innerHeight * 0.5;
+      const progress = Math.min(window.scrollY / heroHeight, 1);
+      setScrollProgress(progress);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roomParam = params.get('room');
+    const modeParam = params.get('mode') || 'video';
+
+    if (roomParam) {
+      const storedName = localStorage.getItem('sp_username') || 'Guest_' + Math.floor(100 + Math.random() * 900);
+      setActiveRoom({
+        roomId: roomParam,
+        username: storedName,
+        mode: modeParam
+      });
+    }
+  }, []);
+
+  const handleStartRoom = (roomId, username, mode) => {
+    const newUrl = `${window.location.pathname}?room=${roomId}&mode=${mode}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+    setActiveRoom({ roomId, username, mode });
+  };
+
+  const handleLeaveRoom = () => {
+    window.history.pushState({ path: window.location.pathname }, '', window.location.pathname);
+    setActiveRoom(null);
+    setActiveTab('home');
+  };
+
+  if (activeRoom) {
+    if (activeRoom.mode === 'watch') {
+      return (
+        <WatchPartyRoom
+          roomId={activeRoom.roomId}
+          username={activeRoom.username}
+          onLeave={handleLeaveRoom}
+        />
+      );
+    }
+
+    if (activeRoom.mode === 'games') {
+      return (
+        <GamePortal
+          roomId={activeRoom.roomId}
+          username={activeRoom.username}
+          onLeave={handleLeaveRoom}
+        />
+      );
+    }
+
+    if (activeRoom.mode === 'merged') {
+      return (
+        <MergedCameraView
+          roomId={activeRoom.roomId}
+          username={activeRoom.username}
+          onLeave={handleLeaveRoom}
+        />
+      );
+    }
+
+    return (
+      <VideoRoom
+        roomId={activeRoom.roomId}
+        username={activeRoom.username}
+        onLeave={handleLeaveRoom}
+      />
+    );
+  }
+
+  return (
+    <div className="app-container">
+      <Navbar
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          if (tab === 'watch') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'watch');
+          else if (tab === 'games') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'games');
+          else if (tab === 'telepresence') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'merged');
+          else setActiveTab(tab);
+        }}
+        user={user}
+        onOpenAuth={() => setShowAuth(true)}
+        onOpenPricing={() => setShowPricing(true)}
+        isScrolled={scrollProgress > 0.4}
+        scrollProgress={scrollProgress}
+      />
+
+      <LandingPage
+        onStartWatchParty={(r, u) => handleStartRoom(r, u, 'watch')}
+        onStartGames={(r, u) => handleStartRoom(r, u, 'games')}
+        onStartMergedCam={(r, u) => handleStartRoom(r, u, 'merged')}
+        onOpenPricing={() => setShowPricing(true)}
+      />
+
+      {showAuth && (
+        <AuthModal
+          onClose={() => setShowAuth(false)}
+          onLoginSuccess={(u) => setUser(u)}
+        />
+      )}
+
+      {showPricing && (
+        <PricingModal
+          onClose={() => setShowPricing(false)}
+          onSuccess={() => {
+            if (user) setUser({ ...user, plan: 'premium' });
+          }}
+        />
+      )}
+    </div>
+  );
+}

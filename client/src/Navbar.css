@@ -1,0 +1,117 @@
+.cogether-navbar {
+  height: 80px;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  transition: background 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+.cogether-navbar.scrolled-header-active {
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navbar-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Reserved header logo spacer: 360px width x 70px height for full-height 3D logo */
+.navbar-brand-logo {
+  cursor: pointer;
+  display: block;
+  user-select: none;
+  min-width: 360px;
+  height: 70px;
+}
+
+/* Pixar-style nav links */
+.nav-menu-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav-menu-btn {
+  background: transparent;
+  color: #ffffff;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 8px 4px;
+  border-radius: 0;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.nav-menu-btn svg {
+  display: none;
+}
+
+.nav-menu-btn:hover {
+  opacity: 0.65;
+  background: transparent;
+}
+
+.nav-menu-btn.active {
+  opacity: 1;
+  background: transparent;
+  color: #ffffff;
+}
+
+/* Right Actions */
+.nav-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-login-rect {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: transparent;
+  border: 2px solid #ffffff;
+  padding: 10px 24px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-login-rect:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.user-nav-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
