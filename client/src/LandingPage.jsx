@@ -21,7 +21,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 1.8;
+      const heroHeight = window.innerHeight * 2.2;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };
@@ -64,17 +64,18 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Light burst active during scrollProgress 0.30 -> 0.60
-  const isBurstActive = scrollProgress > 0.30 && scrollProgress < 0.60;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.30) / 0.30) * Math.PI) : 0;
+  // Phase 2 Light burst active during scrollProgress 0.25 -> 0.52
+  const isBurstActive = scrollProgress > 0.25 && scrollProgress < 0.52;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.25) / 0.27) * Math.PI) : 0;
 
-  // Phase 3 Screen shake during impact (scrollProgress 0.55 -> 0.66)
-  const isShaking = scrollProgress > 0.55 && scrollProgress < 0.66;
+  // Phase 3 Screen shake during impact (scrollProgress 0.48 -> 0.58)
+  const isShaking = scrollProgress > 0.48 && scrollProgress < 0.58;
   const shakeX = isShaking ? Math.sin(scrollProgress * 120) * 10 : 0;
   const shakeY = isShaking ? Math.cos(scrollProgress * 120) * 10 : 0;
 
-  // Pinned 360-Degree Inward Door Flip Progress while sticky pinned (scrollProgress 0.65 -> 1.0)
-  const spinProgress = scrollProgress > 0.65 ? Math.min((scrollProgress - 0.65) * 3.2, 1) : 0;
+  // Phase 4: Full Red Section is 100% Still & Interactive (scrollProgress 0.58 -> 0.78)
+  // Phase 5: 360-Degree Inward Door Flip starts ONLY after scrollProgress > 0.78!
+  const spinProgress = scrollProgress > 0.78 ? Math.min((scrollProgress - 0.78) * 4.5, 1) : 0;
   const doorSpinAngle = spinProgress * 360; // 0deg -> 360deg spin inwards
   const isYellowCanvas = spinProgress > 0.45;
   const isFullyLockedYellow = spinProgress > 0.92;
@@ -94,7 +95,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.60 ? Math.max(1 - (scrollProgress - 0.30) * 3, 0) : 0,
+                opacity: scrollProgress < 0.52 ? Math.max(1 - (scrollProgress - 0.25) * 3, 0) : 0,
                 filter: isBurstActive ? `brightness(${1 + burstOpacity * 3})` : 'none'
               }}
             >
@@ -120,12 +121,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. STICKY PINNED 3D 360-DEGREE INWARD DOOR SPIN STAGE */}
+      {/* 2. STICKY PINNED RED CO-WATCH SECTION: FULL FRAME FIT-TO-SCREEN UNTIL FURTHER SCROLL */}
       <section className="sticky-pinned-red-stage-wrapper">
         <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
-          {/* LEFT DOOR PANEL (Left text content rotates 360deg inwards) */}
+          {/* LEFT DOOR PANEL (Solid Red, rotates 360deg inwards only when scrollProgress > 0.78) */}
           <div
-            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isFullyLockedYellow ? 'no-clip' : ''}`}
+            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
             style={{
               transform: `rotateY(${-doorSpinAngle}deg)`
             }}
@@ -154,9 +155,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* RIGHT DOOR PANEL (Right video frame rotates 360deg inwards) */}
+          {/* RIGHT DOOR PANEL (Solid Red, rotates 360deg inwards only when scrollProgress > 0.78) */}
           <div
-            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isFullyLockedYellow ? 'no-clip' : ''}`}
+            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
             style={{
               transform: `rotateY(${doorSpinAngle}deg)`
             }}
@@ -212,11 +213,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER ON INITIAL CLOSED RED SECTION */}
+          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY (VISIBLE UNTIL DOOR ROTATION STARTS) */}
           <div
             className="vertical-zigzag-crack-container"
             style={{
-              opacity: scrollProgress > 0.60 && spinProgress < 0.08 ? 1 : 0
+              opacity: scrollProgress > 0.50 && spinProgress < 0.08 ? 1 : 0
             }}
           >
             <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
