@@ -77,6 +77,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const spinProgress = scrollProgress > 0.65 ? Math.min((scrollProgress - 0.65) * 3.2, 1) : 0;
   const doorSpinAngle = spinProgress * 360; // 0deg -> 360deg spin inwards
   const isYellowCanvas = spinProgress > 0.45;
+  const isFullyLockedYellow = spinProgress > 0.92;
 
   return (
     <div
@@ -121,10 +122,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
       {/* 2. STICKY PINNED 3D 360-DEGREE INWARD DOOR SPIN STAGE */}
       <section className="sticky-pinned-red-stage-wrapper">
-        <div className="sticky-pinned-red-stage-inner">
+        <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
           {/* LEFT DOOR PANEL (Left text content rotates 360deg inwards) */}
           <div
-            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
+            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isFullyLockedYellow ? 'no-clip' : ''}`}
             style={{
               transform: `rotateY(${-doorSpinAngle}deg)`
             }}
@@ -155,7 +156,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
           {/* RIGHT DOOR PANEL (Right video frame rotates 360deg inwards) */}
           <div
-            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
+            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isFullyLockedYellow ? 'no-clip' : ''}`}
             style={{
               transform: `rotateY(${doorSpinAngle}deg)`
             }}
@@ -211,11 +212,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */}
+          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER ON INITIAL CLOSED RED SECTION */}
           <div
             className="vertical-zigzag-crack-container"
             style={{
-              opacity: scrollProgress > 0.60 && spinProgress < 0.98 ? 1 : 0
+              opacity: scrollProgress > 0.60 && spinProgress < 0.08 ? 1 : 0
             }}
           >
             <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">

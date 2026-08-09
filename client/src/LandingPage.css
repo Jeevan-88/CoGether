@@ -236,10 +236,12 @@
   margin-right: auto;
 }
 
-.plain-yellow-half {
-  width: 100%;
-  height: 100%;
+.sticky-pinned-red-stage-inner.bg-full-yellow {
   background: #ffcc00;
+}
+
+.door-half-panel.no-clip {
+  clip-path: none !important;
 }
 
 /* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */
