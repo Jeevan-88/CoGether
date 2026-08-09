@@ -42,6 +42,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [isMuted, setIsMuted] = useState(true);
   const [camBoxSize, setCamBoxSize] = useState('md');
   const [tutorialStep, setTutorialStep] = useState(1);
+  
+  const [heroProgress, setHeroProgress] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   const TUTORIAL_MESSAGES = [
@@ -52,18 +54,23 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // ULTRA SMOOTH DIRECT SCROLL CALCULATION (ZERO LERP DELAY TO ELIMINATE TIMING MISMATCH)
+  // UNIFIED RESPONSIVE SCROLL TRACKING FOR HERO & STAGE SECTIONS
   useEffect(() => {
     const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const vh = window.innerHeight;
+
+      // 1. Hero Tagline Starburst Flare (scrollY 0 -> vh * 0.6)
+      const hProg = Math.min(scrollY / (vh * 0.6), 1);
+      setHeroProgress(hProg);
+
+      // 2. Stage Section Scroll Progress
       const stageWrapper = document.querySelector('.sticky-pinned-red-stage-wrapper');
       if (stageWrapper) {
         const rect = stageWrapper.getBoundingClientRect();
-        const totalScroll = stageWrapper.clientHeight - window.innerHeight;
-        const target = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        setScrollProgress(target);
-      } else {
-        const heroHeight = window.innerHeight * 2.2;
-        setScrollProgress(Math.min(window.scrollY / heroHeight, 1));
+        const totalScrollable = stageWrapper.clientHeight - vh;
+        const sProg = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
+        setScrollProgress(sProg);
       }
     };
 
@@ -107,17 +114,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Starburst Lightburst Flare (active as user scrolls down from top: 0.0 -> 0.40)
-  const isBurstActive = scrollProgress >= 0.0 && scrollProgress < 0.40;
-  const burstOpacity = isBurstActive ? Math.sin((scrollProgress / 0.40) * Math.PI) : 0;
+  // Phase 1 Starburst Laser Rays Flare (active during heroProgress 0.0 -> 0.8)
+  const burstOpacity = Math.sin(heroProgress * Math.PI);
 
-  // Phase 3 Screen shake during impact (scrollProgress 0.20 -> 0.38)
-  const isShaking = scrollProgress > 0.20 && scrollProgress < 0.38;
+  // Phase 3 Screen shake during impact (scrollProgress 0.15 -> 0.35)
+  const isShaking = scrollProgress > 0.15 && scrollProgress < 0.35;
   const shakeX = isShaking ? Math.sin(scrollProgress * 140) * 12 : 0;
   const shakeY = isShaking ? Math.cos(scrollProgress * 140) * 12 : 0;
 
-  // Phase 4: 360-Degree Inward Door Flip (Red -> Yellow) runs smoothly from 0.0 -> 0.40
-  const spinProgress = Math.min(scrollProgress * 2.5, 1); // 0.0 -> 1.0
+  // Phase 4: 360-Degree Inward Door Flip (Red -> Yellow) runs smoothly from 0.0 -> 0.50
+  const spinProgress = Math.min(scrollProgress * 2.0, 1); // 0.0 -> 1.0
   const doorSpinAngle = spinProgress * 360; // 0deg -> 360deg spin inwards
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
@@ -126,11 +132,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // PERFECT CLOSING LOCK: Lock 100% flat as yellow canvas when spin reaches end
   const isFullyLockedYellow = spinProgress >= 0.94;
 
-  // 1-SEC SCROLL PAUSE: Bullets shoot out of gun barrels ONLY after scrollProgress > 0.48
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.48) * 2.2, 0), 1);
+  // 1-SEC SCROLL PAUSE: Bullets shoot out of gun barrels ONLY after scrollProgress > 0.55
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.55) * 2.2, 0), 1);
 
-  // WHITE ZIGZAG CRACK OVERLAY: ALWAYS VISIBLE AT INITIAL STATE (scrollProgress <= 0.02) AND UNTIL DOOR ROTATES
-  const showWhiteLine = !isYellowCanvas && (scrollProgress <= 0.02 || (scrollProgress > 0 && doorSpinAngle <= 15));
+  // WHITE ZIGZAG CRACK OVERLAY (PERFECTLY VISIBLE ON INITIAL STAGE LOAD BEFORE DOOR SPIN)
+  const showWhiteLine = !isYellowCanvas && (scrollProgress <= 0.05 || (scrollProgress > 0 && doorSpinAngle <= 15));
 
   return (
     <div
@@ -146,8 +152,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.45 ? 1 : 0,
-                filter: isBurstActive ? `brightness(${1 + burstOpacity * 4.0})` : 'none'
+                opacity: heroProgress < 0.9 ? 1 : 0,
+                filter: burstOpacity > 0.1 ? `brightness(${1 + burstOpacity * 4.0})` : 'none'
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
@@ -157,8 +163,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <div
               className="procedural-lightburst-flare"
               style={{
-                opacity: burstOpacity > 0.02 ? burstOpacity : 0.8,
-                transform: `translate(-50%, -50%) scale(${0.6 + burstOpacity * 2.8})`,
+                opacity: Math.max(burstOpacity, 0.75),
+                transform: `translate(-50%, -50%) scale(${0.7 + burstOpacity * 2.5})`,
                 pointerEvents: 'none',
                 display: 'block'
               }}
