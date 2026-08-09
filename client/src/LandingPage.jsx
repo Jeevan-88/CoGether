@@ -52,20 +52,38 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // SILKY SMOOTH RESPONSIVE LERP SCROLL TRACKING
+  // ACCURATE HERO-TO-STAGE SCROLL TRACKING
   useEffect(() => {
     let animId;
     let currVal = 0;
 
     const loop = () => {
+      const scrollY = window.scrollY;
+      const vh = window.innerHeight;
       const stageWrapper = document.querySelector('.sticky-pinned-red-stage-wrapper');
+
+      let target = 0;
       if (stageWrapper) {
         const rect = stageWrapper.getBoundingClientRect();
-        const totalScroll = stageWrapper.clientHeight - window.innerHeight;
-        const target = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currVal += (target - currVal) * 0.08;
-        setScrollProgress(currVal);
+        // Calculate scroll relative to page top so tagline flare starts right as user scrolls down from top!
+        const stageTopOffset = stageWrapper.offsetTop;
+        const totalHeight = stageWrapper.clientHeight;
+        
+        if (scrollY < stageTopOffset) {
+          // In Hero Section: 0.0 -> 0.30
+          target = (scrollY / stageTopOffset) * 0.30;
+        } else {
+          // In Sticky Stage Section: 0.30 -> 1.00
+          const stageScroll = scrollY - stageTopOffset;
+          const stageMaxScroll = totalHeight - vh;
+          target = 0.30 + Math.min(Math.max(stageScroll / stageMaxScroll, 0), 1) * 0.70;
+        }
+      } else {
+        target = Math.min(scrollY / (vh * 2), 1);
       }
+
+      currVal += (target - currVal) * 0.12;
+      setScrollProgress(currVal);
       animId = requestAnimationFrame(loop);
     };
 
@@ -108,14 +126,14 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // STEP 1: INITIAL STATE IS 100% PLAIN CLEAN BLACK (scrollProgress <= 0.02)
-  // ONLY WHEN USER STARTS SCROLLING (scrollProgress > 0.02), CROSS LASER & STARBURST FLARE ANIMATE!
-  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.45;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.43) * Math.PI) : 0;
-  const crossScale = Math.min((scrollProgress - 0.02) * 2.8, 1);
+  // STEP 1: INITIAL HERO STATE IS 100% PLAIN CLEAN BLACK (scrollProgress <= 0.02)
+  // AS USER SCROLLS DOWN (0.02 -> 0.30), STARBURST CROSS LASER FLARE PULSES RIGHT IN FRONT OF EYES!
+  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.40;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.38) * Math.PI) : 0;
+  const crossScale = Math.min((scrollProgress - 0.02) * 3.5, 1);
 
-  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) runs smoothly from 0.05 -> 0.85
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.05) * 2.1, 0), 1);
+  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) runs smoothly from 0.30 -> 0.70
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.30) * 2.5, 0), 1);
   const doorSpinAngle = spinProgress * 360;
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
@@ -126,8 +144,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // As soon as doors spin open (spinProgress > 0.05), white line VANISHES COMPLETELY revealing black void!
   const showWhiteLine = !isYellowCanvas && spinProgress <= 0.05;
 
-  // STEP 3: 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.50)
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.50) * 2.1, 0), 1);
+  // STEP 3: 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.72)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.72) * 3.5, 0), 1);
 
   return (
     <div className="landing-page-official fade-in">
@@ -138,14 +156,14 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.45 ? 1 : 0,
+                opacity: scrollProgress < 0.35 ? 1 : 0,
                 filter: burstOpacity > 0 ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
 
-            {/* HORIZONTAL & VERTICAL CROSS LASER BEAMS + CENTER STARBURST FLARE (ANIMATES ONLY UPON SCROLLING) */}
+            {/* HORIZONTAL & VERTICAL CROSS LASER BEAMS + CENTER STARBURST FLARE */}
             {isBurstActive && (
               <div
                 className="procedural-lightburst-flare"
@@ -477,7 +495,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         <div className="premium-banner-card">
           <div className="banner-left">
             <span className="gold-tag">COGETHER PREMIUM</span>
-            <h2>₹49 / Month</h2>
+            {"\n"}            <h2>₹49 / Month</h2>
             <p>Unlock unlimited Co-Watch rooms, full multiplayer games, Co-Shop & Co-Study desks.</p>
           </div>
           <button className="btn-gold-checkout" onClick={onOpenPricing}>
