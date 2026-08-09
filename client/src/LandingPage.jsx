@@ -108,10 +108,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // STEP 1: Tagline turns into Horizontal & Vertical Cross Laser + Center Starburst Flare (scrollProgress 0.0 -> 0.45)
-  const isHeroActive = scrollProgress < 0.45;
-  const starOpacity = isHeroActive ? Math.sin((scrollProgress / 0.45) * Math.PI) : 0;
-  const crossScale = Math.min(scrollProgress * 2.8, 1);
+  // STEP 1: INITIAL STATE IS 100% PLAIN CLEAN BLACK (scrollProgress <= 0.02)
+  // ONLY WHEN USER STARTS SCROLLING (scrollProgress > 0.02), CROSS LASER & STARBURST FLARE ANIMATE!
+  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.45;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.43) * Math.PI) : 0;
+  const crossScale = Math.min((scrollProgress - 0.02) * 2.8, 1);
 
   // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) runs smoothly from 0.05 -> 0.85
   const spinProgress = Math.min(Math.max((scrollProgress - 0.05) * 2.1, 0), 1);
@@ -138,28 +139,30 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               className="genz-tagline-text"
               style={{
                 opacity: scrollProgress < 0.45 ? 1 : 0,
-                filter: `brightness(${1 + (1 - scrollProgress) * 2.5})`
+                filter: burstOpacity > 0 ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
 
-            {/* HORIZONTAL & VERTICAL CROSS LASER BEAMS + CENTER STARBURST FLARE */}
-            <div
-              className="procedural-lightburst-flare"
-              style={{
-                opacity: scrollProgress < 0.45 ? Math.max(1 - scrollProgress * 1.5, 0.4) : 0,
-                transform: `translate(-50%, -50%) scale(${0.7 + scrollProgress * 2.2})`,
-                pointerEvents: 'none',
-                display: 'block'
-              }}
-            >
-              <div className="flare-core-burst" />
-              <div className="horizontal-laser-beam" style={{ transform: `translateY(-50%) scaleX(${1 + crossScale * 2})` }} />
-              <div className="vertical-laser-beam" style={{ transform: `translateX(-50%) scaleY(${1 + crossScale * 2})` }} />
-              <div className="diagonal-laser-beam-1" />
-              <div className="diagonal-laser-beam-2" />
-            </div>
+            {/* HORIZONTAL & VERTICAL CROSS LASER BEAMS + CENTER STARBURST FLARE (ANIMATES ONLY UPON SCROLLING) */}
+            {isBurstActive && (
+              <div
+                className="procedural-lightburst-flare"
+                style={{
+                  opacity: burstOpacity,
+                  transform: `translate(-50%, -50%) scale(${0.7 + burstOpacity * 2.2})`,
+                  pointerEvents: 'none',
+                  display: 'block'
+                }}
+              >
+                <div className="flare-core-burst" />
+                <div className="horizontal-laser-beam" style={{ transform: `translateY(-50%) scaleX(${1 + crossScale * 2})` }} />
+                <div className="vertical-laser-beam" style={{ transform: `translateX(-50%) scaleY(${1 + crossScale * 2})` }} />
+                <div className="diagonal-laser-beam-1" />
+                <div className="diagonal-laser-beam-2" />
+              </div>
+            )}
           </div>
         </div>
       </section>
