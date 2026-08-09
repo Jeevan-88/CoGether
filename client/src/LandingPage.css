@@ -30,7 +30,7 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
-  margin-top: 55vh;
+  margin-top: 68vh;
 }
 
 /* Clean 18px uppercase white Gen-Z tagline */
@@ -118,7 +118,7 @@
   transform: translateY(-50%) rotate(-45deg);
 }
 
-/* CLEAN WHITE VERTICAL ZIGZAG CRACK LINE EXTENDING ALL THE WAY DOWN THE PAGE */
+/* CLEAN WHITE VERTICAL ZIGZAG CRACK LINE CONFINED ONLY TO RED CANVAS */
 .vertical-zigzag-crack-container {
   position: absolute;
   top: 0;
@@ -126,9 +126,10 @@
   left: 50%;
   width: 40px;
   height: 100%;
-  z-index: 230;
+  z-index: 15;
   pointer-events: none;
   transform: translateX(-50%);
+  transition: opacity 0.3s ease;
 }
 
 .vertical-zigzag-svg {
@@ -137,15 +138,14 @@
   display: block;
 }
 
-/* 2. BOLD RED SECTION WITH 3D PAGE FLIP UNFOLD TRANSITION */
+/* 2. BOLD RED SECTION */
 .official-red-section {
   background: #e50914;
   color: #ffffff;
   padding: 80px 48px;
   position: relative;
+  overflow: hidden;
   z-index: 20;
-  transform-origin: top center;
-  backface-visibility: hidden;
 }
 
 .red-section-container {

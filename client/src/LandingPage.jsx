@@ -70,22 +70,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   return (
     <div className="landing-page-official fade-in">
-      {/* CLEAN WHITE VERTICAL ZIG-ZAG CRACK LINE DOWN THE ENTIRE PAGE */}
-      <div className="vertical-zigzag-crack-container">
-        <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
-          <path
-            d="M20,0 L5,60 L35,120 L5,180 L35,240 L5,300 L35,360 L5,420 L35,480 L5,540 L35,600 L5,660 L35,720 L5,780 L35,840 L5,900 L35,960 L5,1020 L35,1080 L5,1140 L20,1200"
-            fill="none"
-            stroke="#ffffff"
-            strokeWidth="4"
-          />
-        </svg>
-      </div>
-
-      {/* 1. TALL FULLSCREEN BLACK HERO SECTION (160vh) */}
+      {/* 1. TALL FULLSCREEN BLACK HERO SECTION */}
       <section className="fullscreen-pure-black-hero">
         <div className="hero-center-content-wrapper">
-          {/* Gen-Z Tagline: Clean 18px Pixar font */}
+          {/* Gen-Z Tagline: Clean 18px Pixar font positioned cleanly BELOW the 3D logo */}
           <div className="genz-tagline-container">
             <p
               className="genz-tagline-text"
@@ -116,8 +104,25 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. BOLD RED SECTION: CO-WATCH HUB */}
+      {/* 2. BOLD RED SECTION: CO-WATCH HUB WITH VERTICAL ZIGZAG CRACK CONFINED TO RED CANVAS ONLY */}
       <section className="official-red-section">
+        {/* CLEAN WHITE VERTICAL ZIGZAG CRACK LINE — ONLY ON RED CANVAS & ENABLED AFTER SCROLLING */}
+        <div
+          className="vertical-zigzag-crack-container"
+          style={{
+            opacity: scrollProgress > 0.75 ? 1 : 0
+          }}
+        >
+          <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
+            <path
+              d="M20,0 L5,60 L35,120 L5,180 L35,240 L5,300 L35,360 L5,420 L35,480 L5,540 L35,600 L5,660 L35,720 L5,780 L35,840 L5,900 L35,960 L5,1020 L35,1080 L5,1140 L20,1200"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth="4"
+            />
+          </svg>
+        </div>
+
         <div className="red-section-container">
           <div className="red-left-content">
             <div className="watch-together-badge">CO-WATCH HUB</div>
