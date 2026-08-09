@@ -387,27 +387,29 @@
 
 .pistol-static-wrapper {
   flex-shrink: 0;
-  width: 240px;
-  height: 150px;
+  width: 220px;
+  height: 140px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-.pistol-ink-img {
-  width: 220px;
+.pure-pistol-svg {
+  width: 200px;
   height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
   transition: transform 0.2s ease;
 }
 
-.pistol-ink-img.facing-right {
-  transform: scale(1);
+.pure-pistol-svg.facing-right {
+  transform: none;
 }
 
-.pistol-ink-img.facing-left {
-  transform: scaleX(-1) scale(1);
+.pure-pistol-svg.facing-left {
+  transform: scaleX(-1);
 }
 
 /* TORN PAPER WHITE BANNER MATCHING USER SCREENSHOT */
