@@ -43,6 +43,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [camBoxSize, setCamBoxSize] = useState('md');
   const [tutorialStep, setTutorialStep] = useState(1);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [heroScroll, setHeroScroll] = useState(0);
 
   const TUTORIAL_MESSAGES = [
     { sender: 'Alex', text: 'CoGether makes Co-Watch & Co-Play feel like real life! 🍿', color: '#a855f7' },
@@ -52,34 +53,31 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // ACCURATE HERO-TO-STAGE SCROLL TRACKING
+  // ACCURATE SCROLL LISTENERS FOR HERO TAGLINE & STAGE SECTION
   useEffect(() => {
     let animId;
-    let currVal = 0;
+    let currStageVal = 0;
+    let currHeroVal = 0;
 
     const loop = () => {
       const scrollY = window.scrollY;
       const vh = window.innerHeight;
+
+      // 1. Direct Hero Scroll (0.0 -> 1.0 during initial 600px scroll)
+      const targetHero = Math.min(scrollY / (vh * 0.65), 1);
+      currHeroVal += (targetHero - currHeroVal) * 0.10;
+      setHeroScroll(currHeroVal);
+
+      // 2. Stage Section Scroll Tracking
       const stageWrapper = document.querySelector('.sticky-pinned-red-stage-wrapper');
-
-      let target = 0;
       if (stageWrapper) {
-        const stageTopOffset = stageWrapper.offsetTop;
-        const totalHeight = stageWrapper.clientHeight;
-        
-        if (scrollY < stageTopOffset) {
-          target = (scrollY / stageTopOffset) * 0.22;
-        } else {
-          const stageScroll = scrollY - stageTopOffset;
-          const stageMaxScroll = totalHeight - vh;
-          target = 0.22 + Math.min(Math.max(stageScroll / stageMaxScroll, 0), 1) * 0.78;
-        }
-      } else {
-        target = Math.min(scrollY / (vh * 2), 1);
-      }
+        const rect = stageWrapper.getBoundingClientRect();
+        const totalScroll = stageWrapper.clientHeight - vh;
+        const targetStage = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
 
-      currVal += (target - currVal) * 0.12;
-      setScrollProgress(currVal);
+        currStageVal += (targetStage - currStageVal) * 0.05;
+        setScrollProgress(currStageVal);
+      }
       animId = requestAnimationFrame(loop);
     };
 
@@ -122,30 +120,48 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // STEP 1: INITIAL HERO STATE IS 100% PLAIN CLEAN BLACK (scrollProgress <= 0.02)
-  // AS USER SCROLLS DOWN (0.02 -> 0.25), STARBURST CROSS LASER FLARE PULSES
-  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.30;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.28) * Math.PI) : 0;
-  const crossScale = Math.min((scrollProgress - 0.02) * 4.0, 1);
+  // STEP 1: HERO TAGLINE STARBURST CROSS LASER FLARE (heroScroll 0.02 -> 0.70)
+  const isBurstActive = heroScroll > 0.02 && heroScroll < 0.85;
+  const burstOpacity = isBurstActive ? Math.sin(((heroScroll - 0.02) / 0.83) * Math.PI) : 0;
+  const crossScale = Math.min((heroScroll - 0.02) * 3.5, 1);
 
-  // STEP 2: 360-DEGREE INWARD DOOR FLIP (Red -> Yellow) (scrollProgress 0.22 -> 0.40)
-  // Multiplier 5.8 ensures the 360deg spin completes & yellow doors interlock 100% flat with zero gap early!
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.22) * 5.8, 0), 1);
-  const doorSpinAngle = spinProgress * 360;
+  // STEP 2: FULL 360-DEGREE INWARD ZIGZAG DOOR SPIN (Red -> Yellow) (scrollProgress 0.10 -> 0.70)
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.10) * 1.67, 0), 1);
+  let doorSpinAngle = spinProgress * 360;
 
-  const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
+  // ACCELERATE FINAL CLOSING ANGLE (spinProgress 0.90 -> 0.97):
+  // Brings doorSpinAngle to 360deg (0deg flat) by spinProgress = 0.97 so diamond cut corners touch & interlock!
+  if (spinProgress > 0.90 && spinProgress <= 0.97) {
+    const endRatio = (spinProgress - 0.90) / 0.07;
+    doorSpinAngle = 324 + endRatio * 36; // 324deg -> 360deg (0deg flat)
+  } else if (spinProgress > 0.97) {
+    doorSpinAngle = 360;
+  }
+
+  const isSpinning = doorSpinAngle > 1 && doorSpinAngle < 359;
   const isYellowCanvas = spinProgress > 0.40;
 
-  // SOLID YELLOW LOCK: Locks flat smoothly when spinProgress >= 0.85 or scrollProgress >= 0.38!
-  const isFullyLockedYellow = spinProgress >= 0.85 || scrollProgress >= 0.38;
+  // STAGE BACKGROUND BECOMES SOLID YELLOW ONLY AT VERY END (spinProgress >= 0.96) WHEN DOORS ARE ALMOST CLOSED!
+  const isYellowStage = spinProgress >= 0.96;
 
-  // WHITE ZIGZAG CRACK SEAM LINE OVERLAY:
-  // Visible when Red stage appears (scrollProgress >= 0.15) UNTIL exact millisecond door spin starts (spinProgress < 0.005)!
-  const showWhiteLine = scrollProgress >= 0.15 && spinProgress < 0.005;
+  // WHITE LIGHTNING ZIGZAG CRACK SEAM LINE:
+  // 1. Initial Red Stage: Appears early (scrollProgress >= 0.005) until door spin starts (spinProgress < 0.005).
+  // 2. Closing Yellow Stage: Appears DELAYED LATER (spinProgress >= 0.94 -> 0.97) EXACTLY when diamond corners touch,
+  //    then VANISHES IN YELLOW once 100% flat (spinProgress 0.97 -> 0.99)!
+  let whiteLineOpacity = 0;
+  if (scrollProgress >= 0.005 && spinProgress < 0.005) {
+    whiteLineOpacity = 1;
+  } else if (spinProgress >= 0.94 && spinProgress < 0.97) {
+    whiteLineOpacity = (spinProgress - 0.94) / 0.03; // Delayed later when doors are almost flat
+  } else if (spinProgress >= 0.97 && spinProgress <= 0.99) {
+    whiteLineOpacity = 1 - (spinProgress - 0.97) / 0.02; // Vanishes smoothly into yellow once 100% flat!
+  }
 
-  // STEP 3: BULLET STRIKES SHOOT OUT OF BARRELS (scrollProgress > 0.45)
-  // Multiplier 2.5 ensures bullets travel across screen smoothly as you scroll!
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.45) * 2.5, 0), 1);
+  // SOLID YELLOW LOCK: Triggers ONLY AFTER doors complete 360deg spin & white line vanishes in yellow (spinProgress >= 0.99)!
+  const isFullyLockedYellow = spinProgress >= 0.99;
+
+  // STEP 3: SLOW SYNCHRONIZED BULLET MOVEMENT + TORN PAPER UNROLLING (scrollProgress 0.75 -> 0.98)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.75) * 4.0, 0), 1);
 
   return (
     <div className="landing-page-official fade-in">
@@ -156,7 +172,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.30 ? 1 : 0,
+                opacity: heroScroll < 0.80 ? 1 : 0,
                 filter: burstOpacity > 0 ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
               }}
             >
@@ -187,9 +203,14 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
       {/* 2. STICKY PINNED RED CO-WATCH SECTION WITH 360-DEGREE INWARD ZIGZAG DOOR SPIN */}
       <section className="sticky-pinned-red-stage-wrapper">
-        <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
-          {/* BACKGROUND VOID BOLD CONDENSED REVEAL TYPOGRAPHY (Z-INDEX 1 BEHIND DOORS) */}
-          <div className="center-void-condensed-typography">
+        <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow || isYellowStage ? 'bg-full-yellow' : ''}`}>
+          {/* BACKGROUND VOID BOLD CONDENSED REVEAL TYPOGRAPHY (Z-INDEX 1 BEHIND DOORS - HIDDEN ONLY AT VERY END AT 0.95) */}
+          <div
+            className="center-void-condensed-typography"
+            style={{
+              display: spinProgress >= 0.95 ? 'none' : 'block'
+            }}
+          >
             <h1 className="katapult-condensed-headline">CO-WATCH</h1>
           </div>
 
@@ -296,12 +317,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                     
-                    {/* Bullet 1 (Top Row): Starts INSIDE Gun 1 barrel and shoots left-to-right off screen */}
+                    {/* Bullet 1 (Top Row): Starts INSIDE Gun 1 barrel and travels in perfect sync with unrolling paper */}
                     <div
                       className="bullet-flying-wrapper bullet-row-1"
                       style={{
                         position: 'absolute',
-                        left: `calc(190px + ${bulletProgress * 90}vw)`,
+                        left: `calc(190px + ${bulletProgress * 70}vw)`,
                         top: '42px',
                         transform: 'translateY(-50%)',
                         opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0,
@@ -360,12 +381,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   <div className="pistol-static-wrapper pistol-right" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
 
-                    {/* Bullet 2 (Middle Row): Starts INSIDE Gun 2 barrel and shoots right-to-left off screen */}
+                    {/* Bullet 2 (Middle Row): Starts INSIDE Gun 2 barrel and travels in perfect sync with unrolling paper */}
                     <div
                       className="bullet-flying-wrapper bullet-row-2"
                       style={{
                         position: 'absolute',
-                        right: `calc(190px + ${bulletProgress * 90}vw)`,
+                        right: `calc(190px + ${bulletProgress * 70}vw)`,
                         top: '42px',
                         transform: 'translateY(-50%)',
                         opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0,
@@ -382,12 +403,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
 
-                    {/* Bullet 3 (Bottom Row): Starts INSIDE Gun 3 barrel and shoots left-to-right off screen */}
+                    {/* Bullet 3 (Bottom Row): Starts INSIDE Gun 3 barrel and travels in perfect sync with unrolling paper */}
                     <div
                       className="bullet-flying-wrapper bullet-row-3"
                       style={{
                         position: 'absolute',
-                        left: `calc(190px + ${bulletProgress * 90}vw)`,
+                        left: `calc(190px + ${bulletProgress * 70}vw)`,
                         top: '42px',
                         transform: 'translateY(-50%)',
                         opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0,
@@ -423,11 +444,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             </div>
           )}
 
-          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY */}
+          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY WITH DYNAMIC FADE-IN & FADE-AWAY */}
           <div
             className="vertical-zigzag-crack-container"
             style={{
-              opacity: showWhiteLine ? 1 : 0,
+              opacity: whiteLineOpacity,
+              transition: 'opacity 0.15s ease',
               zIndex: 100
             }}
           >
