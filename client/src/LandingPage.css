@@ -423,14 +423,14 @@
   transform: translateY(-50%);
   z-index: 50;
   pointer-events: none;
-  transition: left 0.05s linear, right 0.05s linear, opacity 0.2s ease;
+  transition: left 0.04s linear, right 0.04s linear, opacity 0.15s ease;
 }
 
 .bullet-img {
-  width: 90px;
+  width: 80px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
 }
 
 .bullet-img.facing-right {

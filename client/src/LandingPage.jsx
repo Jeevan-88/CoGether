@@ -52,7 +52,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // SILKY SMOOTH LERP SCROLL ANIMATION LOOP TO FIX "STUCK STUCK" FEEL
+  // ULTRA SMOOTH LERP SCROLL ANIMATION LOOP (SENSITIVE & SMOOTH MOTION)
   useEffect(() => {
     let animId;
     let currVal = 0;
@@ -64,8 +64,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         const totalScroll = stageWrapper.clientHeight - window.innerHeight;
         const target = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
 
-        // Smooth Lerp factor (0.12) ensures 60fps/120fps butter-smooth motion
-        currVal += (target - currVal) * 0.12;
+        // Smooth Lerp factor (0.08) for silky sensitive control
+        currVal += (target - currVal) * 0.08;
         setScrollProgress(currVal);
       }
       animId = requestAnimationFrame(loop);
@@ -110,14 +110,14 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Light burst active during scrollProgress 0.15 -> 0.35
-  const isBurstActive = scrollProgress > 0.15 && scrollProgress < 0.35;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.15) / 0.20) * Math.PI) : 0;
+  // Phase 2 Lightburst & Thunder Lightning effect active during scrollProgress 0.12 -> 0.38
+  const isBurstActive = scrollProgress > 0.12 && scrollProgress < 0.38;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.12) / 0.26) * Math.PI) : 0;
 
-  // Phase 3 Screen shake during impact (scrollProgress 0.30 -> 0.38)
-  const isShaking = scrollProgress > 0.30 && scrollProgress < 0.38;
-  const shakeX = isShaking ? Math.sin(scrollProgress * 120) * 10 : 0;
-  const shakeY = isShaking ? Math.cos(scrollProgress * 120) * 10 : 0;
+  // Phase 3 Screen shake during impact (scrollProgress 0.30 -> 0.42)
+  const isShaking = scrollProgress > 0.30 && scrollProgress < 0.42;
+  const shakeX = isShaking ? Math.sin(scrollProgress * 140) * 12 : 0;
+  const shakeY = isShaking ? Math.cos(scrollProgress * 140) * 12 : 0;
 
   // Phase 4: 360-Degree Inward Door Flip (Red -> Yellow) runs smoothly from 0.0 -> 0.45
   const spinProgress = Math.min(scrollProgress * 2.22, 1); // 0.0 -> 1.0
@@ -127,10 +127,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const isYellowCanvas = spinProgress > 0.45;
   const isFullyLockedYellow = spinProgress >= 0.96; // 360deg spin locks 100% flat as yellow canvas
 
-  // Sequential Row Bullet Strikes & Paper Unrolling after yellow canvas locks flat (scrollProgress 0.45 -> 1.0)
-  const row1Progress = Math.min(Math.max((scrollProgress - 0.46) * 3.8, 0), 1);
-  const row2Progress = Math.min(Math.max((scrollProgress - 0.62) * 3.8, 0), 1);
-  const row3Progress = Math.min(Math.max((scrollProgress - 0.78) * 3.8, 0), 1);
+  // SIMULTANEOUS Scroll-Driven Bullet Strike for All 3 Guns (scrollProgress 0.46 -> 1.0)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.46) * 1.85, 0), 1);
 
   const showWhiteLine = scrollProgress > 0.10 && doorSpinAngle <= 2;
 
@@ -148,18 +146,19 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.35 ? Math.max(1 - (scrollProgress - 0.15) * 4, 0) : 0,
-                filter: isBurstActive ? `brightness(${1 + burstOpacity * 3})` : 'none'
+                opacity: scrollProgress < 0.38 ? Math.max(1 - (scrollProgress - 0.12) * 4, 0) : 0,
+                filter: isBurstActive ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
 
+            {/* LIGHTNING THUNDER LASER RAYS BURST */}
             <div
               className="procedural-lightburst-flare"
               style={{
                 opacity: burstOpacity,
-                transform: `translate(-50%, -50%) scale(${0.4 + burstOpacity * 2.5})`,
+                transform: `translate(-50%, -50%) scale(${0.4 + burstOpacity * 2.8})`,
                 pointerEvents: 'none'
               }}
             >
@@ -270,7 +269,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* SEQUENTIAL SCROLL-DRIVEN BULLETS SHOOTING OUT OF GUN BARRELS ON FULLY LOCKED YELLOW CANVAS */}
+          {/* SIMULTANEOUS 3-BULLET STRIKE OUT OF GUN BARRELS ON FULLY LOCKED YELLOW CANVAS */}
           {isFullyLockedYellow && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
@@ -281,16 +280,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               <div className="torn-banners-container-3">
                 {/* ROW 1: GUN 1 (LEFT) -> SHOOTS BULLET 1 OUT OF BARREL (LEFT TO RIGHT OUT OF PAGE) */}
                 <div className="pistol-banner-row row-left">
-                  <div className="pistol-static-wrapper pistol-left" style={{ opacity: row1Progress > 0 ? 1 : 0.4, transform: `scale(${0.85 + row1Progress * 0.15})` }}>
+                  <div className="pistol-static-wrapper pistol-left">
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                   </div>
 
-                  {/* Bullet 1 Shoots Exactly Out of Gun 1 Barrel from Left -> Right Out of Page */}
+                  {/* Bullet 1 Shoots Exactly Out of Gun 1 Barrel from Left -> Right */}
                   <div
                     className="bullet-flying-wrapper left-to-right-bullet"
                     style={{
-                      left: `calc(210px + ${row1Progress * 95}vw)`,
-                      opacity: row1Progress > 0 ? 1 : 0
+                      left: `calc(195px + ${bulletProgress * 78}%)`,
+                      opacity: bulletProgress > 0 ? 1 : 0
                     }}
                   >
                     <img src="/bullet_artwork.png" alt="Bullet 1" className="bullet-img facing-right" />
@@ -300,7 +299,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   <div
                     className="torn-paper-white-banner"
                     style={{
-                      clipPath: `polygon(0 0, ${row1Progress * 100}% 0, ${row1Progress * 100}% 100%, 0 100%)`
+                      clipPath: `polygon(0 0, ${bulletProgress * 100}% 0, ${bulletProgress * 100}% 100%, 0 100%)`
                     }}
                     onClick={() => handleLaunch('watch')}
                   >
@@ -324,7 +323,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   <div
                     className="torn-paper-white-banner"
                     style={{
-                      clipPath: `polygon(${100 - row2Progress * 100}% 0, 100% 0, 100% 100%, ${100 - row2Progress * 100}% 100%)`
+                      clipPath: `polygon(${100 - bulletProgress * 100}% 0, 100% 0, 100% 100%, ${100 - bulletProgress * 100}% 100%)`
                     }}
                     onClick={() => handleLaunch('watch')}
                   >
@@ -341,34 +340,34 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                   </div>
 
-                  {/* Bullet 2 Shoots Exactly Out of Gun 2 Barrel from Right -> Left Out of Page */}
+                  {/* Bullet 2 (Flipped Facing Left) Shoots Exactly Out of Gun 2 Barrel from Right -> Left */}
                   <div
                     className="bullet-flying-wrapper right-to-left-bullet"
                     style={{
-                      right: `calc(210px + ${row2Progress * 95}vw)`,
-                      opacity: row2Progress > 0 ? 1 : 0
+                      right: `calc(195px + ${bulletProgress * 78}%)`,
+                      opacity: bulletProgress > 0 ? 1 : 0
                     }}
                   >
                     <img src="/bullet_artwork.png" alt="Bullet 2" className="bullet-img facing-left" />
                   </div>
 
-                  <div className="pistol-static-wrapper pistol-right" style={{ opacity: row2Progress > 0 ? 1 : 0.4, transform: `scale(${0.85 + row2Progress * 0.15})` }}>
+                  <div className="pistol-static-wrapper pistol-right">
                     <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
                   </div>
                 </div>
 
                 {/* ROW 3: GUN 3 (LEFT) -> SHOOTS BULLET 3 OUT OF BARREL (LEFT TO RIGHT OUT OF PAGE) */}
                 <div className="pistol-banner-row row-left">
-                  <div className="pistol-static-wrapper pistol-left" style={{ opacity: row3Progress > 0 ? 1 : 0.4, transform: `scale(${0.85 + row3Progress * 0.15})` }}>
+                  <div className="pistol-static-wrapper pistol-left">
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
                   </div>
 
-                  {/* Bullet 3 Shoots Exactly Out of Gun 3 Barrel from Left -> Right Out of Page */}
+                  {/* Bullet 3 Shoots Exactly Out of Gun 3 Barrel from Left -> Right */}
                   <div
                     className="bullet-flying-wrapper left-to-right-bullet"
                     style={{
-                      left: `calc(210px + ${row3Progress * 95}vw)`,
-                      opacity: row3Progress > 0 ? 1 : 0
+                      left: `calc(195px + ${bulletProgress * 78}%)`,
+                      opacity: bulletProgress > 0 ? 1 : 0
                     }}
                   >
                     <img src="/bullet_artwork.png" alt="Bullet 3" className="bullet-img facing-right" />
@@ -378,7 +377,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   <div
                     className="torn-paper-white-banner"
                     style={{
-                      clipPath: `polygon(0 0, ${row3Progress * 100}% 0, ${row3Progress * 100}% 100%, 0 100%)`
+                      clipPath: `polygon(0 0, ${bulletProgress * 100}% 0, ${bulletProgress * 100}% 100%, 0 100%)`
                     }}
                     onClick={() => handleLaunch('watch')}
                   >
