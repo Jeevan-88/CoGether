@@ -4,36 +4,36 @@ import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, Sh
 import './LandingPage.css';
 
 const MOVIE_STREAMING_APPS = [
-  { name: 'Netflix', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg', color: '#E50914' },
-  { name: 'Disney+ Hotstar', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney%2B_Hotstar_logo.svg', color: '#113CCF' },
-  { name: 'Prime Video', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Prime_Video.png', color: '#00A8E1' },
-  { name: 'HBO Max', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/17/HBO_Max_Logo.svg', color: '#5822B4' },
-  { name: 'Apple TV+', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg', color: '#000000' },
-  { name: 'Hulu', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Hulu_Logo.svg', color: '#1CE783' },
-  { name: 'Sony LIV', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/SonyLIV_logo.png', color: '#1E1E1E' },
-  { name: 'Zee5', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/ZEE5_logo.svg', color: '#7E22CE' }
+  { name: 'Netflix', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg' },
+  { name: 'Disney+ Hotstar', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney%2B_Hotstar_logo.svg' },
+  { name: 'Prime Video', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Prime_Video.png' },
+  { name: 'HBO Max', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/17/HBO_Max_Logo.svg' },
+  { name: 'Apple TV+', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg' },
+  { name: 'Hulu', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Hulu_Logo.svg' },
+  { name: 'Sony LIV', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/SonyLIV_logo.png' },
+  { name: 'Zee5', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/ZEE5_logo.svg' }
 ];
 
 const SPORTS_CHANNELS = [
-  { name: 'ESPN+', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/ESPN%2B_logo.svg', color: '#CC0000' },
-  { name: 'Sky Sports', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/37/Sky_Sports_logo_2020.svg', color: '#002B66' },
-  { name: 'DAZN', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/DAZN_Logo_Master_RGB_2018.svg', color: '#000000' },
-  { name: 'Sony Sports', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/SonyLIV_logo.png', color: '#0055FF' },
-  { name: 'Star Sports', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney%2B_Hotstar_logo.svg', color: '#1E3A8A' },
-  { name: 'Eurosport', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/06/Eurosport_logo.svg', color: '#1E293B' },
-  { name: 'NBA TV', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/NBA_TV.svg', color: '#C8102E' },
-  { name: 'Willow HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Willow_TV_logo.svg', color: '#059669' }
+  { name: 'ESPN+', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/ESPN%2B_logo.svg' },
+  { name: 'Sky Sports', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/37/Sky_Sports_logo_2020.svg' },
+  { name: 'DAZN', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/DAZN_Logo_Master_RGB_2018.svg' },
+  { name: 'Sony Sports', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/SonyLIV_logo.png' },
+  { name: 'Star Sports', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney%2B_Hotstar_logo.svg' },
+  { name: 'Eurosport', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/06/Eurosport_logo.svg' },
+  { name: 'NBA TV', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/NBA_TV.svg' },
+  { name: 'Willow HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Willow_TV_logo.svg' }
 ];
 
 const ANIME_NETWORKS = [
-  { name: 'Crunchyroll', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Crunchyroll_Logo.svg', color: '#F47521' },
-  { name: 'Funimation', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b7/Funimation_Logo.svg', color: '#5C2D91' },
-  { name: 'HiDive', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/HiDive_logo.svg', color: '#00A3E0' },
-  { name: 'Ani-One Asia', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/14/Ani-One_Asia.png', color: '#EA580C' },
-  { name: 'Muse Asia', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/52/Muse_Asia_Logo.png', color: '#E11D48' },
-  { name: 'Netflix Anime', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg', color: '#E50914' },
-  { name: 'Toonami', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Toonami_2012_logo.png', color: '#000000' },
-  { name: 'Tubi Anime', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/db/Tubi_logo.svg', color: '#000000' }
+  { name: 'Crunchyroll', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Crunchyroll_Logo.svg' },
+  { name: 'Funimation', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b7/Funimation_Logo.svg' },
+  { name: 'HiDive', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/HiDive_logo.svg' },
+  { name: 'Ani-One Asia', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/14/Ani-One_Asia.png' },
+  { name: 'Muse Asia', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/52/Muse_Asia_Logo.png' },
+  { name: 'Netflix Anime', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg' },
+  { name: 'Toonami', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Toonami_2012_logo.png' },
+  { name: 'Tubi Anime', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/db/Tubi_logo.svg' }
 ];
 
 export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing }) {
@@ -43,10 +43,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [camBoxSize, setCamBoxSize] = useState('md');
   const [tutorialStep, setTutorialStep] = useState(1);
   const [scrollProgress, setScrollProgress] = useState(0);
-
-  const [activeMovieIdx, setActiveMovieIdx] = useState(0);
-  const [activeSportsIdx, setActiveSportsIdx] = useState(0);
-  const [activeAnimeIdx, setActiveAnimeIdx] = useState(0);
 
   const TUTORIAL_MESSAGES = [
     { sender: 'Alex', text: 'CoGether makes Co-Watch & Co-Play feel like real life! 🍿', color: '#a855f7' },
@@ -70,10 +66,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     const timer = setInterval(() => {
       setActiveMsgIdx((prev) => (prev + 1) % TUTORIAL_MESSAGES.length);
       setTutorialStep((prev) => (prev % 3) + 1);
-      setActiveMovieIdx((prev) => (prev + 1) % MOVIE_STREAMING_APPS.length);
-      setActiveSportsIdx((prev) => (prev + 1) % SPORTS_CHANNELS.length);
-      setActiveAnimeIdx((prev) => (prev + 1) % ANIME_NETWORKS.length);
-    }, 3200);
+    }, 3500);
     return () => clearInterval(timer);
   }, []);
 
@@ -261,145 +254,78 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* JAPANESE INK SCANNER WHEELS STAGE ON YELLOW CANVAS */}
+          {/* 3 PISTOL INKED BULLET PIERCING & TORN PAPER MARQUEE STAGE ON YELLOW CANVAS */}
           {isYellowCanvas && (
-            <div className="japanese-ink-wheels-stage fade-in">
-              <div className="ink-wheels-header">
-                <span className="ink-eyebrow-stamp">墨絵 • STREAMING PLATFORMS</span>
-                <h2 className="ink-title-kanji">STREAMING HUBS ROTATING SCANNER</h2>
+            <div className="pistol-bullet-torn-paper-stage fade-in">
+              <div className="ink-stage-header">
+                <span className="ink-eyebrow-stamp">墨絵 • BULLET STRIKE HUBS</span>
+                <h2 className="ink-title-kanji">SELECT STREAMING DESTINATION</h2>
               </div>
 
-              {/* FULL-WIDTH HORIZONTAL WHITE SCANNER / READER BAR (STRETCHES ACROSS SCREEN) */}
-              <div className="horizontal-scanner-bar">
-                <div className="scanner-slot-item">
-                  <span className="slot-channel-tag">MOVIES HUB</span>
-                  <div className="slot-platform-display">
-                    <img src={MOVIE_STREAMING_APPS[activeMovieIdx].logo} alt={MOVIE_STREAMING_APPS[activeMovieIdx].name} />
-                    <strong>{MOVIE_STREAMING_APPS[activeMovieIdx].name}</strong>
+              <div className="torn-banners-container-3">
+                {/* BANNER 1: MOVIES & TV (Pistol 1 shoots Left -> Right) */}
+                <div className="torn-banner-wrapper left-to-right">
+                  <div className="pistol-shooter-group left-gun">
+                    <div className="ink-pistol-icon">🔫</div>
+                    <div className="bullet-streak left-streak" />
                   </div>
-                </div>
 
-                <div className="scanner-slot-item">
-                  <span className="slot-channel-tag">SPORTS HUB</span>
-                  <div className="slot-platform-display">
-                    <img src={SPORTS_CHANNELS[activeSportsIdx].logo} alt={SPORTS_CHANNELS[activeSportsIdx].name} />
-                    <strong>{SPORTS_CHANNELS[activeSportsIdx].name}</strong>
-                  </div>
-                </div>
-
-                <div className="scanner-slot-item">
-                  <span className="slot-channel-tag">ANIME HUB</span>
-                  <div className="slot-platform-display">
-                    <img src={ANIME_NETWORKS[activeAnimeIdx].logo} alt={ANIME_NETWORKS[activeAnimeIdx].name} />
-                    <strong>{ANIME_NETWORKS[activeAnimeIdx].name}</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3 GIANT PURE INK-DRAWN JAPANESE WHEELS PASSING THROUGH THE WHITE SCANNER BAR */}
-              <div className="pure-ink-wheels-row-3">
-                {/* WHEEL 1: MOVIES & TV */}
-                <div className="pure-wheel-column" onClick={() => handleLaunch('watch')}>
-                  <div className="pure-enso-wheel-wrapper wheel-spin-slow">
-                    <svg className="enso-ink-circle-svg" viewBox="0 0 320 320">
-                      <circle cx="160" cy="160" r="140" fill="none" stroke="#111111" strokeWidth="20" strokeDasharray="22 14 35 10 50 18" strokeLinecap="round" />
-                      <circle cx="160" cy="160" r="100" fill="none" stroke="#111111" strokeWidth="5" strokeDasharray="8 8" />
-                    </svg>
-
-                    {MOVIE_STREAMING_APPS.map((app, idx) => {
-                      const angle = (idx * 360) / MOVIE_STREAMING_APPS.length;
-                      return (
-                        <div
-                          key={app.name}
-                          className={`pure-wheel-spoke ${activeMovieIdx === idx ? 'active-top-spoke' : ''}`}
-                          style={{
-                            transform: `rotate(${angle}deg) translateY(-118px) rotate(-${angle}deg)`
-                          }}
-                        >
-                          <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
-                        </div>
-                      );
-                    })}
-
-                    <div className="pure-kanji-center-hub">
-                      <span className="kanji-symbol">映画</span>
-                      <span className="hub-label">MOVIES</span>
+                  <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
+                    <div className="banner-content-inner">
+                      <div className="banner-badge-tag">🎬 MOVIES & TV SHOWS</div>
+                      <div className="marquee-track scroll-left">
+                        {[...MOVIE_STREAMING_APPS, ...MOVIE_STREAMING_APPS].map((app, idx) => (
+                          <div key={idx} className="marquee-app-item">
+                            <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
+                            <span>{app.name}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
+                </div>
 
-                  <div className="pure-wheel-ink-label">
-                    <h3>🎬 MOVIES & TV SHOWS</h3>
-                    <p>Netflix • Hotstar • Prime • HBO Max</p>
+                {/* BANNER 2: LIVE SPORTS (Pistol 2 shoots Right -> Left) */}
+                <div className="torn-banner-wrapper right-to-left">
+                  <div className="pistol-shooter-group right-gun">
+                    <div className="ink-pistol-icon flip-gun">🔫</div>
+                    <div className="bullet-streak right-streak" />
+                  </div>
+
+                  <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
+                    <div className="banner-content-inner">
+                      <div className="banner-badge-tag sports-tag">⚽ LIVE SPORTS CHANNELS</div>
+                      <div className="marquee-track scroll-right">
+                        {[...SPORTS_CHANNELS, ...SPORTS_CHANNELS].map((app, idx) => (
+                          <div key={idx} className="marquee-app-item">
+                            <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
+                            <span>{app.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* WHEEL 2: LIVE SPORTS */}
-                <div className="pure-wheel-column" onClick={() => handleLaunch('watch')}>
-                  <div className="pure-enso-wheel-wrapper wheel-spin-reverse">
-                    <svg className="enso-ink-circle-svg" viewBox="0 0 320 320">
-                      <circle cx="160" cy="160" r="140" fill="none" stroke="#111111" strokeWidth="20" strokeDasharray="28 12 18 14 55 22" strokeLinecap="round" />
-                      <circle cx="160" cy="160" r="100" fill="none" stroke="#111111" strokeWidth="5" strokeDasharray="10 8" />
-                    </svg>
+                {/* BANNER 3: ANIME HUB (Pistol 3 shoots Left -> Right) */}
+                <div className="torn-banner-wrapper left-to-right">
+                  <div className="pistol-shooter-group left-gun">
+                    <div className="ink-pistol-icon">🔫</div>
+                    <div className="bullet-streak left-streak" />
+                  </div>
 
-                    {SPORTS_CHANNELS.map((app, idx) => {
-                      const angle = (idx * 360) / SPORTS_CHANNELS.length;
-                      return (
-                        <div
-                          key={app.name}
-                          className={`pure-wheel-spoke ${activeSportsIdx === idx ? 'active-top-spoke' : ''}`}
-                          style={{
-                            transform: `rotate(${angle}deg) translateY(-118px) rotate(-${angle}deg)`
-                          }}
-                        >
-                          <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
-                        </div>
-                      );
-                    })}
-
-                    <div className="pure-kanji-center-hub">
-                      <span className="kanji-symbol">体育</span>
-                      <span className="hub-label">SPORTS</span>
+                  <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
+                    <div className="banner-content-inner">
+                      <div className="banner-badge-tag anime-tag">⛩️ ANIME STREAMING HUB</div>
+                      <div className="marquee-track scroll-left">
+                        {[...ANIME_NETWORKS, ...ANIME_NETWORKS].map((app, idx) => (
+                          <div key={idx} className="marquee-app-item">
+                            <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
+                            <span>{app.name}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="pure-wheel-ink-label">
-                    <h3>⚽ LIVE SPORTS CHANNELS</h3>
-                    <p>ESPN+ • Sky Sports • DAZN • Sony</p>
-                  </div>
-                </div>
-
-                {/* WHEEL 3: ANIME HUB */}
-                <div className="pure-wheel-column" onClick={() => handleLaunch('watch')}>
-                  <div className="pure-enso-wheel-wrapper wheel-spin-slow">
-                    <svg className="enso-ink-circle-svg" viewBox="0 0 320 320">
-                      <circle cx="160" cy="160" r="140" fill="none" stroke="#111111" strokeWidth="20" strokeDasharray="32 16 12 10 42 20" strokeLinecap="round" />
-                      <circle cx="160" cy="160" r="100" fill="none" stroke="#111111" strokeWidth="5" strokeDasharray="6 10" />
-                    </svg>
-
-                    {ANIME_NETWORKS.map((app, idx) => {
-                      const angle = (idx * 360) / ANIME_NETWORKS.length;
-                      return (
-                        <div
-                          key={app.name}
-                          className={`pure-wheel-spoke ${activeAnimeIdx === idx ? 'active-top-spoke' : ''}`}
-                          style={{
-                            transform: `rotate(${angle}deg) translateY(-118px) rotate(-${angle}deg)`
-                          }}
-                        >
-                          <img src={app.logo} alt={app.name} onError={(e) => { e.target.style.display = 'none'; }} />
-                        </div>
-                      );
-                    })}
-
-                    <div className="pure-kanji-center-hub">
-                      <span className="kanji-symbol">アニメ</span>
-                      <span className="hub-label">ANIME</span>
-                    </div>
-                  </div>
-
-                  <div className="pure-wheel-ink-label">
-                    <h3>⛩️ ANIME STREAMING HUB</h3>
-                    <p>Crunchyroll • Funimation • HiDive</p>
                   </div>
                 </div>
               </div>
