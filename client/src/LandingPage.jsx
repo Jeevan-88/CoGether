@@ -77,8 +77,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // Phase 5: 360-Degree Inward Door Flip starts ONLY after scrollProgress > 0.78!
   const spinProgress = scrollProgress > 0.78 ? Math.min((scrollProgress - 0.78) * 4.5, 1) : 0;
   const doorSpinAngle = spinProgress * 360; // 0deg -> 360deg spin inwards
+  const isSpinning = doorSpinAngle > 1 && doorSpinAngle < 359;
   const isYellowCanvas = spinProgress > 0.45;
-  const isFullyLockedYellow = spinProgress > 0.92;
+  const isFullyLockedYellow = spinProgress > 0.95;
 
   return (
     <div
@@ -121,12 +122,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. STICKY PINNED RED CO-WATCH SECTION: FULL FRAME FIT-TO-SCREEN UNTIL FURTHER SCROLL */}
+      {/* 2. STICKY PINNED RED CO-WATCH SECTION */}
       <section className="sticky-pinned-red-stage-wrapper">
         <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
-          {/* LEFT DOOR PANEL (Solid Red, rotates 360deg inwards only when scrollProgress > 0.78) */}
+          {/* LEFT DOOR PANEL */}
           <div
-            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
+            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''}`}
             style={{
               transform: `rotateY(${-doorSpinAngle}deg)`
             }}
@@ -155,9 +156,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* RIGHT DOOR PANEL (Solid Red, rotates 360deg inwards only when scrollProgress > 0.78) */}
+          {/* RIGHT DOOR PANEL */}
           <div
-            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
+            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''}`}
             style={{
               transform: `rotateY(${doorSpinAngle}deg)`
             }}
