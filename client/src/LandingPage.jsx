@@ -116,6 +116,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const isFullyLockedYellow = spinProgress >= 0.94; // Perfect lock into flat yellow canvas at end of spin
   const showWhiteLine = scrollProgress > 0.50 && doorSpinAngle <= 2;
 
+  // Real-time Bullet & Piercing Paper Unrolling progress driven by scrolling down (scrollProgress 0.82 -> 1.0)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.82) * 5.5, 0), 1);
+
   return (
     <div
       className="landing-page-official fade-in"
@@ -254,7 +257,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* 3 USER-PROVIDED PISTOL ARTWORK IMAGES & TORN PAPER MARQUEE BANNERS ON YELLOW CANVAS */}
+          {/* SCROLL-DRIVEN BULLET SHOOTING & PIERCING PAPER UNROLLING STAGE */}
           {isYellowCanvas && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
@@ -263,12 +266,31 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               </div>
 
               <div className="torn-banners-container-3">
-                {/* ROW 1: PISTOL 1 (LEFT SIDE, FACING RIGHT) + MOVIES & TV BANNER */}
+                {/* ROW 1: GUN 1 (LEFT) -> SHOOTS BULLET 1 (LEFT TO RIGHT) -> UNROLLS MOVIES BANNER */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                   </div>
-                  <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
+
+                  {/* Dynamic Bullet 1 Travelling Left to Right as User Scrolls */}
+                  <div
+                    className="bullet-flying-wrapper left-to-right-bullet"
+                    style={{
+                      left: `calc(130px + ${bulletProgress * 78}%)`,
+                      opacity: bulletProgress > 0 ? 1 : 0
+                    }}
+                  >
+                    <img src="/bullet_artwork.png" alt="Bullet 1" className="bullet-img facing-right" />
+                  </div>
+
+                  {/* Torn White Paper Banner 1 Unrolling Behind Bullet */}
+                  <div
+                    className="torn-paper-white-banner"
+                    style={{
+                      clipPath: `polygon(0 0, ${bulletProgress * 100}% 0, ${bulletProgress * 100}% 100%, 0 100%)`
+                    }}
+                    onClick={() => handleLaunch('watch')}
+                  >
                     <div className="banner-content-inner">
                       <div className="banner-badge-tag">🎬 MOVIES & TV SHOWS</div>
                       <div className="marquee-track scroll-left">
@@ -283,9 +305,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
 
-                {/* ROW 2: LIVE SPORTS BANNER + PISTOL 2 (RIGHT SIDE, FACING LEFT) */}
+                {/* ROW 2: GUN 2 (RIGHT FLIPPED) -> SHOOTS BULLET 2 (RIGHT TO LEFT) -> UNROLLS SPORTS BANNER */}
                 <div className="pistol-banner-row row-right">
-                  <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
+                  {/* Torn White Paper Banner 2 Unrolling Reverse Behind Bullet */}
+                  <div
+                    className="torn-paper-white-banner"
+                    style={{
+                      clipPath: `polygon(${100 - bulletProgress * 100}% 0, 100% 0, 100% 100%, ${100 - bulletProgress * 100}% 100%)`
+                    }}
+                    onClick={() => handleLaunch('watch')}
+                  >
                     <div className="banner-content-inner">
                       <div className="banner-badge-tag sports-tag">⚽ LIVE SPORTS CHANNELS</div>
                       <div className="marquee-track scroll-right">
@@ -298,17 +327,48 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       </div>
                     </div>
                   </div>
+
+                  {/* Dynamic Bullet 2 Travelling Right to Left as User Scrolls */}
+                  <div
+                    className="bullet-flying-wrapper right-to-left-bullet"
+                    style={{
+                      right: `calc(130px + ${bulletProgress * 78}%)`,
+                      opacity: bulletProgress > 0 ? 1 : 0
+                    }}
+                  >
+                    <img src="/bullet_artwork.png" alt="Bullet 2" className="bullet-img facing-left" />
+                  </div>
+
                   <div className="pistol-static-wrapper pistol-right">
                     <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
                   </div>
                 </div>
 
-                {/* ROW 3: PISTOL 3 (LEFT SIDE, FACING RIGHT - SAME AS PISTOL 1) + ANIME BANNER */}
+                {/* ROW 3: GUN 3 (LEFT) -> SHOOTS BULLET 3 (LEFT TO RIGHT) -> UNROLLS ANIME BANNER */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
                   </div>
-                  <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
+
+                  {/* Dynamic Bullet 3 Travelling Left to Right as User Scrolls */}
+                  <div
+                    className="bullet-flying-wrapper left-to-right-bullet"
+                    style={{
+                      left: `calc(130px + ${bulletProgress * 78}%)`,
+                      opacity: bulletProgress > 0 ? 1 : 0
+                    }}
+                  >
+                    <img src="/bullet_artwork.png" alt="Bullet 3" className="bullet-img facing-right" />
+                  </div>
+
+                  {/* Torn White Paper Banner 3 Unrolling Behind Bullet */}
+                  <div
+                    className="torn-paper-white-banner"
+                    style={{
+                      clipPath: `polygon(0 0, ${bulletProgress * 100}% 0, ${bulletProgress * 100}% 100%, 0 100%)`
+                    }}
+                    onClick={() => handleLaunch('watch')}
+                  >
                     <div className="banner-content-inner">
                       <div className="banner-badge-tag anime-tag">⛩️ ANIME STREAMING HUB</div>
                       <div className="marquee-track scroll-left">
