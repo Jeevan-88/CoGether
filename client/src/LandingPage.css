@@ -144,6 +144,43 @@
   background: #ffcc00;
 }
 
+/* BOLD CONDENSED CENTER VOID TYPOGRAPHY MATCHING USER SCREENSHOTS */
+.center-void-condensed-typography {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  pointer-events: none;
+  width: 100%;
+  max-width: 900px;
+  padding: 0 20px;
+  transition: opacity 0.1s linear, transform 0.1s linear;
+}
+
+.katapult-condensed-headline {
+  font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
+  font-size: clamp(70px, 13vw, 170px);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: 4px;
+  color: #ffffff;
+  text-transform: uppercase;
+  margin: 0;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+}
+
+.katapult-condensed-sub {
+  font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
+  font-size: clamp(18px, 3.2vw, 38px);
+  letter-spacing: 6px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  margin-top: 10px;
+  text-shadow: 0 6px 20px rgba(0, 0, 0, 0.9);
+}
+
 .door-half-panel {
   width: 50.1%;
   height: 100%;

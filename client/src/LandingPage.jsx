@@ -83,6 +83,15 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const isFullyLockedYellow = spinProgress > 0.94;
   const showWhiteLine = scrollProgress > 0.50 && doorSpinAngle <= 2;
 
+  // Center Void Condensed Typography Opacity Math:
+  // Appears in the center black void as doors open, fades out as doors close into yellow
+  let centerTextOpacity = 0;
+  if (doorSpinAngle > 10 && doorSpinAngle <= 180) {
+    centerTextOpacity = Math.sin(((doorSpinAngle - 10) / 170) * Math.PI);
+  } else if (doorSpinAngle > 180 && doorSpinAngle < 340) {
+    centerTextOpacity = Math.sin(((340 - doorSpinAngle) / 160) * Math.PI);
+  }
+
   return (
     <div
       className="landing-page-official fade-in"
@@ -127,6 +136,18 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
       {/* 2. STICKY PINNED RED CO-WATCH SECTION */}
       <section className="sticky-pinned-red-stage-wrapper">
         <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
+          {/* CENTER VOID BOLD CONDENSED TYPOGRAPHY MATCHING USER SCREENSHOTS */}
+          <div
+            className="center-void-condensed-typography"
+            style={{
+              opacity: centerTextOpacity,
+              transform: `translate(-50%, -50%) scale(${0.85 + centerTextOpacity * 0.15})`
+            }}
+          >
+            <h1 className="katapult-condensed-headline">CO-WATCH</h1>
+            <p className="katapult-condensed-sub">SYNCHRONIZED REAL-TIME STREAMING</p>
+          </div>
+
           {/* LEFT DOOR PANEL */}
           <div
             className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''} ${isFullyLockedYellow ? 'no-clip' : ''}`}
