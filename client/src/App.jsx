@@ -18,7 +18,7 @@ export default function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 0.5;
+      const heroHeight = window.innerHeight * 0.9;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };

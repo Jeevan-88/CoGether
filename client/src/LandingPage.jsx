@@ -21,7 +21,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 0.55;
+      const heroHeight = window.innerHeight * 1.1;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };
@@ -64,41 +64,45 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Screen Shake computation during lightburst (scrollProgress 0.15 -> 0.5)
-  const isShaking = scrollProgress > 0.15 && scrollProgress < 0.5;
-  const shakeX = isShaking ? Math.sin(scrollProgress * 90) * 10 : 0;
-  const shakeY = isShaking ? Math.cos(scrollProgress * 90) * 10 : 0;
+  // Laser Light burst active when scrollProgress is between 0.4 and 0.82
+  const isBurstActive = scrollProgress > 0.4 && scrollProgress < 0.82;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.4) / 0.42) * Math.PI) : 0;
 
   return (
-    <div
-      className="landing-page-official fade-in"
-      style={{
-        transform: isShaking ? `translate(${shakeX}px, ${shakeY}px)` : 'none'
-      }}
-    >
-      {/* 1. FULLSCREEN HERO SECTION WITH LIGHTBURST FROM TEXT */}
+    <div className="landing-page-official fade-in">
+      {/* CLEAN WHITE VERTICAL ZIG-ZAG CRACK LINE DOWN THE ENTIRE PAGE */}
+      <div className="vertical-zigzag-crack-container">
+        <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
+          <path
+            d="M20,0 L5,60 L35,120 L5,180 L35,240 L5,300 L35,360 L5,420 L35,480 L5,540 L35,600 L5,660 L35,720 L5,780 L35,840 L5,900 L35,960 L5,1020 L35,1080 L5,1140 L20,1200"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="4"
+          />
+        </svg>
+      </div>
+
+      {/* 1. TALL FULLSCREEN BLACK HERO SECTION (160vh) */}
       <section className="fullscreen-pure-black-hero">
         <div className="hero-center-content-wrapper">
-          {/* Gen-Z Tagline: Lightburst emanates directly out from text itself */}
+          {/* Gen-Z Tagline: Clean 18px Pixar font */}
           <div className="genz-tagline-container">
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.45 ? Math.max(1 - scrollProgress * 2.2, 0) : 0,
-                filter: `brightness(${1 + scrollProgress * 4}) drop-shadow(0 0 ${scrollProgress * 40}px #ffffff)`
+                opacity: scrollProgress < 0.75 ? Math.max(1 - (scrollProgress - 0.4) * 2.5, 0) : 0,
+                filter: isBurstActive ? `brightness(${1 + burstOpacity * 3})` : 'none'
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
 
-            {/* Procedural Light Ray Flares Originating from Text Center */}
+            {/* Laser Rays Burst Centered Exactly Over Tagline Text */}
             <div
               className="procedural-lightburst-flare"
               style={{
-                opacity: (scrollProgress > 0.08 && scrollProgress < 0.48)
-                  ? Math.sin(((scrollProgress - 0.08) / 0.4) * Math.PI)
-                  : 0,
-                transform: `translate(-50%, -50%) scale(${0.3 + scrollProgress * 2.5})`,
+                opacity: burstOpacity,
+                transform: `translate(-50%, -50%) scale(${0.4 + burstOpacity * 2.2})`,
                 pointerEvents: 'none'
               }}
             >
@@ -112,33 +116,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* GLOWING WHITE VERTICAL ZIG-ZAG CRACK LINE DOWN THE CENTER */}
-      <div
-        className="vertical-zigzag-crack-container"
-        style={{
-          opacity: scrollProgress > 0.25 ? Math.min((scrollProgress - 0.25) * 3, 1) : 0,
-          transform: `translateX(-50%) scaleX(${scrollProgress > 0.5 ? 1 + (scrollProgress - 0.5) * 3 : 1})`
-        }}
-      >
-        <svg className="vertical-zigzag-svg" viewBox="0 0 40 1000" preserveAspectRatio="none">
-          <path
-            d="M20,0 L5,50 L35,100 L5,150 L35,200 L5,250 L35,300 L5,350 L35,400 L5,450 L35,500 L5,550 L35,600 L5,650 L35,700 L5,750 L35,800 L5,850 L35,900 L5,950 L20,1000"
-            fill="none"
-            stroke="#ffffff"
-            strokeWidth="4"
-            filter="drop-shadow(0 0 15px #ffffff) drop-shadow(0 0 30px #c084fc)"
-          />
-        </svg>
-      </div>
-
-      {/* 2. BOLD RED SECTION: CO-WATCH HUB WITH 3D PAGE FLIP UNFOLD TRANSITION */}
-      <section
-        className="official-red-section 3d-page-flip-stage"
-        style={{
-          transform: scrollProgress > 0.45 ? `rotateX(${(1 - scrollProgress) * 35}deg)` : 'rotateX(35deg)',
-          opacity: Math.min(scrollProgress * 1.5, 1)
-        }}
-      >
+      {/* 2. BOLD RED SECTION: CO-WATCH HUB */}
+      <section className="official-red-section">
         <div className="red-section-container">
           <div className="red-left-content">
             <div className="watch-together-badge">CO-WATCH HUB</div>
