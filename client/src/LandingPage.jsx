@@ -64,29 +64,41 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
+  // Screen Shake computation during lightburst (scrollProgress 0.15 -> 0.5)
+  const isShaking = scrollProgress > 0.15 && scrollProgress < 0.5;
+  const shakeX = isShaking ? Math.sin(scrollProgress * 90) * 10 : 0;
+  const shakeY = isShaking ? Math.cos(scrollProgress * 90) * 10 : 0;
+
   return (
-    <div className="landing-page-official fade-in">
-      {/* 1. FULLSCREEN HERO SECTION WITH GENZ TAGLINE & COSMIC STARBURST EXPLOSION */}
+    <div
+      className="landing-page-official fade-in"
+      style={{
+        transform: isShaking ? `translate(${shakeX}px, ${shakeY}px)` : 'none'
+      }}
+    >
+      {/* 1. FULLSCREEN HERO SECTION WITH LIGHTBURST FROM TEXT */}
       <section className="fullscreen-pure-black-hero">
         <div className="hero-center-content-wrapper">
-          {/* Gen-Z Tagline: Text turns into pure glowing light on scroll */}
+          {/* Gen-Z Tagline: Lightburst emanates directly out from text itself */}
           <div className="genz-tagline-container">
             <p
               className="genz-tagline-text"
               style={{
-                opacity: Math.max(1 - scrollProgress * 1.6, 0),
-                filter: `brightness(${1 + scrollProgress * 5}) drop-shadow(0 0 ${scrollProgress * 50}px #ffffff)`
+                opacity: scrollProgress < 0.45 ? Math.max(1 - scrollProgress * 2.2, 0) : 0,
+                filter: `brightness(${1 + scrollProgress * 4}) drop-shadow(0 0 ${scrollProgress * 40}px #ffffff)`
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
 
-            {/* Pure Procedural Lightburst Flare on Scroll */}
+            {/* Procedural Light Ray Flares Originating from Text Center */}
             <div
               className="procedural-lightburst-flare"
               style={{
-                opacity: scrollProgress > 0.05 ? Math.min((scrollProgress - 0.05) * 2.5, 1) : 0,
-                transform: `translate(-50%, -50%) scale(${0.2 + scrollProgress * 3.5})`,
+                opacity: (scrollProgress > 0.08 && scrollProgress < 0.48)
+                  ? Math.sin(((scrollProgress - 0.08) / 0.4) * Math.PI)
+                  : 0,
+                transform: `translate(-50%, -50%) scale(${0.3 + scrollProgress * 2.5})`,
                 pointerEvents: 'none'
               }}
             >
@@ -100,19 +112,21 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* WHITE ZIG-ZAG TORN PAGE DIVIDER SEAM */}
-      <div className="zigzag-torn-divider-wrapper">
-        <svg className="zigzag-torn-svg" viewBox="0 0 1440 60" preserveAspectRatio="none">
+      {/* GLOWING WHITE VERTICAL ZIG-ZAG CRACK LINE DOWN THE CENTER */}
+      <div
+        className="vertical-zigzag-crack-container"
+        style={{
+          opacity: scrollProgress > 0.25 ? Math.min((scrollProgress - 0.25) * 3, 1) : 0,
+          transform: `translateX(-50%) scaleX(${scrollProgress > 0.5 ? 1 + (scrollProgress - 0.5) * 3 : 1})`
+        }}
+      >
+        <svg className="vertical-zigzag-svg" viewBox="0 0 40 1000" preserveAspectRatio="none">
           <path
-            d="M0,0 L30,30 L60,5 L90,38 L120,10 L150,34 L180,8 L210,42 L240,14 L270,36 L300,12 L330,40 L360,16 L390,44 L420,18 L450,46 L480,20 L510,48 L540,22 L570,50 L600,24 L630,52 L660,26 L690,54 L720,22 L750,50 L780,24 L810,52 L840,26 L870,54 L900,22 L930,50 L960,24 L990,52 L1020,26 L1050,54 L1080,22 L1110,50 L1140,24 L1170,52 L1200,26 L1230,54 L1260,22 L1290,50 L1320,24 L1350,52 L1380,26 L1410,54 L1440,28 L1440,60 L0,60 Z"
-            fill="#e50914"
-          />
-          <path
-            d="M0,0 L30,30 L60,5 L90,38 L120,10 L150,34 L180,8 L210,42 L240,14 L270,36 L300,12 L330,40 L360,16 L390,44 L420,18 L450,46 L480,20 L510,48 L540,22 L570,50 L600,24 L630,52 L660,26 L690,54 L720,22 L750,50 L780,24 L810,52 L840,26 L870,54 L900,22 L930,50 L960,24 L990,52 L1020,26 L1050,54 L1080,22 L1110,50 L1140,24 L1170,52 L1200,26 L1230,54 L1260,22 L1290,50 L1320,24 L1350,52 L1380,26 L1410,54 L1440,28"
+            d="M20,0 L5,50 L35,100 L5,150 L35,200 L5,250 L35,300 L5,350 L35,400 L5,450 L35,500 L5,550 L35,600 L5,650 L35,700 L5,750 L35,800 L5,850 L35,900 L5,950 L20,1000"
             fill="none"
             stroke="#ffffff"
-            strokeWidth="5"
-            filter="drop-shadow(0 0 12px #ffffff)"
+            strokeWidth="4"
+            filter="drop-shadow(0 0 15px #ffffff) drop-shadow(0 0 30px #c084fc)"
           />
         </svg>
       </div>
