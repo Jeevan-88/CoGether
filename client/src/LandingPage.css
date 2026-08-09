@@ -387,8 +387,8 @@
 
 .pistol-static-wrapper {
   flex-shrink: 0;
-  width: 220px;
-  height: 140px;
+  width: 250px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -397,18 +397,22 @@
   box-shadow: none !important;
 }
 
-.pure-pistol-svg {
-  width: 200px;
+.pistol-ink-img {
+  width: 230px;
   height: auto;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+  object-fit: contain;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
   transition: transform 0.2s ease;
 }
 
-.pure-pistol-svg.facing-right {
+.pistol-ink-img.facing-right {
   transform: none;
 }
 
-.pure-pistol-svg.facing-left {
+.pistol-ink-img.facing-left {
   transform: scaleX(-1);
 }
 

@@ -36,39 +36,6 @@ const ANIME_NETWORKS = [
   { name: 'Tubi Anime', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/db/Tubi_logo.svg' }
 ];
 
-// PURE INLINE VECTOR SVG PISTOL - ZERO IMAGE FILES, ZERO BOX SHADOWS, 100% VECTOR TRANSPARENT
-const PurePistolSVG = ({ facingLeft = false }) => (
-  <svg
-    viewBox="0 0 200 135"
-    className={`pure-pistol-svg ${facingLeft ? 'facing-left' : 'facing-right'}`}
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g fill="#111111">
-      {/* Top Slide */}
-      <path d="M5 25 H195 V55 H185 V62 H155 V55 H10 Z" />
-      {/* Barrel Tip */}
-      <rect x="190" y="32" width="10" height="12" />
-      {/* 4 Yellow Diagonal Serrations on Slide (////) */}
-      <polygon points="35,28 42,28 36,52 29,52" fill="#FFCC00" />
-      <polygon points="50,28 57,28 51,52 44,52" fill="#FFCC00" />
-      <polygon points="65,28 72,28 66,52 59,52" fill="#FFCC00" />
-      <polygon points="80,28 87,28 81,52 74,52" fill="#FFCC00" />
-      {/* Tactical Rear & Front Sights */}
-      <rect x="12" y="18" width="6" height="7" fill="#111111" />
-      <rect x="180" y="20" width="6" height="5" fill="#111111" />
-      {/* Main Handgun Grip */}
-      <path d="M50 55 L32 125 H72 L95 55 Z" />
-      {/* Textured Grip Panels */}
-      <path d="M42 66 L37 118 H63 L75 66 Z" fill="#222222" />
-      {/* Magazine Baseplate */}
-      <path d="M30 123 H74 V128 H30 Z" />
-      {/* Trigger Guard & Trigger */}
-      <path d="M95 55 C95 80 128 80 128 55" fill="none" stroke="#111111" strokeWidth="5" />
-      <path d="M106 58 Q114 70 118 64" fill="none" stroke="#111111" strokeWidth="4" strokeLinecap="round" />
-    </g>
-  </svg>
-);
-
 export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing }) {
   const [roomCode, setRoomCode] = useState('');
   const [username, setUsername] = useState(localStorage.getItem('sp_username') || '');
@@ -287,7 +254,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* 3 PURE VECTOR PISTOL SILHOUETTES & TORN PAPER MARQUEE BANNERS ON YELLOW CANVAS */}
+          {/* 3 USER-PROVIDED PISTOL ARTWORK IMAGES & TORN PAPER MARQUEE BANNERS ON YELLOW CANVAS */}
           {isYellowCanvas && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
@@ -299,7 +266,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 {/* ROW 1: PISTOL 1 (LEFT SIDE, FACING RIGHT) + MOVIES & TV BANNER */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
-                    <PurePistolSVG facingLeft={false} />
+                    <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                   </div>
                   <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
                     <div className="banner-content-inner">
@@ -332,14 +299,14 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                   </div>
                   <div className="pistol-static-wrapper pistol-right">
-                    <PurePistolSVG facingLeft={true} />
+                    <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
                   </div>
                 </div>
 
                 {/* ROW 3: PISTOL 3 (LEFT SIDE, FACING RIGHT - SAME AS PISTOL 1) + ANIME BANNER */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
-                    <PurePistolSVG facingLeft={false} />
+                    <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
                   </div>
                   <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
                     <div className="banner-content-inner">
