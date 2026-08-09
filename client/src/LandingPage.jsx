@@ -254,22 +254,20 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* 3 PISTOL INKED BULLET PIERCING & TORN PAPER MARQUEE STAGE ON YELLOW CANVAS */}
+          {/* 3 STATIC PISTOL SILHOUETTES & TORN PAPER MARQUEE BANNERS ON YELLOW CANVAS */}
           {isYellowCanvas && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
-                <span className="ink-eyebrow-stamp">墨絵 • BULLET STRIKE HUBS</span>
+                <span className="ink-eyebrow-stamp">墨絵 • STREAMING HUBS</span>
                 <h2 className="ink-title-kanji">SELECT STREAMING DESTINATION</h2>
               </div>
 
               <div className="torn-banners-container-3">
-                {/* BANNER 1: MOVIES & TV (Pistol 1 shoots Left -> Right) */}
-                <div className="torn-banner-wrapper left-to-right">
-                  <div className="pistol-shooter-group left-gun">
-                    <div className="ink-pistol-icon">🔫</div>
-                    <div className="bullet-streak left-streak" />
+                {/* ROW 1: PISTOL 1 (LEFT SIDE, FACING RIGHT) + MOVIES & TV BANNER */}
+                <div className="pistol-banner-row row-left">
+                  <div className="pistol-static-wrapper pistol-left">
+                    <img src="/pistol_artwork.jpg" alt="Pistol 1" className="pistol-ink-img facing-right" />
                   </div>
-
                   <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
                     <div className="banner-content-inner">
                       <div className="banner-badge-tag">🎬 MOVIES & TV SHOWS</div>
@@ -285,13 +283,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
 
-                {/* BANNER 2: LIVE SPORTS (Pistol 2 shoots Right -> Left) */}
-                <div className="torn-banner-wrapper right-to-left">
-                  <div className="pistol-shooter-group right-gun">
-                    <div className="ink-pistol-icon flip-gun">🔫</div>
-                    <div className="bullet-streak right-streak" />
-                  </div>
-
+                {/* ROW 2: LIVE SPORTS BANNER + PISTOL 2 (RIGHT SIDE, FACING LEFT) */}
+                <div className="pistol-banner-row row-right">
                   <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
                     <div className="banner-content-inner">
                       <div className="banner-badge-tag sports-tag">⚽ LIVE SPORTS CHANNELS</div>
@@ -305,15 +298,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       </div>
                     </div>
                   </div>
+                  <div className="pistol-static-wrapper pistol-right">
+                    <img src="/pistol_artwork.jpg" alt="Pistol 2" className="pistol-ink-img facing-left" />
+                  </div>
                 </div>
 
-                {/* BANNER 3: ANIME HUB (Pistol 3 shoots Left -> Right) */}
-                <div className="torn-banner-wrapper left-to-right">
-                  <div className="pistol-shooter-group left-gun">
-                    <div className="ink-pistol-icon">🔫</div>
-                    <div className="bullet-streak left-streak" />
+                {/* ROW 3: PISTOL 3 (LEFT SIDE, FACING RIGHT - SAME AS PISTOL 1) + ANIME BANNER */}
+                <div className="pistol-banner-row row-left">
+                  <div className="pistol-static-wrapper pistol-left">
+                    <img src="/pistol_artwork.jpg" alt="Pistol 3" className="pistol-ink-img facing-right" />
                   </div>
-
                   <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
                     <div className="banner-content-inner">
                       <div className="banner-badge-tag anime-tag">⛩️ ANIME STREAMING HUB</div>

@@ -370,65 +370,45 @@
   margin: 0 auto;
 }
 
-.torn-banner-wrapper {
-  position: relative;
+.pistol-banner-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   width: 100%;
+}
+
+.pistol-banner-row.row-left {
+  flex-direction: row;
+}
+
+.pistol-banner-row.row-right {
+  flex-direction: row;
+}
+
+.pistol-static-wrapper {
+  flex-shrink: 0;
+  width: 150px;
+  height: 95px;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
-/* PISTOL SHOOTER & BULLET STREAK ANIMATION */
-.pistol-shooter-group {
-  position: absolute;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  pointer-events: none;
+.pistol-ink-img {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+  mix-blend-mode: multiply; /* Blends yellow background image 100% seamlessly with yellow canvas! */
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
+  transition: transform 0.2s ease;
 }
 
-.left-gun {
-  left: -20px;
+.pistol-ink-img.facing-right {
+  transform: none;
 }
 
-.right-gun {
-  right: -20px;
-  flex-direction: row-reverse;
-}
-
-.ink-pistol-icon {
-  font-size: 38px;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
-}
-
-.flip-gun {
+.pistol-ink-img.facing-left {
   transform: scaleX(-1);
-}
-
-.bullet-streak {
-  height: 6px;
-  background: linear-gradient(90deg, #111111, #e50914, transparent);
-  border-radius: 4px;
-  box-shadow: 0 0 12px #e50914;
-}
-
-.left-streak {
-  width: 120px;
-  animation: bulletFlyLeft 1.2s ease-out forwards;
-}
-
-.right-streak {
-  width: 120px;
-  animation: bulletFlyRight 1.2s ease-out forwards;
-}
-
-@keyframes bulletFlyLeft {
-  from { width: 0px; opacity: 1; }
-  to { width: 100vw; opacity: 0; }
-}
-
-@keyframes bulletFlyRight {
-  from { width: 0px; opacity: 1; }
-  to { width: 100vw; opacity: 0; }
 }
 
 /* TORN PAPER WHITE BANNER MATCHING USER SCREENSHOT */
