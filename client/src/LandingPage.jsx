@@ -109,12 +109,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Starburst / Lightburst Flare active during scrollProgress 0.08 -> 0.35
-  const isBurstActive = scrollProgress > 0.08 && scrollProgress < 0.35;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.08) / 0.27) * Math.PI) : 0;
+  // Phase 2 Starburst / Lightburst Flare active during scrollProgress 0.05 -> 0.35
+  const isBurstActive = scrollProgress > 0.05 && scrollProgress < 0.35;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.05) / 0.30) * Math.PI) : 0;
 
-  // Phase 3 Screen shake during impact (scrollProgress 0.25 -> 0.38)
-  const isShaking = scrollProgress > 0.25 && scrollProgress < 0.38;
+  // Phase 3 Screen shake during impact (scrollProgress 0.20 -> 0.38)
+  const isShaking = scrollProgress > 0.20 && scrollProgress < 0.38;
   const shakeX = isShaking ? Math.sin(scrollProgress * 140) * 12 : 0;
   const shakeY = isShaking ? Math.cos(scrollProgress * 140) * 12 : 0;
 
@@ -124,13 +124,15 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
   const isYellowCanvas = spinProgress > 0.45;
-  const isFullyLockedYellow = spinProgress >= 0.94; // 360deg spin locks 100% flat as yellow canvas
 
-  // 1-SEC PAUSE BEFORE BULLET STRIKE: Bullet motion starts ONLY after scrollProgress > 0.48 (gives 1-sec scroll pause)
+  // PERFECT CLOSING LOCK: Lock 100% flat as yellow canvas when spin reaches end
+  const isFullyLockedYellow = spinProgress >= 0.94;
+
+  // 1-SEC SCROLL PAUSE: Bullets shoot out of gun barrels ONLY after scrollProgress > 0.48
   const bulletProgress = Math.min(Math.max((scrollProgress - 0.48) * 2.2, 0), 1);
 
-  // WHITE ZIGZAG CRACK OVERLAY (VISIBLE FROM START 0.0 TO DOOR ROTATION STARTS)
-  const showWhiteLine = scrollProgress >= 0 && spinProgress < 0.08;
+  // WHITE ZIGZAG CRACK OVERLAY (PERFECTLY VISIBLE ON INITIAL SCROLL BEFORE DOOR SPIN STARTS)
+  const showWhiteLine = scrollProgress >= 0 && spinProgress < 0.15;
 
   return (
     <div
@@ -146,7 +148,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.38 ? Math.max(1 - (scrollProgress - 0.08) * 4, 0) : 0,
+                opacity: scrollProgress < 0.38 ? Math.max(1 - (scrollProgress - 0.05) * 4, 0) : 0,
                 filter: isBurstActive ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
               }}
             >
@@ -269,7 +271,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* YELLOW STAGE WITH 3 GUNS PERFECTLY PLACED (GUN 1 LEFT, GUN 2 RIGHT FLIPPED, GUN 3 LEFT) */}
+          {/* YELLOW STAGE WITH 3 GUNS & 3 BULLETS (1 BULLET PER GUN BARREL IN INSIDE POSITIONS) */}
           {isFullyLockedYellow && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
@@ -278,21 +280,25 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               </div>
 
               <div className="torn-banners-container-3">
-                {/* ROW 1 (TOP): GUN 1 (LEFT SIDE) -> BULLET 1 (TOP ROW ONLY, LEFT TO RIGHT) */}
+                {/* ROW 1 (TOP): GUN 1 (LEFT SIDE) -> BULLET 1 (TOP ROW INSIDE GUN BARREL, LEFT TO RIGHT) */}
                 <div className="pistol-banner-row row-left">
-                  <div className="pistol-static-wrapper pistol-left">
+                  <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
-                  </div>
-
-                  {/* Bullet 1 (Top Row Only): Starts at Gun 1 barrel & shoots left-to-right off screen */}
-                  <div
-                    className="bullet-flying-wrapper bullet-row-1"
-                    style={{
-                      left: `calc(195px + ${bulletProgress * 115}%)`,
-                      opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0
-                    }}
-                  >
-                    <img src="/bullet_artwork.png" alt="Bullet 1" className="bullet-img facing-right" />
+                    
+                    {/* Bullet 1 (Top Row): Starts INSIDE Gun 1 barrel and shoots left-to-right off screen */}
+                    <div
+                      className="bullet-flying-wrapper bullet-row-1"
+                      style={{
+                        position: 'absolute',
+                        left: `calc(190px + ${bulletProgress * 90}vw)`,
+                        top: '42px',
+                        transform: 'translateY(-50%)',
+                        opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0,
+                        zIndex: 100
+                      }}
+                    >
+                      <img src="/bullet_artwork.png" alt="Bullet 1" className="bullet-img facing-right" />
+                    </div>
                   </div>
 
                   {/* Torn White Paper Banner 1 Unrolling Behind Bullet 1 */}
@@ -317,7 +323,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
 
-                {/* ROW 2 (MIDDLE): GUN 2 (RIGHT SIDE FLIPPED) -> BULLET 2 (MIDDLE ROW ONLY, RIGHT TO LEFT) */}
+                {/* ROW 2 (MIDDLE): GUN 2 (RIGHT SIDE FLIPPED) -> BULLET 2 (MIDDLE ROW INSIDE GUN BARREL, RIGHT TO LEFT) */}
                 <div className="pistol-banner-row row-right">
                   {/* Torn White Paper Banner 2 Unrolling Reverse Behind Bullet 2 */}
                   <div
@@ -340,37 +346,45 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                   </div>
 
-                  {/* Bullet 2 (Middle Row Only): Starts at Gun 2 barrel & shoots right-to-left off screen */}
-                  <div
-                    className="bullet-flying-wrapper bullet-row-2"
-                    style={{
-                      right: `calc(195px + ${bulletProgress * 115}%)`,
-                      opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0
-                    }}
-                  >
-                    <img src="/bullet_artwork.png" alt="Bullet 2" className="bullet-img facing-left" />
-                  </div>
-
-                  <div className="pistol-static-wrapper pistol-right">
+                  <div className="pistol-static-wrapper pistol-right" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
+
+                    {/* Bullet 2 (Middle Row): Starts INSIDE Gun 2 barrel and shoots right-to-left off screen */}
+                    <div
+                      className="bullet-flying-wrapper bullet-row-2"
+                      style={{
+                        position: 'absolute',
+                        right: `calc(190px + ${bulletProgress * 90}vw)`,
+                        top: '42px',
+                        transform: 'translateY(-50%)',
+                        opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0,
+                        zIndex: 100
+                      }}
+                    >
+                      <img src="/bullet_artwork.png" alt="Bullet 2" className="bullet-img facing-left" />
+                    </div>
                   </div>
                 </div>
 
-                {/* ROW 3 (BOTTOM): GUN 3 (LEFT SIDE) -> BULLET 3 (BOTTOM ROW ONLY, LEFT TO RIGHT) */}
+                {/* ROW 3 (BOTTOM): GUN 3 (LEFT SIDE) -> BULLET 3 (BOTTOM ROW INSIDE GUN BARREL, LEFT TO RIGHT) */}
                 <div className="pistol-banner-row row-left">
-                  <div className="pistol-static-wrapper pistol-left">
+                  <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
-                  </div>
 
-                  {/* Bullet 3 (Bottom Row Only): Starts at Gun 3 barrel & shoots left-to-right off screen */}
-                  <div
-                    className="bullet-flying-wrapper bullet-row-3"
-                    style={{
-                      left: `calc(195px + ${bulletProgress * 115}%)`,
-                      opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0
-                    }}
-                  >
-                    <img src="/bullet_artwork.png" alt="Bullet 3" className="bullet-img facing-right" />
+                    {/* Bullet 3 (Bottom Row): Starts INSIDE Gun 3 barrel and shoots left-to-right off screen */}
+                    <div
+                      className="bullet-flying-wrapper bullet-row-3"
+                      style={{
+                        position: 'absolute',
+                        left: `calc(190px + ${bulletProgress * 90}vw)`,
+                        top: '42px',
+                        transform: 'translateY(-50%)',
+                        opacity: bulletProgress > 0 && bulletProgress < 0.98 ? 1 : 0,
+                        zIndex: 100
+                      }}
+                    >
+                      <img src="/bullet_artwork.png" alt="Bullet 3" className="bullet-img facing-right" />
+                    </div>
                   </div>
 
                   {/* Torn White Paper Banner 3 Unrolling Behind Bullet 3 */}
