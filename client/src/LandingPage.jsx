@@ -52,32 +52,24 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // ULTRA SMOOTH LERP SCROLL ANIMATION LOOP
+  // ULTRA SMOOTH DIRECT SCROLL CALCULATION (ZERO LERP DELAY TO ELIMINATE TIMING MISMATCH)
   useEffect(() => {
-    let animId;
-    let currVal = 0;
-
-    const loop = () => {
+    const handleScroll = () => {
       const stageWrapper = document.querySelector('.sticky-pinned-red-stage-wrapper');
       if (stageWrapper) {
         const rect = stageWrapper.getBoundingClientRect();
         const totalScroll = stageWrapper.clientHeight - window.innerHeight;
         const target = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-
-        currVal += (target - currVal) * 0.08;
-        setScrollProgress(currVal);
+        setScrollProgress(target);
       } else {
-        // Fallback for hero section window scroll
         const heroHeight = window.innerHeight * 2.2;
-        const target = Math.min(window.scrollY / heroHeight, 1);
-        currVal += (target - currVal) * 0.08;
-        setScrollProgress(currVal);
+        setScrollProgress(Math.min(window.scrollY / heroHeight, 1));
       }
-      animId = requestAnimationFrame(loop);
     };
 
-    loop();
-    return () => cancelAnimationFrame(animId);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -115,9 +107,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Starburst / Lightburst Flare active as user starts scrolling down (scrollProgress 0.01 -> 0.40)
-  const isBurstActive = scrollProgress > 0.01 && scrollProgress < 0.40;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.01) / 0.39) * Math.PI) : 0;
+  // Phase 2 Starburst Lightburst Flare (active as user scrolls down from top: 0.0 -> 0.40)
+  const isBurstActive = scrollProgress >= 0.0 && scrollProgress < 0.40;
+  const burstOpacity = isBurstActive ? Math.sin((scrollProgress / 0.40) * Math.PI) : 0;
 
   // Phase 3 Screen shake during impact (scrollProgress 0.20 -> 0.38)
   const isShaking = scrollProgress > 0.20 && scrollProgress < 0.38;
@@ -137,8 +129,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // 1-SEC SCROLL PAUSE: Bullets shoot out of gun barrels ONLY after scrollProgress > 0.48
   const bulletProgress = Math.min(Math.max((scrollProgress - 0.48) * 2.2, 0), 1);
 
-  // WHITE ZIGZAG CRACK OVERLAY (PERFECTLY VISIBLE ON INITIAL SCROLL BEFORE DOOR SPIN STARTS)
-  const showWhiteLine = scrollProgress >= 0 && spinProgress < 0.15;
+  // WHITE ZIGZAG CRACK OVERLAY: ALWAYS VISIBLE AT INITIAL STATE (scrollProgress <= 0.02) AND UNTIL DOOR ROTATES
+  const showWhiteLine = !isYellowCanvas && (scrollProgress <= 0.02 || (scrollProgress > 0 && doorSpinAngle <= 15));
 
   return (
     <div
@@ -155,7 +147,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               className="genz-tagline-text"
               style={{
                 opacity: scrollProgress < 0.45 ? 1 : 0,
-                filter: isBurstActive ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
+                filter: isBurstActive ? `brightness(${1 + burstOpacity * 4.0})` : 'none'
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
@@ -165,8 +157,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <div
               className="procedural-lightburst-flare"
               style={{
-                opacity: burstOpacity > 0.05 ? burstOpacity : 0,
-                transform: `translate(-50%, -50%) scale(${0.5 + burstOpacity * 3.0})`,
+                opacity: burstOpacity > 0.02 ? burstOpacity : 0.8,
+                transform: `translate(-50%, -50%) scale(${0.6 + burstOpacity * 2.8})`,
                 pointerEvents: 'none',
                 display: 'block'
               }}
@@ -423,7 +415,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           <div
             className="vertical-zigzag-crack-container"
             style={{
-              opacity: showWhiteLine ? 1 : 0
+              opacity: showWhiteLine ? 1 : 0,
+              zIndex: 100
             }}
           >
             <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
