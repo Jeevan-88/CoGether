@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { POKI_TOP_TRENDING, POKI_WEB_EXCLUSIVES } from './pokiCatalog.js';
-import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, ShieldCheck, Share2, Clapperboard, Film, Radio } from 'lucide-react';
+import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move } from 'lucide-react';
 import './LandingPage.css';
 
 export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing }) {
@@ -75,11 +75,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   // 360-Degree Inward Door Flip Progress (scrollProgress 0.72 -> 1.0)
   const doorSpinProgress = scrollProgress > 0.72 ? Math.min((scrollProgress - 0.72) * 3.6, 1) : 0;
-  const doorAngleLeft = doorSpinProgress * 360; // 0deg -> 360deg spin
+  const doorAngleLeft = doorSpinProgress * 360; // 0deg -> 360deg spin inwards
   const doorAngleRight = doorSpinProgress * 360;
 
-  // Color transition from RED to VIBRANT YELLOW (#FFCC00) at 180deg flip mid-point
-  const isYellowCanvas = doorSpinProgress > 0.45;
+  // Color transition from RED to VIBRANT PLAIN YELLOW (#FFCC00) at 180deg flip mid-point
+  const isPlainYellowCanvas = doorSpinProgress > 0.45;
 
   return (
     <div
@@ -122,16 +122,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. 3D 360-DEGREE INWARD DOOR FLIP STAGE (RED TO YELLOW TRANSITION) */}
+      {/* 2. 3D 360-DEGREE INWARD DOOR FLIP STAGE (ORIGINAL RED CO-WATCH LAYOUT TRANSITIONING TO PLAIN YELLOW CANVAS) */}
       <section className="3d-360-doors-stage">
-        {/* LEFT DOOR HALF (Rotates 360deg inwards from left) */}
+        {/* LEFT DOOR HALF (Left Text Panel rotates 360deg inwards) */}
         <div
-          className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
+          className={`door-half-panel door-panel-left ${isPlainYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
           style={{
             transform: `rotateY(${-doorAngleLeft}deg)`
           }}
         >
-          {!isYellowCanvas ? (
+          {!isPlainYellowCanvas ? (
             <div className="door-content-left-red">
               <div className="watch-together-badge">CO-WATCH HUB</div>
               <h2 className="red-section-headline">Synchronized Movies & TV Shows</h2>
@@ -151,24 +151,20 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               </button>
             </div>
           ) : (
-            <div className="door-content-left-yellow">
-              <span className="yellow-eyebrow-badge">CO-WATCH HUB CATEGORIES</span>
-              <h2 className="yellow-canvas-headline">WHAT ARE YOU CO-WATCHING TODAY?</h2>
-              <p className="yellow-canvas-sub">
-                Stream Anime, Movies, Live Sports & YouTube with millisecond sync. Legal Screen Sharing & Embedded Video Links supported!
-              </p>
+            <div className="door-content-left-yellow plain-yellow-content">
+              {/* Plain Yellow Canvas Left Side */}
             </div>
           )}
         </div>
 
-        {/* RIGHT DOOR HALF (Rotates 360deg inwards from right) */}
+        {/* RIGHT DOOR HALF (Right Video Frame rotates 360deg inwards) */}
         <div
-          className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
+          className={`door-half-panel door-panel-right ${isPlainYellowCanvas ? 'bg-yellow' : 'bg-red'}`}
           style={{
             transform: `rotateY(${doorAngleRight}deg)`
           }}
         >
-          {!isYellowCanvas ? (
+          {!isPlainYellowCanvas ? (
             <div className="door-content-right-red">
               <div className="video-player-box-red">
                 <div className="video-overlay-bar">
@@ -210,38 +206,13 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               </div>
             </div>
           ) : (
-            <div className="door-content-right-yellow">
-              <div className="yellow-mini-wheels-grid">
-                <div className="yellow-wheel-card" onClick={() => handleLaunch('watch')}>
-                  <span className="wheel-badge-tag red-badge">LEGAL ANIME SYNC</span>
-                  <h3>⛩️ Anime Hub</h3>
-                  <p>Legal Screen Share & Crunchyroll Embeds</p>
-                  <button className="btn-wheel-launch">Co-Watch Anime <ArrowRight size={14} /></button>
-                </div>
-                <div className="yellow-wheel-card" onClick={() => handleLaunch('watch')}>
-                  <span className="wheel-badge-tag red-badge">CINEMATIC SYNC</span>
-                  <h3>🎬 Movies & Shows</h3>
-                  <p>Netflix, Disney+, Prime Video 4K</p>
-                  <button className="btn-wheel-launch">Co-Watch Movies <ArrowRight size={14} /></button>
-                </div>
-                <div className="yellow-wheel-card" onClick={() => handleLaunch('watch')}>
-                  <span className="wheel-badge-tag red-badge">STADIUM LIVE</span>
-                  <h3>⚽ Sports & Live TV</h3>
-                  <p>Zero-latency stadium reaction rooms</p>
-                  <button className="btn-wheel-launch">Co-Watch Sports <ArrowRight size={14} /></button>
-                </div>
-                <div className="yellow-wheel-card" onClick={() => handleLaunch('watch')}>
-                  <span className="wheel-badge-tag red-badge">INSTANT QUEUE</span>
-                  <h3>🍿 YouTube & Shorts</h3>
-                  <p>Shared room video queue & playback</p>
-                  <button className="btn-wheel-launch">Co-Watch YouTube <ArrowRight size={14} /></button>
-                </div>
-              </div>
+            <div className="door-content-right-yellow plain-yellow-content">
+              {/* Plain Yellow Canvas Right Side */}
             </div>
           )}
         </div>
 
-        {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE IN THE CENTER */}
+        {/* CLEAN WHITE VERTICAL ZIGZAG CUT SEAM LINE IN THE CENTER */}
         <div
           className="vertical-zigzag-crack-container"
           style={{
