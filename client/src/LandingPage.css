@@ -136,11 +136,16 @@
   overflow: hidden;
   display: flex;
   align-items: center;
-  background: #000000;
+  background: #e50914;
+  transition: background 0.3s ease;
+}
+
+.sticky-pinned-red-stage-inner.bg-yellow-stage {
+  background: #ffcc00;
 }
 
 .door-half-panel {
-  width: 50%;
+  width: 50.5%;
   height: 100%;
   min-height: 100vh;
   position: relative;
@@ -152,12 +157,7 @@
 }
 
 .door-panel-left {
-  width: 50%;
   transform-origin: left center;
-}
-
-.door-panel-left.is-spinning {
-  width: 50.5%;
   clip-path: polygon(
     0% 0%,
     100% 0%,
@@ -182,17 +182,12 @@
     97.5% 95%,
     100% 100%,
     0% 100%
-  ) !important;
+  );
 }
 
 .door-panel-right {
-  width: 50%;
-  transform-origin: right center;
-}
-
-.door-panel-right.is-spinning {
-  width: 50.5%;
   margin-left: -1px;
+  transform-origin: right center;
   clip-path: polygon(
     0% 0%,
     100% 0%,
@@ -217,7 +212,7 @@
     2.5% 15%,
     0% 10%,
     2.5% 5%
-  ) !important;
+  );
 }
 
 .door-half-panel.bg-red {

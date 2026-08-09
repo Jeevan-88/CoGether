@@ -78,11 +78,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const spinProgress = scrollProgress > 0.78 ? Math.min((scrollProgress - 0.78) * 4.5, 1) : 0;
   const doorSpinAngle = spinProgress * 360; // 0deg -> 360deg spin inwards
 
-  // Scissor-cut clip-path activates ONLY when door is actively spinning (15deg < angle < 345deg)
-  const isSpinning = doorSpinAngle > 15 && doorSpinAngle < 345;
   const isYellowCanvas = spinProgress > 0.45;
-  const isFullyLockedYellow = spinProgress > 0.92;
-  const showWhiteLine = scrollProgress > 0.50 && doorSpinAngle <= 15;
+  const isFullyLockedYellow = spinProgress > 0.94;
+  const showWhiteLine = scrollProgress > 0.50 && doorSpinAngle <= 8;
 
   return (
     <div
@@ -127,10 +125,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
       {/* 2. STICKY PINNED RED CO-WATCH SECTION */}
       <section className="sticky-pinned-red-stage-wrapper">
-        <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
+        <div className={`sticky-pinned-red-stage-inner ${isYellowCanvas ? 'bg-yellow-stage' : ''} ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
           {/* LEFT DOOR PANEL */}
           <div
-            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''} ${isFullyLockedYellow ? 'no-clip' : ''}`}
+            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isFullyLockedYellow ? 'no-clip' : ''}`}
             style={{
               transform: `rotateY(${-doorSpinAngle}deg)`
             }}
@@ -161,7 +159,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
           {/* RIGHT DOOR PANEL */}
           <div
-            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''} ${isFullyLockedYellow ? 'no-clip' : ''}`}
+            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isFullyLockedYellow ? 'no-clip' : ''}`}
             style={{
               transform: `rotateY(${doorSpinAngle}deg)`
             }}
