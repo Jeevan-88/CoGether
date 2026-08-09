@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { POKI_TOP_TRENDING, POKI_WEB_EXCLUSIVES } from './pokiCatalog.js';
-import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move } from 'lucide-react';
+import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, ShieldCheck, Share2, Clapperboard, Film } from 'lucide-react';
 import './LandingPage.css';
 
 export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing }) {
@@ -76,6 +76,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // Red Section reveal progress (scrollProgress 0.70 -> 1.0)
   const redRevealProgress = scrollProgress > 0.70 ? Math.min((scrollProgress - 0.70) * 3.3, 1) : 0;
 
+  // 3D Card Flip Angle on Left Text Panel (scrollProgress 0.72 -> 1.0, 0deg -> 180deg)
+  const flipProgress = scrollProgress > 0.72 ? Math.min((scrollProgress - 0.72) * 3.8, 1) : 0;
+  const cardFlipAngle = flipProgress * 180;
+
   return (
     <div
       className="landing-page-official fade-in"
@@ -117,7 +121,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 2. BOLD RED SECTION: CO-WATCH HUB WITH CLEAN SMOOTH SCROLL REVEAL */}
+      {/* 2. BOLD RED SECTION: CO-WATCH HUB WITH 3D INWARD FLIP ON LEFT CARD */}
       <section
         className="official-red-section smooth-reveal-stage"
         style={{
@@ -143,25 +147,76 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
 
         <div className="red-section-container">
-          <div className="red-left-content">
-            <div className="watch-together-badge">CO-WATCH HUB</div>
-            <h2 className="red-section-headline">Synchronized Movies & TV Shows</h2>
-            <p className="red-section-sub">
-              Stream movies, TV shows, and videos synchronized to the exact millisecond with integrated real-time video calls.
-            </p>
-            <div className="how-it-works-switcher-box">
-              <span className="switcher-label">CAMERA RESIZER (CoGether Room):</span>
-              <div className="switcher-btns-row">
-                <button className={`switch-btn ${camBoxSize === 'sm' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('sm')}>Small</button>
-                <button className={`switch-btn ${camBoxSize === 'md' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('md')}>Medium</button>
-                <button className={`switch-btn ${camBoxSize === 'lg' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('lg')}>Large</button>
+          {/* LEFT CONTENT: 3D CARD THAT FLIPS INWARDS ON SCROLL TO BECOME YELLOW (#FFCC00) */}
+          <div className="red-left-content-3d-card-stage">
+            <div
+              className="red-left-3d-flip-card"
+              style={{
+                transform: `rotateY(${cardFlipAngle}deg)`
+              }}
+            >
+              {/* FRONT FACE (RED) */}
+              <div className="card-face card-front-red">
+                <div className="watch-together-badge">CO-WATCH HUB</div>
+                <h2 className="red-section-headline">Synchronized Movies & TV Shows</h2>
+                <p className="red-section-sub">
+                  Stream movies, TV shows, and videos synchronized to the exact millisecond with integrated real-time video calls.
+                </p>
+                <div className="how-it-works-switcher-box">
+                  <span className="switcher-label">CAMERA RESIZER (CoGether Room):</span>
+                  <div className="switcher-btns-row">
+                    <button className={`switch-btn ${camBoxSize === 'sm' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('sm')}>Small</button>
+                    <button className={`switch-btn ${camBoxSize === 'md' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('md')}>Medium</button>
+                    <button className={`switch-btn ${camBoxSize === 'lg' ? 'active-size' : ''}`} onClick={() => setCamBoxSize('lg')}>Large</button>
+                  </div>
+                </div>
+                <button className="btn-black-launch-party" onClick={() => handleLaunch('watch')}>
+                  Launch Co-Watch Room <ArrowRight size={18} />
+                </button>
+              </div>
+
+              {/* BACK FACE (VIBRANT YELLOW #FFCC00) */}
+              <div className="card-face card-back-yellow">
+                <div className="yellow-card-badge">CO-WATCH CATEGORIES</div>
+                <h3 className="yellow-card-title">What are you watching today?</h3>
+                <div className="yellow-categories-list">
+                  <div className="cat-item" onClick={() => handleLaunch('watch')}>
+                    <span className="cat-icon"><Clapperboard size={22} color="#e50914" /></span>
+                    <div className="cat-info">
+                      <strong>⛩️ Anime Hub</strong>
+                      <span className="cat-sub">Legal Screen Share & Crunchyroll Embeds</span>
+                    </div>
+                  </div>
+                  <div className="cat-item" onClick={() => handleLaunch('watch')}>
+                    <span className="cat-icon"><Film size={22} color="#e50914" /></span>
+                    <div className="cat-info">
+                      <strong>🎬 Movies & TV Shows</strong>
+                      <span className="cat-sub">Netflix, Disney+, Prime 4K Sync</span>
+                    </div>
+                  </div>
+                  <div className="cat-item" onClick={() => handleLaunch('watch')}>
+                    <span className="cat-icon"><Tv size={22} color="#e50914" /></span>
+                    <div className="cat-info">
+                      <strong>⚽ Sports & Live TV</strong>
+                      <span className="cat-sub">Stadium zero-latency watch rooms</span>
+                    </div>
+                  </div>
+                  <div className="cat-item" onClick={() => handleLaunch('watch')}>
+                    <span className="cat-icon"><Play size={22} color="#e50914" fill="#e50914" /></span>
+                    <div className="cat-info">
+                      <strong>🍿 YouTube & Shorts</strong>
+                      <span className="cat-sub">Instant queue & room video sync</span>
+                    </div>
+                  </div>
+                </div>
+                <button className="btn-black-launch-party yellow-btn" onClick={() => handleLaunch('watch')}>
+                  Launch Co-Watch Room <ArrowRight size={18} />
+                </button>
               </div>
             </div>
-            <button className="btn-black-launch-party" onClick={() => handleLaunch('watch')}>
-              Launch Co-Watch Room <ArrowRight size={18} />
-            </button>
           </div>
 
+          {/* RIGHT CONTENT: VIDEO PLAYER FRAME */}
           <div className="red-right-video-frame">
             <div className="video-player-box-red">
               <div className="video-overlay-bar">
