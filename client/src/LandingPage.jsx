@@ -266,7 +266,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 {/* ROW 1: PISTOL 1 (LEFT SIDE, FACING RIGHT) + MOVIES & TV BANNER */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
-                    <img src="/pistol_artwork.jpg" alt="Pistol 1" className="pistol-ink-img facing-right" />
+                    <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                   </div>
                   <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
                     <div className="banner-content-inner">
@@ -299,14 +299,14 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                   </div>
                   <div className="pistol-static-wrapper pistol-right">
-                    <img src="/pistol_artwork.jpg" alt="Pistol 2" className="pistol-ink-img facing-left" />
+                    <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
                   </div>
                 </div>
 
                 {/* ROW 3: PISTOL 3 (LEFT SIDE, FACING RIGHT - SAME AS PISTOL 1) + ANIME BANNER */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left">
-                    <img src="/pistol_artwork.jpg" alt="Pistol 3" className="pistol-ink-img facing-right" />
+                    <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
                   </div>
                   <div className="torn-paper-white-banner" onClick={() => handleLaunch('watch')}>
                     <div className="banner-content-inner">
