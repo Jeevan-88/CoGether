@@ -66,6 +66,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
         currVal += (target - currVal) * 0.08;
         setScrollProgress(currVal);
+      } else {
+        // Fallback for hero section window scroll
+        const heroHeight = window.innerHeight * 2.2;
+        const target = Math.min(window.scrollY / heroHeight, 1);
+        currVal += (target - currVal) * 0.08;
+        setScrollProgress(currVal);
       }
       animId = requestAnimationFrame(loop);
     };
@@ -109,9 +115,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 2 Starburst / Lightburst Flare active during scrollProgress 0.05 -> 0.35
-  const isBurstActive = scrollProgress > 0.05 && scrollProgress < 0.35;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.05) / 0.30) * Math.PI) : 0;
+  // Phase 2 Starburst / Lightburst Flare active as user starts scrolling down (scrollProgress 0.01 -> 0.40)
+  const isBurstActive = scrollProgress > 0.01 && scrollProgress < 0.40;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.01) / 0.39) * Math.PI) : 0;
 
   // Phase 3 Screen shake during impact (scrollProgress 0.20 -> 0.38)
   const isShaking = scrollProgress > 0.20 && scrollProgress < 0.38;
@@ -148,7 +154,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.38 ? Math.max(1 - (scrollProgress - 0.05) * 4, 0) : 0,
+                opacity: scrollProgress < 0.45 ? 1 : 0,
                 filter: isBurstActive ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
               }}
             >
@@ -159,9 +165,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <div
               className="procedural-lightburst-flare"
               style={{
-                opacity: burstOpacity,
-                transform: `translate(-50%, -50%) scale(${0.4 + burstOpacity * 2.8})`,
-                pointerEvents: 'none'
+                opacity: burstOpacity > 0.05 ? burstOpacity : 0,
+                transform: `translate(-50%, -50%) scale(${0.5 + burstOpacity * 3.0})`,
+                pointerEvents: 'none',
+                display: 'block'
               }}
             >
               <div className="flare-core-burst" />
