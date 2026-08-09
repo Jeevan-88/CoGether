@@ -77,9 +77,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // Phase 5: 360-Degree Inward Door Flip starts ONLY after scrollProgress > 0.78!
   const spinProgress = scrollProgress > 0.78 ? Math.min((scrollProgress - 0.78) * 4.5, 1) : 0;
   const doorSpinAngle = spinProgress * 360; // 0deg -> 360deg spin inwards
-  const isSpinning = doorSpinAngle > 1 && doorSpinAngle < 359;
+
+  // Scissor-cut clip-path activates ONLY when door is actively spinning (15deg < angle < 345deg)
+  const isSpinning = doorSpinAngle > 15 && doorSpinAngle < 345;
   const isYellowCanvas = spinProgress > 0.45;
-  const isFullyLockedYellow = spinProgress > 0.95;
+  const isFullyLockedYellow = spinProgress > 0.92;
+  const showWhiteLine = scrollProgress > 0.50 && doorSpinAngle <= 15;
 
   return (
     <div
@@ -127,7 +130,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow ? 'bg-full-yellow' : ''}`}>
           {/* LEFT DOOR PANEL */}
           <div
-            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''}`}
+            className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''} ${isFullyLockedYellow ? 'no-clip' : ''}`}
             style={{
               transform: `rotateY(${-doorSpinAngle}deg)`
             }}
@@ -158,7 +161,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
           {/* RIGHT DOOR PANEL */}
           <div
-            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''}`}
+            className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''} ${isFullyLockedYellow ? 'no-clip' : ''}`}
             style={{
               transform: `rotateY(${doorSpinAngle}deg)`
             }}
@@ -218,7 +221,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           <div
             className="vertical-zigzag-crack-container"
             style={{
-              opacity: scrollProgress > 0.50 && spinProgress < 0.08 ? 1 : 0
+              opacity: showWhiteLine ? 1 : 0
             }}
           >
             <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">
