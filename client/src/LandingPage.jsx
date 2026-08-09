@@ -21,7 +21,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 1.1;
+      const heroHeight = window.innerHeight * 1.2;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };
@@ -64,21 +64,31 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Laser Light burst active when scrollProgress is between 0.4 and 0.82
-  const isBurstActive = scrollProgress > 0.4 && scrollProgress < 0.82;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.4) / 0.42) * Math.PI) : 0;
+  // Phase 2 Light burst active during scrollProgress 0.35 -> 0.72
+  const isBurstActive = scrollProgress > 0.35 && scrollProgress < 0.72;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.35) / 0.37) * Math.PI) : 0;
+
+  // Phase 3 Screen shake during impact (scrollProgress 0.65 -> 0.80)
+  const isShaking = scrollProgress > 0.65 && scrollProgress < 0.80;
+  const shakeX = isShaking ? Math.sin(scrollProgress * 120) * 10 : 0;
+  const shakeY = isShaking ? Math.cos(scrollProgress * 120) * 10 : 0;
 
   return (
-    <div className="landing-page-official fade-in">
-      {/* 1. TALL FULLSCREEN BLACK HERO SECTION */}
+    <div
+      className="landing-page-official fade-in"
+      style={{
+        transform: isShaking ? `translate(${shakeX}px, ${shakeY}px)` : 'none'
+      }}
+    >
+      {/* 1. TALL FULLSCREEN BLACK HERO SECTION (160vh) */}
       <section className="fullscreen-pure-black-hero">
         <div className="hero-center-content-wrapper">
-          {/* Gen-Z Tagline: Clean 18px Pixar font positioned cleanly BELOW the 3D logo */}
+          {/* Gen-Z Tagline: Positioned below 3D logo, scrolls up into lightburst during Phase 2 */}
           <div className="genz-tagline-container">
             <p
               className="genz-tagline-text"
               style={{
-                opacity: scrollProgress < 0.75 ? Math.max(1 - (scrollProgress - 0.4) * 2.5, 0) : 0,
+                opacity: scrollProgress < 0.75 ? Math.max(1 - (scrollProgress - 0.35) * 3, 0) : 0,
                 filter: isBurstActive ? `brightness(${1 + burstOpacity * 3})` : 'none'
               }}
             >
@@ -90,7 +100,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               className="procedural-lightburst-flare"
               style={{
                 opacity: burstOpacity,
-                transform: `translate(-50%, -50%) scale(${0.4 + burstOpacity * 2.2})`,
+                transform: `translate(-50%, -50%) scale(${0.4 + burstOpacity * 2.5})`,
                 pointerEvents: 'none'
               }}
             >
@@ -106,11 +116,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
       {/* 2. BOLD RED SECTION: CO-WATCH HUB WITH VERTICAL ZIGZAG CRACK CONFINED TO RED CANVAS ONLY */}
       <section className="official-red-section">
-        {/* CLEAN WHITE VERTICAL ZIGZAG CRACK LINE — ONLY ON RED CANVAS & ENABLED AFTER SCROLLING */}
+        {/* CLEAN WHITE VERTICAL ZIGZAG CRACK LINE — ONLY ON RED CANVAS & ENABLED AFTER PHASE 2 (scrollProgress > 0.75) */}
         <div
           className="vertical-zigzag-crack-container"
           style={{
-            opacity: scrollProgress > 0.75 ? 1 : 0
+            opacity: scrollProgress > 0.72 ? Math.min((scrollProgress - 0.72) * 4, 1) : 0
           }}
         >
           <svg className="vertical-zigzag-svg" viewBox="0 0 40 1200" preserveAspectRatio="none">

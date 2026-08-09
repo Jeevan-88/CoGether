@@ -18,7 +18,7 @@ export default function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 0.9;
+      const heroHeight = window.innerHeight * 1.2;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
     };
@@ -106,7 +106,7 @@ export default function App() {
         user={user}
         onOpenAuth={() => setShowAuth(true)}
         onOpenPricing={() => setShowPricing(true)}
-        isScrolled={scrollProgress > 0.4}
+        isScrolled={scrollProgress > 0.3}
         scrollProgress={scrollProgress}
       />
 

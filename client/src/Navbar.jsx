@@ -8,11 +8,14 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
   // Aspect ratio of tight-cropped 8K 3D logo: 1076 / 5496 = 0.1957788
   const logoAspect = 1076 / 5496;
 
-  // Target navbar logo center coordinates inside 80px fixed header (70px height for full vertical navbar fit)
+  // Phase 1: Logo flies from center to navbar in first 35% of scroll (scrollProgress 0 -> 0.35)
+  const logoProgress = Math.min(scrollProgress / 0.35, 1);
+
+  // Target navbar logo center coordinates inside 80px fixed header
   const containerOffset = Math.max((winW - 1440) / 2, 0);
   const navPaddingLeft = 32;
   const navLogoTargetHeight = 70;
-  const navLogoTargetWidth = navLogoTargetHeight / logoAspect; // ~357.5px wide!
+  const navLogoTargetWidth = navLogoTargetHeight / logoAspect; // ~357.5px wide
   const navLogoTargetX = containerOffset + navPaddingLeft + (navLogoTargetWidth / 2);
   const navLogoTargetY = 40; // center of 80px fixed header
 
@@ -20,9 +23,9 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
   const heroImgCenterX = winW / 2;
   const heroImgCenterY = winH / 2;
 
-  // Interpolated center X & Y as user scrolls
-  const currentCenterX = heroImgCenterX + scrollProgress * (navLogoTargetX - heroImgCenterX);
-  const currentCenterY = heroImgCenterY + scrollProgress * (navLogoTargetY - heroImgCenterY);
+  // Interpolated center X & Y as user scrolls during Phase 1
+  const currentCenterX = heroImgCenterX + logoProgress * (navLogoTargetX - heroImgCenterX);
+  const currentCenterY = heroImgCenterY + logoProgress * (navLogoTargetY - heroImgCenterY);
 
   // Hero initial width & height
   const heroInitialWidth = Math.min(winW * 0.85, 1150);
@@ -30,7 +33,7 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
 
   // Scale interpolation
   const targetScale = navLogoTargetWidth / heroInitialWidth;
-  const currentScale = 1 - (scrollProgress * (1 - targetScale));
+  const currentScale = 1 - (logoProgress * (1 - targetScale));
 
   const currentW = heroInitialWidth * currentScale;
   const currentH = heroInitialHeight * currentScale;
@@ -40,7 +43,7 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
 
   return (
     <header className={`cogether-navbar ${isScrolled ? 'scrolled-header-active' : ''}`}>
-      {/* SINGLE CONTINUOUS TIGHT-CROPPED 8K 3D LOGO: Fits full height of the navbar */}
+      {/* SINGLE CONTINUOUS 8K 3D LOGO: Flies up to top-left navbar header during Phase 1 */}
       <img
         src="/cogether-transparent-hd.png?v=11"
         alt="CoGether"
@@ -63,7 +66,7 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
       />
 
       <div className="navbar-container">
-        {/* Reserved header logo spacer for full-height 3D logo */}
+        {/* Reserved header logo spacer */}
         <div className="navbar-brand-logo" onClick={() => onTabChange('home')} />
 
         {/* Pixar-style nav links: uppercase, spaced, pure white */}
