@@ -128,24 +128,22 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.36) * Math.PI) : 0;
   const crossScale = Math.min((scrollProgress - 0.02) * 3.5, 1);
 
-  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) (scrollProgress 0.28 -> 0.56)
-  // Multiplier 3.6 ensures the yellow doors complete their 360deg spin & interlock 100% flat smoothly!
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.28) * 3.6, 0), 1);
+  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) (scrollProgress 0.28 -> 0.52)
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.28) * 4.0, 0), 1);
   const doorSpinAngle = spinProgress * 360;
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
   const isYellowCanvas = spinProgress > 0.40;
 
-  // SOLID YELLOW LOCK: Locks flat smoothly when spinProgress >= 0.88 or scrollProgress >= 0.56!
-  const isFullyLockedYellow = spinProgress >= 0.88 || scrollProgress >= 0.56;
+  // SOLID YELLOW LOCK: Locks flat smoothly when spinProgress >= 0.88 or scrollProgress >= 0.52!
+  const isFullyLockedYellow = spinProgress >= 0.88 || scrollProgress >= 0.52;
 
   // WHITE ZIGZAG CRACK SEAM LINE OVERLAY:
   // Visible when Red stage appears (scrollProgress >= 0.18) UNTIL exact millisecond door spin starts (spinProgress < 0.005)!
   const showWhiteLine = scrollProgress >= 0.18 && spinProgress < 0.005;
 
-  // STEP 3: 2-SEC SCROLL PAUSE (scrollProgress 0.56 -> 0.74)
-  // Bullets shoot out of gun barrels ONLY after scrollProgress > 0.74!
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.74) * 2.5, 0), 1);
+  // STEP 3: 3 BULLETS SHOOT OUT OF GUN BARRELS ONCE YELLOW STAGE LOCKS FLAT (scrollProgress > 0.52)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.52) * 2.2, 0), 1);
 
   return (
     <div className="landing-page-official fade-in">
@@ -282,7 +280,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* YELLOW STAGE WITH 3 SWAG GUNS & 3 BULLETS (1 BULLET PER GUN BARREL IN INSIDE POSITIONS) */}
+          {/* YELLOW STAGE WITH 3 CLEAN PISTOLS & 3 BULLETS (1 BULLET PER GUN BARREL IN INSIDE POSITIONS) */}
           {isFullyLockedYellow && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
@@ -293,7 +291,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               <div className="torn-banners-container-3">
                 {/* ROW 1 (TOP): GUN 1 (LEFT SIDE) -> BULLET 1 (TOP ROW INSIDE GUN BARREL, LEFT TO RIGHT) */}
                 <div className="pistol-banner-row row-left">
-                  <div className="pistol-static-wrapper pistol-left swag-gun-pop" style={{ position: 'relative', animationDelay: '0.0s' }}>
+                  <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                     
                     {/* Bullet 1 (Top Row): Starts INSIDE Gun 1 barrel and shoots left-to-right off screen */}
@@ -357,7 +355,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                   </div>
 
-                  <div className="pistol-static-wrapper pistol-right swag-gun-pop" style={{ position: 'relative', animationDelay: '0.15s' }}>
+                  <div className="pistol-static-wrapper pistol-right" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
 
                     {/* Bullet 2 (Middle Row): Starts INSIDE Gun 2 barrel and shoots right-to-left off screen */}
@@ -379,7 +377,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
                 {/* ROW 3 (BOTTOM): GUN 3 (LEFT SIDE) -> BULLET 3 (BOTTOM ROW INSIDE GUN BARREL, LEFT TO RIGHT) */}
                 <div className="pistol-banner-row row-left">
-                  <div className="pistol-static-wrapper pistol-left swag-gun-pop" style={{ position: 'relative', animationDelay: '0.30s' }}>
+                  <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
 
                     {/* Bullet 3 (Bottom Row): Starts INSIDE Gun 3 barrel and shoots left-to-right off screen */}
