@@ -42,8 +42,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [isMuted, setIsMuted] = useState(true);
   const [camBoxSize, setCamBoxSize] = useState('md');
   const [tutorialStep, setTutorialStep] = useState(1);
-  
-  const [heroProgress, setHeroProgress] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   const TUTORIAL_MESSAGES = [
@@ -54,29 +52,25 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // UNIFIED RESPONSIVE SCROLL TRACKING FOR HERO & STAGE SECTIONS
+  // SILKY SMOOTH RESPONSIVE LERP SCROLL TRACKING
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const vh = window.innerHeight;
+    let animId;
+    let currVal = 0;
 
-      // 1. Hero Tagline Starburst Flare (scrollY 0 -> vh * 0.6)
-      const hProg = Math.min(scrollY / (vh * 0.6), 1);
-      setHeroProgress(hProg);
-
-      // 2. Stage Section Scroll Progress
+    const loop = () => {
       const stageWrapper = document.querySelector('.sticky-pinned-red-stage-wrapper');
       if (stageWrapper) {
         const rect = stageWrapper.getBoundingClientRect();
-        const totalScrollable = stageWrapper.clientHeight - vh;
-        const sProg = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
-        setScrollProgress(sProg);
+        const totalScroll = stageWrapper.clientHeight - window.innerHeight;
+        const target = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
+        currVal += (target - currVal) * 0.08;
+        setScrollProgress(currVal);
       }
+      animId = requestAnimationFrame(loop);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    loop();
+    return () => cancelAnimationFrame(animId);
   }, []);
 
   useEffect(() => {
@@ -114,37 +108,33 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
 
-  // Phase 1 Starburst Laser Rays Flare (active during heroProgress 0.0 -> 0.8)
-  const burstOpacity = Math.sin(heroProgress * Math.PI);
+  // STEP 1: Plain Horizontal Laser Line (scrollProgress 0.00 -> 0.20)
+  const horizontalScale = Math.min(scrollProgress / 0.15, 1);
 
-  // Phase 3 Screen shake during impact (scrollProgress 0.15 -> 0.35)
-  const isShaking = scrollProgress > 0.15 && scrollProgress < 0.35;
-  const shakeX = isShaking ? Math.sin(scrollProgress * 140) * 12 : 0;
-  const shakeY = isShaking ? Math.cos(scrollProgress * 140) * 12 : 0;
+  // STEP 2: Starburst Flare Formation (scrollProgress 0.15 -> 0.35)
+  const isStarActive = scrollProgress >= 0.12 && scrollProgress < 0.45;
+  const starOpacity = isStarActive ? Math.sin(((scrollProgress - 0.12) / 0.33) * Math.PI) : 0;
 
-  // Phase 4: 360-Degree Inward Door Flip (Red -> Yellow) runs smoothly from 0.0 -> 0.50
-  const spinProgress = Math.min(scrollProgress * 2.0, 1); // 0.0 -> 1.0
-  const doorSpinAngle = spinProgress * 360; // 0deg -> 360deg spin inwards
+  // STEP 3: Vertical Laser Line Hitting Red Canvas (scrollProgress 0.30 -> 0.50)
+  const verticalProgress = Math.min(Math.max((scrollProgress - 0.28) / 0.18, 0), 1);
+  const showVerticalLaser = scrollProgress >= 0.28 && scrollProgress < 0.52;
+
+  // STEP 4 & 5: 360-Degree Inward Door Flip (Red -> Yellow) (scrollProgress 0.48 -> 0.85)
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.48) * 2.6, 0), 1);
+  const doorSpinAngle = spinProgress * 360;
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
   const isYellowCanvas = spinProgress > 0.45;
-
-  // PERFECT CLOSING LOCK: Lock 100% flat as yellow canvas when spin reaches end
   const isFullyLockedYellow = spinProgress >= 0.94;
 
-  // 1-SEC SCROLL PAUSE: Bullets shoot out of gun barrels ONLY after scrollProgress > 0.55
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.55) * 2.2, 0), 1);
+  // STEP 4: White ZigZag Crack Seam Line Overlay (visible right when vertical laser hits red canvas: 0.42 -> door spin starts 0.55)
+  const showZigZagLine = scrollProgress >= 0.42 && spinProgress < 0.15;
 
-  // WHITE ZIGZAG CRACK OVERLAY (PERFECTLY VISIBLE ON INITIAL STAGE LOAD BEFORE DOOR SPIN)
-  const showWhiteLine = !isYellowCanvas && (scrollProgress <= 0.05 || (scrollProgress > 0 && doorSpinAngle <= 15));
+  // STEP 6: Bullet Strikes (scrollProgress > 0.86)
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.86) * 7.5, 0), 1);
 
   return (
-    <div
-      className="landing-page-official fade-in"
-      style={{
-        transform: isShaking ? `translate(${shakeX}px, ${shakeY}px)` : 'none'
-      }}
-    >
+    <div className="landing-page-official fade-in">
       {/* 1. TALL FULLSCREEN BLACK HERO SECTION */}
       <section className="fullscreen-pure-black-hero">
         <div className="hero-center-content-wrapper">
@@ -152,29 +142,47 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <p
               className="genz-tagline-text"
               style={{
-                opacity: heroProgress < 0.9 ? 1 : 0,
-                filter: burstOpacity > 0.1 ? `brightness(${1 + burstOpacity * 4.0})` : 'none'
+                opacity: scrollProgress < 0.45 ? 1 : 0,
+                filter: starOpacity > 0.1 ? `brightness(${1 + starOpacity * 3.5})` : 'none'
               }}
             >
               WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
             </p>
 
-            {/* STARBURST LIGHTNING THUNDER LASER RAYS BURST */}
+            {/* STEP 1: PLAIN HORIZONTAL LASER BEAM */}
+            <div
+              className="horizontal-laser-beam"
+              style={{
+                transform: `translateY(-50%) scaleX(${horizontalScale})`,
+                opacity: scrollProgress < 0.45 ? 1 : 0
+              }}
+            />
+
+            {/* STEP 2: STARBURST FLARE & DIAGONAL LASER RAYS */}
             <div
               className="procedural-lightburst-flare"
               style={{
-                opacity: Math.max(burstOpacity, 0.75),
-                transform: `translate(-50%, -50%) scale(${0.7 + burstOpacity * 2.5})`,
+                opacity: starOpacity,
+                transform: `translate(-50%, -50%) scale(${0.5 + starOpacity * 2.8})`,
                 pointerEvents: 'none',
                 display: 'block'
               }}
             >
               <div className="flare-core-burst" />
-              <div className="horizontal-laser-beam" />
-              <div className="vertical-laser-beam" />
               <div className="diagonal-laser-beam-1" />
               <div className="diagonal-laser-beam-2" />
             </div>
+
+            {/* STEP 3: VERTICAL LASER LINE HITTING RED CANVAS */}
+            {showVerticalLaser && (
+              <div
+                className="vertical-laser-beam"
+                style={{
+                  height: `${verticalProgress * 100}%`,
+                  opacity: verticalProgress
+                }}
+              />
+            )}
           </div>
         </div>
       </section>
@@ -417,11 +425,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             </div>
           )}
 
-          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY (VISIBLE UNTIL DOOR ROTATION STARTS) */}
+          {/* STEP 4: CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY */}
           <div
             className="vertical-zigzag-crack-container"
             style={{
-              opacity: showWhiteLine ? 1 : 0,
+              opacity: showZigZagLine ? 1 : 0,
               zIndex: 100
             }}
           >
