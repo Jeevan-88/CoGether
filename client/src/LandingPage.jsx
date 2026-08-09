@@ -68,11 +68,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         const totalHeight = stageWrapper.clientHeight;
         
         if (scrollY < stageTopOffset) {
-          target = (scrollY / stageTopOffset) * 0.30;
+          target = (scrollY / stageTopOffset) * 0.28;
         } else {
           const stageScroll = scrollY - stageTopOffset;
           const stageMaxScroll = totalHeight - vh;
-          target = 0.30 + Math.min(Math.max(stageScroll / stageMaxScroll, 0), 1) * 0.70;
+          target = 0.28 + Math.min(Math.max(stageScroll / stageMaxScroll, 0), 1) * 0.72;
         }
       } else {
         target = Math.min(scrollY / (vh * 2), 1);
@@ -124,28 +124,28 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   // STEP 1: INITIAL HERO STATE IS 100% PLAIN CLEAN BLACK (scrollProgress <= 0.02)
   // AS USER SCROLLS DOWN (0.02 -> 0.35), STARBURST CROSS LASER FLARE PULSES
-  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.40;
-  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.38) * Math.PI) : 0;
+  const isBurstActive = scrollProgress > 0.02 && scrollProgress < 0.38;
+  const burstOpacity = isBurstActive ? Math.sin(((scrollProgress - 0.02) / 0.36) * Math.PI) : 0;
   const crossScale = Math.min((scrollProgress - 0.02) * 3.5, 1);
 
-  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) (scrollProgress 0.30 -> 0.72)
-  // Zigzag teeth cut edges stay active ALL THE WAY through the 360deg spin until doors interlock at 360deg!
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.30) * 2.4, 0), 1); // 0.0 -> 1.0
+  // STEP 2: 360-Degree Inward Door Flip (Red -> Yellow) (scrollProgress 0.28 -> 0.56)
+  // Multiplier 3.6 ensures the yellow doors complete their 360deg spin & interlock 100% flat smoothly!
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.28) * 3.6, 0), 1);
   const doorSpinAngle = spinProgress * 360;
 
   const isSpinning = doorSpinAngle > 2 && doorSpinAngle < 358;
-  const isYellowCanvas = spinProgress > 0.45;
+  const isYellowCanvas = spinProgress > 0.40;
 
-  // SOLID YELLOW LOCK: Locks flat ONLY when spinProgress reaches >= 0.98 (353° -> 360° full closure)!
-  // This allows the yellow doors with their zigzag teeth cuts to come back together, interlock 100% flat, and THEN flatten into solid yellow canvas!
-  const isFullyLockedYellow = spinProgress >= 0.98;
+  // SOLID YELLOW LOCK: Locks flat smoothly when spinProgress >= 0.88 or scrollProgress >= 0.56!
+  const isFullyLockedYellow = spinProgress >= 0.88 || scrollProgress >= 0.56;
 
   // WHITE ZIGZAG CRACK SEAM LINE OVERLAY:
-  // Visible when Red stage appears (scrollProgress >= 0.20) UNTIL exact millisecond door spin starts (spinProgress < 0.005)!
-  const showWhiteLine = scrollProgress >= 0.20 && spinProgress < 0.005;
+  // Visible when Red stage appears (scrollProgress >= 0.18) UNTIL exact millisecond door spin starts (spinProgress < 0.005)!
+  const showWhiteLine = scrollProgress >= 0.18 && spinProgress < 0.005;
 
-  // STEP 3: 1-SEC SCROLL PAUSE -> 3 Bullets Shoot out of Gun Barrels ONLY after yellow canvas locks flat (scrollProgress > 0.78)
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.78) * 2.2, 0), 1);
+  // STEP 3: 2-SEC SCROLL PAUSE (scrollProgress 0.56 -> 0.74)
+  // Bullets shoot out of gun barrels ONLY after scrollProgress > 0.74!
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.74) * 2.5, 0), 1);
 
   return (
     <div className="landing-page-official fade-in">
@@ -282,7 +282,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* YELLOW STAGE WITH 3 GUNS & 3 BULLETS (1 BULLET PER GUN BARREL IN INSIDE POSITIONS) */}
+          {/* YELLOW STAGE WITH 3 SWAG GUNS & 3 BULLETS (1 BULLET PER GUN BARREL IN INSIDE POSITIONS) */}
           {isFullyLockedYellow && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
@@ -293,7 +293,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               <div className="torn-banners-container-3">
                 {/* ROW 1 (TOP): GUN 1 (LEFT SIDE) -> BULLET 1 (TOP ROW INSIDE GUN BARREL, LEFT TO RIGHT) */}
                 <div className="pistol-banner-row row-left">
-                  <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
+                  <div className="pistol-static-wrapper pistol-left swag-gun-pop" style={{ position: 'relative', animationDelay: '0.0s' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
                     
                     {/* Bullet 1 (Top Row): Starts INSIDE Gun 1 barrel and shoots left-to-right off screen */}
@@ -357,7 +357,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                   </div>
 
-                  <div className="pistol-static-wrapper pistol-right" style={{ position: 'relative' }}>
+                  <div className="pistol-static-wrapper pistol-right swag-gun-pop" style={{ position: 'relative', animationDelay: '0.15s' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
 
                     {/* Bullet 2 (Middle Row): Starts INSIDE Gun 2 barrel and shoots right-to-left off screen */}
@@ -379,7 +379,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
                 {/* ROW 3 (BOTTOM): GUN 3 (LEFT SIDE) -> BULLET 3 (BOTTOM ROW INSIDE GUN BARREL, LEFT TO RIGHT) */}
                 <div className="pistol-banner-row row-left">
-                  <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
+                  <div className="pistol-static-wrapper pistol-left swag-gun-pop" style={{ position: 'relative', animationDelay: '0.30s' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
 
                     {/* Bullet 3 (Bottom Row): Starts INSIDE Gun 3 barrel and shoots left-to-right off screen */}
