@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { POKI_TOP_TRENDING, POKI_WEB_EXCLUSIVES, POKI_CATEGORY_HUBS } from './pokiCatalog.js';
-import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, Box } from 'lucide-react';
+import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, Box, ShoppingCart } from 'lucide-react';
 import './LandingPage.css';
 
 const MOVIE_STREAMING_APPS = [
@@ -137,6 +137,32 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [scrollProgress, setScrollProgress] = useState(0);
   const [heroScroll, setHeroScroll] = useState(0);
   const [coplayScrollProgress, setCoplayScrollProgress] = useState(0);
+  const [coshopScrollProgress, setCoshopScrollProgress] = useState(0);
+
+  // FINAL PERFECT USER LOCKED CO-SHOP STAGE COORDINATES
+  const [tunerTab, setTunerTab] = useState('letters');
+  const [shelfY, setShelfY] = useState(217);
+  const [shelfScale, setShelfScale] = useState(102);
+  
+  // 1. PERFECT WOODEN LETTERS (LOCKED: X=33, Y=-461, Size=140)
+  const [lettersX, setLettersX] = useState(33);
+  const [lettersY, setLettersY] = useState(-461);
+  const [letterHeight, setLetterHeight] = useState(140);
+  
+  // 2. PERFECT LEFT JADE PLANT (LOCKED: X=50, Y=-202, Size=240)
+  const [leftPlantX, setLeftPlantX] = useState(50);
+  const [leftPlantY, setLeftPlantY] = useState(-202);
+  const [leftPlantSize, setLeftPlantSize] = useState(240);
+
+  // 3. PERFECT RIGHT JADE PLANT (LOCKED: X=-18, Y=-208, Size=240)
+  const [rightPlantX, setRightPlantX] = useState(-18);
+  const [rightPlantY, setRightPlantY] = useState(-208);
+  const [rightPlantSize, setRightPlantSize] = useState(240);
+
+  // 4. PERFECT CANVAS TOTE BAG (LOCKED: HookY=45, Height=213)
+  const [toteTop, setToteTop] = useState(45);
+  const [toteHeight, setToteHeight] = useState(213);
+  const [showTuner, setShowTuner] = useState(false);
 
   const TUTORIAL_MESSAGES = [
     { sender: 'Alex', text: 'CoGether makes Co-Watch & Co-Play feel like real life! 🍿', color: '#a855f7' },
@@ -146,12 +172,13 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // ACCURATE SCROLL LISTENERS FOR HERO TAGLINE, STAGE SECTION & CO-PLAY SECTION
+  // ACCURATE SCROLL LISTENERS FOR HERO TAGLINE, STAGE SECTION, CO-PLAY SECTION & CO-SHOP SECTION
   useEffect(() => {
     let animId;
     let currStageVal = 0;
     let currHeroVal = 0;
     let currCoplayVal = 0;
+    let currCoshopVal = 0;
 
     const loop = () => {
       const scrollY = window.scrollY;
@@ -183,6 +210,17 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         currCoplayVal += (targetCoplay - currCoplayVal) * 0.08;
         setCoplayScrollProgress(currCoplayVal);
       }
+
+        // 4. CO-SHOP Section Scroll & Room Illumination Tracking (Pinned 3-Sec Scroll Sequence)
+        const coshopWrapper = document.querySelector('.sticky-pinned-coshop-stage-wrapper');
+        if (coshopWrapper) {
+          const rect = coshopWrapper.getBoundingClientRect();
+          const totalScroll = coshopWrapper.clientHeight - vh;
+          const targetCoshop = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
+
+          currCoshopVal += (targetCoshop - currCoshopVal) * 0.18; // Instant responsive scroll tracking!
+          setCoshopScrollProgress(currCoshopVal);
+        }
 
       animId = requestAnimationFrame(loop);
     };
@@ -224,8 +262,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     else setCamBoxSize('sm');
   };
 
-  const allOnlineGames = [...POKI_TOP_TRENDING, ...POKI_WEB_EXCLUSIVES];
-
   // STEP 1: HERO TAGLINE STARBURST CROSS LASER FLARE (heroScroll 0.02 -> 0.70)
   const isBurstActive = heroScroll > 0.02 && heroScroll < 0.85;
   const burstOpacity = isBurstActive ? Math.sin(((heroScroll - 0.02) / 0.83) * Math.PI) : 0;
@@ -235,7 +271,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const spinProgress = Math.min(Math.max((scrollProgress - 0.10) * 1.67, 0), 1);
   let doorSpinAngle = spinProgress * 360;
 
-  // ACCELERATE FINAL CLOSING ANGLE (spinProgress 0.90 -> 0.97):
   if (spinProgress > 0.90 && spinProgress <= 0.97) {
     const endRatio = (spinProgress - 0.90) / 0.07;
     doorSpinAngle = 324 + endRatio * 36;
@@ -245,11 +280,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const isSpinning = doorSpinAngle > 1 && doorSpinAngle < 359;
   const isYellowCanvas = spinProgress > 0.40;
-
-  // STAGE BACKGROUND BECOMES SOLID YELLOW ONLY AT VERY END (spinProgress >= 0.96) WHEN DOORS ARE ALMOST CLOSED!
   const isYellowStage = spinProgress >= 0.96;
 
-  // WHITE LIGHTNING ZIGZAG CRACK SEAM LINE:
   let whiteLineOpacity = 0;
   if (scrollProgress >= 0.005 && spinProgress < 0.005) {
     whiteLineOpacity = 1;
@@ -259,26 +291,46 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     whiteLineOpacity = 1 - (spinProgress - 0.97) / 0.02;
   }
 
-  // SOLID YELLOW LOCK: Triggers ONLY AFTER doors complete 360deg spin & white line vanishes in yellow (spinProgress >= 0.99)!
   const isFullyLockedYellow = spinProgress >= 0.99;
-
-  // STEP 3: SLOW SYNCHRONIZED BULLET MOVEMENT + TORN PAPER UNROLLING (scrollProgress 0.75 -> 0.98)
   const bulletProgress = Math.min(Math.max((scrollProgress - 0.75) * 4.0, 0), 1);
 
-  // STEP 4: CO-PLAY STICKY SCROLL ZOOM, GAMEBOY PAUSE & VERTICAL SPLIT REVEAL WITH 2-SECOND WHITE PAGE DWELL
+  // STEP 4: CO-PLAY STICKY SCROLL ZOOM
   const coplayZoomProgress = Math.min(Math.max((coplayScrollProgress - 0.15) * 4.0, 0), 1);
   const coplayZoomScale = 1 + coplayZoomProgress * 14.0;
-
-  // Text marquee opacity: Fades out completely as zoom enters black interior (REACHES EXACT 0 OPACITY BY 0.38!)
   const textZoomOpacity = coplayScrollProgress < 0.15 ? 1 : Math.max(1 - Math.max((coplayScrollProgress - 0.15) * 4.5, 0), 0);
-
-  // GameBoy console opacity (Appears on PURE PITCH BLACK AFTER text has completely vanished!):
   const gameboyBlendOpacity = Math.min(Math.max((coplayScrollProgress - 0.38) * 5.0, 0), 1);
-
-  // Vertical split door opening progress (0.65 -> 0.85):
   const coplaySplitProgress = Math.min(Math.max((coplayScrollProgress - 0.65) * 5.0, 0), 1);
 
   const COPLAY_TYPO_ITEMS = Array(12).fill('CO-PLAY');
+
+  // STEP 5: CO-SHOP INTERACTIVE SCROLL ANIMATION CALCULATIONS
+  // Phase 1 (0.20 -> 0.60): Log slants, letters slide down one-by-one into cart, log falls behind!
+  const slantProgress = Math.min(Math.max((coshopScrollProgress - 0.20) * 2.5, 0), 1);
+  const logTiltAngle = slantProgress * 32; // rotates up to 32deg
+
+  const COSHOP_LETTERS_ARRAY = ['C', 'O', '-', 'S', 'H', 'O', 'P'];
+
+  // Log falls behind outside page after letters slide out (slantProgress > 0.85)
+  const logFallOpacity = slantProgress > 0.85 ? Math.max(1 - (slantProgress - 0.85) * 6.6, 0) : 1;
+  const logFallY = slantProgress > 0.85 ? (slantProgress - 0.85) * 300 : 0;
+
+  // Phase 2 (0.60 -> 0.85): Cart rolls to left carrying letters
+  const cartRollProgress = Math.min(Math.max((coshopScrollProgress - 0.60) * 4.0, 0), 1);
+  const cartTranslateX = -cartRollProgress * 110; // moves left up to -110vw
+
+  // Phase 3 (0.75 -> 1.00): Dark Leaf Green Canvas slides in from right to left (100% -> 0%)
+  const greenCanvasSlideProgress = Math.min(Math.max((coshopScrollProgress - 0.72) * 3.5, 0), 1);
+  const greenCanvasTranslateX = 100 - greenCanvasSlideProgress * 100; // 100% -> 0%
+
+  const REAL_WOODEN_LETTERS = [
+    { id: 'c1', char: 'C', img: '/letters/wood_letter_C.png' },
+    { id: 'o1', char: 'O', img: '/letters/wood_letter_O.png' },
+    { id: 'h1', isBulbHyphen: true, img: '/wood_hyphen_bulb.png' },
+    { id: 's1', char: 'S', img: '/letters/wood_letter_S.png' },
+    { id: 'h2', char: 'H', img: '/letters/wood_letter_H.png' },
+    { id: 'o2', char: 'O', img: '/letters/wood_letter_O.png', isHangingTote: true },
+    { id: 'p1', char: 'P', img: '/letters/wood_letter_P.png' }
+  ];
 
   return (
     <div className="landing-page-official fade-in">
@@ -321,7 +373,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
       {/* 2. STICKY PINNED RED CO-WATCH SECTION WITH 360-DEGREE INWARD ZIGZAG DOOR SPIN */}
       <section className="sticky-pinned-red-stage-wrapper">
         <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow || isYellowStage ? 'bg-full-yellow' : ''}`}>
-          {/* BACKGROUND VOID BOLD CONDENSED REVEAL TYPOGRAPHY (Z-INDEX 1 BEHIND DOORS - HIDDEN ONLY AT VERY END AT 0.95) */}
+          {/* BACKGROUND VOID BOLD CONDENSED REVEAL TYPOGRAPHY */}
           <div
             className="center-void-condensed-typography"
             style={{
@@ -331,7 +383,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <h1 className="katapult-condensed-headline">CO-WATCH</h1>
           </div>
 
-          {/* LEFT DOOR PANEL (Z-INDEX 5 IN FRONT OF BACKGROUND TEXT) */}
+          {/* LEFT DOOR PANEL */}
           <div
             className={`door-half-panel door-panel-left ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''} ${isFullyLockedYellow ? 'no-clip' : ''}`}
             style={{
@@ -362,7 +414,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* RIGHT DOOR PANEL (Z-INDEX 5 IN FRONT OF BACKGROUND TEXT) */}
+          {/* RIGHT DOOR PANEL */}
           <div
             className={`door-half-panel door-panel-right ${isYellowCanvas ? 'bg-yellow' : 'bg-red'} ${isSpinning ? 'is-spinning' : ''} ${isFullyLockedYellow ? 'no-clip' : ''}`}
             style={{
@@ -420,7 +472,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             )}
           </div>
 
-          {/* YELLOW STAGE WITH 3 CLEAN PISTOLS & 3 BULLETS (1 BULLET PER GUN BARREL IN INSIDE POSITIONS) */}
+          {/* YELLOW STAGE WITH 3 CLEAN PISTOLS & 3 BULLETS */}
           {isFullyLockedYellow && (
             <div className="pistol-bullet-torn-paper-stage fade-in">
               <div className="ink-stage-header">
@@ -429,12 +481,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               </div>
 
               <div className="torn-banners-container-3">
-                {/* ROW 1 (TOP): GUN 1 (LEFT SIDE) -> BULLET 1 (TOP ROW INSIDE GUN BARREL, LEFT TO RIGHT) */}
+                {/* ROW 1 */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 1" className="pistol-ink-img facing-right" />
-                    
-                    {/* Bullet 1 (Top Row): Starts INSIDE Gun 1 barrel and travels in perfect sync with unrolling paper */}
                     <div
                       className="bullet-flying-wrapper bullet-row-1"
                       style={{
@@ -449,8 +499,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       <img src="/bullet_artwork.png" alt="Bullet 1" className="bullet-img facing-right" />
                     </div>
                   </div>
-
-                  {/* Torn White Paper Banner 1 Unrolling Behind Bullet 1 */}
                   <div
                     className="torn-paper-white-banner"
                     style={{
@@ -472,9 +520,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
 
-                {/* ROW 2 (MIDDLE): GUN 2 (RIGHT SIDE FLIPPED) -> BULLET 2 (MIDDLE ROW INSIDE GUN BARREL, RIGHT TO LEFT) */}
+                {/* ROW 2 */}
                 <div className="pistol-banner-row row-right">
-                  {/* Torn White Paper Banner 2 Unrolling Reverse Behind Bullet 2 */}
                   <div
                     className="torn-paper-white-banner"
                     style={{
@@ -497,8 +544,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
                   <div className="pistol-static-wrapper pistol-right" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 2" className="pistol-ink-img facing-left" />
-
-                    {/* Bullet 2 (Middle Row): Starts INSIDE Gun 2 barrel and travels in perfect sync with unrolling paper */}
                     <div
                       className="bullet-flying-wrapper bullet-row-2"
                       style={{
@@ -515,12 +560,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
 
-                {/* ROW 3 (BOTTOM): GUN 3 (LEFT SIDE) -> BULLET 3 (BOTTOM ROW INSIDE GUN BARREL, LEFT TO RIGHT) */}
+                {/* ROW 3 */}
                 <div className="pistol-banner-row row-left">
                   <div className="pistol-static-wrapper pistol-left" style={{ position: 'relative' }}>
                     <img src="/pistol_artwork.png" alt="Pistol 3" className="pistol-ink-img facing-right" />
-
-                    {/* Bullet 3 (Bottom Row): Starts INSIDE Gun 3 barrel and travels in perfect sync with unrolling paper */}
                     <div
                       className="bullet-flying-wrapper bullet-row-3"
                       style={{
@@ -536,7 +579,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                   </div>
 
-                  {/* Torn White Paper Banner 3 Unrolling Behind Bullet 3 */}
                   <div
                     className="torn-paper-white-banner"
                     style={{
@@ -545,7 +587,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     onClick={() => handleLaunch('watch')}
                   >
                     <div className="banner-content-inner">
-                      <div className="banner-badge-tag anime-tag">git🎬 MOVIES & TV SHOWS</div>
+                      <div className="banner-badge-tag anime-tag">🎬 MOVIES & TV SHOWS</div>
                       <div className="marquee-track scroll-left">
                         {[...ANIME_NETWORKS, ...ANIME_NETWORKS].map((app, idx) => (
                           <div key={idx} className="marquee-app-item">
@@ -561,7 +603,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             </div>
           )}
 
-          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE OVERLAY WITH DYNAMIC FADE-IN & FADE-AWAY */}
+          {/* CLEAN WHITE VERTICAL ZIGZAG SEAM LINE */}
           <div
             className="vertical-zigzag-crack-container"
             style={{
@@ -582,21 +624,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 3. CO-PLAY: STICKY PINNED 3D ZOOM, GAMEBOY PAUSE & VERTICAL SPLIT DOOR SECTION */}
+      {/* 3. CO-PLAY: STICKY PINNED 3D ZOOM & VERTICAL SPLIT DOOR SECTION */}
       <section className="sticky-pinned-coplay-stage-wrapper">
         <div className="sticky-pinned-coplay-stage-inner">
-          
-          {/* UNDERLYING PRISTINE WHITE PAGE REVEALED AS SPLIT DOORS OPEN (1.5fr / 1fr ULTRA-MASSIVE SPLIT) */}
           <div className="underlying-white-page-reveal">
             <div className="white-page-grid-split">
               
-              {/* LEFT HALF (1.5fr): ULTRA-MASSIVE 3D PC MONITOR WITH PERFECT PERMANENT 3D TILTED DISPLAY SCREEN */}
+              {/* LEFT HALF: 3D PC MONITOR */}
               <div className="left-hero-media-wrapper">
                 <div className="user-3d-pc-monitor-wrapper">
-                  {/* USER'S 3D PC MONITOR ARTWORK IMAGE */}
                   <img src="/pc_monitor_artwork.png" alt="3D PC Monitor" className="user-pc-monitor-art" />
-
-                  {/* 100% PERFECTLY LOCKED FITTED SCREEN VIDEO DISPLAY */}
                   <div className="pc-monitor-screen-video-overlay">
                     <video autoPlay loop muted playsInline className="placeholder-demo-video">
                       <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4" />
@@ -606,37 +643,25 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 </div>
               </div>
 
-              {/* RIGHT HALF (1fr): 1000+ CENTERED BEHIND 3D ROTATING RUBIK'S CUBE */}
+              {/* RIGHT HALF: 1000+ RUBIK'S CUBE */}
               <div className="right-games-rubiks-hub">
                 <div className="vertical-filled-typography-column text-center-all">
-                  
-                  {/* TOP WORD: P L A Y (CENTERED) */}
                   <h3 className="hero-word-top text-center">P L A Y</h3>
-                  
-                  {/* GIANT OVERLAPPING CENTER LAYER: 1,000+ BEHIND THE 3D ROTATING CUBE */}
                   <div className="giant-1000-cube-overlay-stack">
-                    {/* GIANT RED 1,000+ TEXT BEHIND (Z-INDEX 1) */}
                     <h2 className="hero-word-giant-1000-behind">1,000+</h2>
-
-                    {/* 3D ROTATING RUBIK'S CUBE FLOATING IN FRONT (Z-INDEX 5) */}
                     <div className="embedded-diagonal-cube-box center-front-cube">
                       <AutomaticDiagonal3DRubiksCube />
                     </div>
                   </div>
-
-                  {/* BELOW WORD: MULTIPLAYER & ONLINE GAMES (CENTERED) */}
                   <h4 className="hero-word-multiplayer text-center">MULTIPLAYER & ONLINE GAMES</h4>
-
-                  {/* BOTTOM WORD: LIVE WITH FRIENDS (CENTERED) */}
                   <h4 className="hero-word-friends text-center">LIVE WITH FRIENDS</h4>
-
                 </div>
               </div>
 
             </div>
           </div>
 
-          {/* TOP VERTICAL SPLIT DOOR PANEL (MOVES VERTICALLY UP: translateY(-100%)) */}
+          {/* TOP DOOR */}
           <div
             className="coplay-split-door-top"
             style={{
@@ -645,8 +670,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             }}
           >
             <div className="coplay-door-canvas-content">
-              
-              {/* ZOOMABLE MARQUEE & CO-PLAY TYPOGRAPHY CONTAINER (ZOOMS & FADES OUT COMPLETELY BEFORE GAMEBOY APPEARS) */}
               {textZoomOpacity > 0.01 && (
                 <div
                   className="coplay-zoomable-content-wrapper"
@@ -656,9 +679,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     opacity: textZoomOpacity
                   }}
                 >
-                  {/* 3 STACKED MARQUEE ROWS SLIDING HORIZONTALLY */}
                   <div className="coplay-pure-typo-container">
-                    {/* ROW 1: SLIDING LEFT TO RIGHT */}
                     <div className="coplay-typo-row">
                       <div className="coplay-typo-track scroll-left">
                         {COPLAY_TYPO_ITEMS.map((item, idx) => (
@@ -666,8 +687,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                         ))}
                       </div>
                     </div>
-
-                    {/* ROW 2 (CENTER): MAIN BOLD WHITE CO-PLAY MARQUEE ROW THAT ZOOM TARGETS */}
                     <div className="coplay-typo-row row-center-zoom-target">
                       <div className="coplay-typo-track scroll-right">
                         {COPLAY_TYPO_ITEMS.map((item, idx) => (
@@ -675,8 +694,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                         ))}
                       </div>
                     </div>
-
-                    {/* ROW 3: SLIDING LEFT TO RIGHT */}
                     <div className="coplay-typo-row">
                       <div className="coplay-typo-track scroll-left">
                         {COPLAY_TYPO_ITEMS.map((item, idx) => (
@@ -687,21 +704,13 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
               )}
-
-              {/* GAMEBOY PIXEL ART IMAGE (PURE PITCH BLACK, ZERO GLOW, ZERO SHADOW, PERFECT UN-ZOOMED FIT) */}
-              <div
-                className="gameboy-perfect-fit-overlay gameboy-top-half"
-                style={{
-                  opacity: gameboyBlendOpacity
-                }}
-              >
+              <div className="gameboy-perfect-fit-overlay gameboy-top-half" style={{ opacity: gameboyBlendOpacity }}>
                 <img src="/gameboy_pixel_art.png" alt="GameBoy Pixel Art" className="gameboy-fitted-img" />
               </div>
-
             </div>
           </div>
 
-          {/* BOTTOM VERTICAL SPLIT DOOR PANEL (MOVES VERTICALLY DOWN: translateY(100%)) */}
+          {/* BOTTOM DOOR */}
           <div
             className="coplay-split-door-bottom"
             style={{
@@ -710,8 +719,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             }}
           >
             <div className="coplay-door-canvas-content">
-              
-              {/* ZOOMABLE MARQUEE & CO-PLAY TYPOGRAPHY CONTAINER (ZOOMS & FADES OUT COMPLETELY BEFORE GAMEBOY APPEARS) */}
               {textZoomOpacity > 0.01 && (
                 <div
                   className="coplay-zoomable-content-wrapper"
@@ -721,9 +728,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     opacity: textZoomOpacity
                   }}
                 >
-                  {/* 3 STACKED MARQUEE ROWS SLIDING HORIZONTALLY */}
                   <div className="coplay-pure-typo-container">
-                    {/* ROW 1: SLIDING LEFT TO RIGHT */}
                     <div className="coplay-typo-row">
                       <div className="coplay-typo-track scroll-left">
                         {COPLAY_TYPO_ITEMS.map((item, idx) => (
@@ -731,8 +736,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                         ))}
                       </div>
                     </div>
-
-                    {/* ROW 2 (CENTER): MAIN BOLD WHITE CO-PLAY MARQUEE ROW THAT ZOOM TARGETS */}
                     <div className="coplay-typo-row row-center-zoom-target">
                       <div className="coplay-typo-track scroll-right">
                         {COPLAY_TYPO_ITEMS.map((item, idx) => (
@@ -740,8 +743,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                         ))}
                       </div>
                     </div>
-
-                    {/* ROW 3: SLIDING LEFT TO RIGHT */}
                     <div className="coplay-typo-row">
                       <div className="coplay-typo-track scroll-left">
                         {COPLAY_TYPO_ITEMS.map((item, idx) => (
@@ -752,38 +753,294 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 </div>
               )}
-
-              {/* GAMEBOY PIXEL ART IMAGE (PURE PITCH BLACK, ZERO GLOW, ZERO SHADOW, PERFECT UN-ZOOMED FIT) */}
-              <div
-                className="gameboy-perfect-fit-overlay gameboy-bottom-half"
-                style={{
-                  opacity: gameboyBlendOpacity
-                }}
-              >
+              <div className="gameboy-perfect-fit-overlay gameboy-bottom-half" style={{ opacity: gameboyBlendOpacity }}>
                 <img src="/gameboy_pixel_art.png" alt="GameBoy Pixel Art" className="gameboy-fitted-img" />
               </div>
-
             </div>
           </div>
 
         </div>
       </section>
 
-      {/* 4. CO-SHOP & CO-STUDY */}
-      <section className="co-experience-section">
-        <div className="co-exp-grid">
-          <div className="exp-card" onClick={() => handleLaunch('watch')}>
-            <div className="exp-icon icon-red"><ShoppingBag size={28} /></div>
-            <h3>Co-Shop</h3>
-            <p>Browse products in shared screen sessions with your friends before buying.</p>
-          </div>
-          <div className="exp-card" onClick={() => handleLaunch('merged')}>
-            <div className="exp-icon icon-black"><BookOpen size={28} /></div>
-            <h3>Co-Study</h3>
-            <p>Pomodoro focus timers, shared study desks, and silent video call accountability.</p>
-          </div>
-        </div>
-      </section>
+      {/* 4. PINNED CO-SHOP HUB SECTION (400VH STAGE: 3-SEC PAUSE -> PAC-MAN SWEEP -> SPLIT SCREEN HUB) */}
+      <div className="sticky-pinned-coshop-stage-wrapper" style={{ height: '400vh', position: 'relative' }}>
+        <section
+          className="static-coshop-canvas-section"
+          style={{
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            width: '100%',
+            backgroundColor: coshopScrollProgress > 0.15 ? '#c4cbd2' : '#11151c',
+            backgroundImage: `radial-gradient(ellipse 120% 90% at 50% 35%, rgba(255, 255, 255, ${0.98 * Math.min(coshopScrollProgress * 2, 1)}) 0%, rgba(241, 245, 249, ${0.85 * Math.min(coshopScrollProgress * 2, 1)}) 35%, rgba(200, 208, 216, ${Math.min(coshopScrollProgress * 2, 1)}) 70%, #11151c 100%)`
+          }}
+        >
+          {/* CALCULATED PAC-MAN FRONT MOUTH POSITION FOR PINPOINT ACCURACY */}
+          {(() => {
+            // Stage B: Pac-Man sweeps cleanly from coshopScrollProgress 0.35 to 0.80
+            const inPacmanSweepWindow = coshopScrollProgress >= 0.35;
+            // Linear progress 0.0 -> 1.0 during sweep window
+            const pacProgress = Math.max(0, Math.min(1, (coshopScrollProgress - 0.35) / 0.45));
+            // Pac-Man wrapper center left position in VW (-50vw offscreen left to +150vw offscreen right)
+            const pacmanLeftVw = -50 + pacProgress * 200;
+            // Pac-Man front mouth tip position in VW (wrapper left + 45vw front tip radius)
+            const pacmanFrontTipVw = pacmanLeftVw + 45;
+
+            // Pinpoint item devour thresholds in screen VW:
+            // Left Plant: centered around 25vw
+            const leftPlantEaten = pacmanFrontTipVw >= 25;
+            // Wooden Log Shelf Base: spans 20vw to 80vw - vanishes ONLY after Pac-Man reaches the right end (85vw)!
+            const shelfEaten = pacmanFrontTipVw >= 85;
+            // Right Plant: centered around 75vw
+            const rightPlantEaten = pacmanFrontTipVw >= 75;
+
+            // Individual wooden letter thresholds across screen VW (C, O, -, S, H, O, P)
+            const letterFrontThresholds = [35, 40, 47, 53, 58, 64, 70];
+
+            return (
+              <>
+                {/* FOREGROUND STAGE CONTAINER (100% CRYSTAL CLEAR NATIVE 4K SHARPNESS) */}
+                {coshopScrollProgress < 0.80 && (
+                  <div className="coshop-static-center-container" style={{ position: 'relative', zIndex: 10 }}>
+                    
+                    {/* UNIFIED WOODEN LOG SHELF DISPLAY STAGE */}
+                    <div
+                      className="static-wooden-log-shelf-wrapper"
+                      style={{
+                        transform: `translateY(${shelfY}px) scale(${shelfScale / 100})`,
+                        opacity: shelfEaten ? 0 : (0.35 + 0.65 * Math.min(coshopScrollProgress * 2, 1))
+                      }}
+                    >
+                      
+                      {/* WOODEN LOG SHELF ARTWORK BASE */}
+                      <img
+                        src="/wooden_shelf_artwork.png"
+                        alt="Wooden Log Shelf"
+                        className="static-wooden-log-shelf-img"
+                        style={{
+                          position: 'relative',
+                          zIndex: 5,
+                          filter: `drop-shadow(0 16px 24px rgba(0, 0, 0, ${0.65 - 0.25 * Math.min(coshopScrollProgress * 2, 1)}))`
+                        }}
+                      />
+
+                      {/* SEPARATE: LEFT POTTED JADE PLANT */}
+                      <img
+                        src="/jade_plant_pot.png"
+                        alt="Potted Jade Plant Left"
+                        className="shelf-jade-plant plant-left"
+                        style={{
+                          height: `${leftPlantSize}px`,
+                          position: 'absolute',
+                          left: '20px',
+                          bottom: '30px',
+                          transform: `translate(${leftPlantX}px, ${leftPlantY}px)`,
+                          zIndex: 40,
+                          filter: `drop-shadow(0 16px 22px rgba(0, 0, 0, 0.65))`,
+                          opacity: leftPlantEaten ? 0 : 1
+                        }}
+                      />
+
+                      {/* SEPARATE: RIGHT POTTED JADE PLANT */}
+                      <img
+                        src="/jade_plant_pot.png"
+                        alt="Potted Jade Plant Right"
+                        className="shelf-jade-plant plant-right"
+                        style={{
+                          height: `${rightPlantSize}px`,
+                          position: 'absolute',
+                          right: '20px',
+                          bottom: '30px',
+                          transform: `translate(${rightPlantX}px, ${rightPlantY}px)`,
+                          zIndex: 40,
+                          filter: `drop-shadow(0 16px 22px rgba(0, 0, 0, 0.65))`,
+                          opacity: rightPlantEaten ? 0 : 1
+                        }}
+                      />
+
+                      {/* SEPARATE: 3D CARVED WOODEN "CO-SHOP" LETTERS TRACK */}
+                      <div
+                        className="static-letters-sitting-track"
+                        style={{
+                          position: 'absolute',
+                          bottom: '30px',
+                          left: '50%',
+                          transform: `translateX(calc(-50% + ${lettersX}px)) translateY(${lettersY}px)`,
+                          zIndex: 20
+                        }}
+                      >
+                        {REAL_WOODEN_LETTERS.map((item, idx) => {
+                          const itemThreshold = letterFrontThresholds[idx] || 50;
+                          const isEaten = pacmanFrontTipVw >= itemThreshold;
+
+                          return (
+                            <div
+                              key={item.id}
+                              className="static-wood-letter-wrapper"
+                              style={{
+                                opacity: isEaten ? 0 : 1
+                              }}
+                            >
+                              {item.isBulbHyphen ? (
+                                <img
+                                  src={item.img}
+                                  alt="Wood Bulb Separator"
+                                  className="static-wood-hyphen-bulb-img"
+                                  style={{
+                                    height: `${Math.round(letterHeight * 0.8)}px`,
+                                    filter: `drop-shadow(0 0 ${16 * Math.min(coshopScrollProgress * 2, 1)}px rgba(251, 191, 36, ${0.85 * Math.min(coshopScrollProgress * 2, 1)})) drop-shadow(0 0 ${35 * Math.min(coshopScrollProgress * 2, 1)}px rgba(245, 158, 11, ${0.55 * Math.min(coshopScrollProgress * 2, 1)}))`
+                                  }}
+                                />
+                              ) : (
+                                <>
+                                  <img
+                                    src={item.img}
+                                    alt={item.char}
+                                    className="static-wood-letter-img"
+                                    style={{
+                                      height: `${letterHeight}px`,
+                                      filter: `drop-shadow(0 16px 24px rgba(0, 0, 0, ${0.75 - 0.2 * Math.min(coshopScrollProgress * 2, 1)}))`
+                                    }}
+                                  />
+                                  {item.isHangingTote && (
+                                    <img
+                                      src="/tote_bag.png"
+                                      alt="Hanging Canvas Tote Bag"
+                                      className="hanging-tote-bag-on-letter"
+                                      style={{
+                                        top: `${toteTop}px`,
+                                        height: `${toteHeight}px`,
+                                        zIndex: 15,
+                                        filter: `drop-shadow(0 16px 22px rgba(0, 0, 0, 0.65))`,
+                                        opacity: pacmanFrontTipVw >= 64 ? 0 : 1
+                                      }}
+                                    />
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                    </div>
+
+                  </div>
+                )}
+
+                {/* STAGE B: SEAMLESS CLASSIC SVG PAC-MAN SWEEP (ONLY ACTIVE DURING SWEEP WINDOW UNTIL OFFSCREEN RIGHT) */}
+                {inPacmanSweepWindow && coshopScrollProgress < 0.80 && (
+                  <div
+                    className="classic-svg-pacman-wrapper"
+                    style={{
+                      left: `${pacmanLeftVw}vw`
+                    }}
+                  >
+                    <svg viewBox="0 0 100 100" className="pacman-seamless-svg">
+                      <path
+                        fill="#ffcc00"
+                        d="M 50 50 L 98 22 A 48 48 0 1 0 98 78 Z"
+                        className="pacman-animated-mouth-path"
+                      />
+                      <circle cx="48" cy="22" r="5.5" fill="#000000" />
+                    </svg>
+                  </div>
+                )}
+
+                {/* STAGE C: INTERACTIVE CO-SHOP SPLIT SCREEN HUB (ONLY LOADS AFTER PAC-MAN COMPLETELY EXITS OFFSCREEN RIGHT!) */}
+                {coshopScrollProgress >= 0.80 && (
+                  <div
+                    className="coshop-split-screen-experience-wrapper"
+                    style={{
+                      opacity: Math.min(1, (coshopScrollProgress - 0.80) * 5),
+                      transform: `translateY(${(1 - Math.min(1, (coshopScrollProgress - 0.80) * 5)) * 25}px)`
+                    }}
+                  >
+                    {/* LEFT SIDE: TILTED BROWSER VIDEO SHARE FRAME (STYLE MATCHING REFERENCE PHOTO FRAME) */}
+                    <div className="coshop-left-browser-frame-tilted">
+                      <div className="browser-header-bar">
+                        <div className="browser-dots">
+                          <span className="dot red" />
+                          <span className="dot yellow" />
+                          <span className="dot green" />
+                        </div>
+                        <div className="browser-url-bar">
+                          <Lock size={12} color="#10b981" />
+                          <span>https://www.amazon.in/dp/co-shop-shared-session</span>
+                        </div>
+                      </div>
+
+                      <div className="browser-content-mock">
+                        <div className="shared-product-card-preview">
+                          <div className="product-tag-sale">CO-SHOPPING LIVE</div>
+                          <img src="/jade_plant_pot.png" alt="Featured Product" className="shared-prod-img" />
+                          <div className="shared-prod-details">
+                            <h4>Premium Brass Jade Plant Pot</h4>
+                            <div className="prod-price-row">
+                              <span className="price">₹1,299</span>
+                              <span className="rating">★ 4.9 (2,450)</span>
+                            </div>
+                            <button className="btn-add-shared-cart">🛒 Add to Shared Cart</button>
+                          </div>
+                        </div>
+
+                        {/* OVERLAY FRIENDS VIDEO CALL PIP */}
+                        <div className="friends-video-pip-overlay">
+                          <div className="pip-friend friend-alex">
+                            <div className="pip-avatar">A</div>
+                            <span>You</span>
+                            <span className="live-dot" />
+                          </div>
+                          <div className="pip-friend friend-maya">
+                            <div className="pip-avatar avatar-maya">M</div>
+                            <span>Maya</span>
+                            <span className="live-dot" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* RIGHT SIDE: BOLD EDITORIAL INFO SECTION & REAL E-COMMERCE BRAND CAROUSEL */}
+                    <div className="coshop-right-editorial-info">
+                      <span className="gold-pill-tag">🛍️ LIVE CO-SHOPPING</span>
+                      <h2 className="editorial-main-title">SHOP TOGETHER IN REAL-TIME</h2>
+                      <p className="editorial-desc">
+                        Screen share any website on live video calls with friends. Compare items, get instant opinions, build shared carts, and checkout together seamlessly.
+                      </p>
+
+                      {/* CONTINUOUS E-COMMERCE BRAND CAROUSEL / MARQUEE */}
+                      <div className="ecommerce-brand-carousel-wrapper">
+                        <span className="carousel-title-label">SUPPORTED SHOPPING WEBSITES:</span>
+                        <div className="marquee-carousel-container">
+                          <div className="marquee-carousel-track">
+                            <div className="brand-logo-card brand-amazon"><span>Amazon.in</span></div>
+                            <div className="brand-logo-card brand-flipkart"><span>Flipkart</span></div>
+                            <div className="brand-logo-card brand-myntra"><span>Myntra</span></div>
+                            <div className="brand-logo-card brand-meesho"><span>Meesho</span></div>
+                            <div className="brand-logo-card brand-ajio"><span>Ajio</span></div>
+                            <div className="brand-logo-card brand-nykaa"><span>Nykaa</span></div>
+                            {/* Duplicate for seamless infinite loop */}
+                            <div className="brand-logo-card brand-amazon"><span>Amazon.in</span></div>
+                            <div className="brand-logo-card brand-flipkart"><span>Flipkart</span></div>
+                            <div className="brand-logo-card brand-myntra"><span>Myntra</span></div>
+                            <div className="brand-logo-card brand-meesho"><span>Meesho</span></div>
+                            <div className="brand-logo-card brand-ajio"><span>Ajio</span></div>
+                            <div className="brand-logo-card brand-nykaa"><span>Nykaa</span></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button className="btn-launch-coshop-hub" onClick={() => handleLaunch('watch')}>
+                        Launch Co-Shop Room <ArrowRight size={18} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </section>
+      </div>
 
       {/* 5. PREMIUM */}
       <section className="premium-gateway-section">
