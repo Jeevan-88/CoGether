@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { POKI_TOP_TRENDING, POKI_WEB_EXCLUSIVES } from './pokiCatalog.js';
-import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move } from 'lucide-react';
+import { POKI_TOP_TRENDING, POKI_WEB_EXCLUSIVES, POKI_CATEGORY_HUBS } from './pokiCatalog.js';
+import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, Box } from 'lucide-react';
 import './LandingPage.css';
 
 const MOVIE_STREAMING_APPS = [
@@ -36,6 +36,98 @@ const ANIME_NETWORKS = [
   { name: 'Tubi Anime', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/db/Tubi_logo.svg' }
 ];
 
+// FAMOUS HIGH-RES ONLINE GAME LOGOS FOR 3D CUBE FACES
+const FAMOUS_GAME_TILES_FACE1 = [
+  { name: 'Subway Surfers', img: 'https://img.gamemonetize.com/tmhj9i3trg8ot0u7h9qahh6flzn9zkjp/512x384.jpg' },
+  { name: 'Temple Run 2', img: 'https://img.gamemonetize.com/q6u8ghlmkx9rhy48udltwan4cqmmoxxm/512x384.jpg' },
+  { name: 'Smash Karts', img: 'https://img.gamemonetize.com/rrflwl9gzd8jw3wpk6mzgwfzi32pvnlp/512x384.jpg' },
+  { name: 'Shell Shockers', img: 'https://img.gamemonetize.com/ou0bfqy1ejiobw4yb4ozvj23t85x2xxj/512x384.jpg' },
+  { name: 'Moto X3M', img: 'https://img.gamemonetize.com/5q7rgv3nxbtcx1doq963t8t8ax6sc0ss/512x384.jpg' },
+  { name: 'Car Stunt Master', img: 'https://img.gamemonetize.com/gixytcyqjodb9t1bd6z6c2bhuc0n2zqi/512x384.jpg' },
+  { name: 'Retro Bowl', img: 'https://img.gamemonetize.com/zo8ocq9uu0gjavl3iazgiessapj6ov6n/512x384.jpg' },
+  { name: 'Drive Mad', img: 'https://img.gamemonetize.com/fz2a4g1h9hdohgcyd7em6c6n3wggsfw0/512x384.jpg' },
+  { name: 'Tuk Tuk Auto', img: 'https://img.gamemonetize.com/e3nqbd83zbz64dri00qtgftk6ke4reds/512x384.jpg' }
+];
+
+const FAMOUS_GAME_TILES_FACE2 = [
+  { name: 'Shifted Realms', img: 'https://img.gamemonetize.com/ou0bfqy1ejiobw4yb4ozvj23t85x2xxj/512x384.jpg' },
+  { name: 'Police Car Parking', img: 'https://img.gamemonetize.com/zo8ocq9uu0gjavl3iazgiessapj6ov6n/512x384.jpg' },
+  { name: 'Mud Truck', img: 'https://img.gamemonetize.com/fz2a4g1h9hdohgcyd7em6c6n3wggsfw0/512x384.jpg' },
+  { name: 'Season Change', img: 'https://img.gamemonetize.com/6xui5nnxg3d3r3frxs2003f38hjeig7r/512x384.jpg' },
+  { name: 'Heroes Beware', img: 'https://img.gamemonetize.com/5q7rgv3nxbtcx1doq963t8t8ax6sc0ss/512x384.jpg' },
+  { name: 'Subway Surfers', img: 'https://img.gamemonetize.com/tmhj9i3trg8ot0u7h9qahh6flzn9zkjp/512x384.jpg' },
+  { name: 'Car Evolution', img: 'https://img.gamemonetize.com/rrflwl9gzd8jw3wpk6mzgwfzi32pvnlp/512x384.jpg' },
+  { name: 'Offroad Jeep', img: 'https://img.gamemonetize.com/q6u8ghlmkx9rhy48udltwan4cqmmoxxm/512x384.jpg' },
+  { name: 'Car Stunt', img: 'https://img.gamemonetize.com/gixytcyqjodb9t1bd6z6c2bhuc0n2zqi/512x384.jpg' }
+];
+
+// AUTOMATIC DIAGONAL 3D ROTATABLE GAME RUBIK'S CUBE COMPONENT
+function AutomaticDiagonal3DRubiksCube() {
+  return (
+    <div className="automatic-diagonal-3d-stage stage-massive">
+      {/* CONTINUOUS AUTOMATIC DIAGONAL ROTATION CUBE BODY */}
+      <div className="rubiks-cube-diagonal-body cube-massive">
+        {/* FACE 1: FRONT */}
+        <div className="cube-face face-front">
+          {FAMOUS_GAME_TILES_FACE1.map((g, idx) => (
+            <div key={idx} className="cube-tile-cell">
+              <img src={g.img} alt={g.name} />
+            </div>
+          ))}
+        </div>
+
+        {/* FACE 2: BACK */}
+        <div className="cube-face face-back">
+          {FAMOUS_GAME_TILES_FACE2.map((g, idx) => (
+            <div key={idx} className="cube-tile-cell">
+              <img src={g.img} alt={g.name} />
+            </div>
+          ))}
+        </div>
+
+        {/* FACE 3: RIGHT */}
+        <div className="cube-face face-right">
+          {FAMOUS_GAME_TILES_FACE1.map((g, idx) => (
+            <div key={idx} className="cube-tile-cell">
+              <img src={g.img} alt={g.name} />
+            </div>
+          ))}
+        </div>
+
+        {/* FACE 4: LEFT */}
+        <div className="cube-face face-left">
+          {FAMOUS_GAME_TILES_FACE2.map((g, idx) => (
+            <div key={idx} className="cube-tile-cell">
+              <img src={g.img} alt={g.name} />
+            </div>
+          ))}
+        </div>
+
+        {/* FACE 5: TOP */}
+        <div className="cube-face face-top">
+          {FAMOUS_GAME_TILES_FACE1.map((g, idx) => (
+            <div key={idx} className="cube-tile-cell">
+              <img src={g.img} alt={g.name} />
+            </div>
+          ))}
+        </div>
+
+        {/* FACE 6: BOTTOM */}
+        <div className="cube-face face-bottom">
+          {FAMOUS_GAME_TILES_FACE2.map((g, idx) => (
+            <div key={idx} className="cube-tile-cell">
+              <img src={g.img} alt={g.name} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* FLOOR REFLECTION SHADOW */}
+      <div className="cube-3d-floor-shadow shadow-massive" />
+    </div>
+  );
+}
+
 export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing }) {
   const [roomCode, setRoomCode] = useState('');
   const [username, setUsername] = useState(localStorage.getItem('sp_username') || '');
@@ -44,6 +136,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [tutorialStep, setTutorialStep] = useState(1);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [heroScroll, setHeroScroll] = useState(0);
+  const [coplayScrollProgress, setCoplayScrollProgress] = useState(0);
 
   const TUTORIAL_MESSAGES = [
     { sender: 'Alex', text: 'CoGether makes Co-Watch & Co-Play feel like real life! 🍿', color: '#a855f7' },
@@ -53,11 +146,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // ACCURATE SCROLL LISTENERS FOR HERO TAGLINE & STAGE SECTION
+  // ACCURATE SCROLL LISTENERS FOR HERO TAGLINE, STAGE SECTION & CO-PLAY SECTION
   useEffect(() => {
     let animId;
     let currStageVal = 0;
     let currHeroVal = 0;
+    let currCoplayVal = 0;
 
     const loop = () => {
       const scrollY = window.scrollY;
@@ -78,6 +172,18 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         currStageVal += (targetStage - currStageVal) * 0.05;
         setScrollProgress(currStageVal);
       }
+
+      // 3. CO-PLAY Section Scroll Tracking
+      const coplayWrapper = document.querySelector('.sticky-pinned-coplay-stage-wrapper');
+      if (coplayWrapper) {
+        const rect = coplayWrapper.getBoundingClientRect();
+        const totalScroll = coplayWrapper.clientHeight - vh;
+        const targetCoplay = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
+
+        currCoplayVal += (targetCoplay - currCoplayVal) * 0.08;
+        setCoplayScrollProgress(currCoplayVal);
+      }
+
       animId = requestAnimationFrame(loop);
     };
 
@@ -130,10 +236,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   let doorSpinAngle = spinProgress * 360;
 
   // ACCELERATE FINAL CLOSING ANGLE (spinProgress 0.90 -> 0.97):
-  // Brings doorSpinAngle to 360deg (0deg flat) by spinProgress = 0.97 so diamond cut corners touch & interlock!
   if (spinProgress > 0.90 && spinProgress <= 0.97) {
     const endRatio = (spinProgress - 0.90) / 0.07;
-    doorSpinAngle = 324 + endRatio * 36; // 324deg -> 360deg (0deg flat)
+    doorSpinAngle = 324 + endRatio * 36;
   } else if (spinProgress > 0.97) {
     doorSpinAngle = 360;
   }
@@ -145,16 +250,13 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const isYellowStage = spinProgress >= 0.96;
 
   // WHITE LIGHTNING ZIGZAG CRACK SEAM LINE:
-  // 1. Initial Red Stage: Appears early (scrollProgress >= 0.005) until door spin starts (spinProgress < 0.005).
-  // 2. Closing Yellow Stage: Appears DELAYED LATER (spinProgress >= 0.94 -> 0.97) EXACTLY when diamond corners touch,
-  //    then VANISHES IN YELLOW once 100% flat (spinProgress 0.97 -> 0.99)!
   let whiteLineOpacity = 0;
   if (scrollProgress >= 0.005 && spinProgress < 0.005) {
     whiteLineOpacity = 1;
   } else if (spinProgress >= 0.94 && spinProgress < 0.97) {
-    whiteLineOpacity = (spinProgress - 0.94) / 0.03; // Delayed later when doors are almost flat
+    whiteLineOpacity = (spinProgress - 0.94) / 0.03;
   } else if (spinProgress >= 0.97 && spinProgress <= 0.99) {
-    whiteLineOpacity = 1 - (spinProgress - 0.97) / 0.02; // Vanishes smoothly into yellow once 100% flat!
+    whiteLineOpacity = 1 - (spinProgress - 0.97) / 0.02;
   }
 
   // SOLID YELLOW LOCK: Triggers ONLY AFTER doors complete 360deg spin & white line vanishes in yellow (spinProgress >= 0.99)!
@@ -162,6 +264,21 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   // STEP 3: SLOW SYNCHRONIZED BULLET MOVEMENT + TORN PAPER UNROLLING (scrollProgress 0.75 -> 0.98)
   const bulletProgress = Math.min(Math.max((scrollProgress - 0.75) * 4.0, 0), 1);
+
+  // STEP 4: CO-PLAY STICKY SCROLL ZOOM, GAMEBOY PAUSE & VERTICAL SPLIT REVEAL WITH 2-SECOND WHITE PAGE DWELL
+  const coplayZoomProgress = Math.min(Math.max((coplayScrollProgress - 0.15) * 4.0, 0), 1);
+  const coplayZoomScale = 1 + coplayZoomProgress * 14.0;
+
+  // Text marquee opacity: Fades out completely as zoom enters black interior (REACHES EXACT 0 OPACITY BY 0.38!)
+  const textZoomOpacity = coplayScrollProgress < 0.15 ? 1 : Math.max(1 - Math.max((coplayScrollProgress - 0.15) * 4.5, 0), 0);
+
+  // GameBoy console opacity (Appears on PURE PITCH BLACK AFTER text has completely vanished!):
+  const gameboyBlendOpacity = Math.min(Math.max((coplayScrollProgress - 0.38) * 5.0, 0), 1);
+
+  // Vertical split door opening progress (0.65 -> 0.85):
+  const coplaySplitProgress = Math.min(Math.max((coplayScrollProgress - 0.65) * 5.0, 0), 1);
+
+  const COPLAY_TYPO_ITEMS = Array(12).fill('CO-PLAY');
 
   return (
     <div className="landing-page-official fade-in">
@@ -428,7 +545,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     onClick={() => handleLaunch('watch')}
                   >
                     <div className="banner-content-inner">
-                      <div className="banner-badge-tag anime-tag">⛩️ ANIME STREAMING HUB</div>
+                      <div className="banner-badge-tag anime-tag">git🎬 MOVIES & TV SHOWS</div>
                       <div className="marquee-track scroll-left">
                         {[...ANIME_NETWORKS, ...ANIME_NETWORKS].map((app, idx) => (
                           <div key={idx} className="marquee-app-item">
@@ -465,34 +582,190 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 3. CO-PLAY: ONLINE GAMES CAROUSEL */}
-      <section className="games-carousel-section">
-        <div className="carousel-header-bar">
-          <div className="carousel-title-group">
-            <span className="section-eyebrow-red">CO-PLAY SECTION</span>
-            <h2>Multiplayer & Online Games</h2>
-          </div>
-          <button className="view-all-games-btn" onClick={() => handleLaunch('games')}>
-            View All 2,000+ Games <ArrowRight size={16} />
-          </button>
-        </div>
-        <div className="games-horizontal-scroll">
-          {allOnlineGames.map((g, idx) => (
-            <div key={g.id || idx} className="carousel-game-card" onClick={() => handleLaunch('games')}>
-              <div className="game-card-thumb-wrapper">
-                <img src={g.thumb} alt={g.title} />
-                {g.badge && <span className="game-badge-tag">{g.badge}</span>}
-              </div>
-              <div className="game-card-details">
-                <div className="game-card-title-row">
-                  <h3>{g.title}</h3>
-                  {g.rating && <span className="game-star-rating"><Star size={12} fill="#f59e0b" color="#f59e0b" /> {g.rating}</span>}
+      {/* 3. CO-PLAY: STICKY PINNED 3D ZOOM, GAMEBOY PAUSE & VERTICAL SPLIT DOOR SECTION */}
+      <section className="sticky-pinned-coplay-stage-wrapper">
+        <div className="sticky-pinned-coplay-stage-inner">
+          
+          {/* UNDERLYING PRISTINE WHITE PAGE REVEALED AS SPLIT DOORS OPEN (1.5fr / 1fr ULTRA-MASSIVE SPLIT) */}
+          <div className="underlying-white-page-reveal">
+            <div className="white-page-grid-split">
+              
+              {/* LEFT HALF (1.5fr): ULTRA-MASSIVE 3D PC MONITOR WITH PERFECT PERMANENT 3D TILTED DISPLAY SCREEN */}
+              <div className="left-hero-media-wrapper">
+                <div className="user-3d-pc-monitor-wrapper">
+                  {/* USER'S 3D PC MONITOR ARTWORK IMAGE */}
+                  <img src="/pc_monitor_artwork.png" alt="3D PC Monitor" className="user-pc-monitor-art" />
+
+                  {/* 100% PERFECTLY LOCKED FITTED SCREEN VIDEO DISPLAY */}
+                  <div className="pc-monitor-screen-video-overlay">
+                    <video autoPlay loop muted playsInline className="placeholder-demo-video">
+                      <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4" />
+                      <source src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4" />
+                    </video>
+                  </div>
                 </div>
-                <p>{g.description}</p>
-                <button className="btn-play-game-card"><Play size={14} fill="#fff" /> Co-Play Instantly</button>
               </div>
+
+              {/* RIGHT HALF (1fr): 1000+ CENTERED BEHIND 3D ROTATING RUBIK'S CUBE */}
+              <div className="right-games-rubiks-hub">
+                <div className="vertical-filled-typography-column text-center-all">
+                  
+                  {/* TOP WORD: P L A Y (CENTERED) */}
+                  <h3 className="hero-word-top text-center">P L A Y</h3>
+                  
+                  {/* GIANT OVERLAPPING CENTER LAYER: 1,000+ BEHIND THE 3D ROTATING CUBE */}
+                  <div className="giant-1000-cube-overlay-stack">
+                    {/* GIANT RED 1,000+ TEXT BEHIND (Z-INDEX 1) */}
+                    <h2 className="hero-word-giant-1000-behind">1,000+</h2>
+
+                    {/* 3D ROTATING RUBIK'S CUBE FLOATING IN FRONT (Z-INDEX 5) */}
+                    <div className="embedded-diagonal-cube-box center-front-cube">
+                      <AutomaticDiagonal3DRubiksCube />
+                    </div>
+                  </div>
+
+                  {/* BELOW WORD: MULTIPLAYER & ONLINE GAMES (CENTERED) */}
+                  <h4 className="hero-word-multiplayer text-center">MULTIPLAYER & ONLINE GAMES</h4>
+
+                  {/* BOTTOM WORD: LIVE WITH FRIENDS (CENTERED) */}
+                  <h4 className="hero-word-friends text-center">LIVE WITH FRIENDS</h4>
+
+                </div>
+              </div>
+
             </div>
-          ))}
+          </div>
+
+          {/* TOP VERTICAL SPLIT DOOR PANEL (MOVES VERTICALLY UP: translateY(-100%)) */}
+          <div
+            className="coplay-split-door-top"
+            style={{
+              transform: `translateY(-${coplaySplitProgress * 100}%)`,
+              zIndex: 20
+            }}
+          >
+            <div className="coplay-door-canvas-content">
+              
+              {/* ZOOMABLE MARQUEE & CO-PLAY TYPOGRAPHY CONTAINER (ZOOMS & FADES OUT COMPLETELY BEFORE GAMEBOY APPEARS) */}
+              {textZoomOpacity > 0.01 && (
+                <div
+                  className="coplay-zoomable-content-wrapper"
+                  style={{
+                    transform: `scale(${coplayZoomScale})`,
+                    transformOrigin: 'center center',
+                    opacity: textZoomOpacity
+                  }}
+                >
+                  {/* 3 STACKED MARQUEE ROWS SLIDING HORIZONTALLY */}
+                  <div className="coplay-pure-typo-container">
+                    {/* ROW 1: SLIDING LEFT TO RIGHT */}
+                    <div className="coplay-typo-row">
+                      <div className="coplay-typo-track scroll-left">
+                        {COPLAY_TYPO_ITEMS.map((item, idx) => (
+                          <span key={idx} className="coplay-typo-text text-small-white">{item} <span className="typo-dot">•</span></span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ROW 2 (CENTER): MAIN BOLD WHITE CO-PLAY MARQUEE ROW THAT ZOOM TARGETS */}
+                    <div className="coplay-typo-row row-center-zoom-target">
+                      <div className="coplay-typo-track scroll-right">
+                        {COPLAY_TYPO_ITEMS.map((item, idx) => (
+                          <span key={idx} className="coplay-typo-text text-main-white">{item} <span className="typo-dot">•</span></span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ROW 3: SLIDING LEFT TO RIGHT */}
+                    <div className="coplay-typo-row">
+                      <div className="coplay-typo-track scroll-left">
+                        {COPLAY_TYPO_ITEMS.map((item, idx) => (
+                          <span key={idx} className="coplay-typo-text text-stroke">{item} <span className="typo-dot">•</span></span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* GAMEBOY PIXEL ART IMAGE (PURE PITCH BLACK, ZERO GLOW, ZERO SHADOW, PERFECT UN-ZOOMED FIT) */}
+              <div
+                className="gameboy-perfect-fit-overlay gameboy-top-half"
+                style={{
+                  opacity: gameboyBlendOpacity
+                }}
+              >
+                <img src="/gameboy_pixel_art.png" alt="GameBoy Pixel Art" className="gameboy-fitted-img" />
+              </div>
+
+            </div>
+          </div>
+
+          {/* BOTTOM VERTICAL SPLIT DOOR PANEL (MOVES VERTICALLY DOWN: translateY(100%)) */}
+          <div
+            className="coplay-split-door-bottom"
+            style={{
+              transform: `translateY(${coplaySplitProgress * 100}%)`,
+              zIndex: 20
+            }}
+          >
+            <div className="coplay-door-canvas-content">
+              
+              {/* ZOOMABLE MARQUEE & CO-PLAY TYPOGRAPHY CONTAINER (ZOOMS & FADES OUT COMPLETELY BEFORE GAMEBOY APPEARS) */}
+              {textZoomOpacity > 0.01 && (
+                <div
+                  className="coplay-zoomable-content-wrapper"
+                  style={{
+                    transform: `scale(${coplayZoomScale})`,
+                    transformOrigin: 'center center',
+                    opacity: textZoomOpacity
+                  }}
+                >
+                  {/* 3 STACKED MARQUEE ROWS SLIDING HORIZONTALLY */}
+                  <div className="coplay-pure-typo-container">
+                    {/* ROW 1: SLIDING LEFT TO RIGHT */}
+                    <div className="coplay-typo-row">
+                      <div className="coplay-typo-track scroll-left">
+                        {COPLAY_TYPO_ITEMS.map((item, idx) => (
+                          <span key={idx} className="coplay-typo-text text-small-white">{item} <span className="typo-dot">•</span></span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ROW 2 (CENTER): MAIN BOLD WHITE CO-PLAY MARQUEE ROW THAT ZOOM TARGETS */}
+                    <div className="coplay-typo-row row-center-zoom-target">
+                      <div className="coplay-typo-track scroll-right">
+                        {COPLAY_TYPO_ITEMS.map((item, idx) => (
+                          <span key={idx} className="coplay-typo-text text-main-white">{item} <span className="typo-dot">•</span></span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ROW 3: SLIDING LEFT TO RIGHT */}
+                    <div className="coplay-typo-row">
+                      <div className="coplay-typo-track scroll-left">
+                        {COPLAY_TYPO_ITEMS.map((item, idx) => (
+                          <span key={idx} className="coplay-typo-text text-stroke">{item} <span className="typo-dot">•</span></span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* GAMEBOY PIXEL ART IMAGE (PURE PITCH BLACK, ZERO GLOW, ZERO SHADOW, PERFECT UN-ZOOMED FIT) */}
+              <div
+                className="gameboy-perfect-fit-overlay gameboy-bottom-half"
+                style={{
+                  opacity: gameboyBlendOpacity
+                }}
+              >
+                <img src="/gameboy_pixel_art.png" alt="GameBoy Pixel Art" className="gameboy-fitted-img" />
+              </div>
+
+            </div>
+          </div>
+
         </div>
       </section>
 
