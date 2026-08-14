@@ -4182,6 +4182,52 @@
   clip-path: polygon(0 4vw, 100% 0, 100% calc(100% - 4vw), 0 100%);
 }
 
+/* HYBRID ECOSYSTEM BADGES MOSAIC IN PRICING BANNER */
+.ecosystem-hybrid-badges-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.hybrid-pill {
+  border: 3px solid #000000;
+  border-radius: 30px;
+  padding: 8px 18px;
+  font-family: 'Impact', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 4px 4px 0px #000000;
+  transition: transform 0.15s ease;
+}
+
+.hybrid-pill:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+
+.pill-cowatch {
+  background: #11151c;
+  color: #ffcc00;
+}
+
+.pill-cogames {
+  background: #FF70A6;
+  color: #000000;
+}
+
+.pill-coshop {
+  background: #ffffff;
+  color: #000000;
+}
+
+.pill-costudy {
+  background: #CCFF00;
+  color: #000000;
+}
+
 .price-gold-badge {
   display: inline-block;
   background: #CCFF00;

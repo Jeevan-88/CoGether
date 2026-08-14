@@ -934,107 +934,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* ── PAUSE SPACER ── */}
-      <div style={{ height: '20vh', background: '#11151c' }} />
-
-      {/* 3. CO-GAMES MULTIPLAYER ARCADE & LIVE CAM ROOM FINDER SECTION */}
-      <section className="cogame-arcade-section">
-        <div className="cogame-header-container">
-          <span className="cogame-badge">🎮 MULTIPLAYER GAME ARCADE</span>
-          <h2 className="cogame-title">PLAY ONLINE GAMES WITH YOUR SQUAD ON LIVE CAM.</h2>
-          <p className="cogame-subtitle">
-            No downloads required! Jump into live camera party rooms with voice chat, video grids, and instant multiplayer scoreboards.
-          </p>
-        </div>
-
-        {/* INTERACTIVE GAME CATEGORY FILTER PILLS */}
-        <div className="cogame-filters-row">
-          <button className="btn-cogame-filter active">🔥 All Party Rooms</button>
-          <button className="btn-cogame-filter">🎯 Trivia Battles</button>
-          <button className="btn-cogame-filter">🎨 Draw & Guess</button>
-          <button className="btn-cogame-filter">♟️ Speed Chess</button>
-          <button className="btn-cogame-filter">👾 Retro Arcade</button>
-        </div>
-
-        {/* LIVE GAME ROOMS GRID */}
-        <div className="cogame-rooms-grid">
-          {/* ROOM 1: TRIVIA BATTLES */}
-          <div className="cogame-room-card">
-            <div className="room-card-top">
-              <span className="room-tag">🎯 TRIVIA BATTLES</span>
-              <span className="room-status-badge">🔴 LIVE CAM • 3/4</span>
-            </div>
-            <h3 className="room-title">🔥 Gen-Z Pop Culture & Music Quiz</h3>
-            <div className="room-players-stack">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Player 1" className="player-avatar-mini" />
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Player 2" className="player-avatar-mini" />
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Player 3" className="player-avatar-mini" />
-              <span className="player-slot-badge">+1 Slot Left</span>
-            </div>
-            <button className="btn-join-game-room" onClick={() => handleLaunch('watch')}>
-              Join Room on Cam <ArrowRight size={16} />
-            </button>
-          </div>
-
-          {/* ROOM 2: SKRIBBL DRAWING LOUNGE */}
-          <div className="cogame-room-card">
-            <div className="room-card-top">
-              <span className="room-tag">🎨 DRAW & GUESS</span>
-              <span className="room-status-badge">🔴 LIVE CAM • 5/8</span>
-            </div>
-            <h3 className="room-title">✏️ Skribbl Squad Drawing Lounge</h3>
-            <div className="room-players-stack">
-              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="Player 1" className="player-avatar-mini" />
-              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80" alt="Player 2" className="player-avatar-mini" />
-              <span className="player-slot-badge">+3 Slots Left</span>
-            </div>
-            <button className="btn-join-game-room" onClick={() => handleLaunch('watch')}>
-              Join Room on Cam <ArrowRight size={16} />
-            </button>
-          </div>
-
-          {/* ROOM 3: SPEED CHESS BLITZ */}
-          <div className="cogame-room-card">
-            <div className="room-card-top">
-              <span className="room-tag">♟️ SPEED CHESS</span>
-              <span className="room-status-badge waiting">🟡 WAITING • 1/2</span>
-            </div>
-            <h3 className="room-title">⚡ 3-Minute Speed Chess Blitz</h3>
-            <div className="room-players-stack">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Player Maya" className="player-avatar-mini" />
-              <span className="player-slot-badge">Needs 1 Opponent</span>
-            </div>
-            <button className="btn-join-game-room" onClick={() => handleLaunch('watch')}>
-              Challenge Maya →
-            </button>
-          </div>
-
-          {/* ROOM 4: RETRO ARCADE */}
-          <div className="cogame-room-card">
-            <div className="room-card-top">
-              <span className="room-tag">👾 RETRO ARCADE</span>
-              <span className="room-status-badge">🔴 LIVE CAM • 4/4</span>
-            </div>
-            <h3 className="room-title">🕹️ Pac-Man & Mario Kart Retro Night</h3>
-            <div className="room-players-stack">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Player 1" className="player-avatar-mini" />
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Player 2" className="player-avatar-mini" />
-              <span className="player-slot-badge">Full Room</span>
-            </div>
-            <button className="btn-join-game-room" onClick={() => handleLaunch('watch')}>
-              Spectate Live →
-            </button>
-          </div>
-        </div>
-
-        {/* BOTTOM CUSTOM ROOM CTA */}
-        <div className="cogame-bottom-cta">
-          <h4>✨ Want to host a custom private party room?</h4>
-          <button className="btn-create-custom-room" onClick={() => handleLaunch('watch')}>
-            + Create Private Game Room →
-          </button>
-        </div>
-      </section>
+      {/* ── PAUSE SPACER: 60vh breathing room before Co-Shop ── */}
+      <div style={{ height: '60vh', background: '#11151c' }} />
 
       {/* 4. PINNED CO-SHOP HUB SECTION (500VH STAGE: HD PAUSE -> PAC-MAN SWEEP -> SPLIT SCREEN HUB) */}
       <div className="sticky-pinned-coshop-stage-wrapper" style={{ height: '500vh', position: 'relative' }}>
@@ -1489,15 +1390,24 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      {/* 6. GEOMETRIC TRIANGLE PRICING & SARCASTIC PSYCHOLOGICAL FOOTER SECTION */}
+      {/* 6. ULTIMATE HYBRID ECOSYSTEM PRICING & SARCASTIC FOOTER SECTION */}
       <section className="triangle-pricing-footer-section">
         {/* TRIANGLE ANGLED SLASH BANNER */}
         <div className="triangle-hero-slash">
           <div className="slash-content-wrapper">
+            
+            {/* HYBRID ECOSYSTEM BADGES MOSAIC */}
+            <div className="ecosystem-hybrid-badges-row">
+              <span className="hybrid-pill pill-cowatch">🍿 CO-WATCH CINEMA (4K Movie Sync)</span>
+              <span className="hybrid-pill pill-cogames">🎮 CO-GAMES (Trivia & Arcade)</span>
+              <span className="hybrid-pill pill-coshop">🛒 CO-SHOPPING (Shared Cart • ₹2,598)</span>
+              <span className="hybrid-pill pill-costudy">🎓 CO-STUDY (Graduation Desk + Lofi)</span>
+            </div>
+
             <span className="price-gold-badge">₹49 / MONTH • UNLIMITED ACCESS</span>
-            <h2 className="triangle-main-title">UNLOCK COGETHER PREMIUM</h2>
+            <h2 className="triangle-main-title">ONE SUBSCRIPTION. UNLIMITED EVERYTHING.</h2>
             <p className="triangle-subtitle">
-              Co-Watch Movies in Buttery 4K • Multiplayer Quiz Battles • Virtual Co-Study Desks • Shared Shopping Carts
+              Every single feature, every room, every game, and every study desk — all unlocked for just ₹49/month.
             </p>
             <button className="btn-triangle-subscribe" onClick={onOpenPricing}>
               Get Premium for ₹49 / Month →
@@ -1518,7 +1428,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           <div className="fomo-bullets-grid">
             <div className="fomo-bullet-item">
               <span className="bullet-icon">💔</span>
-              <p><strong>Do you really want your crush/partner studying with someone else</strong> who already has a Co-Study desk?</p>
+              <p><strong>Do you really want your crush/partner studying or watching movies with someone else</strong> who already has CoGether Premium?</p>
             </div>
             <div className="fomo-bullet-item">
               <span className="bullet-icon">📉</span>
@@ -1526,7 +1436,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             </div>
             <div className="fomo-bullet-item">
               <span className="bullet-icon">🍿</span>
-              <p><strong>Crying over laggy 480p screenshares</strong> when you could co-stream in 4K HD for just ₹49?</p>
+              <p><strong>Crying over laggy 480p screenshares</strong> when you could co-stream in buttery 4K HD for just ₹49?</p>
             </div>
             <div className="fomo-bullet-item highlight-quote">
               <span className="bullet-icon">😱</span>
