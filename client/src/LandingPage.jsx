@@ -1390,63 +1390,70 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      {/* 6. ULTIMATE HYBRID ECOSYSTEM PRICING & SARCASTIC FOOTER SECTION */}
-      <section className="triangle-pricing-footer-section">
-        {/* TRIANGLE ANGLED SLASH BANNER */}
-        <div className="triangle-hero-slash">
-          <div className="slash-content-wrapper">
-            
-            {/* HYBRID ECOSYSTEM BADGES MOSAIC */}
-            <div className="ecosystem-hybrid-badges-row">
-              <span className="hybrid-pill pill-cowatch">🍿 CO-WATCH CINEMA (4K Movie Sync)</span>
-              <span className="hybrid-pill pill-cogames">🎮 CO-GAMES (Trivia & Arcade)</span>
-              <span className="hybrid-pill pill-coshop">🛒 CO-SHOPPING (Shared Cart • ₹2,598)</span>
-              <span className="hybrid-pill pill-costudy">🎓 CO-STUDY (Graduation Desk + Lofi)</span>
-            </div>
+      {/* 6. MULTI-SECTION DIAGONAL COLOR CUTS + TRANSPARENT CENTER TRIANGLE HERO */}
+      <section className="ultimate-hybrid-mosaic-section">
+        {/* 4 DIAGONAL BACKGROUND COLOR CUT WEDGES */}
+        <div className="diagonal-bg-wedge wedge-cowatch-black" />
+        <div className="diagonal-bg-wedge wedge-coshop-steel" />
+        <div className="diagonal-bg-wedge wedge-costudy-cream" />
 
-            <span className="price-gold-badge">₹49 / MONTH • UNLIMITED ACCESS</span>
-            <h2 className="triangle-main-title">ONE SUBSCRIPTION. UNLIMITED EVERYTHING.</h2>
-            <p className="triangle-subtitle">
-              Every single feature, every room, every game, and every study desk — all unlocked for just ₹49/month.
-            </p>
-            <button className="btn-triangle-subscribe" onClick={onOpenPricing}>
-              Get Premium for ₹49 / Month →
-            </button>
-          </div>
+        {/* CENTER TRANSPARENT FLOATING GLASS TRIANGLE PRICING HERO */}
+        <div className="transparent-center-triangle-hero glass-triangle-shape">
+          <span className="glass-pricing-badge">₹49 / MONTH • UNLIMITED ACCESS</span>
+          <h2 className="glass-main-title">ONE SUBSCRIPTION.<br />ALL ECOSYSTEMS.</h2>
+          <p className="glass-subtitle">
+            Co-Watch Movies in Buttery 4K • Multiplayer Quiz Battles • Virtual Co-Study Desks • Shared Shopping Carts
+          </p>
+          <button className="btn-glass-subscribe" onClick={onOpenPricing}>
+            Get Premium for ₹49 →
+          </button>
         </div>
 
-        {/* HILARIOUS SARCASTIC PSYCHOLOGICAL FOMO CARD */}
-        <div className="psychological-fomo-card">
-          <div className="fomo-card-header">
-            <span className="fomo-emoji">🧠</span>
-            <div>
-              <h3>WHY WOULD YOU NOT TAKE THIS SUBSCRIPTION?</h3>
-              <span className="fomo-subtag">A quick psychological reality check...</span>
+        {/* SURROUNDING GEN-Z PSYCHOLOGICAL WORD CARDS RING */}
+        <div className="psychological-cards-ring">
+          {/* CARD 1 */}
+          <div className="genz-psych-card highlight-pink">
+            <div className="genz-card-header">
+              <span className="genz-card-icon">💔</span>
+              <span className="genz-card-tag">REALITY CHECK #01</span>
             </div>
+            <p className="genz-card-text">
+              <strong>Do you really want your crush / partner studying or watching movies with someone else</strong> who already has CoGether Premium?
+            </p>
           </div>
 
-          <div className="fomo-bullets-grid">
-            <div className="fomo-bullet-item">
-              <span className="bullet-icon">💔</span>
-              <p><strong>Do you really want your crush/partner studying or watching movies with someone else</strong> who already has CoGether Premium?</p>
+          {/* CARD 2 */}
+          <div className="genz-psych-card">
+            <div className="genz-card-header">
+              <span className="genz-card-icon">📉</span>
+              <span className="genz-card-tag">REALITY CHECK #02</span>
             </div>
-            <div className="fomo-bullet-item">
-              <span className="bullet-icon">📉</span>
-              <p><strong>Are you gonna let your squad get A+ grades</strong> while you get distracted scrolling reels alone?</p>
-            </div>
-            <div className="fomo-bullet-item">
-              <span className="bullet-icon">🍿</span>
-              <p><strong>Crying over laggy 480p screenshares</strong> when you could co-stream in buttery 4K HD for just ₹49?</p>
-            </div>
-            <div className="fomo-bullet-item highlight-quote">
-              <span className="bullet-icon">😱</span>
-              <p><em>"Oh damn... did he really mention this in the prompt?! Okay fine, I HAVE TO TAKE THE SUBSCRIPTION RIGHT NOW! 😭🔥"</em></p>
-            </div>
+            <p className="genz-card-text">
+              <strong>Are you gonna let your squad get A+ grades</strong> while you get distracted scrolling reels alone at 3 AM?
+            </p>
           </div>
 
-          <button className="btn-fomo-convert-now" onClick={onOpenPricing}>
-            Fine, Take My ₹49 & Unlock Everything →
-          </button>
+          {/* CARD 3 */}
+          <div className="genz-psych-card">
+            <div className="genz-card-header">
+              <span className="genz-card-icon">🍿</span>
+              <span className="genz-card-tag">REALITY CHECK #03</span>
+            </div>
+            <p className="genz-card-text">
+              <strong>Crying over laggy 480p screenshares</strong> when you could co-stream in buttery 4K HD for just ₹49?
+            </p>
+          </div>
+
+          {/* CARD 4 */}
+          <div className="genz-psych-card highlight-yellow">
+            <div className="genz-card-header">
+              <span className="genz-card-icon">😱</span>
+              <span className="genz-card-tag">THE MOMENT OF TRUTH</span>
+            </div>
+            <p className="genz-card-quote">
+              "OH DAMN... DID HE REALLY MENTION THIS IN THE PROMPT?! OKAY FINE, I HAVE TO TAKE THE SUBSCRIPTION RIGHT NOW! 😭🔥"
+            </p>
+          </div>
         </div>
 
         {/* BOTTOM WATERMARK & FOOTER */}
