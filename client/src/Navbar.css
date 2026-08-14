@@ -18,6 +18,16 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.cogether-navbar.navbar-transparent-coshop {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
 .navbar-container {
   width: 100%;
   max-width: 1440px;

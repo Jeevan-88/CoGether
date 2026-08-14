@@ -14,6 +14,7 @@ export default function App() {
   const [activeRoom, setActiveRoom] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
+  const [isCoshopActive, setIsCoshopActive] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
@@ -21,8 +22,18 @@ export default function App() {
       const heroHeight = window.innerHeight * 1.2;
       const progress = Math.min(window.scrollY / heroHeight, 1);
       setScrollProgress(progress);
+
+      const coshopWrapper = document.querySelector('.sticky-pinned-coshop-stage-wrapper');
+      if (coshopWrapper) {
+        const rect = coshopWrapper.getBoundingClientRect();
+        const isActive = rect.top <= 10 && rect.bottom >= window.innerHeight - 10;
+        setIsCoshopActive(isActive);
+      } else {
+        setIsCoshopActive(false);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -108,6 +119,7 @@ export default function App() {
         onOpenPricing={() => setShowPricing(true)}
         isScrolled={scrollProgress > 0.3}
         scrollProgress={scrollProgress}
+        hideNavbar={isCoshopActive}
       />
 
       <LandingPage

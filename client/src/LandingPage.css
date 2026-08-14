@@ -1912,7 +1912,7 @@
   height: 90vh;
   z-index: 100;
   pointer-events: none;
-  transition: left 0.1s linear;
+  will-change: left;
   filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.15));
 }
 
@@ -2597,4 +2597,1081 @@
   color: #0f172a;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   CO-SHOP STAGE C — Proper split interface + glass bevel
+   Left: split co-shopping screen  |  Right: heading + glass bevel carousel
+   ═══════════════════════════════════════════════════════════ */
+.coshop-reveal-stage-c {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  z-index: 50;
+  background: #c4cbd2; /* plain grey — same as lit room bg */
+}
+
+/* ── LEFT: Split co-shopping interface ── */
+.coshop-left-split-panel {
+  flex: 1.1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 2vw 24px 4vw;
+}
+
+.coshop-split-screen-interface {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 28px 64px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Amazon top bar */
+.csi-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: #131921;
+  flex-shrink: 0;
+}
+.csi-logo { color: #FF9900; font-weight: 900; font-size: 1rem; font-style: italic; letter-spacing: -0.03em; }
+.csi-search-bar {
+  flex: 1; background: #fff; border-radius: 4px; padding: 5px 10px;
+  font-size: 0.72rem; color: #666;
+}
+.csi-colive-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.12); border-radius: 100px;
+  padding: 3px 10px; font-size: 0.65rem; font-weight: 700;
+  color: #fff; letter-spacing: 0.06em;
+}
+.csi-live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #22c55e; display: inline-block;
+  animation: pulse-live 1.2s ease-in-out infinite;
+}
+
+/* Split body — two halves side by side */
+.csi-split-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.csi-user-half {
+  flex: 1;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fafafa;
+}
+.csi-user-b { background: #f0f4ff; }
+
+.csi-user-tag {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.72rem; font-weight: 700; color: #374151;
+}
+.csi-user-av {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff; font-size: 0.75rem; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+.av-b { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+
+.csi-product-card {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: #fff; border-radius: 10px; padding: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.csi-prod-img {
+  width: 56px; height: 56px; border-radius: 8px;
+  background: #f1f5f9; display: flex; align-items: center;
+  justify-content: center; font-size: 1.8rem; flex-shrink: 0;
+}
+.csi-prod-info { display: flex; flex-direction: column; gap: 3px; }
+.csi-prod-title { font-size: 0.7rem; font-weight: 700; color: #111; line-height: 1.3; }
+.csi-prod-price { font-size: 0.78rem; font-weight: 900; color: #e85d04; }
+.csi-prod-price s { font-weight: 400; opacity: 0.5; font-size: 0.65rem; margin-left: 4px; }
+.csi-stars { font-size: 0.65rem; color: #f59e0b; }
+.csi-stars span { color: #6b7280; margin-left: 3px; }
+.csi-action-row { display: flex; gap: 6px; margin-top: 4px; }
+.csi-btn-cart {
+  background: #FFD814; border: none; padding: 4px 10px;
+  border-radius: 4px; font-size: 0.65rem; font-weight: 700;
+  cursor: pointer; color: #111;
+}
+.csi-btn-added { background: #22c55e; color: #fff; }
+.csi-btn-wish {
+  background: #f1f5f9; border: none; padding: 4px 8px;
+  border-radius: 4px; font-size: 0.75rem; cursor: pointer;
+}
+
+.csi-reaction-strip {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  font-size: 0.65rem; color: #6b7280;
+}
+
+/* Center divider */
+.csi-center-divider {
+  width: 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  position: relative;
+}
+.csi-divider-line { flex: 1; width: 1px; background: #e2e8f0; }
+.csi-divider-icon {
+  font-size: 1rem; padding: 4px;
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 50%; z-index: 1;
+}
+
+/* Shared cart bar */
+.csi-shared-cart-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px;
+  background: #1a1a2e;
+  color: #fff; font-size: 0.75rem; font-weight: 600;
+  flex-shrink: 0;
+}
+.csi-cart-count { background: #6366f1; border-radius: 100px; padding: 2px 8px; font-size: 0.65rem; }
+.csi-cart-total { font-weight: 900; font-size: 0.82rem; color: #fbbf24; }
+.csi-checkout-btn {
+  margin-left: auto; background: #FFD814; border: none;
+  padding: 6px 14px; border-radius: 6px; font-size: 0.7rem;
+  font-weight: 800; color: #111; cursor: pointer;
+}
+
+/* ── RIGHT: Heading + Glass bevel panel ── */
+.coshop-right-bevel-panel {
+  flex: 0.9;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 4vw 32px 3vw;
+  gap: 14px;
+}
+
+.coshop-section-label {
+  font-size: 0.72rem; font-weight: 900;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: #4f46e5;
+}
+
+/* Matches .katapult-condensed-headline style from Co-Watch */
+.coshop-main-headline {
+  font-size: clamp(2.8rem, 5.5vw, 5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: #0f172a;
+  text-transform: uppercase;
+}
+
+.coshop-section-sub {
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.65;
+  max-width: 320px;
+}
+
+/* ── GLASS BEVEL — replicates uploaded rounded-rect crystal glass tile ── */
+.glass-bevel-host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  margin-top: 6px;
+}
+
+/* The bevel shape itself — rounded rectangle with inward glass appearance */
+.glass-bevel-shape {
+  position: relative;
+  width: 100%;
+  height: 110px;
+  border-radius: 22px;
+  overflow: hidden;
+  /* Glass body */
+  background: linear-gradient(145deg,
+    rgba(220, 225, 235, 0.92) 0%,
+    rgba(200, 208, 220, 0.85) 50%,
+    rgba(185, 195, 210, 0.90) 100%
+  );
+  /* Inward bevel: thick border + deep inset shadow mimicking the reference image */
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    /* Outer bevel highlight (top-left bright edge) */
+    -2px -2px 0 rgba(255,255,255,0.9),
+    /* Outer bevel shadow (bottom-right dark edge) */
+    2px 2px 0 rgba(150,160,175,0.6),
+    /* Inward cavity depth */
+    inset 0 4px 12px rgba(255,255,255,0.6),
+    inset 0 -4px 12px rgba(100,115,135,0.25),
+    inset 4px 0 8px rgba(255,255,255,0.3),
+    inset -4px 0 8px rgba(100,115,135,0.15),
+    /* Overall drop shadow */
+    0 12px 40px rgba(0,0,0,0.18);
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Top-right gloss spot from reference image */
+.gbevel-top-gloss {
+  position: absolute;
+  top: 8px; right: 22px;
+  width: 90px; height: 40px;
+  background: radial-gradient(ellipse at 60% 30%,
+    rgba(255,255,255,0.85) 0%,
+    rgba(255,255,255,0.35) 40%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Subtle bottom shadow line */
+.gbevel-bottom-shadow {
+  position: absolute;
+  bottom: 0; left: 8%; right: 8%;
+  height: 14px;
+  background: linear-gradient(to bottom, transparent, rgba(100,115,135,0.18));
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Carousel container inside bevel */
+.gbevel-carousel-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+  z-index: 2;
+}
+
+/* Each brand slide — stacked on top of each other, only active one visible */
+.gbevel-brand-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  transition: opacity 0.6s ease;
+}
+
+.gbevel-brand-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  background: #fff;
+  padding: 6px;
+}
+
+.gbevel-brand-label {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Carousel dot indicators */
+.gbevel-dots {
+  display: flex; gap: 6px; align-items: center;
+  z-index: 4; position: absolute; bottom: 10px;
+  left: 50%; transform: translateX(-50%);
+}
+.gbevel-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  transition: background 0.4s ease, transform 0.2s ease;
+  display: block;
+}
+
+.gbevel-caption {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════
+   SHOPPING CART ICON ON PAC-MAN
+   Centered on the Pac-Man body
+   ═══════════════════════════════════════════════ */
+.pacman-cart-icon {
+  position: absolute;
+  top: 50%;
+  left: 42%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NEW CO-SHOP GREEN CART & SPLIT SCREEN LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+
+/* Center 3D Green Cart (pops up in center then glides to top-right) */
+.coshop-green-cart-standalone {
+  position: absolute;
+  height: 220px;
+  width: auto;
+  object-fit: contain;
+  z-index: 80;
+  pointer-events: none;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.28));
+  will-change: left, top, transform;
+}
+
+/* Vertical Split stage wrapper: Left half Grey (#c4cbd2), Right half Green (#69b32e) */
+.coshop-vertical-split-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  z-index: 50;
+  overflow: hidden;
+}
+
+.coshop-left-vertical-panel {
+  flex: 1;
+  height: 100%;
+  background-image: url('/co_shop_masterpiece_3d_room.png');
+  background-size: 200% 100%;
+  background-position: left center;
+  position: relative;
+  will-change: transform;
+}
+
+.coshop-right-vertical-panel {
+  flex: 1;
+  height: 100%;
+  background-image: url('/co_shop_masterpiece_3d_room.png');
+  background-size: 200% 100%;
+  background-position: right center;
+  position: relative;
+  will-change: transform;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TABLET SCREEN OVERLAY FOR CO-SHOP LIVE VIDEO CALL SHOPPING
+   ═══════════════════════════════════════════════════════════ */
+
+.coshop-tablet-screen-overlay {
+  position: absolute;
+  top: 63.5%;
+  left: 48.9%;
+  transform: translate(-50%, -50%) perspective(800px) rotateX(1.5deg) rotateY(1deg) rotateZ(0deg) skewX(-0.5deg) skewY(0.5deg);
+  width: 305px;
+  height: 161px;
+  background: #000000;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: none;
+  border: none;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+}
+
+.tablet-coshop-header-bar {
+  height: 20px;
+  background: #000000 !important;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.store-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #a3e635;
+}
+
+.live-red-dot {
+  width: 5px;
+  height: 5px;
+  background: #ef4444;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #ef4444;
+  animation: pulseDot 1.5s infinite;
+}
+
+.shared-cart-pill {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 0.48rem;
+}
+
+.tablet-video-content-body {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.tablet-coshop-live-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Two Friends Video Call Avatars */
+.friend-video-avatar {
+  position: absolute;
+  top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  z-index: 30;
+}
+
+.friend-video-avatar.avatar-left {
+  left: 6px;
+}
+
+.friend-video-avatar.avatar-right {
+  right: 6px;
+}
+
+.avatar-video-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid #a3e635;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.avatar-video-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.live-cam-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  font-size: 0.4rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.5px 0;
+}
+
+.reaction-bubble-pop {
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  font-size: 0.48rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  animation: floatBubble 2.5s ease-in-out infinite alternate;
+}
+
+/* Product Bottom Card inside tablet display */
+.tablet-product-bottom-card {
+  position: absolute;
+  bottom: 4px;
+  left: 6px;
+  right: 6px;
+  background: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 30;
+}
+
+.product-info-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.prod-title {
+  color: #ffffff;
+  font-size: 0.5rem;
+  font-weight: 800;
+}
+
+.prod-price {
+  color: #a3e635;
+  font-size: 0.54rem;
+  font-weight: 900;
+}
+
+.old-price {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.44rem;
+  margin-left: 3px;
+}
+
+.btn-buy-together-now {
+  background: linear-gradient(135deg, #a3e635 0%, #65a30d 100%);
+  color: #000000;
+  font-size: 0.5rem;
+  font-weight: 900;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(163, 230, 53, 0.35);
+}
+
+/* Floating Emojis */
+.tablet-floating-emojis-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.emoji-float {
+  position: absolute;
+  font-size: 1rem;
+  animation: floatEmojiUp 3s infinite ease-out;
+}
+
+.emoji-1 { left: 25%; animation-delay: 0s; }
+.emoji-2 { left: 45%; animation-delay: 0.8s; }
+.emoji-3 { left: 65%; animation-delay: 1.6s; }
+.emoji-4 { left: 80%; animation-delay: 2.2s; }
+
+@keyframes floatEmojiUp {
+  0% { transform: translateY(80px) scale(0.6); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-80px) scale(1.2); opacity: 0; }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CINEMATIC CO-STUDY PORTAL & DIAGONAL BLACK SQUARES SHOWCASE (#FFFFE3)
+   ═══════════════════════════════════════════════════════════ */
+
+.sticky-pinned-costudy-stage-wrapper {
+  height: 500vh;
+  position: relative;
+  background: #FFFFE3;
+}
+
+.costudy-sticky-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  background: #FFFFE3;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  color: #000000;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* CENTERED "CO - STUDY" HEADLINE WRAPPER */
+.centered-costudy-headline-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  pointer-events: none;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  transition: transform 0.05s linear, opacity 0.05s linear;
+}
+
+.centered-costudy-headline-wrapper.clickable-target-active {
+  pointer-events: auto !important;
+  cursor: crosshair !important;
+}
+
+.costudy-text-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.08em;
+  font-size: clamp(5.2rem, 15vw, 18rem);
+  max-width: 95vw;
+  font-weight: 900;
+  font-stretch: ultra-condensed;
+  color: #000000;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  text-transform: uppercase;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.co-letter-o-custom-circle {
+  position: relative;
+  width: 0.82em;
+  height: 0.82em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.04em;
+  transform-origin: center center;
+  transition: transform 0.1s ease;
+}
+
+.o-black-circle-body {
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.o-cream-center-hole {
+  background: #FFFFE3;
+  border-radius: 50%;
+  transition: width 0.15s ease, height 0.15s ease;
+}
+
+/* ROTATING PERFECT CIRCULAR WHITE DOTS RING */
+.o-dots-ring-perfect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  z-index: 10;
+}
+
+/* LIVE FLOATING 'O' TUNER WIDGET PANEL */
+.costudy-o-tuner-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 310px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.costudy-o-tuner-widget.minimized {
+  width: 230px;
+}
+
+.tuner-header {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #FFFFE3;
+  user-select: none;
+}
+
+.btn-toggle-tuner {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tuner-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tuner-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tuner-row label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  justify-content: space-between;
+}
+
+.tuner-row label strong {
+  color: #fde047;
+  font-weight: 900;
+}
+
+.tuner-row input[type="range"] {
+  width: 100%;
+  accent-color: #fde047;
+  cursor: pointer;
+}
+
+.tuner-checkbox-row {
+  flex-direction: row !important;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer;
+  font-size: 0.78rem !important;
+  color: #fde047 !important;
+  font-weight: 700;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #fde047;
+  cursor: pointer;
+}
+
+.btn-copy-calib-values {
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: #fde047;
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn-copy-calib-values:hover {
+  background: #eab308;
+  transform: scale(1.02);
+}
+
+/* TARGET CROSSHAIR RETICLE OVERLAY 🎯 */
+.pinpoint-zoom-crosshair {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.crosshair-ring {
+  width: 32px;
+  height: 32px;
+  border: 2px dashed #ef4444;
+  border-radius: 50%;
+  animation: spinCrosshair 4s linear infinite;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+}
+
+.crosshair-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #ef4444;
+  border-radius: 50%;
+}
+
+.crosshair-label {
+  position: absolute;
+  top: 36px;
+  background: rgba(239, 68, 68, 0.95);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes spinCrosshair {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* DIAGONAL BLACK FILLED SQUARES GRID */
+.costudy-black-squares-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 45;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 24px;
+  padding: 48px;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+@media (max-width: 900px) {
+  .costudy-black-squares-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    overflow-y: auto;
+    padding: 24px;
+  }
+}
+
+.black-info-square {
+  background: #000000;
+  color: #ffffff;
+  border-radius: 28px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  will-change: transform, opacity;
+  transition: transform 0.1s linear, opacity 0.1s linear;
+}
+
+.sq-number {
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.sq-icon {
+  font-size: 2.5rem;
+  margin: 12px 0 8px 0;
+}
+
+.black-info-square h3 {
+  font-size: clamp(1.4rem, 2.2vw, 2.1rem);
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+}
+
+.black-info-square p {
+  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+.sq-btn-white {
+  background: #FFFFE3;
+  color: #000000;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 8px 20px rgba(255, 255, 227, 0.2);
+}
+
+.sq-btn-white:hover {
+  transform: translateY(-2px) scale(1.03);
+  background: #ffffff;
+}
+
+/* Right side content container — centered vertically on green half */
+.coshop-green-content-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  z-index: 30;
+  max-width: 500px;
+  position: relative;
+}
+
+.coshop-badge-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.coshop-headline-green {
+  font-size: clamp(3.2rem, 6vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-family: inherit;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.coshop-sub-green {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
+  max-width: 460px;
+}
+
+.btn-launch-coshop-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-size: 1.05rem;
+  font-weight: 900;
+  padding: 16px 32px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-launch-coshop-green:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* ── RUNNING / SCROLLING MARQUEE BANNER ── */
+.coshop-marquee-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  padding: 12px 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 20;
+}
+
+.coshop-marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  width: max-content;
+  animation: marqueeLoop 20s linear infinite;
+}
+
+.coshop-brand-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  padding: 8px 18px;
+  border-radius: 100px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+.coshop-brand-card img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.coshop-brand-card span {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+@keyframes marqueeLoop {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 

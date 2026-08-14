@@ -1,7 +1,7 @@
 import React from 'react';
 import './Navbar.css';
 
-export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpenPricing, isScrolled, scrollProgress = 0 }) {
+export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpenPricing, isScrolled, scrollProgress = 0, hideNavbar = false }) {
   const winW = typeof window !== 'undefined' ? window.innerWidth : 1200;
   const winH = typeof window !== 'undefined' ? window.innerHeight : 800;
 
@@ -42,7 +42,7 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
   const posY = currentCenterY - (currentH / 2);
 
   return (
-    <header className={`cogether-navbar ${isScrolled ? 'scrolled-header-active' : ''}`}>
+    <header className={`cogether-navbar ${isScrolled ? 'scrolled-header-active' : ''} ${hideNavbar ? 'navbar-transparent-coshop' : ''}`}>
       {/* SINGLE CONTINUOUS 8K 3D LOGO: Flies up to top-left navbar header during Phase 1 */}
       <img
         src="/cogether-transparent-hd.png?v=11"
@@ -58,10 +58,12 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
           top: `${posY}px`,
           width: `${currentW}px`,
           height: `${currentH}px`,
-          zIndex: 250,
+          zIndex: hideNavbar ? 0 : 250,
           cursor: 'pointer',
           objectFit: 'contain',
-          pointerEvents: 'auto'
+          pointerEvents: hideNavbar ? 'none' : 'auto',
+          opacity: hideNavbar ? 0 : 1,
+          transition: 'opacity 0.4s ease, transform 0.4s ease'
         }}
       />
 

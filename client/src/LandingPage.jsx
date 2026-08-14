@@ -138,8 +138,36 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [heroScroll, setHeroScroll] = useState(0);
   const [coplayScrollProgress, setCoplayScrollProgress] = useState(0);
   const [coshopScrollProgress, setCoshopScrollProgress] = useState(0);
+  const [costudyScrollProgress, setCostudyScrollProgress] = useState(0);
 
-  // FINAL PERFECT USER LOCKED CO-SHOP STAGE COORDINATES
+  // PERFECT CIRCULAR 'O', WHITE DOTS & PINPOINT ZOOM CALIBRATOR CONFIG
+  const [oTuner, setOTuner] = useState({
+    dotsRadius: 43.5,
+    dotSize: 3.0,
+    holeSize: 46,
+    oScale: 0.77,
+    zoomTargetX: 21.0,
+    zoomTargetY: 50.0,
+    panX: 26.5,
+    maxZoom: 65,
+    showReticle: false,
+    showTuner: false
+  });
+
+  // FINAL LOCKED TABLET DISPLAY OVERLAY CONFIG
+  const [tabletConfig] = useState({
+    top: 63.5,
+    left: 48.9,
+    width: 305,
+    height: 161,
+    borderRadius: 6,
+    rotateX: 1.5,
+    rotateY: 1.0,
+    rotateZ: 0.0,
+    skewX: -0.5,
+    skewY: 0.5,
+    perspective: 800
+  });
   const [tunerTab, setTunerTab] = useState('letters');
   const [shelfY, setShelfY] = useState(217);
   const [shelfScale, setShelfScale] = useState(102);
@@ -172,55 +200,139 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
-  // ACCURATE SCROLL LISTENERS FOR HERO TAGLINE, STAGE SECTION, CO-PLAY SECTION & CO-SHOP SECTION
+  // ─────────────────────────────────────────────────────────────────────────────
+  // MASTER SCROLL RATE LIMITER — Intercepts wheel events and caps scroll speed.
+  // No matter how fast the user scrolls, the PAGE ITSELF moves slowly so every
+  // sticky animation section has enough time to fully play through.
+  // ─────────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    let targetScrollY = window.scrollY;
+    let currentScrollY = window.scrollY;
+    let scrollRafId;
+
+    const onWheel = (e) => {
+      e.preventDefault(); // Block native scroll entirely
+
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+
+      // Cap each wheel tick to 60px max (prevents trackpad inertia from flying)
+      // Then apply 0.45 sensitivity multiplier (45% of normal scroll speed)
+      const cappedDelta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 60) * 0.45;
+      targetScrollY = Math.max(0, Math.min(maxScroll, targetScrollY + cappedDelta));
+    };
+
+    const onKeyDown = (e) => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        e.preventDefault();
+        targetScrollY = Math.min(maxScroll, targetScrollY + 120);
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        targetScrollY = Math.max(0, targetScrollY - 120);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        targetScrollY = maxScroll;
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        targetScrollY = 0;
+      }
+    };
+
+    const scrollLoop = () => {
+      // Smooth lerp: page glides slowly toward target (factor 0.07 = silky glide)
+      currentScrollY += (targetScrollY - currentScrollY) * 0.07;
+
+      // Snap when very close to avoid floating-point jitter
+      if (Math.abs(targetScrollY - currentScrollY) < 0.5) {
+        currentScrollY = targetScrollY;
+      }
+
+      window.scrollTo({ top: currentScrollY, behavior: 'instant' });
+      scrollRafId = requestAnimationFrame(scrollLoop);
+    };
+
+    document.addEventListener('wheel', onWheel, { passive: false });
+    document.addEventListener('keydown', onKeyDown, { passive: false });
+    scrollLoop();
+
+    return () => {
+      document.removeEventListener('wheel', onWheel);
+      document.removeEventListener('keydown', onKeyDown);
+      cancelAnimationFrame(scrollRafId);
+    };
+  }, []);
+
+  // SCROLL SPEED LIMITER — animations always play at full pace regardless of how fast user scrolls
   useEffect(() => {
     let animId;
     let currStageVal = 0;
     let currHeroVal = 0;
     let currCoplayVal = 0;
     let currCoshopVal = 0;
+    let currCostudyVal = 0;
+
+    // MAX STEP PER FRAME: controls how fast each section's animation plays at 60fps
+    // Lower = slower max animation speed. At 60fps, full 0→1 range:
+    //   0.002 = ~8s minimum | 0.003 = ~5.5s | 0.004 = ~4s
+    const HERO_MAX_STEP    = 0.008; // Hero tagline — quick fade
+    const STAGE_MAX_STEP   = 0.003; // Pistol/bullet reveal — cinematic slow
+    const COPLAY_MAX_STEP  = 0.003; // Co-Play door/cube — cinematic slow
+    const COSHOP_MAX_STEP  = 0.002; // Co-Shop Pac-Man devour — very slow, full detail
+
+    const clampedStep = (current, target, maxStep) => {
+      const diff = target - current;
+      if (Math.abs(diff) <= maxStep) return target;
+      return current + maxStep * Math.sign(diff);
+    };
 
     const loop = () => {
       const scrollY = window.scrollY;
       const vh = window.innerHeight;
 
-      // 1. Direct Hero Scroll (0.0 -> 1.0 during initial 600px scroll)
+      // 1. Hero Scroll — velocity capped
       const targetHero = Math.min(scrollY / (vh * 0.65), 1);
-      currHeroVal += (targetHero - currHeroVal) * 0.10;
+      currHeroVal = clampedStep(currHeroVal, targetHero, HERO_MAX_STEP);
       setHeroScroll(currHeroVal);
 
-      // 2. Stage Section Scroll Tracking
+      // 2. Stage Section (Pistol/Bullet Reveal) — velocity capped
       const stageWrapper = document.querySelector('.sticky-pinned-red-stage-wrapper');
       if (stageWrapper) {
         const rect = stageWrapper.getBoundingClientRect();
         const totalScroll = stageWrapper.clientHeight - vh;
         const targetStage = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-
-        currStageVal += (targetStage - currStageVal) * 0.05;
+        currStageVal = clampedStep(currStageVal, targetStage, STAGE_MAX_STEP);
         setScrollProgress(currStageVal);
       }
 
-      // 3. CO-PLAY Section Scroll Tracking
+      // 3. Co-Play Section (Door Spin / Cube Zoom) — velocity capped
       const coplayWrapper = document.querySelector('.sticky-pinned-coplay-stage-wrapper');
       if (coplayWrapper) {
         const rect = coplayWrapper.getBoundingClientRect();
         const totalScroll = coplayWrapper.clientHeight - vh;
         const targetCoplay = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-
-        currCoplayVal += (targetCoplay - currCoplayVal) * 0.08;
+        currCoplayVal = clampedStep(currCoplayVal, targetCoplay, COPLAY_MAX_STEP);
         setCoplayScrollProgress(currCoplayVal);
       }
 
-        // 4. CO-SHOP Section Scroll & Room Illumination Tracking (Pinned 3-Sec Scroll Sequence)
-        const coshopWrapper = document.querySelector('.sticky-pinned-coshop-stage-wrapper');
-        if (coshopWrapper) {
-          const rect = coshopWrapper.getBoundingClientRect();
-          const totalScroll = coshopWrapper.clientHeight - vh;
-          const targetCoshop = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
+      // 4. Co-Shop Section (HD Pause → Pac-Man Devour → Diagonal Split) — velocity capped
+      const coshopWrapper = document.querySelector('.sticky-pinned-coshop-stage-wrapper');
+      if (coshopWrapper) {
+        const rect = coshopWrapper.getBoundingClientRect();
+        const totalScroll = coshopWrapper.clientHeight - vh;
+        const targetCoshop = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
+        currCoshopVal = clampedStep(currCoshopVal, targetCoshop, COSHOP_MAX_STEP);
+        setCoshopScrollProgress(currCoshopVal);
+      }
 
-          currCoshopVal += (targetCoshop - currCoshopVal) * 0.18; // Instant responsive scroll tracking!
-          setCoshopScrollProgress(currCoshopVal);
-        }
+      // 5. Co-Study Section (NOTHIN'-style Typography + Cards Reveal) — velocity capped
+      const costudyWrapper = document.querySelector('.sticky-pinned-costudy-stage-wrapper');
+      if (costudyWrapper) {
+        const rect = costudyWrapper.getBoundingClientRect();
+        const totalScroll = costudyWrapper.clientHeight - vh;
+        const targetCostudy = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
+        currCostudyVal = clampedStep(currCostudyVal, targetCostudy, 0.003);
+        setCostudyScrollProgress(currCostudyVal);
+      }
 
       animId = requestAnimationFrame(loop);
     };
@@ -331,6 +443,44 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     { id: 'o2', char: 'O', img: '/letters/wood_letter_O.png', isHangingTote: true },
     { id: 'p1', char: 'P', img: '/letters/wood_letter_P.png' }
   ];
+
+  const handleSetTargetPoint = (e) => {
+    if (!oTuner.showReticle) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const xPct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const yPct = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    setOTuner(prev => ({
+      ...prev,
+      zoomTargetX: parseFloat(xPct.toFixed(1)),
+      zoomTargetY: parseFloat(yPct.toFixed(1))
+    }));
+  };
+
+  // STEP 6: CO-STUDY INTERACTIVE SCROLL ANIMATION CALCULATIONS
+  const dotsRotationDeg = costudyScrollProgress * 1800; // spins up to 5 full rotations as user scrolls!
+  
+  // Smooth camera pan offset + Exponential Zoom directly into the letter 'O'
+  const zoomFactor = Math.min(Math.max((costudyScrollProgress - 0.08) * 2.5, 0), 1);
+  const portalZoomScale = 1 + Math.pow(zoomFactor, 3.2) * oTuner.maxZoom;
+  const oPanShiftX = Math.min(Math.pow(zoomFactor, 1.2), 1) * oTuner.panX; // Shifts text rightward (vw) only during zoom!
+  const portalOpacity = costudyScrollProgress > 0.50 ? Math.max(0, 1 - (costudyScrollProgress - 0.50) * 7) : 1;
+
+  // 4 Diagonal Black Square Wipe Cards (Top-Left, Bottom-Right, Top-Right, Bottom-Left)
+  const sq1Progress = Math.min(Math.max((costudyScrollProgress - 0.45) * 5.0, 0), 1);
+  const sq1X = (1 - sq1Progress) * -120;
+  const sq1Y = (1 - sq1Progress) * -120;
+
+  const sq2Progress = Math.min(Math.max((costudyScrollProgress - 0.58) * 5.0, 0), 1);
+  const sq2X = (1 - sq2Progress) * 120;
+  const sq2Y = (1 - sq2Progress) * 120;
+
+  const sq3Progress = Math.min(Math.max((costudyScrollProgress - 0.70) * 5.0, 0), 1);
+  const sq3X = (1 - sq3Progress) * 120;
+  const sq3Y = (1 - sq3Progress) * -120;
+
+  const sq4Progress = Math.min(Math.max((costudyScrollProgress - 0.82) * 5.0, 0), 1);
+  const sq4X = (1 - sq4Progress) * -120;
+  const sq4Y = (1 - sq4Progress) * 120;
 
   return (
     <div className="landing-page-official fade-in">
@@ -624,6 +774,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
+      {/* ── PAUSE SPACER: 60vh breathing room before Co-Play ── */}
+      <div style={{ height: '60vh', background: '#000000' }} />
+
       {/* 3. CO-PLAY: STICKY PINNED 3D ZOOM & VERTICAL SPLIT DOOR SECTION */}
       <section className="sticky-pinned-coplay-stage-wrapper">
         <div className="sticky-pinned-coplay-stage-inner">
@@ -762,8 +915,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* 4. PINNED CO-SHOP HUB SECTION (400VH STAGE: 3-SEC PAUSE -> PAC-MAN SWEEP -> SPLIT SCREEN HUB) */}
-      <div className="sticky-pinned-coshop-stage-wrapper" style={{ height: '400vh', position: 'relative' }}>
+      {/* ── PAUSE SPACER: 60vh breathing room before Co-Shop ── */}
+      <div style={{ height: '60vh', background: '#11151c' }} />
+
+      {/* 4. PINNED CO-SHOP HUB SECTION (500VH STAGE: HD PAUSE -> PAC-MAN SWEEP -> SPLIT SCREEN HUB) */}
+      <div className="sticky-pinned-coshop-stage-wrapper" style={{ height: '500vh', position: 'relative' }}>
         <section
           className="static-coshop-canvas-section"
           style={{
@@ -771,274 +927,519 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             top: 0,
             height: '100vh',
             width: '100%',
-            backgroundColor: coshopScrollProgress > 0.15 ? '#c4cbd2' : '#11151c',
-            backgroundImage: `radial-gradient(ellipse 120% 90% at 50% 35%, rgba(255, 255, 255, ${0.98 * Math.min(coshopScrollProgress * 2, 1)}) 0%, rgba(241, 245, 249, ${0.85 * Math.min(coshopScrollProgress * 2, 1)}) 35%, rgba(200, 208, 216, ${Math.min(coshopScrollProgress * 2, 1)}) 70%, #11151c 100%)`
+            backgroundColor: coshopScrollProgress > 0.15 ? '#c4cbd2' : '#11151c'
           }}
         >
-          {/* CALCULATED PAC-MAN FRONT MOUTH POSITION FOR PINPOINT ACCURACY */}
           {(() => {
-            // Stage B: Pac-Man sweeps cleanly from coshopScrollProgress 0.35 to 0.80
-            const inPacmanSweepWindow = coshopScrollProgress >= 0.35;
-            // Linear progress 0.0 -> 1.0 during sweep window
-            const pacProgress = Math.max(0, Math.min(1, (coshopScrollProgress - 0.35) / 0.45));
-            // Pac-Man wrapper center left position in VW (-50vw offscreen left to +150vw offscreen right)
-            const pacmanLeftVw = -50 + pacProgress * 200;
-            // Pac-Man front mouth tip position in VW (wrapper left + 45vw front tip radius)
-            const pacmanFrontTipVw = pacmanLeftVw + 45;
+            // ── PIECEWISE PROGRESS MAPPER (with internal pauses between stages) ──
+            const raw = coshopScrollProgress;
+            let p;
+            if (raw <= 0.20)      p = raw * (0.25 / 0.20);
+            else if (raw <= 0.25) p = 0.25;                                        // Hold 1 (~2s pause)
+            else if (raw <= 0.55) p = 0.25 + ((raw - 0.25) / 0.30) * 0.35;        // Pacman sweep (0.25 -> 0.60)
+            else if (raw <= 0.78) p = 0.60 + ((raw - 0.55) / 0.23) * 0.25;        // Vertical split 3D room reveal (0.60 -> 0.85)
+            else                  p = 0.85 + Math.min(1, (raw - 0.78) / 0.10) * 0.15; // Final hold 2
+            const csp = Math.min(1, Math.max(0, p));
 
-            // Pinpoint item devour thresholds in screen VW:
-            // Left Plant: centered around 25vw
-            const leftPlantEaten = pacmanFrontTipVw >= 25;
-            // Wooden Log Shelf Base: spans 20vw to 80vw - vanishes ONLY after Pac-Man reaches the right end (85vw)!
-            const shelfEaten = pacmanFrontTipVw >= 85;
-            // Right Plant: centered around 75vw
-            const rightPlantEaten = pacmanFrontTipVw >= 75;
+            // ── PAC-MAN: sweep from -55vw to 110vw during csp 0.25 -> 0.60 ──
+            const pacProgress = Math.max(0, Math.min(1, (csp - 0.25) / 0.35));
+            const pacmanLeftVw = -55 + pacProgress * 165;
+            const pacFront = pacmanLeftVw + 48;
 
-            // Individual wooden letter thresholds across screen VW (C, O, -, S, H, O, P)
-            const letterFrontThresholds = [35, 40, 47, 53, 58, 64, 70];
+            const eaten = {
+              C:          pacFront >= 33,
+              O1:         pacFront >= 40,
+              leftPlant:  pacFront >= 45,
+              bulb:       pacFront >= 50,
+              S:          pacFront >= 55,
+              H:          pacFront >= 61,
+              O2:         pacFront >= 66,
+              tote:       pacFront >= 66,
+              P:          pacFront >= 72,
+              rightPlant: pacFront >= 77,
+              shelf:      pacFront >= 90,
+            };
+
+            const letterFrontThresholds = [eaten.C, eaten.O1, eaten.bulb, eaten.S, eaten.H, eaten.O2, eaten.P];
+            const isPacmanActive = csp >= 0.25 && csp < 0.60;
+
+            // ── VERTICAL SPLIT 3D ROOM REVEAL PROGRESS (0 -> 1) ──
+            const revealProgress = Math.max(0, Math.min(1, (csp - 0.60) / 0.25));
+
+            const roomBright = Math.min(csp * (1 / 0.25), 1);
+
+            const BRAND_LIST = [
+              { name: 'Amazon', logo: 'https://www.google.com/s2/favicons?domain=amazon.in&sz=64' },
+              { name: 'Myntra', logo: 'https://www.google.com/s2/favicons?domain=myntra.com&sz=64' },
+              { name: 'Flipkart', logo: 'https://www.google.com/s2/favicons?domain=flipkart.com&sz=64' },
+              { name: 'Blinkit', logo: 'https://www.google.com/s2/favicons?domain=blinkit.com&sz=64' },
+              { name: 'Ajio', logo: 'https://www.google.com/s2/favicons?domain=ajio.com&sz=64' },
+              { name: 'Nykaa', logo: 'https://www.google.com/s2/favicons?domain=nykaa.com&sz=64' },
+            ];
 
             return (
               <>
-                {/* FOREGROUND STAGE CONTAINER (100% CRYSTAL CLEAR NATIVE 4K SHARPNESS) */}
-                {coshopScrollProgress < 0.80 && (
+                {/* 1. STAGE A: SHELF strictly before Pac-Man */}
+                {csp < 0.25 && (
                   <div className="coshop-static-center-container" style={{ position: 'relative', zIndex: 10 }}>
-                    
-                    {/* UNIFIED WOODEN LOG SHELF DISPLAY STAGE */}
                     <div
                       className="static-wooden-log-shelf-wrapper"
                       style={{
                         transform: `translateY(${shelfY}px) scale(${shelfScale / 100})`,
-                        opacity: shelfEaten ? 0 : (0.35 + 0.65 * Math.min(coshopScrollProgress * 2, 1))
+                        opacity: 0.35 + 0.65 * roomBright
                       }}
                     >
-                      
-                      {/* WOODEN LOG SHELF ARTWORK BASE */}
-                      <img
-                        src="/wooden_shelf_artwork.png"
-                        alt="Wooden Log Shelf"
-                        className="static-wooden-log-shelf-img"
-                        style={{
-                          position: 'relative',
-                          zIndex: 5,
-                          filter: `drop-shadow(0 16px 24px rgba(0, 0, 0, ${0.65 - 0.25 * Math.min(coshopScrollProgress * 2, 1)}))`
-                        }}
-                      />
+                      <img src="/wooden_shelf_artwork.png" alt="Wooden Log Shelf" className="static-wooden-log-shelf-img"
+                        style={{ position: 'relative', zIndex: 5, filter: `drop-shadow(0 16px 24px rgba(0,0,0,${0.65 - 0.25 * roomBright}))` }} />
 
-                      {/* SEPARATE: LEFT POTTED JADE PLANT */}
-                      <img
-                        src="/jade_plant_pot.png"
-                        alt="Potted Jade Plant Left"
-                        className="shelf-jade-plant plant-left"
-                        style={{
-                          height: `${leftPlantSize}px`,
-                          position: 'absolute',
-                          left: '20px',
-                          bottom: '30px',
-                          transform: `translate(${leftPlantX}px, ${leftPlantY}px)`,
-                          zIndex: 40,
-                          filter: `drop-shadow(0 16px 22px rgba(0, 0, 0, 0.65))`,
-                          opacity: leftPlantEaten ? 0 : 1
-                        }}
-                      />
+                      <img src="/jade_plant_pot.png" alt="Left Plant" className="shelf-jade-plant plant-left"
+                        style={{ height: `${leftPlantSize}px`, position: 'absolute', left: '20px', bottom: '30px',
+                          transform: `translate(${leftPlantX}px, ${leftPlantY}px)`, zIndex: 40,
+                          filter: 'drop-shadow(0 16px 22px rgba(0,0,0,0.65))' }} />
 
-                      {/* SEPARATE: RIGHT POTTED JADE PLANT */}
-                      <img
-                        src="/jade_plant_pot.png"
-                        alt="Potted Jade Plant Right"
-                        className="shelf-jade-plant plant-right"
-                        style={{
-                          height: `${rightPlantSize}px`,
-                          position: 'absolute',
-                          right: '20px',
-                          bottom: '30px',
-                          transform: `translate(${rightPlantX}px, ${rightPlantY}px)`,
-                          zIndex: 40,
-                          filter: `drop-shadow(0 16px 22px rgba(0, 0, 0, 0.65))`,
-                          opacity: rightPlantEaten ? 0 : 1
-                        }}
-                      />
+                      <img src="/jade_plant_pot.png" alt="Right Plant" className="shelf-jade-plant plant-right"
+                        style={{ height: `${rightPlantSize}px`, position: 'absolute', right: '20px', bottom: '30px',
+                          transform: `translate(${rightPlantX}px, ${rightPlantY}px)`, zIndex: 40,
+                          filter: 'drop-shadow(0 16px 22px rgba(0,0,0,0.65))' }} />
 
-                      {/* SEPARATE: 3D CARVED WOODEN "CO-SHOP" LETTERS TRACK */}
+                      <div className="static-letters-sitting-track"
+                        style={{ position: 'absolute', bottom: '30px', left: '50%',
+                          transform: `translateX(calc(-50% + ${lettersX}px)) translateY(${lettersY}px)`, zIndex: 20 }}>
+                        {REAL_WOODEN_LETTERS.map((item, idx) => (
+                          <div key={item.id} className="static-wood-letter-wrapper">
+                            {item.isBulbHyphen ? (
+                              <img src={item.img} alt="Bulb" className="static-wood-hyphen-bulb-img"
+                                style={{ height: `${Math.round(letterHeight * 0.8)}px`,
+                                  filter: `drop-shadow(0 0 ${16 * roomBright}px rgba(251,191,36,${0.85 * roomBright})) drop-shadow(0 0 ${35 * roomBright}px rgba(245,158,11,${0.55 * roomBright}))` }} />
+                            ) : (
+                              <>
+                                <img src={item.img} alt={item.char} className="static-wood-letter-img"
+                                  style={{ height: `${letterHeight}px`, filter: `drop-shadow(0 16px 24px rgba(0,0,0,${0.75 - 0.2 * roomBright}))` }} />
+                                {item.isHangingTote && (
+                                  <img src="/tote_bag.png" alt="Tote Bag" className="hanging-tote-bag-on-letter"
+                                    style={{ top: `${toteTop}px`, height: `${toteHeight}px`, zIndex: 15,
+                                      filter: 'drop-shadow(0 16px 22px rgba(0,0,0,0.65))' }} />
+                                )}
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. DURING PAC-MAN SWEEP: shelf devouring + clean yellow Pac-Man */}
+                {isPacmanActive && (
+                  <>
+                    <div className="coshop-static-center-container" style={{ position: 'relative', zIndex: 10 }}>
+                      <div className="static-wooden-log-shelf-wrapper"
+                        style={{ transform: `translateY(${shelfY}px) scale(${shelfScale / 100})`,
+                          opacity: eaten.shelf ? 0 : 1 }}>
+                        <img src="/wooden_shelf_artwork.png" alt="Shelf" className="static-wooden-log-shelf-img"
+                          style={{ position: 'relative', zIndex: 5, filter: `drop-shadow(0 16px 24px rgba(0,0,0,0.4))` }} />
+
+                        <img src="/jade_plant_pot.png" alt="Left Plant" className="shelf-jade-plant plant-left"
+                          style={{ height: `${leftPlantSize}px`, position: 'absolute', left: '20px', bottom: '30px',
+                            transform: `translate(${leftPlantX}px, ${leftPlantY}px)`, zIndex: 40,
+                            filter: 'drop-shadow(0 16px 22px rgba(0,0,0,0.65))',
+                            opacity: eaten.leftPlant ? 0 : 1, transition: 'opacity 0.15s' }} />
+
+                        <img src="/jade_plant_pot.png" alt="Right Plant" className="shelf-jade-plant plant-right"
+                          style={{ height: `${rightPlantSize}px`, position: 'absolute', right: '20px', bottom: '30px',
+                            transform: `translate(${rightPlantX}px, ${rightPlantY}px)`, zIndex: 40,
+                            filter: 'drop-shadow(0 16px 22px rgba(0,0,0,0.65))',
+                            opacity: eaten.rightPlant ? 0 : 1, transition: 'opacity 0.15s' }} />
+
+                        <div className="static-letters-sitting-track"
+                          style={{ position: 'absolute', bottom: '30px', left: '50%',
+                            transform: `translateX(calc(-50% + ${lettersX}px)) translateY(${lettersY}px)`, zIndex: 20 }}>
+                          {REAL_WOODEN_LETTERS.map((item, idx) => {
+                            const isEaten = letterFrontThresholds[idx];
+                            return (
+                              <div key={item.id} className="static-wood-letter-wrapper"
+                                style={{ opacity: isEaten ? 0 : 1, transition: 'opacity 0.15s' }}>
+                                {item.isBulbHyphen ? (
+                                  <img src={item.img} alt="Bulb" className="static-wood-hyphen-bulb-img"
+                                    style={{ height: `${Math.round(letterHeight * 0.8)}px`,
+                                      filter: `drop-shadow(0 0 16px rgba(251,191,36,0.85)) drop-shadow(0 0 35px rgba(245,158,11,0.55))`,
+                                      opacity: eaten.bulb ? 0 : 1 }} />
+                                ) : (
+                                  <>
+                                    <img src={item.img} alt={item.char} className="static-wood-letter-img"
+                                      style={{ height: `${letterHeight}px`, filter: `drop-shadow(0 16px 24px rgba(0,0,0,0.55))` }} />
+                                    {item.isHangingTote && (
+                                      <img src="/tote_bag.png" alt="Tote" className="hanging-tote-bag-on-letter"
+                                        style={{ top: `${toteTop}px`, height: `${toteHeight}px`, zIndex: 15,
+                                          filter: 'drop-shadow(0 16px 22px rgba(0,0,0,0.65))',
+                                          opacity: eaten.tote ? 0 : 1, transition: 'opacity 0.15s' }} />
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CLEAN PAC-MAN (Yellow SVG, NO ICON ON BODY!) */}
+                    <div className="classic-svg-pacman-wrapper" style={{ left: `${pacmanLeftVw}vw`, zIndex: 50 }}>
+                      <svg viewBox="0 0 100 100" className="pacman-seamless-svg">
+                        <path fill="#ffcc00" d="M 50 50 L 98 22 A 48 48 0 1 0 98 78 Z" className="pacman-animated-mouth-path" />
+                        <circle cx="48" cy="22" r="5.5" fill="#000000" />
+                      </svg>
+                    </div>
+                  </>
+                )}
+
+                {/* 3. VERTICAL SPLIT 3D MASTERPIECE ROOM STAGE (Left half slides DOWN from Top | Right half slides UP from Bottom) */}
+                {revealProgress > 0 && (
+                  <div className="coshop-vertical-split-container" style={{ opacity: Math.min(1, revealProgress * 1.5) }}>
+                    {/* LEFT HALF: Grey 3D room half — Slides DOWN from Top */}
+                    <div
+                      className="coshop-left-vertical-panel"
+                      style={{
+                        transform: `translateY(${(1 - revealProgress) * -100}%)`
+                      }}
+                    />
+
+                    {/* RIGHT HALF: Green 3D room half — Slides UP from Bottom */}
+                    <div
+                      className="coshop-right-vertical-panel"
+                      style={{
+                        transform: `translateY(${(1 - revealProgress) * 100}%)`
+                      }}
+                    />
+
+                    {/* TABLET DISPLAY: LIVE CO-SHOP VIDEO CALL SHOPPING WITH FRIEND (appears ONLY AFTER image locks in place) */}
+                    {revealProgress >= 0.95 && (
                       <div
-                        className="static-letters-sitting-track"
+                        className="coshop-tablet-screen-overlay"
                         style={{
-                          position: 'absolute',
-                          bottom: '30px',
-                          left: '50%',
-                          transform: `translateX(calc(-50% + ${lettersX}px)) translateY(${lettersY}px)`,
-                          zIndex: 20
+                          top: `${tabletConfig.top}%`,
+                          left: `${tabletConfig.left}%`,
+                          width: `${tabletConfig.width}px`,
+                          height: `${tabletConfig.height}px`,
+                          borderRadius: `${tabletConfig.borderRadius}px`,
+                          transform: `translate(-50%, -50%) perspective(${tabletConfig.perspective}px) rotateX(${tabletConfig.rotateX}deg) rotateY(${tabletConfig.rotateY}deg) rotateZ(${tabletConfig.rotateZ}deg) skewX(${tabletConfig.skewX}deg) skewY(${tabletConfig.skewY}deg)`,
+                          opacity: Math.min(1, (revealProgress - 0.95) / 0.05)
                         }}
                       >
-                        {REAL_WOODEN_LETTERS.map((item, idx) => {
-                          const itemThreshold = letterFrontThresholds[idx] || 50;
-                          const isEaten = pacmanFrontTipVw >= itemThreshold;
+                        {/* HEADER BAR INSIDE TABLET DISPLAY */}
+                        <div className="tablet-coshop-header-bar">
+                          <div className="store-pill">
+                            <span className="live-red-dot" /> Amazon.in | CO-LIVE 🔴
+                          </div>
+                          <div className="shared-cart-pill">
+                            🛒 Shared Cart (2 items • ₹2,598)
+                          </div>
+                        </div>
 
-                          return (
-                            <div
-                              key={item.id}
-                              className="static-wood-letter-wrapper"
-                              style={{
-                                opacity: isEaten ? 0 : 1
-                              }}
-                            >
-                              {item.isBulbHyphen ? (
-                                <img
-                                  src={item.img}
-                                  alt="Wood Bulb Separator"
-                                  className="static-wood-hyphen-bulb-img"
-                                  style={{
-                                    height: `${Math.round(letterHeight * 0.8)}px`,
-                                    filter: `drop-shadow(0 0 ${16 * Math.min(coshopScrollProgress * 2, 1)}px rgba(251, 191, 36, ${0.85 * Math.min(coshopScrollProgress * 2, 1)})) drop-shadow(0 0 ${35 * Math.min(coshopScrollProgress * 2, 1)}px rgba(245, 158, 11, ${0.55 * Math.min(coshopScrollProgress * 2, 1)}))`
-                                  }}
-                                />
-                              ) : (
-                                <>
-                                  <img
-                                    src={item.img}
-                                    alt={item.char}
-                                    className="static-wood-letter-img"
-                                    style={{
-                                      height: `${letterHeight}px`,
-                                      filter: `drop-shadow(0 16px 24px rgba(0, 0, 0, ${0.75 - 0.2 * Math.min(coshopScrollProgress * 2, 1)}))`
-                                    }}
-                                  />
-                                  {item.isHangingTote && (
-                                    <img
-                                      src="/tote_bag.png"
-                                      alt="Hanging Canvas Tote Bag"
-                                      className="hanging-tote-bag-on-letter"
-                                      style={{
-                                        top: `${toteTop}px`,
-                                        height: `${toteHeight}px`,
-                                        zIndex: 15,
-                                        filter: `drop-shadow(0 16px 22px rgba(0, 0, 0, 0.65))`,
-                                        opacity: pacmanFrontTipVw >= 64 ? 0 : 1
-                                      }}
-                                    />
-                                  )}
-                                </>
-                              )}
+                        {/* LIVE SHOPPING VIDEO PLAY BODY */}
+                        <div className="tablet-video-content-body">
+                          <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="tablet-coshop-live-video"
+                          >
+                            <source src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4" />
+                          </video>
+
+                          {/* TWO FRIENDS LIVE VIDEO CALL OVERLAYS */}
+                          <div className="friend-video-avatar avatar-left">
+                            <div className="avatar-video-box">
+                              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Jeevan (You)" />
+                              <span className="live-cam-badge">Jeevan (You)</span>
                             </div>
-                          );
-                        })}
-                      </div>
+                            <div className="reaction-bubble-pop">😍 "Love the brass finish!"</div>
+                          </div>
 
-                    </div>
-
-                  </div>
-                )}
-
-                {/* STAGE B: SEAMLESS CLASSIC SVG PAC-MAN SWEEP (ONLY ACTIVE DURING SWEEP WINDOW UNTIL OFFSCREEN RIGHT) */}
-                {inPacmanSweepWindow && coshopScrollProgress < 0.80 && (
-                  <div
-                    className="classic-svg-pacman-wrapper"
-                    style={{
-                      left: `${pacmanLeftVw}vw`
-                    }}
-                  >
-                    <svg viewBox="0 0 100 100" className="pacman-seamless-svg">
-                      <path
-                        fill="#ffcc00"
-                        d="M 50 50 L 98 22 A 48 48 0 1 0 98 78 Z"
-                        className="pacman-animated-mouth-path"
-                      />
-                      <circle cx="48" cy="22" r="5.5" fill="#000000" />
-                    </svg>
-                  </div>
-                )}
-
-                {/* STAGE C: INTERACTIVE CO-SHOP SPLIT SCREEN HUB (ONLY LOADS AFTER PAC-MAN COMPLETELY EXITS OFFSCREEN RIGHT!) */}
-                {coshopScrollProgress >= 0.80 && (
-                  <div
-                    className="coshop-split-screen-experience-wrapper"
-                    style={{
-                      opacity: Math.min(1, (coshopScrollProgress - 0.80) * 5),
-                      transform: `translateY(${(1 - Math.min(1, (coshopScrollProgress - 0.80) * 5)) * 25}px)`
-                    }}
-                  >
-                    {/* LEFT SIDE: TILTED BROWSER VIDEO SHARE FRAME (STYLE MATCHING REFERENCE PHOTO FRAME) */}
-                    <div className="coshop-left-browser-frame-tilted">
-                      <div className="browser-header-bar">
-                        <div className="browser-dots">
-                          <span className="dot red" />
-                          <span className="dot yellow" />
-                          <span className="dot green" />
-                        </div>
-                        <div className="browser-url-bar">
-                          <Lock size={12} color="#10b981" />
-                          <span>https://www.amazon.in/dp/co-shop-shared-session</span>
-                        </div>
-                      </div>
-
-                      <div className="browser-content-mock">
-                        <div className="shared-product-card-preview">
-                          <div className="product-tag-sale">CO-SHOPPING LIVE</div>
-                          <img src="/jade_plant_pot.png" alt="Featured Product" className="shared-prod-img" />
-                          <div className="shared-prod-details">
-                            <h4>Premium Brass Jade Plant Pot</h4>
-                            <div className="prod-price-row">
-                              <span className="price">₹1,299</span>
-                              <span className="rating">★ 4.9 (2,450)</span>
+                          <div className="friend-video-avatar avatar-right">
+                            <div className="avatar-video-box">
+                              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" alt="Maya (Friend)" />
+                              <span className="live-cam-badge">Maya (Friend)</span>
                             </div>
-                            <button className="btn-add-shared-cart">🛒 Add to Shared Cart</button>
+                            <div className="reaction-bubble-pop">🛒 "Added to shared cart!"</div>
                           </div>
-                        </div>
 
-                        {/* OVERLAY FRIENDS VIDEO CALL PIP */}
-                        <div className="friends-video-pip-overlay">
-                          <div className="pip-friend friend-alex">
-                            <div className="pip-avatar">A</div>
-                            <span>You</span>
-                            <span className="live-dot" />
+                          {/* FLOATING REACTION EMOJIS (♡, 🔥, 😍, 🛒) */}
+                          <div className="tablet-floating-emojis-container">
+                            <span className="emoji-float emoji-1">🔥</span>
+                            <span className="emoji-float emoji-2">😍</span>
+                            <span className="emoji-float emoji-3">♡</span>
+                            <span className="emoji-float emoji-4">🛒</span>
                           </div>
-                          <div className="pip-friend friend-maya">
-                            <div className="pip-avatar avatar-maya">M</div>
-                            <span>Maya</span>
-                            <span className="live-dot" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* RIGHT SIDE: BOLD EDITORIAL INFO SECTION & REAL E-COMMERCE BRAND CAROUSEL */}
-                    <div className="coshop-right-editorial-info">
-                      <span className="gold-pill-tag">🛍️ LIVE CO-SHOPPING</span>
-                      <h2 className="editorial-main-title">SHOP TOGETHER IN REAL-TIME</h2>
-                      <p className="editorial-desc">
-                        Screen share any website on live video calls with friends. Compare items, get instant opinions, build shared carts, and checkout together seamlessly.
-                      </p>
-
-                      {/* CONTINUOUS E-COMMERCE BRAND CAROUSEL / MARQUEE */}
-                      <div className="ecommerce-brand-carousel-wrapper">
-                        <span className="carousel-title-label">SUPPORTED SHOPPING WEBSITES:</span>
-                        <div className="marquee-carousel-container">
-                          <div className="marquee-carousel-track">
-                            <div className="brand-logo-card brand-amazon"><span>Amazon.in</span></div>
-                            <div className="brand-logo-card brand-flipkart"><span>Flipkart</span></div>
-                            <div className="brand-logo-card brand-myntra"><span>Myntra</span></div>
-                            <div className="brand-logo-card brand-meesho"><span>Meesho</span></div>
-                            <div className="brand-logo-card brand-ajio"><span>Ajio</span></div>
-                            <div className="brand-logo-card brand-nykaa"><span>Nykaa</span></div>
-                            {/* Duplicate for seamless infinite loop */}
-                            <div className="brand-logo-card brand-amazon"><span>Amazon.in</span></div>
-                            <div className="brand-logo-card brand-flipkart"><span>Flipkart</span></div>
-                            <div className="brand-logo-card brand-myntra"><span>Myntra</span></div>
-                            <div className="brand-logo-card brand-meesho"><span>Meesho</span></div>
-                            <div className="brand-logo-card brand-ajio"><span>Ajio</span></div>
-                            <div className="brand-logo-card brand-nykaa"><span>Nykaa</span></div>
+                          {/* BOTTOM SHOPPING ACTION CARD */}
+                          <div className="tablet-product-bottom-card">
+                            <div className="product-info-left">
+                              <span className="prod-title">🪴 Brass Jade Plant Pot — Premium</span>
+                              <span className="prod-price">₹1,299 <s className="old-price">₹2,499</s></span>
+                            </div>
+                            <button className="btn-buy-together-now" onClick={() => handleLaunch('watch')}>
+                              Checkout Together →
+                            </button>
                           </div>
                         </div>
                       </div>
-
-                      <button className="btn-launch-coshop-hub" onClick={() => handleLaunch('watch')}>
-                        Launch Co-Shop Room <ArrowRight size={18} />
-                      </button>
-                    </div>
+                    )}
                   </div>
                 )}
               </>
             );
           })()}
+        </section>
+      </div>
+
+      {/* 5. STICKY PINNED CO-STUDY SHOWCASE SECTION (#FFFFE3 NOTHIN.IN STYLE BACKGROUND) */}
+      <div className="sticky-pinned-costudy-stage-wrapper">
+        <section className="costudy-sticky-stage">
+          {/* CENTERED "CO - STUDY" TYPOGRAPHY WITH ROTATING DOTS RING INSIDE THE 'O' */}
+          {/* CENTERED "CO - STUDY" TYPOGRAPHY WITH ROTATING DOTS RING INSIDE THE 'O' */}
+          {costudyScrollProgress < 0.65 && (
+            <div
+              className={`centered-costudy-headline-wrapper ${oTuner.showReticle ? 'clickable-target-active' : ''}`}
+              style={{
+                transform: `translate(calc(-50% + ${oPanShiftX}vw), -50%) scale(${portalZoomScale})`,
+                transformOrigin: `${oTuner.zoomTargetX}% ${oTuner.zoomTargetY}%`,
+                opacity: portalOpacity
+              }}
+              onClick={handleSetTargetPoint}
+            >
+              <div className="costudy-text-row">
+                <span className="char-c">C</span>
+                {/* PERFECT GEOMETRIC CIRCULAR 'O' WITH PERFECT WHITE DOTS RING */}
+                <div className="co-letter-o-custom-circle" style={{ transform: `scale(${oTuner.oScale})` }}>
+                  <div className="o-black-circle-body">
+                    <div className="o-cream-center-hole" style={{ width: `${oTuner.holeSize}%`, height: `${oTuner.holeSize}%` }} />
+                  </div>
+                  <svg className="o-dots-ring-perfect" viewBox="0 0 100 100" style={{ transform: `translate(-50%, -50%) rotate(${dotsRotationDeg}deg)` }}>
+                    {Array.from({ length: 12 }).map((_, i) => {
+                      const angle = (i * 30 * Math.PI) / 180;
+                      const cx = 50 + oTuner.dotsRadius * Math.cos(angle);
+                      const cy = 50 + oTuner.dotsRadius * Math.sin(angle);
+                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r={oTuner.dotSize} fill="#ffffff" />;
+                    })}
+                  </svg>
+                </div>
+                <span className="char-hyphen">-</span>
+                <span className="char-study">STUDY</span>
+              </div>
+
+              {/* TARGET CROSSHAIR OVERLAY 🎯 */}
+              {oTuner.showReticle && (
+                <div
+                  className="pinpoint-zoom-crosshair"
+                  style={{
+                    left: `${oTuner.zoomTargetX}%`,
+                    top: `${oTuner.zoomTargetY}%`
+                  }}
+                >
+                  <div className="crosshair-ring" />
+                  <div className="crosshair-dot" />
+                  <span className="crosshair-label">🎯 Target ({oTuner.zoomTargetX}%, {oTuner.zoomTargetY}%)</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* COMPREHENSIVE FLOATING LIVE PINPOINT CALIBRATOR WIDGET */}
+          {costudyScrollProgress > 0 && costudyScrollProgress < 0.60 && (
+            <div className={`costudy-o-tuner-widget ${!oTuner.showTuner ? 'minimized' : ''}`}>
+              <div className="tuner-header" onClick={() => setOTuner(prev => ({ ...prev, showTuner: !prev.showTuner }))}>
+                <span>🎯 Pinpoint Zoom Calibrator</span>
+                <button className="btn-toggle-tuner">
+                  {oTuner.showTuner ? '−' : '+'}
+                </button>
+              </div>
+
+              {oTuner.showTuner && (
+                <div className="tuner-body">
+                  <div className="tuner-row">
+                    <label>Target Origin X: <strong>{oTuner.zoomTargetX}%</strong></label>
+                    <input
+                      type="range"
+                      min="10.0"
+                      max="40.0"
+                      step="0.1"
+                      value={oTuner.zoomTargetX}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, zoomTargetX: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>Target Origin Y: <strong>{oTuner.zoomTargetY}%</strong></label>
+                    <input
+                      type="range"
+                      min="30.0"
+                      max="70.0"
+                      step="0.1"
+                      value={oTuner.zoomTargetY}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, zoomTargetY: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>Camera Pan Shift X: <strong>{oTuner.panX}vw</strong></label>
+                    <input
+                      type="range"
+                      min="0.0"
+                      max="40.0"
+                      step="0.5"
+                      value={oTuner.panX}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, panX: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>Max Zoom Depth: <strong>{oTuner.maxZoom}x</strong></label>
+                    <input
+                      type="range"
+                      min="20"
+                      max="120"
+                      step="1"
+                      value={oTuner.maxZoom}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, maxZoom: parseInt(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>White Dots Radius: <strong>{oTuner.dotsRadius}px</strong></label>
+                    <input
+                      type="range"
+                      min="25"
+                      max="55"
+                      step="0.5"
+                      value={oTuner.dotsRadius}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, dotsRadius: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>White Dot Size: <strong>{oTuner.dotSize}px</strong></label>
+                    <input
+                      type="range"
+                      min="1.5"
+                      max="5.0"
+                      step="0.1"
+                      value={oTuner.dotSize}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, dotSize: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>Inner Cream Hole: <strong>{oTuner.holeSize}%</strong></label>
+                    <input
+                      type="range"
+                      min="30"
+                      max="65"
+                      step="1"
+                      value={oTuner.holeSize}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, holeSize: parseInt(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row tuner-checkbox-row">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={oTuner.showReticle}
+                        onChange={(e) => setOTuner(prev => ({ ...prev, showReticle: e.target.checked }))}
+                      />
+                      <span>🎯 Show Target Crosshair</span>
+                    </label>
+                  </div>
+
+                  <button
+                    className="btn-copy-calib-values"
+                    onClick={() => {
+                      const summary = `TargetX: ${oTuner.zoomTargetX}%, TargetY: ${oTuner.zoomTargetY}%, PanX: ${oTuner.panX}vw, MaxZoom: ${oTuner.maxZoom}x, DotsRadius: ${oTuner.dotsRadius}px, DotSize: ${oTuner.dotSize}px, HoleSize: ${oTuner.holeSize}%`;
+                      navigator.clipboard.writeText(summary);
+                      alert(`📋 Pinpoint Values Copied!\n\n${summary}`);
+                    }}
+                  >
+                    📋 Copy Pinpoint Values
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* DIAGONAL BLACK FILLED SQUARES WIPE REVEAL WITH WHITE TEXT */}
+          {costudyScrollProgress >= 0.40 && (
+            <div className="costudy-black-squares-grid">
+              {/* SQUARE 1: TOP-LEFT DIAGONAL */}
+              <div
+                className="black-info-square square-top-left"
+                style={{
+                  transform: `translate(${sq1X}%, ${sq1Y}%)`,
+                  opacity: sq1Progress
+                }}
+              >
+                <div className="sq-number">01 / STUDY MATES</div>
+                <div className="sq-icon">📚</div>
+                <h3>Study With Friends Online</h3>
+                <p>Real-time video calls & silent focus desks. Stay motivated and accountable together with your study circle.</p>
+                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>
+                  Launch Co-Study Room <ArrowRight size={16} />
+                </button>
+              </div>
+
+              {/* SQUARE 2: BOTTOM-RIGHT DIAGONAL */}
+              <div
+                className="black-info-square square-bottom-right"
+                style={{
+                  transform: `translate(${sq2X}%, ${sq2Y}%)`,
+                  opacity: sq2Progress
+                }}
+              >
+                <div className="sq-number">02 / TRIVIA & GAMES</div>
+                <div className="sq-icon">🎮</div>
+                <h3>Fun Multiplayer Games & Quizzes</h3>
+                <p>Speed recall trivia, flashcard challenges, and competitive streak leaderboards with studymates.</p>
+                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>
+                  Play Quiz Battles <ArrowRight size={16} />
+                </button>
+              </div>
+
+              {/* SQUARE 3: TOP-RIGHT DIAGONAL */}
+              <div
+                className="black-info-square square-top-right"
+                style={{
+                  transform: `translate(${sq3X}%, ${sq3Y}%)`,
+                  opacity: sq3Progress
+                }}
+              >
+                <div className="sq-number">03 / EXAM PREPARATION</div>
+                <div className="sq-icon">🎯</div>
+                <h3>Exam Prep & Mock Papers</h3>
+                <p>Timed practice papers with instant step-by-step AI solutions and detailed breakdown cards.</p>
+                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>
+                  Start Practice Test <ArrowRight size={16} />
+                </button>
+              </div>
+
+              {/* SQUARE 4: BOTTOM-LEFT DIAGONAL */}
+              <div
+                className="black-info-square square-bottom-left"
+                style={{
+                  transform: `translate(${sq4X}%, ${sq4Y}%)`,
+                  opacity: sq4Progress
+                }}
+              >
+                <div className="sq-number">04 / LIVE CANVAS</div>
+                <div className="sq-icon">📝</div>
+                <h3>Shared Notes & Live Canvas</h3>
+                <p>Annotate PDFs together, sync live notes, stream lo-fi rain beats, and run shared Pomodoro clocks.</p>
+                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>
+                  Open Shared Desk <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
 
