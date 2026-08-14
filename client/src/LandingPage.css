@@ -4108,189 +4108,229 @@
   margin: 20px 0;
 }
 /* ==========================================================================
-   3D CRYSTAL KEY UNLOCK SECTION (BOXED RECTANGULAR LAYOUT)
+   INVERTED TRIANGLE KEY SECTION (RED/PINK/GOLD SPLIT + WAVY FLOATING KEY)
    ========================================================================== */
 
-.crystal-key-unlock-section {
+.inverted-triangle-key-section {
   position: relative;
-  background: #09090b;
+  min-height: 100vh;
+  background: #FF0055;
   color: #ffffff;
-  padding: 100px 24px 60px 24px;
+  padding: 80px 24px 60px 24px;
   font-family: 'Syne', 'Outfit', sans-serif;
   overflow: hidden;
 }
 
-.key-section-header {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto 50px auto;
+/* 3-WAY SPLIT BACKGROUND: LEFT RED, RIGHT PINK, CENTER GOLD SLASH */
+.key-bg-split-left-red {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(135deg, #E60039 0%, #FF0055 100%);
+  z-index: 1;
 }
 
-.key-gold-tag {
+.key-bg-split-right-pink {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(135deg, #FF70A6 0%, #ff5291 100%);
+  z-index: 1;
+}
+
+.key-bg-split-center-gold {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  height: 80vw;
+  max-width: 900px;
+  max-height: 900px;
+  background: radial-gradient(circle, rgba(255, 204, 0, 0.4) 0%, rgba(204, 255, 0, 0.15) 50%, rgba(0,0,0,0) 70%);
+  border-radius: 50%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* CENTER INVERTED BLACK TRIANGLE SHIELD (POINTS DOWNWARDS) */
+.center-black-inverted-triangle {
+  position: relative;
+  max-width: 650px;
+  margin: 0 auto 50px auto;
+  background: #0a0a0c;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  padding: 60px 40px 140px 40px;
+  text-align: center;
+  z-index: 10;
+  border-top: 5px solid #CCFF00;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+}
+
+/* WAVY WIND FLOATING KEY CONTAINER */
+@keyframes floatWavyWind {
+  0% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(-18px) rotate(6deg) scale(1.04);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+}
+
+.wavy-floating-key-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 10px auto 30px auto;
+  animation: floatWavyWind 4s ease-in-out infinite;
+}
+
+.glowing-wavy-key-img {
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 25px rgba(255, 112, 166, 0.8)) drop-shadow(0 0 45px rgba(204, 255, 0, 0.6));
+  border-radius: 50%;
+}
+
+/* HANGING THREAD & PRICE TAG BADGE ATTACHED TO KEY */
+.hanging-thread-line {
+  width: 2px;
+  height: 35px;
+  background: linear-gradient(to bottom, #ffffff, #CCFF00);
+  margin: -10px auto 0 auto;
+  box-shadow: 0 0 8px #CCFF00;
+}
+
+.hanging-price-tag-badge {
   display: inline-block;
   background: #CCFF00;
   color: #000000;
   border: 3.5px solid #000000;
-  border-radius: 30px;
-  padding: 8px 22px;
+  border-radius: 14px;
+  padding: 10px 24px;
   font-family: 'Impact', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   font-weight: 900;
   letter-spacing: 0.05em;
-  box-shadow: 4px 4px 0px #000000;
-  margin-bottom: 16px;
-  text-transform: uppercase;
+  box-shadow: 5px 5px 0px #000000;
+  transform: rotate(-3deg);
+  margin-top: 4px;
 }
 
-.key-section-title {
-  font-family: 'Impact', sans-serif;
-  font-size: clamp(2.4rem, 5.5vw, 4.5rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  margin: 0 0 16px 0;
-  line-height: 1.05;
-  color: #ffffff;
-}
-
-.key-section-subtitle {
-  font-size: clamp(1rem, 1.8vw, 1.25rem);
-  color: #cccccc;
-  line-height: 1.5;
-  margin: 0;
-}
-
-/* RECTANGULAR BOXED LAYOUT GRID (LEFT, CENTER KEY, RIGHT, BOTTOM) */
-.key-boxed-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto 40px auto;
-  align-items: center;
-}
-
-.key-box-card {
-  border: 4px solid #000000;
-  border-radius: 24px;
-  padding: 32px 26px;
-  box-sizing: border-box;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.key-box-card.box-left {
+.btn-triangle-key-buy {
   background: #FF70A6;
   color: #000000;
-  box-shadow: 8px 8px 0px #CCFF00;
+  border: 3.5px solid #000000;
+  border-radius: 16px;
+  padding: 14px 32px;
+  font-family: 'Impact', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 5px 5px 0px #ffffff;
+  cursor: pointer;
+  margin-top: 18px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.key-box-card.box-right {
+.btn-triangle-key-buy:hover {
+  transform: translateY(-3px);
+  box-shadow: 7px 7px 0px #CCFF00;
+}
+
+/* LEFT & RIGHT SIDE PSYCHOLOGICAL REALITY CHECK CARDS */
+.triangle-side-cards-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  max-width: 1100px;
+  margin: -60px auto 40px auto;
+  position: relative;
+  z-index: 20;
+}
+
+.side-psych-card {
+  border: 4px solid #000000;
+  border-radius: 22px;
+  padding: 28px 24px;
+  box-sizing: border-box;
+}
+
+.side-psych-card.left-card-red {
+  background: #000000;
+  color: #ffffff;
+  border: 4px solid #CCFF00;
+  box-shadow: 8px 8px 0px #000000;
+}
+
+.side-psych-card.right-card-pink {
   background: #F7F3E9;
   color: #000000;
-  box-shadow: 8px 8px 0px #000000;
+  border: 4px solid #000000;
+  box-shadow: 8px 8px 0px #FF70A6;
 }
 
-.key-box-card.box-bottom {
-  grid-column: span 3;
-  background: #CCFF00;
-  color: #000000;
-  box-shadow: 8px 8px 0px #000000;
-  text-align: center;
-  padding: 36px 30px;
-}
-
-.key-card-badge {
+.side-card-badge {
   font-size: 0.8rem;
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #333333;
   margin-bottom: 12px;
   display: block;
 }
 
-.key-card-body {
-  font-size: clamp(1rem, 1.5vw, 1.2rem);
+.left-card-red .side-card-badge {
+  color: #CCFF00;
+}
+
+.right-card-pink .side-card-badge {
+  color: #FF0055;
+}
+
+.side-card-body {
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
   font-weight: 800;
   line-height: 1.45;
   margin: 0;
 }
 
-/* CENTER 3D CRYSTAL KEY HERO CARD */
-.key-center-crystal-card {
-  background: rgba(18, 18, 24, 0.95);
-  border: 4.5px solid #CCFF00;
-  border-radius: 28px;
-  box-shadow: 10px 10px 0px #FF70A6, 0 20px 40px rgba(0, 0, 0, 0.6);
-  padding: 36px 24px;
+/* BOTTOM GOLD MOMENT OF TRUTH CARD */
+.bottom-gold-truth-card {
+  max-width: 1100px;
+  margin: 0 auto 50px auto;
+  background: #FFCC00;
+  color: #000000;
+  border: 4px solid #000000;
+  border-radius: 22px;
+  padding: 32px;
   text-align: center;
+  box-shadow: 8px 8px 0px #000000;
   position: relative;
+  z-index: 20;
 }
 
-.crystal-key-img-wrapper {
-  position: relative;
-  max-width: 280px;
-  margin: 0 auto 20px auto;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 3.5px solid #000000;
-  box-shadow: 6px 6px 0px #000000;
-}
-
-.crystal-key-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-.crystal-key-img-wrapper:hover .crystal-key-img {
-  transform: scale(1.05) rotate(2deg);
-}
-
-.key-price-tag-badge {
-  display: inline-block;
-  background: #CCFF00;
-  color: #000000;
-  border: 3.5px solid #000000;
-  border-radius: 30px;
-  padding: 8px 20px;
+.truth-quote-text {
   font-family: 'Impact', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 900;
-  box-shadow: 4px 4px 0px #000000;
-  margin-bottom: 20px;
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
   text-transform: uppercase;
+  line-height: 1.25;
+  margin: 0 0 16px 0;
 }
 
-.btn-buy-crystal-key {
-  width: 100%;
-  background: #FF70A6;
-  color: #000000;
-  border: 3.5px solid #000000;
-  border-radius: 16px;
-  padding: 16px 24px;
-  font-family: 'Impact', sans-serif;
-  font-size: 1.3rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  box-shadow: 5px 5px 0px #ffffff;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.btn-buy-crystal-key:hover {
-  transform: translateY(-3px);
-  box-shadow: 7px 7px 0px #CCFF00;
-}
-
-.btn-bottom-claim-key {
-  margin-top: 18px;
+.btn-truth-claim-key {
   background: #000000;
   color: #CCFF00;
   border: 3.5px solid #000000;
   border-radius: 14px;
-  padding: 14px 32px;
+  padding: 14px 36px;
   font-family: 'Impact', sans-serif;
   font-size: 1.2rem;
   font-weight: 900;
@@ -4300,7 +4340,7 @@
   transition: transform 0.15s ease;
 }
 
-.btn-bottom-claim-key:hover {
+.btn-truth-claim-key:hover {
   transform: translateY(-3px);
   background: #FF70A6;
   color: #000000;

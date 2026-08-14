@@ -1390,59 +1390,64 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      {/* 6. 3D CRYSTAL KEY UNLOCK SECTION (BOXED RECTANGULAR LAYOUT) */}
-      <section className="crystal-key-unlock-section">
-        <div className="key-section-header">
-          <span className="key-gold-tag">🔑 UNLOCK EVERYTHING WITH THE CRYSTAL KEY</span>
-          <h2 className="key-section-title">PURCHASE THIS KEY TO UNLOCK COGETHER.</h2>
-          <p className="key-section-subtitle">
-            One single crystal key unlocks all 4 ecosystems — Co-Watch Cinema, Co-Study Desks, Shared Cart, and Multiplayer Quiz Battles.
-          </p>
+      {/* 6. INVERTED BLACK TRIANGLE KEY SECTION (RED/PINK/GOLD SPLIT + WAVY FLOATING KEY) */}
+      <section className="inverted-triangle-key-section">
+        {/* 3-WAY BACKGROUND COLOR SPLIT */}
+        <div className="key-bg-split-left-red" />
+        <div className="key-bg-split-right-pink" />
+        <div className="key-bg-split-center-gold" />
+
+        {/* CENTER INVERTED BLACK TRIANGLE SHIELD (POINTS DOWNWARDS) */}
+        <div className="center-black-inverted-triangle">
+          <span className="key-gold-tag">🔑 UNLOCK EVERYTHING</span>
+          <h2 className="key-section-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', margin: '10px 0' }}>
+            PURCHASE THIS KEY TO UNLOCK COGETHER
+          </h2>
+
+          {/* WAVY WIND FLOATING 3D KEY WITH HANGING THREAD PRICE TAG */}
+          <div className="wavy-floating-key-wrapper">
+            <img src="/crystal_key_unlock.jpg" alt="Wavy Floating 3D Key" className="glowing-wavy-key-img" />
+            <div className="hanging-thread-line" />
+            <span className="hanging-price-tag-badge">🏷️ PRICE: ₹49 / MONTH</span>
+          </div>
+
+          <br />
+          <button className="btn-triangle-key-buy" onClick={onOpenPricing}>
+            Buy The ₹49 Unlock Key →
+          </button>
         </div>
 
-        {/* RECTANGULAR BOXED LAYOUT GRID */}
-        <div className="key-boxed-grid">
-          {/* LEFT BOX CARD */}
-          <div className="key-box-card box-left">
-            <span className="key-card-badge">💔 PSYCHOLOGICAL QUESTION #01</span>
-            <p className="key-card-body">
-              <strong>Why would you NOT buy this key?</strong> Do you really want your crush/partner studying or watching movies with someone else while you scroll reels alone?
+        {/* LEFT & RIGHT SIDE PSYCHOLOGICAL REALITY CHECK CARDS */}
+        <div className="triangle-side-cards-wrapper">
+          {/* LEFT RED SIDE CARD */}
+          <div className="side-psych-card left-card-red">
+            <span className="side-card-badge">💔 PSYCHOLOGICAL QUESTION #01</span>
+            <p className="side-card-body">
+              <strong>Why would you NOT buy this key?</strong> Do you really want your crush / partner studying or watching movies with someone else while you scroll reels alone?
             </p>
           </div>
 
-          {/* CENTER 3D CRYSTAL KEY HERO CARD */}
-          <div className="key-center-crystal-card">
-            <div className="crystal-key-img-wrapper">
-              <img src="/crystal_key_unlock.jpg" alt="3D Glowing Crystal Key" className="crystal-key-img" />
-            </div>
-            <span className="key-price-tag-badge">🔑 KEY PRICE: ₹49 / MONTH</span>
-            <button className="btn-buy-crystal-key" onClick={onOpenPricing}>
-              BUY THE UNLOCK KEY FOR ₹49 →
-            </button>
-          </div>
-
-          {/* RIGHT BOX CARD */}
-          <div className="key-box-card box-right">
-            <span className="key-card-badge">📉 PSYCHOLOGICAL QUESTION #02</span>
-            <p className="key-card-body">
+          {/* RIGHT PINK SIDE CARD */}
+          <div className="side-psych-card right-card-pink">
+            <span className="side-card-badge">📉 PSYCHOLOGICAL QUESTION #02</span>
+            <p className="side-card-body">
               <strong>Are you really gonna let your squad get A+ grades</strong> in Co-Study rooms while you're locked out crying over laggy 480p screenshares?
             </p>
           </div>
+        </div>
 
-          {/* BOTTOM WIDE BOX CARD */}
-          <div className="key-box-card box-bottom">
-            <span className="key-card-badge">😱 THE MOMENT OF TRUTH</span>
-            <p className="key-card-body" style={{ fontSize: '1.3rem', textTransform: 'uppercase', fontFamily: "'Impact', sans-serif" }}>
-              "OH DAMN... I READ THIS PSYCHOLOGICAL REALITY CHECK & I ALREADY KNOW WHY THIS WEBSITE IS SO GENIUS. FINE BRO, I'M BUYING THE KEY RIGHT NOW! 😭🔥"
-            </p>
-            <button className="btn-bottom-claim-key" onClick={onOpenPricing}>
-              Claim My ₹49 Unlock Key →
-            </button>
-          </div>
+        {/* BOTTOM GOLD MOMENT OF TRUTH CARD */}
+        <div className="bottom-gold-truth-card">
+          <p className="truth-quote-text">
+            "OH DAMN... I READ THIS PSYCHOLOGICAL REALITY CHECK & I ALREADY KNOW WHY THIS WEBSITE IS SO GENIUS. FINE BRO, I'M BUYING THE KEY FOR ₹49 NOW! 😭🔥"
+          </p>
+          <button className="btn-truth-claim-key" onClick={onOpenPricing}>
+            Claim My ₹49 Unlock Key →
+          </button>
         </div>
 
         {/* BOTTOM WATERMARK & FOOTER */}
-        <footer className="jeevan-official-footer">
+        <footer className="jeevan-official-footer" style={{ position: 'relative', zIndex: 20 }}>
           <div className="footer-watermark-row">
             <span className="creator-tag">⚡ CRAFTED WITH ❤️ BY JEEVAN YADAV</span>
             <div className="footer-links">
