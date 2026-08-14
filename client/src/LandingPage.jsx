@@ -156,6 +156,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     overrideScroll: null
   });
 
+  // NODECK.ONLINE INTERACTIVE DECK SLIDE STATE
+  const [activeNodeckSlide, setActiveNodeckSlide] = useState(1);
+
   // FINAL LOCKED TABLET DISPLAY OVERLAY CONFIG
   const [tabletConfig] = useState({
     top: 63.5,
@@ -461,6 +464,19 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // STEP 6: CO-STUDY INTERACTIVE SCROLL ANIMATION CALCULATIONS
   const effectiveCostudyScroll = oTuner.overrideScroll !== null ? oTuner.overrideScroll : costudyScrollProgress;
   const dotsRotationDeg = effectiveCostudyScroll * 1800; // spins up to 5 full rotations as user scrolls!
+
+  // Sync active slide with scroll progress
+  useEffect(() => {
+    if (effectiveCostudyScroll < 0.45) {
+      setActiveNodeckSlide(1);
+    } else if (effectiveCostudyScroll >= 0.45 && effectiveCostudyScroll < 0.65) {
+      setActiveNodeckSlide(2);
+    } else if (effectiveCostudyScroll >= 0.65 && effectiveCostudyScroll < 0.85) {
+      setActiveNodeckSlide(3);
+    } else if (effectiveCostudyScroll >= 0.85) {
+      setActiveNodeckSlide(4);
+    }
+  }, [effectiveCostudyScroll]);
   
   // Smooth camera pan offset + Exponential Zoom directly into the letter 'O'
   const zoomFactor = Math.min(Math.max((effectiveCostudyScroll - 0.08) * 2.5, 0), 1);
@@ -1222,27 +1238,142 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               </div>
             </div>
           )}
-          {effectiveCostudyScroll >= 0.40 && (
-            <div className="costudy-black-squares-grid">
-              <div className="black-info-square square-top-left" style={{ transform: `translate(${sq1X}%, ${sq1Y}%)`, opacity: sq1Progress }}>
-                <div className="sq-number">01 / STUDY MATES</div><div className="sq-icon">👥</div>
-                <h3>Study with Studymates Online</h3><p>Virtual quiet study desks with screen share, live camera grid, and background lofi music.</p>
-                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>Join Study Desk →</button>
+          {/* NODECK.ONLINE STYLE INTERACTIVE DECK SHOWCASE (POPS IN AFTER ZOOMING THROUGH 'O') */}
+          {effectiveCostudyScroll >= 0.35 && (
+            <div className={`nodeck-stage-container ${activeNodeckSlide === 1 || activeNodeckSlide === 4 ? 'bg-pink' : 'bg-cream'} fade-in`}>
+              {/* TOP NODECK BRANDING HEADER */}
+              <div className="nodeck-top-header">
+                <h1 className="nodeck-logo-title">NODECK</h1>
+                <span className="nodeck-subtag">
+                  {activeNodeckSlide === 1 && 'THE PROBLEM'}
+                  {activeNodeckSlide === 2 && 'THE MANIFESTO'}
+                  {activeNodeckSlide === 3 && 'WHAT WE DON\'T DO'}
+                  {activeNodeckSlide === 4 && 'WIN THE ROOM.'}
+                </span>
               </div>
-              <div className="black-info-square square-bottom-right" style={{ transform: `translate(${sq2X}%, ${sq2Y}%)`, opacity: sq2Progress }}>
-                <div className="sq-number">02 / TRIVIA & GAMES</div><div className="sq-icon">🎮</div>
-                <h3>Fun Multiplayer Games & Quizzes</h3><p>Speed recall trivia, flashcard challenges, and competitive streak leaderboards with studymates.</p>
-                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>Play Quiz Battles →</button>
+
+              {/* MAIN SLIDE CONTENT CANVAS AREA */}
+              <div className="nodeck-slide-canvas">
+                {/* SLIDE 1: THE PROBLEM (PINK BG, DECK NOBODY READS) */}
+                {activeNodeckSlide === 1 && (
+                  <div className="nodeck-slide-wrapper fade-in">
+                    <div className="nodeck-3d-eraser" />
+                    <h2 className="nodeck-huge-headline">
+                      EVERY YEAR, BILLIONS ARE SPENT ON DECKS <mark className="nodeck-highlighter-green">NOBODY READS</mark>, FRAMEWORKS <mark className="nodeck-highlighter-green">NOBODY USES</mark>, AND CONSULTANTS <mark className="nodeck-highlighter-green">NOBODY REMEMBERS.</mark>
+                    </h2>
+                  </div>
+                )}
+
+                {/* SLIDE 2: THE MANIFESTO (CREAM BG, THE BEST PITCH IS NO PITCH) */}
+                {activeNodeckSlide === 2 && (
+                  <div className="nodeck-slide-wrapper fade-in">
+                    <h2 className="nodeck-huge-headline">
+                      THE BEST PITCH IS NO PITCH.<sup>1</sup><br />
+                      THE BEST DECK IS NO DECK.<sup>2</sup><br />
+                      <mark className="nodeck-highlighter-green">THE BEST DEAL IS A SIGNED ONE.<sup>3</sup></mark>
+                    </h2>
+                    <div className="nodeck-footnotes-row">
+                      <span><sup>1</sup> YES, WE MEAN IT.</span>
+                      <span><sup>2</sup> WE'VE WALKED OUT OF ROOMS...</span>
+                      <span><sup>3</sup> IF IT'S NOT SIGNED, IT DIDN'T HAPPEN.</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* SLIDE 3: WHAT WE DON'T DO (CREAM BG, PINNED PAPER WITH STRIKETHROUGH) */}
+                {activeNodeckSlide === 3 && (
+                  <div className="nodeck-slide3-layout fade-in">
+                    <div className="nodeck-slide3-left">
+                      <h2>WHAT WE<br /><mark className="nodeck-highlighter-green">DON'T DO</mark></h2>
+                    </div>
+                    <div className="nodeck-pinned-paper-card">
+                      <span className="nodeck-red-pushpin">📍</span>
+                      <ul className="nodeck-strikethrough-list">
+                        <li>1. STRATEGY DECKS</li>
+                        <li>2. FRAMEWORKS</li>
+                        <li>3. ROADMAPS</li>
+                        <li>4. INSPIRING WORKSHOPS</li>
+                        <li>5. MEANINGLESS 70 PAGE PDFS</li>
+                      </ul>
+                      <p className="nodeck-pinned-caption">
+                        THESE THINGS HAVE ONE THING IN COMMON: THEY FEEL LIKE PROGRESS WITHOUT BEING PROGRESS. THE DECK GETS APPROVED. THE MEETING ENDS. EVERYBODY LEAVES WITH A PDF. NOBODY LEAVES WITH A CONTRACT.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* SLIDE 4: WIN THE ROOM (PINK BG, 3 CARDS CAROUSEL) */}
+                {activeNodeckSlide === 4 && (
+                  <div className="nodeck-cards-grid fade-in">
+                    {/* CARD 1 */}
+                    <div className="nodeck-deck-card">
+                      <span className="nodeck-card-tag">THE PATTERN</span>
+                      <div className="nodeck-card-body">
+                        GOOD PRODUCT.<br />
+                        GREAT SLIDES.<br />
+                        EVERYONE SMILES.<br />
+                        NO CONTRACT.
+                      </div>
+                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
+                        Join Desk <ArrowRight size={16} />
+                      </button>
+                    </div>
+
+                    {/* CARD 2 */}
+                    <div className="nodeck-deck-card">
+                      <span className="nodeck-card-tag">WHAT WE DO</span>
+                      <div className="nodeck-card-body">
+                        WE FIND WHAT'S KILLING THE DEAL AND HELP TO FIX IT.
+                      </div>
+                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
+                        Play Battle <ArrowRight size={16} />
+                      </button>
+                    </div>
+
+                    {/* CARD 3 */}
+                    <div className="nodeck-deck-card">
+                      <span className="nodeck-card-tag">WHAT YOU GET</span>
+                      <div className="nodeck-card-body">
+                        MORE YES.<br />
+                        FEWER FOLLOW-UPS.<br />
+                        LESS "WE'LL THINK ABOUT IT."
+                      </div>
+                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
+                        Open Canvas <ArrowRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="black-info-square square-top-right" style={{ transform: `translate(${sq3X}%, ${sq3Y}%)`, opacity: sq3Progress }}>
-                <div className="sq-number">03 / EXAM PREPARATION</div><div className="sq-icon">🎯</div>
-                <h3>Exam Prep & Mock Papers</h3><p>Timed practice papers with instant step-by-step AI solutions and detailed breakdown cards.</p>
-                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>Start Practice Test →</button>
+
+              {/* BOTTOM FIXED NODECK NAVIGATION DOCK BAR */}
+              <div className="nodeck-bottom-dock">
+                <button
+                  className="btn-nodeck-nav"
+                  onClick={() => setActiveNodeckSlide(prev => Math.max(1, prev - 1))}
+                  disabled={activeNodeckSlide === 1}
+                >
+                  ⟨ PREV
+                </button>
+                <div
+                  className="btn-nodeck-menu-circle"
+                  onClick={() => setActiveNodeckSlide(prev => (prev % 4) + 1)}
+                  title="Toggle Slide"
+                >
+                  ≡
+                </div>
+                <button
+                  className="btn-nodeck-nav"
+                  onClick={() => setActiveNodeckSlide(prev => Math.min(4, prev + 1))}
+                  disabled={activeNodeckSlide === 4}
+                >
+                  NEXT ⟩
+                </button>
               </div>
-              <div className="black-info-square square-bottom-left" style={{ transform: `translate(${sq4X}%, ${sq4Y}%)`, opacity: sq4Progress }}>
-                <div className="sq-number">04 / LIVE CANVAS</div><div className="sq-icon">📝</div>
-                <h3>Shared Notes & Live Canvas</h3><p>Annotate PDFs together, sync live notes, stream lo-fi rain beats, and run shared Pomodoro clocks.</p>
-                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>Open Shared Desk →</button>
+
+              {/* SLIDE COUNTER BADGE */}
+              <div className="nodeck-slide-badge">
+                SLIDE {activeNodeckSlide}/4
               </div>
             </div>
           )}
