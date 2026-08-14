@@ -3298,6 +3298,37 @@
   z-index: 10;
 }
 
+/* DISCREET KEYBOARD ARROW KEY NUDGE TOAST */
+.o-nudge-keyboard-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  padding: 10px 20px;
+  color: #FFFFE3;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.85rem;
+  z-index: 999999;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+}
+
+.o-nudge-keyboard-toast strong {
+  color: #38bdf8;
+}
+
+.o-nudge-keyboard-toast .toast-subtext {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
 /* LIVE FLOATING 'O' TUNER WIDGET PANEL */
 .costudy-o-tuner-widget {
   position: fixed;
@@ -3309,7 +3340,7 @@
   border-radius: 16px;
   backdrop-filter: blur(20px);
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
-  z-index: 9999;
+  z-index: 999999;
   color: #ffffff;
   font-family: system-ui, -apple-system, sans-serif;
   overflow: hidden;

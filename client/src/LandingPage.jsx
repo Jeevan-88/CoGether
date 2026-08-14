@@ -146,13 +146,41 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     dotSize: 3.0,
     holeSize: 46,
     oScale: 1.00,
+    oOffsetY: 0,
     zoomTargetX: 27.2,
     zoomTargetY: 50.6,
     panX: 26.5,
     maxZoom: 65,
     showReticle: false,
-    showTuner: false
+    showTuner: false,
+    overrideScroll: null
   });
+
+  // ⌨️ KEYBOARD ARROW KEYS (↑ / ↓) LIVE NUDGE CONTROLLER FOR LETTER 'O'
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          setOTuner(prev => ({ ...prev, oScale: parseFloat((prev.oScale + 0.01).toFixed(2)) }));
+        } else {
+          setOTuner(prev => ({ ...prev, oOffsetY: prev.oOffsetY - 1 }));
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          setOTuner(prev => ({ ...prev, oScale: parseFloat(Math.max(0.40, prev.oScale - 0.01).toFixed(2)) }));
+        } else {
+          setOTuner(prev => ({ ...prev, oOffsetY: prev.oOffsetY + 1 }));
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // FINAL LOCKED TABLET DISPLAY OVERLAY CONFIG
   const [tabletConfig] = useState({
@@ -457,28 +485,29 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   };
 
   // STEP 6: CO-STUDY INTERACTIVE SCROLL ANIMATION CALCULATIONS
-  const dotsRotationDeg = costudyScrollProgress * 1800; // spins up to 5 full rotations as user scrolls!
+  const effectiveCostudyScroll = oTuner.overrideScroll !== null ? oTuner.overrideScroll : costudyScrollProgress;
+  const dotsRotationDeg = effectiveCostudyScroll * 1800; // spins up to 5 full rotations as user scrolls!
   
   // Smooth camera pan offset + Exponential Zoom directly into the letter 'O'
-  const zoomFactor = Math.min(Math.max((costudyScrollProgress - 0.08) * 2.5, 0), 1);
+  const zoomFactor = Math.min(Math.max((effectiveCostudyScroll - 0.08) * 2.5, 0), 1);
   const portalZoomScale = 1 + Math.pow(zoomFactor, 3.2) * 65;
   const oPanShiftPct = zoomFactor * 29.0; // Shifts text rightward by 29% to center 'O' at 50vw during zoom
-  const portalOpacity = costudyScrollProgress > 0.50 ? Math.max(0, 1 - (costudyScrollProgress - 0.50) * 7) : 1;
+  const portalOpacity = effectiveCostudyScroll > 0.50 ? Math.max(0, 1 - (effectiveCostudyScroll - 0.50) * 7) : 1;
 
   // 4 Diagonal Black Square Wipe Cards (Top-Left, Bottom-Right, Top-Right, Bottom-Left)
-  const sq1Progress = Math.min(Math.max((costudyScrollProgress - 0.45) * 5.0, 0), 1);
+  const sq1Progress = Math.min(Math.max((effectiveCostudyScroll - 0.45) * 5.0, 0), 1);
   const sq1X = (1 - sq1Progress) * -120;
   const sq1Y = (1 - sq1Progress) * -120;
 
-  const sq2Progress = Math.min(Math.max((costudyScrollProgress - 0.58) * 5.0, 0), 1);
+  const sq2Progress = Math.min(Math.max((effectiveCostudyScroll - 0.58) * 5.0, 0), 1);
   const sq2X = (1 - sq2Progress) * 120;
   const sq2Y = (1 - sq2Progress) * 120;
 
-  const sq3Progress = Math.min(Math.max((costudyScrollProgress - 0.70) * 5.0, 0), 1);
+  const sq3Progress = Math.min(Math.max((effectiveCostudyScroll - 0.70) * 5.0, 0), 1);
   const sq3X = (1 - sq3Progress) * 120;
   const sq3Y = (1 - sq3Progress) * -120;
 
-  const sq4Progress = Math.min(Math.max((costudyScrollProgress - 0.82) * 5.0, 0), 1);
+  const sq4Progress = Math.min(Math.max((effectiveCostudyScroll - 0.82) * 5.0, 0), 1);
   const sq4X = (1 - sq4Progress) * -120;
   const sq4Y = (1 - sq4Progress) * 120;
 
@@ -1165,14 +1194,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                             <div className="reaction-bubble-pop">🛒 "Added to shared cart!"</div>
                           </div>
 
-                          {/* FLOATING REACTION EMOJIS (♡, 🔥, 😍, 🛒) */}
-                          <div className="tablet-floating-emojis-container">
-                            <span className="emoji-float emoji-1">🔥</span>
-                            <span className="emoji-float emoji-2">😍</span>
-                            <span className="emoji-float emoji-3">♡</span>
-                            <span className="emoji-float emoji-4">🛒</span>
-                          </div>
-
                           {/* BOTTOM SHOPPING ACTION CARD */}
                           <div className="tablet-product-bottom-card">
                             <div className="product-info-left">
@@ -1194,11 +1215,10 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      {/* 5. STICKY PINNED CO-STUDY SHOWCASE SECTION (#FFFFE3 NOTHIN.IN STYLE BACKGROUND) */}
+      {/* 5. STICKY PINNED CO-STUDY SHOWCASE SECTION */}
       <div className="sticky-pinned-costudy-stage-wrapper">
         <section className="costudy-sticky-stage">
-          {/* CENTERED "CO - STUDY" TYPOGRAPHY WITH ROTATING DOTS RING INSIDE THE 'O' */}
-          {costudyScrollProgress < 0.65 && (
+          {effectiveCostudyScroll < 0.65 && (
             <div
               className={`centered-costudy-headline-wrapper ${oTuner.showReticle ? 'clickable-target-active' : ''}`}
               style={{
@@ -1210,11 +1230,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             >
               <div className="costudy-text-row">
                 <span className="char-c">C</span>
-                {/* PERFECT GEOMETRIC CIRCULAR 'O' WITH PERFECT WHITE DOTS RING */}
-                <div className="co-letter-o-custom-circle" style={{ transform: `scale(${oTuner.oScale})` }}>
-                  <div className="o-black-circle-body">
-                    <div className="o-cream-center-hole" style={{ width: `${oTuner.holeSize}%`, height: `${oTuner.holeSize}%` }} />
-                  </div>
+                <div className="co-letter-o-custom-circle" style={{ transform: `scale(${oTuner.oScale}) translateY(${oTuner.oOffsetY}px)` }}>
+                  <div className="o-black-circle-body"><div className="o-cream-center-hole" style={{ width: `${oTuner.holeSize}%`, height: `${oTuner.holeSize}%` }} /></div>
                   <svg className="o-dots-ring-perfect" viewBox="0 0 100 100" style={{ transform: `translate(-50%, -50%) rotate(${dotsRotationDeg}deg)` }}>
                     {Array.from({ length: 12 }).map((_, i) => {
                       const angle = (i * 30 * Math.PI) / 180;
@@ -1227,187 +1244,41 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 <span className="char-hyphen">-</span>
                 <span className="char-study">STUDY</span>
               </div>
-
-              {/* TARGET CROSSHAIR OVERLAY 🎯 */}
               {oTuner.showReticle && (
-                <div
-                  className="pinpoint-zoom-crosshair"
-                  style={{
-                    left: `${oTuner.zoomTargetX}%`,
-                    top: `${oTuner.zoomTargetY}%`
-                  }}
-                >
-                  <div className="crosshair-ring" />
-                  <div className="crosshair-dot" />
+                <div className="pinpoint-zoom-crosshair" style={{ left: `${oTuner.zoomTargetX}%`, top: `${oTuner.zoomTargetY}%` }}>
+                  <div className="crosshair-ring" /><div className="crosshair-dot" />
                   <span className="crosshair-label">🎯 Target ({oTuner.zoomTargetX}%, {oTuner.zoomTargetY}%)</span>
                 </div>
               )}
             </div>
           )}
-
-          {/* FLOATING LIVE TUNER WIDGET */}
-          {costudyScrollProgress > 0 && costudyScrollProgress < 0.60 && (
-            <div className={`costudy-o-tuner-widget ${!oTuner.showTuner ? 'minimized' : ''}`}>
-              <div className="tuner-header" onClick={() => setOTuner(prev => ({ ...prev, showTuner: !prev.showTuner }))}>
-                <span>🎯 Pinpoint Zoom Calibrator</span>
-                <button className="btn-toggle-tuner">
-                  {oTuner.showTuner ? '−' : '+'}
-                </button>
-              </div>
-
-              {oTuner.showTuner && (
-                <div className="tuner-body">
-                  <div className="tuner-row">
-                    <label>Target Origin X: <strong>{oTuner.zoomTargetX}%</strong></label>
-                    <input
-                      type="range"
-                      min="10.0"
-                      max="40.0"
-                      step="0.1"
-                      value={oTuner.zoomTargetX}
-                      onChange={(e) => setOTuner(prev => ({ ...prev, zoomTargetX: parseFloat(e.target.value) }))}
-                    />
-                  </div>
-
-                  <div className="tuner-row">
-                    <label>Target Origin Y: <strong>{oTuner.zoomTargetY}%</strong></label>
-                    <input
-                      type="range"
-                      min="30.0"
-                      max="70.0"
-                      step="0.1"
-                      value={oTuner.zoomTargetY}
-                      onChange={(e) => setOTuner(prev => ({ ...prev, zoomTargetY: parseFloat(e.target.value) }))}
-                    />
-                  </div>
-
-                  <div className="tuner-row">
-                    <label>'O' Letter Scale: <strong>{oTuner.oScale}x</strong></label>
-                    <input
-                      type="range"
-                      min="0.50"
-                      max="1.10"
-                      step="0.01"
-                      value={oTuner.oScale}
-                      onChange={(e) => setOTuner(prev => ({ ...prev, oScale: parseFloat(e.target.value) }))}
-                    />
-                  </div>
-
-                  <div className="tuner-row">
-                    <label>White Dots Radius: <strong>{oTuner.dotsRadius}px</strong></label>
-                    <input
-                      type="range"
-                      min="25"
-                      max="55"
-                      step="0.5"
-                      value={oTuner.dotsRadius}
-                      onChange={(e) => setOTuner(prev => ({ ...prev, dotsRadius: parseFloat(e.target.value) }))}
-                    />
-                  </div>
-
-                  <div className="tuner-row">
-                    <label>Inner Cream Hole: <strong>{oTuner.holeSize}%</strong></label>
-                    <input
-                      type="range"
-                      min="30"
-                      max="65"
-                      step="1"
-                      value={oTuner.holeSize}
-                      onChange={(e) => setOTuner(prev => ({ ...prev, holeSize: parseInt(e.target.value) }))}
-                    />
-                  </div>
-
-                  <button
-                    className="btn-copy-calib-values"
-                    onClick={() => {
-                      const summary = `TargetX: ${oTuner.zoomTargetX}%, TargetY: ${oTuner.zoomTargetY}%, oScale: ${oTuner.oScale}`;
-                      navigator.clipboard.writeText(summary);
-                      alert(`📋 Pinpoint Values Copied!\n\n${summary}`);
-                    }}
-                  >
-                    📋 Copy Pinpoint Values
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* DIAGONAL BLACK FILLED SQUARES WIPE REVEAL WITH WHITE TEXT */}
-          {costudyScrollProgress >= 0.40 && (
+          {effectiveCostudyScroll >= 0.40 && (
             <div className="costudy-black-squares-grid">
-              {/* SQUARE 1: TOP-LEFT DIAGONAL */}
-              <div
-                className="black-info-square square-top-left"
-                style={{
-                  transform: `translate(${sq1X}%, ${sq1Y}%)`,
-                  opacity: sq1Progress
-                }}
-              >
-                <div className="sq-number">01 / STUDY MATES</div>
-                <div className="sq-icon">📚</div>
-                <h3>Study With Friends Online</h3>
-                <p>Real-time video calls & silent focus desks. Stay motivated and accountable together with your study circle.</p>
-                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>
-                  Launch Co-Study Room <ArrowRight size={16} />
-                </button>
+              <div className="black-info-square square-top-left" style={{ transform: `translate(${sq1X}%, ${sq1Y}%)`, opacity: sq1Progress }}>
+                <div className="sq-number">01 / STUDY MATES</div><div className="sq-icon">👥</div>
+                <h3>Study with Studymates Online</h3><p>Virtual quiet study desks with screen share, live camera grid, and background lofi music.</p>
+                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>Join Study Desk →</button>
               </div>
-
-              {/* SQUARE 2: BOTTOM-RIGHT DIAGONAL */}
-              <div
-                className="black-info-square square-bottom-right"
-                style={{
-                  transform: `translate(${sq2X}%, ${sq2Y}%)`,
-                  opacity: sq2Progress
-                }}
-              >
-                <div className="sq-number">02 / TRIVIA & GAMES</div>
-                <div className="sq-icon">🎮</div>
-                <h3>Fun Multiplayer Games & Quizzes</h3>
-                <p>Speed recall trivia, flashcard challenges, and competitive streak leaderboards with studymates.</p>
-                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>
-                  Play Quiz Battles <ArrowRight size={16} />
-                </button>
+              <div className="black-info-square square-bottom-right" style={{ transform: `translate(${sq2X}%, ${sq2Y}%)`, opacity: sq2Progress }}>
+                <div className="sq-number">02 / TRIVIA & GAMES</div><div className="sq-icon">🎮</div>
+                <h3>Fun Multiplayer Games & Quizzes</h3><p>Speed recall trivia, flashcard challenges, and competitive streak leaderboards with studymates.</p>
+                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>Play Quiz Battles →</button>
               </div>
-
-              {/* SQUARE 3: TOP-RIGHT DIAGONAL */}
-              <div
-                className="black-info-square square-top-right"
-                style={{
-                  transform: `translate(${sq3X}%, ${sq3Y}%)`,
-                  opacity: sq3Progress
-                }}
-              >
-                <div className="sq-number">03 / EXAM PREPARATION</div>
-                <div className="sq-icon">🎯</div>
-                <h3>Exam Prep & Mock Papers</h3>
-                <p>Timed practice papers with instant step-by-step AI solutions and detailed breakdown cards.</p>
-                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>
-                  Start Practice Test <ArrowRight size={16} />
-                </button>
+              <div className="black-info-square square-top-right" style={{ transform: `translate(${sq3X}%, ${sq3Y}%)`, opacity: sq3Progress }}>
+                <div className="sq-number">03 / EXAM PREPARATION</div><div className="sq-icon">🎯</div>
+                <h3>Exam Prep & Mock Papers</h3><p>Timed practice papers with instant step-by-step AI solutions and detailed breakdown cards.</p>
+                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>Start Practice Test →</button>
               </div>
-
-              {/* SQUARE 4: BOTTOM-LEFT DIAGONAL */}
-              <div
-                className="black-info-square square-bottom-left"
-                style={{
-                  transform: `translate(${sq4X}%, ${sq4Y}%)`,
-                  opacity: sq4Progress
-                }}
-              >
-                <div className="sq-number">04 / LIVE CANVAS</div>
-                <div className="sq-icon">📝</div>
-                <h3>Shared Notes & Live Canvas</h3>
-                <p>Annotate PDFs together, sync live notes, stream lo-fi rain beats, and run shared Pomodoro clocks.</p>
-                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>
-                  Open Shared Desk <ArrowRight size={16} />
-                </button>
+              <div className="black-info-square square-bottom-left" style={{ transform: `translate(${sq4X}%, ${sq4Y}%)`, opacity: sq4Progress }}>
+                <div className="sq-number">04 / LIVE CANVAS</div><div className="sq-icon">📝</div>
+                <h3>Shared Notes & Live Canvas</h3><p>Annotate PDFs together, sync live notes, stream lo-fi rain beats, and run shared Pomodoro clocks.</p>
+                <button className="sq-btn-white" onClick={() => handleLaunch('watch')}>Open Shared Desk →</button>
               </div>
             </div>
           )}
         </section>
       </div>
 
-      {/* 5. PREMIUM */}
       <section className="premium-gateway-section">
         <div className="premium-banner-card">
           <div className="banner-left">
@@ -1415,11 +1286,15 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <h2>₹49 / Month</h2>
             <p>Unlock unlimited Co-Watch rooms, full multiplayer games, Co-Shop & Co-Study desks.</p>
           </div>
-          <button className="btn-gold-checkout" onClick={onOpenPricing}>
-            Get Premium for ₹49 <ArrowRight size={18} />
-          </button>
+          <button className="btn-gold-checkout" onClick={onOpenPricing}>Get Premium for ₹49 →</button>
         </div>
       </section>
+
+      {/* ⌨️ DISCREET KEYBOARD ARROW KEY NUDGE TOAST */}
+      <div className="o-nudge-keyboard-toast">
+        <span>⌨️ Letter 'O' Y-Shift: <strong>{oTuner.oOffsetY > 0 ? `+${oTuner.oOffsetY}` : oTuner.oOffsetY}px</strong> | Scale: <strong>{oTuner.oScale}x</strong></span>
+        <span className="toast-subtext">Press ↑ / ↓ Arrow Keys to nudge up/down (Shift+↑/↓ to scale)</span>
+      </div>
     </div>
   );
 }
