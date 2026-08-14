@@ -1390,69 +1390,54 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      {/* 6. MULTI-SECTION DIAGONAL COLOR CUTS + TRANSPARENT CENTER TRIANGLE HERO */}
-      <section className="ultimate-hybrid-mosaic-section">
-        {/* 4 DIAGONAL BACKGROUND COLOR CUT WEDGES */}
-        <div className="diagonal-bg-wedge wedge-cowatch-black" />
-        <div className="diagonal-bg-wedge wedge-coshop-steel" />
-        <div className="diagonal-bg-wedge wedge-costudy-cream" />
-
-        {/* CENTER TRANSPARENT FLOATING GLASS TRIANGLE PRICING HERO */}
-        <div className="transparent-center-triangle-hero glass-triangle-shape">
-          <span className="glass-pricing-badge">₹49 / MONTH • UNLIMITED ACCESS</span>
-          <h2 className="glass-main-title">ONE SUBSCRIPTION.<br />ALL ECOSYSTEMS.</h2>
-          <p className="glass-subtitle">
-            Co-Watch Movies in Buttery 4K • Multiplayer Quiz Battles • Virtual Co-Study Desks • Shared Shopping Carts
+      {/* 6. 3D CRYSTAL KEY UNLOCK SECTION (BOXED RECTANGULAR LAYOUT) */}
+      <section className="crystal-key-unlock-section">
+        <div className="key-section-header">
+          <span className="key-gold-tag">🔑 UNLOCK EVERYTHING WITH THE CRYSTAL KEY</span>
+          <h2 className="key-section-title">PURCHASE THIS KEY TO UNLOCK COGETHER.</h2>
+          <p className="key-section-subtitle">
+            One single crystal key unlocks all 4 ecosystems — Co-Watch Cinema, Co-Study Desks, Shared Cart, and Multiplayer Quiz Battles.
           </p>
-          <button className="btn-glass-subscribe" onClick={onOpenPricing}>
-            Get Premium for ₹49 →
-          </button>
         </div>
 
-        {/* SURROUNDING GEN-Z PSYCHOLOGICAL WORD CARDS RING */}
-        <div className="psychological-cards-ring">
-          {/* CARD 1 */}
-          <div className="genz-psych-card highlight-pink">
-            <div className="genz-card-header">
-              <span className="genz-card-icon">💔</span>
-              <span className="genz-card-tag">REALITY CHECK #01</span>
-            </div>
-            <p className="genz-card-text">
-              <strong>Do you really want your crush / partner studying or watching movies with someone else</strong> who already has CoGether Premium?
+        {/* RECTANGULAR BOXED LAYOUT GRID */}
+        <div className="key-boxed-grid">
+          {/* LEFT BOX CARD */}
+          <div className="key-box-card box-left">
+            <span className="key-card-badge">💔 PSYCHOLOGICAL QUESTION #01</span>
+            <p className="key-card-body">
+              <strong>Why would you NOT buy this key?</strong> Do you really want your crush/partner studying or watching movies with someone else while you scroll reels alone?
             </p>
           </div>
 
-          {/* CARD 2 */}
-          <div className="genz-psych-card">
-            <div className="genz-card-header">
-              <span className="genz-card-icon">📉</span>
-              <span className="genz-card-tag">REALITY CHECK #02</span>
+          {/* CENTER 3D CRYSTAL KEY HERO CARD */}
+          <div className="key-center-crystal-card">
+            <div className="crystal-key-img-wrapper">
+              <img src="/crystal_key_unlock.jpg" alt="3D Glowing Crystal Key" className="crystal-key-img" />
             </div>
-            <p className="genz-card-text">
-              <strong>Are you gonna let your squad get A+ grades</strong> while you get distracted scrolling reels alone at 3 AM?
+            <span className="key-price-tag-badge">🔑 KEY PRICE: ₹49 / MONTH</span>
+            <button className="btn-buy-crystal-key" onClick={onOpenPricing}>
+              BUY THE UNLOCK KEY FOR ₹49 →
+            </button>
+          </div>
+
+          {/* RIGHT BOX CARD */}
+          <div className="key-box-card box-right">
+            <span className="key-card-badge">📉 PSYCHOLOGICAL QUESTION #02</span>
+            <p className="key-card-body">
+              <strong>Are you really gonna let your squad get A+ grades</strong> in Co-Study rooms while you're locked out crying over laggy 480p screenshares?
             </p>
           </div>
 
-          {/* CARD 3 */}
-          <div className="genz-psych-card">
-            <div className="genz-card-header">
-              <span className="genz-card-icon">🍿</span>
-              <span className="genz-card-tag">REALITY CHECK #03</span>
-            </div>
-            <p className="genz-card-text">
-              <strong>Crying over laggy 480p screenshares</strong> when you could co-stream in buttery 4K HD for just ₹49?
+          {/* BOTTOM WIDE BOX CARD */}
+          <div className="key-box-card box-bottom">
+            <span className="key-card-badge">😱 THE MOMENT OF TRUTH</span>
+            <p className="key-card-body" style={{ fontSize: '1.3rem', textTransform: 'uppercase', fontFamily: "'Impact', sans-serif" }}>
+              "OH DAMN... I READ THIS PSYCHOLOGICAL REALITY CHECK & I ALREADY KNOW WHY THIS WEBSITE IS SO GENIUS. FINE BRO, I'M BUYING THE KEY RIGHT NOW! 😭🔥"
             </p>
-          </div>
-
-          {/* CARD 4 */}
-          <div className="genz-psych-card highlight-yellow">
-            <div className="genz-card-header">
-              <span className="genz-card-icon">😱</span>
-              <span className="genz-card-tag">THE MOMENT OF TRUTH</span>
-            </div>
-            <p className="genz-card-quote">
-              "OH DAMN... DID HE REALLY MENTION THIS IN THE PROMPT?! OKAY FINE, I HAVE TO TAKE THE SUBSCRIPTION RIGHT NOW! 😭🔥"
-            </p>
+            <button className="btn-bottom-claim-key" onClick={onOpenPricing}>
+              Claim My ₹49 Unlock Key →
+            </button>
           </div>
         </div>
 
