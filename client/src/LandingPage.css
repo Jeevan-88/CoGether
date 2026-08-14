@@ -3262,8 +3262,22 @@
   align-items: center;
   justify-content: center;
   margin: 0 0.04em;
+  transform: translateY(12px);
   transform-origin: center center;
   transition: transform 0.1s ease;
+}
+
+/* GRADUATION CAP / MORTARBOARD ON TOP OF 'O' 🎓 */
+.o-graduation-cap {
+  position: absolute;
+  top: -0.44em;
+  left: 50%;
+  transform: translateX(-52%) rotate(-4deg);
+  width: 0.95em;
+  height: auto;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: multiply;
 }
 
 .o-black-circle-body {

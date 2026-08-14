@@ -1230,14 +1230,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             >
               <div className="costudy-text-row">
                 <span className="char-c">C</span>
-                <div className="co-letter-o-custom-circle" style={{ transform: `scale(${oTuner.oScale}) translateY(${oTuner.oOffsetY}px)` }}>
-                  <div className="o-black-circle-body"><div className="o-cream-center-hole" style={{ width: `${oTuner.holeSize}%`, height: `${oTuner.holeSize}%` }} /></div>
+                <div className="co-letter-o-custom-circle">
+                  {/* GRADUATION CAP / MORTARBOARD ON TOP OF 'O' 🎓 */}
+                  <img src="/graduation_cap.png" alt="Graduation Cap" className="o-graduation-cap" />
+                  <div className="o-black-circle-body"><div className="o-cream-center-hole" style={{ width: `46%`, height: `46%` }} /></div>
                   <svg className="o-dots-ring-perfect" viewBox="0 0 100 100" style={{ transform: `translate(-50%, -50%) rotate(${dotsRotationDeg}deg)` }}>
                     {Array.from({ length: 12 }).map((_, i) => {
                       const angle = (i * 30 * Math.PI) / 180;
-                      const cx = 50 + oTuner.dotsRadius * Math.cos(angle);
-                      const cy = 50 + oTuner.dotsRadius * Math.sin(angle);
-                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r={oTuner.dotSize} fill="#ffffff" />;
+                      const cx = 50 + 43.5 * Math.cos(angle);
+                      const cy = 50 + 43.5 * Math.sin(angle);
+                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r="3.0" fill="#ffffff" />;
                     })}
                   </svg>
                 </div>
@@ -1290,11 +1292,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
-      {/* ⌨️ DISCREET KEYBOARD ARROW KEY NUDGE TOAST */}
-      <div className="o-nudge-keyboard-toast">
-        <span>⌨️ Letter 'O' Y-Shift: <strong>{oTuner.oOffsetY > 0 ? `+${oTuner.oOffsetY}` : oTuner.oOffsetY}px</strong> | Scale: <strong>{oTuner.oScale}x</strong></span>
-        <span className="toast-subtext">Press ↑ / ↓ Arrow Keys to nudge up/down (Shift+↑/↓ to scale)</span>
-      </div>
     </div>
   );
 }
