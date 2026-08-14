@@ -1254,13 +1254,18 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
               {/* MAIN SLIDE CONTENT CANVAS AREA */}
               <div className="nodeck-slide-canvas">
-                {/* SLIDE 1: THE PROBLEM (PINK BG, STUDYING ALONE) */}
+                {/* SLIDE 1: THE PROBLEM (PINK BG, STUDYING ALONE WITH ARTISTIC ILLUSTRATION) */}
                 {activeNodeckSlide === 1 && (
-                  <div className="nodeck-slide-wrapper fade-in">
-                    <div className="nodeck-3d-eraser" />
-                    <h2 className="nodeck-huge-headline">
-                      EVERY YEAR, MILLIONS OF HOURS ARE WASTED <mark className="nodeck-highlighter-green">STUDYING ALONE</mark>. CRAMMING <mark className="nodeck-highlighter-green">NOBODY ENJOYS</mark>, DISTRACTIONS <mark className="nodeck-highlighter-green">NOBODY ESCAPES</mark>, AND NOTES NOBODY REMEMBERS.
-                    </h2>
+                  <div className="nodeck-slide1-split-layout fade-in">
+                    <div className="nodeck-slide1-text-left">
+                      <h2 className="nodeck-huge-headline text-left-aligned">
+                        EVERY YEAR, MILLIONS OF HOURS ARE WASTED <mark className="nodeck-highlighter-green">STUDYING ALONE</mark>. CRAMMING <mark className="nodeck-highlighter-green">NOBODY ENJOYS</mark>, DISTRACTIONS <mark className="nodeck-highlighter-green">NOBODY ESCAPES</mark>, AND NOTES NOBODY REMEMBERS.
+                      </h2>
+                    </div>
+                    <div className="nodeck-slide1-art-frame">
+                      <div className="art-frame-badge">LO-FI STUDY VIBES 🎧</div>
+                      <img src="/costudy_illustration.jpg" alt="Artistic Co-Study Desk" className="nodeck-art-img" />
+                    </div>
                   </div>
                 )}
 
