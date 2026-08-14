@@ -156,30 +156,51 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     overrideScroll: null
   });
 
-  // ⌨️ KEYBOARD ARROW KEYS (↑ / ↓) LIVE NUDGE CONTROLLER FOR LETTER 'O'
+  // GRADUATION CAP LIVE TUNER (WASD for Position, Q/E for Rotation, Shift+W/S for Size)
+  const [hatTuner, setHatTuner] = useState({
+    topPct: -44,   // top offset (%)
+    leftPct: 50,   // left offset (%)
+    rotateDeg: -4, // rotation (deg)
+    widthEm: 0.95  // width (em)
+  });
+
+  // ⌨️ WASD + Q/E KEYBOARD LISTENER TO NUDGE GRADUATION CAP LIVE!
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleHatKey = (e) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
 
-      if (e.key === 'ArrowUp') {
+      const key = e.key.toLowerCase();
+      if (key === 'w') {
         e.preventDefault();
         if (e.shiftKey) {
-          setOTuner(prev => ({ ...prev, oScale: parseFloat((prev.oScale + 0.01).toFixed(2)) }));
+          setHatTuner(prev => ({ ...prev, widthEm: parseFloat((prev.widthEm + 0.02).toFixed(2)) }));
         } else {
-          setOTuner(prev => ({ ...prev, oOffsetY: prev.oOffsetY - 1 }));
+          setHatTuner(prev => ({ ...prev, topPct: prev.topPct - 2 }));
         }
-      } else if (e.key === 'ArrowDown') {
+      } else if (key === 's') {
         e.preventDefault();
         if (e.shiftKey) {
-          setOTuner(prev => ({ ...prev, oScale: parseFloat(Math.max(0.40, prev.oScale - 0.01).toFixed(2)) }));
+          setHatTuner(prev => ({ ...prev, widthEm: parseFloat(Math.max(0.3, prev.widthEm - 0.02).toFixed(2)) }));
         } else {
-          setOTuner(prev => ({ ...prev, oOffsetY: prev.oOffsetY + 1 }));
+          setHatTuner(prev => ({ ...prev, topPct: prev.topPct + 2 }));
         }
+      } else if (key === 'a') {
+        e.preventDefault();
+        setHatTuner(prev => ({ ...prev, leftPct: prev.leftPct - 2 }));
+      } else if (key === 'd') {
+        e.preventDefault();
+        setHatTuner(prev => ({ ...prev, leftPct: prev.leftPct + 2 }));
+      } else if (key === 'q') {
+        e.preventDefault();
+        setHatTuner(prev => ({ ...prev, rotateDeg: prev.rotateDeg - 2 }));
+      } else if (key === 'e') {
+        e.preventDefault();
+        setHatTuner(prev => ({ ...prev, rotateDeg: prev.rotateDeg + 2 }));
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleHatKey);
+    return () => window.removeEventListener('keydown', handleHatKey);
   }, []);
 
   // FINAL LOCKED TABLET DISPLAY OVERLAY CONFIG
@@ -1232,7 +1253,17 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 <span className="char-c">C</span>
                 <div className="co-letter-o-custom-circle">
                   {/* GRADUATION CAP / MORTARBOARD ON TOP OF 'O' 🎓 */}
-                  <img src="/graduation_cap.png" alt="Graduation Cap" className="o-graduation-cap" />
+                  <img
+                    src="/graduation_cap.png"
+                    alt="Graduation Cap"
+                    className="o-graduation-cap"
+                    style={{
+                      top: `${hatTuner.topPct}%`,
+                      left: `${hatTuner.leftPct}%`,
+                      transform: `translateX(-50%) rotate(${hatTuner.rotateDeg}deg)`,
+                      width: `${hatTuner.widthEm}em`
+                    }}
+                  />
                   <div className="o-black-circle-body"><div className="o-cream-center-hole" style={{ width: `46%`, height: `46%` }} /></div>
                   <svg className="o-dots-ring-perfect" viewBox="0 0 100 100" style={{ transform: `translate(-50%, -50%) rotate(${dotsRotationDeg}deg)` }}>
                     {Array.from({ length: 12 }).map((_, i) => {
@@ -1292,6 +1323,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
       </section>
 
+      {/* ⌨️ DISCREET WASD KEYBOARD TOAST FOR GRADUATION CAP */}
+      <div className="o-nudge-keyboard-toast">
+        <span>🎓 Hat Position: <strong>Top {hatTuner.topPct}%</strong> | <strong>Left {hatTuner.leftPct}%</strong> | <strong>{hatTuner.rotateDeg}°</strong> | <strong>{hatTuner.widthEm}em</strong></span>
+        <span className="toast-subtext">Use WASD to move hat | Q / E to rotate | Shift+W / Shift+S to scale</span>
+      </div>
     </div>
   );
 }
