@@ -145,9 +145,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     dotsRadius: 43.5,
     dotSize: 3.0,
     holeSize: 46,
-    oScale: 0.77,
-    zoomTargetX: 21.0,
-    zoomTargetY: 50.0,
+    oScale: 1.00,
+    zoomTargetX: 27.2,
+    zoomTargetY: 50.6,
     panX: 26.5,
     maxZoom: 65,
     showReticle: false,
@@ -1200,32 +1200,135 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           {/* CENTERED "CO - STUDY" TYPOGRAPHY WITH ROTATING DOTS RING INSIDE THE 'O' */}
           {costudyScrollProgress < 0.65 && (
             <div
-              className="centered-costudy-headline-wrapper"
+              className={`centered-costudy-headline-wrapper ${oTuner.showReticle ? 'clickable-target-active' : ''}`}
               style={{
                 transform: `translate(calc(-50% + ${oPanShiftPct}%), -50%) scale(${portalZoomScale})`,
-                transformOrigin: `21.0% 50.0%`,
+                transformOrigin: `${oTuner.zoomTargetX}% ${oTuner.zoomTargetY}%`,
                 opacity: portalOpacity
               }}
+              onClick={handleSetTargetPoint}
             >
               <div className="costudy-text-row">
                 <span className="char-c">C</span>
                 {/* PERFECT GEOMETRIC CIRCULAR 'O' WITH PERFECT WHITE DOTS RING */}
-                <div className="co-letter-o-custom-circle">
+                <div className="co-letter-o-custom-circle" style={{ transform: `scale(${oTuner.oScale})` }}>
                   <div className="o-black-circle-body">
-                    <div className="o-cream-center-hole" style={{ width: `46%`, height: `46%` }} />
+                    <div className="o-cream-center-hole" style={{ width: `${oTuner.holeSize}%`, height: `${oTuner.holeSize}%` }} />
                   </div>
                   <svg className="o-dots-ring-perfect" viewBox="0 0 100 100" style={{ transform: `translate(-50%, -50%) rotate(${dotsRotationDeg}deg)` }}>
                     {Array.from({ length: 12 }).map((_, i) => {
                       const angle = (i * 30 * Math.PI) / 180;
-                      const cx = 50 + 43.5 * Math.cos(angle);
-                      const cy = 50 + 43.5 * Math.sin(angle);
-                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r="3.0" fill="#ffffff" />;
+                      const cx = 50 + oTuner.dotsRadius * Math.cos(angle);
+                      const cy = 50 + oTuner.dotsRadius * Math.sin(angle);
+                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r={oTuner.dotSize} fill="#ffffff" />;
                     })}
                   </svg>
                 </div>
                 <span className="char-hyphen">-</span>
                 <span className="char-study">STUDY</span>
               </div>
+
+              {/* TARGET CROSSHAIR OVERLAY 🎯 */}
+              {oTuner.showReticle && (
+                <div
+                  className="pinpoint-zoom-crosshair"
+                  style={{
+                    left: `${oTuner.zoomTargetX}%`,
+                    top: `${oTuner.zoomTargetY}%`
+                  }}
+                >
+                  <div className="crosshair-ring" />
+                  <div className="crosshair-dot" />
+                  <span className="crosshair-label">🎯 Target ({oTuner.zoomTargetX}%, {oTuner.zoomTargetY}%)</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* FLOATING LIVE TUNER WIDGET */}
+          {costudyScrollProgress > 0 && costudyScrollProgress < 0.60 && (
+            <div className={`costudy-o-tuner-widget ${!oTuner.showTuner ? 'minimized' : ''}`}>
+              <div className="tuner-header" onClick={() => setOTuner(prev => ({ ...prev, showTuner: !prev.showTuner }))}>
+                <span>🎯 Pinpoint Zoom Calibrator</span>
+                <button className="btn-toggle-tuner">
+                  {oTuner.showTuner ? '−' : '+'}
+                </button>
+              </div>
+
+              {oTuner.showTuner && (
+                <div className="tuner-body">
+                  <div className="tuner-row">
+                    <label>Target Origin X: <strong>{oTuner.zoomTargetX}%</strong></label>
+                    <input
+                      type="range"
+                      min="10.0"
+                      max="40.0"
+                      step="0.1"
+                      value={oTuner.zoomTargetX}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, zoomTargetX: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>Target Origin Y: <strong>{oTuner.zoomTargetY}%</strong></label>
+                    <input
+                      type="range"
+                      min="30.0"
+                      max="70.0"
+                      step="0.1"
+                      value={oTuner.zoomTargetY}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, zoomTargetY: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>'O' Letter Scale: <strong>{oTuner.oScale}x</strong></label>
+                    <input
+                      type="range"
+                      min="0.50"
+                      max="1.10"
+                      step="0.01"
+                      value={oTuner.oScale}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, oScale: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>White Dots Radius: <strong>{oTuner.dotsRadius}px</strong></label>
+                    <input
+                      type="range"
+                      min="25"
+                      max="55"
+                      step="0.5"
+                      value={oTuner.dotsRadius}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, dotsRadius: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="tuner-row">
+                    <label>Inner Cream Hole: <strong>{oTuner.holeSize}%</strong></label>
+                    <input
+                      type="range"
+                      min="30"
+                      max="65"
+                      step="1"
+                      value={oTuner.holeSize}
+                      onChange={(e) => setOTuner(prev => ({ ...prev, holeSize: parseInt(e.target.value) }))}
+                    />
+                  </div>
+
+                  <button
+                    className="btn-copy-calib-values"
+                    onClick={() => {
+                      const summary = `TargetX: ${oTuner.zoomTargetX}%, TargetY: ${oTuner.zoomTargetY}%, oScale: ${oTuner.oScale}`;
+                      navigator.clipboard.writeText(summary);
+                      alert(`📋 Pinpoint Values Copied!\n\n${summary}`);
+                    }}
+                  >
+                    📋 Copy Pinpoint Values
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
