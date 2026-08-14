@@ -4158,4 +4158,230 @@
   text-transform: uppercase;
 }
 
+/* ==========================================================================
+   TRIANGLE PRICING & SARCASTIC PSYCHOLOGICAL FOOTER SECTION
+   ========================================================================== */
+
+.triangle-pricing-footer-section {
+  position: relative;
+  background: #0d0d0d;
+  color: #ffffff;
+  padding-top: 40px;
+  overflow: hidden;
+  font-family: 'Syne', 'Outfit', sans-serif;
+}
+
+/* TRIANGLE ANGLED SLASH BANNER */
+.triangle-hero-slash {
+  position: relative;
+  background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+  border-top: 5px solid #CCFF00;
+  border-bottom: 5px solid #FF70A6;
+  padding: 80px 24px;
+  text-align: center;
+  clip-path: polygon(0 4vw, 100% 0, 100% calc(100% - 4vw), 0 100%);
+}
+
+.price-gold-badge {
+  display: inline-block;
+  background: #CCFF00;
+  color: #000000;
+  border: 3px solid #000000;
+  border-radius: 30px;
+  padding: 8px 22px;
+  font-family: 'Impact', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  box-shadow: 4px 4px 0px #000000;
+  margin-bottom: 20px;
+}
+
+.triangle-main-title {
+  font-family: 'Impact', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px 0;
+  color: #ffffff;
+}
+
+.triangle-subtitle {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  color: #cccccc;
+  max-width: 750px;
+  margin: 0 auto 30px auto;
+  line-height: 1.5;
+}
+
+.btn-triangle-subscribe {
+  background: #FF70A6;
+  color: #000000;
+  border: 3.5px solid #000000;
+  border-radius: 16px;
+  padding: 16px 36px;
+  font-family: 'Impact', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 6px 6px 0px #ffffff;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-triangle-subscribe:hover {
+  transform: translateY(-4px);
+  box-shadow: 8px 8px 0px #CCFF00;
+}
+
+/* SARCASTIC PSYCHOLOGICAL FOMO CARD */
+.psychological-fomo-card {
+  max-width: 920px;
+  margin: 60px auto 50px auto;
+  background: #F7F3E9;
+  color: #000000;
+  border: 4px solid #000000;
+  border-radius: 24px;
+  box-shadow: 10px 10px 0px #CCFF00;
+  padding: 40px 32px;
+  box-sizing: border-box;
+}
+
+.fomo-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 3px solid #000000;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+}
+
+.fomo-emoji {
+  font-size: 3rem;
+}
+
+.fomo-card-header h3 {
+  font-family: 'Impact', sans-serif;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.fomo-subtag {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fomo-bullets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.fomo-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #ffffff;
+  border: 3px solid #000000;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+.fomo-bullet-item.highlight-quote {
+  grid-column: span 2;
+  background: #CCFF00;
+  border: 3.5px solid #000000;
+}
+
+.bullet-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.fomo-bullet-item p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #1a1a1a;
+}
+
+.btn-fomo-convert-now {
+  width: 100%;
+  background: #000000;
+  color: #CCFF00;
+  border: 3.5px solid #000000;
+  border-radius: 16px;
+  padding: 18px;
+  font-family: 'Impact', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 5px 5px 0px #FF70A6;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn-fomo-convert-now:hover {
+  background: #FF70A6;
+  color: #000000;
+}
+
+/* FOOTER & JEEVAN WATERMARK */
+.jeevan-official-footer {
+  border-top: 3px solid #222222;
+  padding: 40px 24px 30px 24px;
+  text-align: center;
+  background: #050505;
+}
+
+.footer-watermark-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto 20px auto;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.creator-tag {
+  font-family: 'Impact', sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  color: #CCFF00;
+  text-transform: uppercase;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links a {
+  color: #888888;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #ffffff;
+}
+
+.copyright-text {
+  font-size: 0.8rem;
+  color: #555555;
+  margin: 0;
+}
+
 

@@ -1390,15 +1390,70 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      <section className="premium-gateway-section">
-        <div className="premium-banner-card">
-          <div className="banner-left">
-            <span className="gold-tag">COGETHER PREMIUM</span>
-            <h2>₹49 / Month</h2>
-            <p>Unlock unlimited Co-Watch rooms, full multiplayer games, Co-Shop & Co-Study desks.</p>
+      {/* 6. GEOMETRIC TRIANGLE PRICING & SARCASTIC PSYCHOLOGICAL FOOTER SECTION */}
+      <section className="triangle-pricing-footer-section">
+        {/* TRIANGLE ANGLED SLASH BANNER */}
+        <div className="triangle-hero-slash">
+          <div className="slash-content-wrapper">
+            <span className="price-gold-badge">₹49 / MONTH • UNLIMITED ACCESS</span>
+            <h2 className="triangle-main-title">UNLOCK COGETHER PREMIUM</h2>
+            <p className="triangle-subtitle">
+              Co-Watch Movies in Buttery 4K • Multiplayer Quiz Battles • Virtual Co-Study Desks • Shared Shopping Carts
+            </p>
+            <button className="btn-triangle-subscribe" onClick={onOpenPricing}>
+              Get Premium for ₹49 / Month →
+            </button>
           </div>
-          <button className="btn-gold-checkout" onClick={onOpenPricing}>Get Premium for ₹49 →</button>
         </div>
+
+        {/* HILARIOUS SARCASTIC PSYCHOLOGICAL FOMO CARD */}
+        <div className="psychological-fomo-card">
+          <div className="fomo-card-header">
+            <span className="fomo-emoji">🧠</span>
+            <div>
+              <h3>WHY WOULD YOU NOT TAKE THIS SUBSCRIPTION?</h3>
+              <span className="fomo-subtag">A quick psychological reality check...</span>
+            </div>
+          </div>
+
+          <div className="fomo-bullets-grid">
+            <div className="fomo-bullet-item">
+              <span className="bullet-icon">💔</span>
+              <p><strong>Do you really want your crush/partner studying with someone else</strong> who already has a Co-Study desk?</p>
+            </div>
+            <div className="fomo-bullet-item">
+              <span className="bullet-icon">📉</span>
+              <p><strong>Are you gonna let your squad get A+ grades</strong> while you get distracted scrolling reels alone?</p>
+            </div>
+            <div className="fomo-bullet-item">
+              <span className="bullet-icon">🍿</span>
+              <p><strong>Crying over laggy 480p screenshares</strong> when you could co-stream in 4K HD for just ₹49?</p>
+            </div>
+            <div className="fomo-bullet-item highlight-quote">
+              <span className="bullet-icon">😱</span>
+              <p><em>"Oh damn... did he really mention this in the prompt?! Okay fine, I HAVE TO TAKE THE SUBSCRIPTION RIGHT NOW! 😭🔥"</em></p>
+            </div>
+          </div>
+
+          <button className="btn-fomo-convert-now" onClick={onOpenPricing}>
+            Fine, Take My ₹49 & Unlock Everything →
+          </button>
+        </div>
+
+        {/* BOTTOM WATERMARK & FOOTER */}
+        <footer className="jeevan-official-footer">
+          <div className="footer-watermark-row">
+            <span className="creator-tag">⚡ CRAFTED WITH ❤️ BY JEEVAN YADAV</span>
+            <div className="footer-links">
+              <a href="mailto:jeevan@cogether.app">📧 jeevan@cogether.app</a>
+              <a href="https://github.com/Jeevan-88/CoGether.git" target="_blank" rel="noreferrer">🐙 GitHub Repo</a>
+              <a href="#privacy">🔒 Privacy & Terms</a>
+            </div>
+          </div>
+          <p className="copyright-text">
+            © 2026 CoGether Inc. All rights reserved. Built by Jeevan Yadav.
+          </p>
+        </footer>
       </section>
     </div>
   );
