@@ -1254,33 +1254,33 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
               {/* MAIN SLIDE CONTENT CANVAS AREA */}
               <div className="nodeck-slide-canvas">
-                {/* SLIDE 1: THE PROBLEM (PINK BG, DECK NOBODY READS) */}
+                {/* SLIDE 1: THE PROBLEM (PINK BG, STUDYING ALONE) */}
                 {activeNodeckSlide === 1 && (
                   <div className="nodeck-slide-wrapper fade-in">
                     <div className="nodeck-3d-eraser" />
                     <h2 className="nodeck-huge-headline">
-                      EVERY YEAR, BILLIONS ARE SPENT ON DECKS <mark className="nodeck-highlighter-green">NOBODY READS</mark>, FRAMEWORKS <mark className="nodeck-highlighter-green">NOBODY USES</mark>, AND CONSULTANTS <mark className="nodeck-highlighter-green">NOBODY REMEMBERS.</mark>
+                      EVERY YEAR, MILLIONS OF HOURS ARE WASTED <mark className="nodeck-highlighter-green">STUDYING ALONE</mark>. CRAMMING <mark className="nodeck-highlighter-green">NOBODY ENJOYS</mark>, DISTRACTIONS <mark className="nodeck-highlighter-green">NOBODY ESCAPES</mark>, AND NOTES NOBODY REMEMBERS.
                     </h2>
                   </div>
                 )}
 
-                {/* SLIDE 2: THE MANIFESTO (CREAM BG, THE BEST PITCH IS NO PITCH) */}
+                {/* SLIDE 2: THE MANIFESTO (CREAM BG, THE BEST STUDY ROOM IS A SHARED ONE) */}
                 {activeNodeckSlide === 2 && (
                   <div className="nodeck-slide-wrapper fade-in">
                     <h2 className="nodeck-huge-headline">
-                      THE BEST PITCH IS NO PITCH.<sup>1</sup><br />
-                      THE BEST DECK IS NO DECK.<sup>2</sup><br />
-                      <mark className="nodeck-highlighter-green">THE BEST DEAL IS A SIGNED ONE.<sup>3</sup></mark>
+                      THE BEST STUDY SESSION IS A SHARED ONE.<sup>1</sup><br />
+                      THE BEST DESK IS A CO-STUDY DESK.<sup>2</sup><br />
+                      <mark className="nodeck-highlighter-green">THE BEST EXAM SCORE IS A TOP ONE.<sup>3</sup></mark>
                     </h2>
                     <div className="nodeck-footnotes-row">
                       <span><sup>1</sup> YES, WE MEAN IT.</span>
-                      <span><sup>2</sup> WE'VE WALKED OUT OF ROOMS...</span>
-                      <span><sup>3</sup> IF IT'S NOT SIGNED, IT DIDN'T HAPPEN.</span>
+                      <span><sup>2</sup> VIRTUAL DESKS WITH LIVE CAMERA & LO-FI BEATS.</span>
+                      <span><sup>3</sup> IF YOU DON'T PRACTICE, YOU DON'T PASS.</span>
                     </div>
                   </div>
                 )}
 
-                {/* SLIDE 3: WHAT WE DON'T DO (CREAM BG, PINNED PAPER WITH STRIKETHROUGH) */}
+                {/* SLIDE 3: WHAT WE DON'T DO (CREAM BG, PINNED PAPER WITH STRIKETHROUGH STUDY HABITS) */}
                 {activeNodeckSlide === 3 && (
                   <div className="nodeck-slide3-layout fade-in">
                     <div className="nodeck-slide3-left">
@@ -1289,57 +1289,57 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     <div className="nodeck-pinned-paper-card">
                       <span className="nodeck-red-pushpin">📍</span>
                       <ul className="nodeck-strikethrough-list">
-                        <li>1. STRATEGY DECKS</li>
-                        <li>2. FRAMEWORKS</li>
-                        <li>3. ROADMAPS</li>
-                        <li>4. INSPIRING WORKSHOPS</li>
-                        <li>5. MEANINGLESS 70 PAGE PDFS</li>
+                        <li>1. SOLITARY ISOLATED CRAMMING</li>
+                        <li>2. ENDLESS INSTAGRAM DISTRACTIONS</li>
+                        <li>3. BORING LONE READINGS</li>
+                        <li>4. PASSIVE NO-ACCOUNTABILITY STUDYING</li>
+                        <li>5. MEANINGLESS 100-PAGE DENSE PDFS</li>
                       </ul>
                       <p className="nodeck-pinned-caption">
-                        THESE THINGS HAVE ONE THING IN COMMON: THEY FEEL LIKE PROGRESS WITHOUT BEING PROGRESS. THE DECK GETS APPROVED. THE MEETING ENDS. EVERYBODY LEAVES WITH A PDF. NOBODY LEAVES WITH A CONTRACT.
+                        THESE THINGS HAVE ONE THING IN COMMON: THEY FEEL LIKE STUDYING WITHOUT PRODUCING RESULTS. CO-STUDY REPLACES ISOLATION WITH LIVE STUDYMATES, SYNCED MUSIC, AND REAL FOCUS.
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* SLIDE 4: WIN THE ROOM (PINK BG, 3 CARDS CAROUSEL) */}
+                {/* SLIDE 4: WIN THE EXAM (PINK BG, 3 CO-STUDY CARDS) */}
                 {activeNodeckSlide === 4 && (
                   <div className="nodeck-cards-grid fade-in">
                     {/* CARD 1 */}
                     <div className="nodeck-deck-card">
-                      <span className="nodeck-card-tag">THE PATTERN</span>
+                      <span className="nodeck-card-tag">01 / VIRTUAL DESKS</span>
                       <div className="nodeck-card-body">
-                        GOOD PRODUCT.<br />
-                        GREAT SLIDES.<br />
-                        EVERYONE SMILES.<br />
-                        NO CONTRACT.
+                        VIRTUAL QUIET DESKS.<br />
+                        SCREEN SHARE.<br />
+                        LO-FI RAIN BEATS.<br />
+                        ZERO DISTRACTION.
                       </div>
                       <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
-                        Join Desk <ArrowRight size={16} />
+                        Join Study Desk <ArrowRight size={16} />
                       </button>
                     </div>
 
                     {/* CARD 2 */}
                     <div className="nodeck-deck-card">
-                      <span className="nodeck-card-tag">WHAT WE DO</span>
+                      <span className="nodeck-card-tag">02 / TRIVIA BATTLES</span>
                       <div className="nodeck-card-body">
-                        WE FIND WHAT'S KILLING THE DEAL AND HELP TO FIX IT.
+                        WE FIND WHAT'S KILLING YOUR FOCUS AND HELP YOU CRUSH IT WITH MULTIPLAYER QUIZ BATTLES.
                       </div>
                       <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
-                        Play Battle <ArrowRight size={16} />
+                        Play Quiz Battles <ArrowRight size={16} />
                       </button>
                     </div>
 
                     {/* CARD 3 */}
                     <div className="nodeck-deck-card">
-                      <span className="nodeck-card-tag">WHAT YOU GET</span>
+                      <span className="nodeck-card-tag">03 / LIVE CANVAS</span>
                       <div className="nodeck-card-body">
-                        MORE YES.<br />
-                        FEWER FOLLOW-UPS.<br />
-                        LESS "WE'LL THINK ABOUT IT."
+                        MORE DISTINCTIONS.<br />
+                        FEWER DERAILS.<br />
+                        TOP MARKS.
                       </div>
                       <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
-                        Open Canvas <ArrowRight size={16} />
+                        Open Shared Desk <ArrowRight size={16} />
                       </button>
                     </div>
                   </div>
