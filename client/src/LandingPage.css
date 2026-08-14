@@ -3270,9 +3270,9 @@
 /* GRADUATION CAP / MORTARBOARD ON TOP OF 'O' 🎓 */
 .o-graduation-cap {
   position: absolute;
-  top: -0.44em;
-  left: 50%;
-  transform: translateX(-52%) rotate(-4deg);
+  top: -48%;
+  left: -78%;
+  transform: translateX(-50%) rotate(-30deg);
   width: 0.95em;
   height: auto;
   pointer-events: none;
