@@ -3733,7 +3733,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 40px 24px 30px 24px;
+  padding: 55px 30px 105px 30px;
   box-sizing: border-box;
   transition: background-color 0.4s ease;
   font-family: 'Impact', 'Syne', 'Outfit', sans-serif;
@@ -3758,27 +3758,20 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
+  margin-bottom: 10px;
 }
 
-.nodeck-logo-title {
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  color: #000000;
-  text-shadow: 2px 2px 0px #ffffff;
-  margin: 0;
-  line-height: 1;
-}
-
-.nodeck-subtag {
-  font-size: 0.85rem;
+.nodeck-top-tag-pill {
+  background: #000000;
+  color: #CCFF00;
+  border: 3.5px solid #000000;
+  border-radius: 30px;
+  padding: 8px 22px;
+  font-size: 0.9rem;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: #000000;
-  margin-top: 6px;
-  opacity: 0.8;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
 /* HIGHLIGHTER MARK BRUSH STROKE (NEON YELLOW-GREEN #CCFF00) */
@@ -4080,7 +4073,7 @@
 .nodeck-art-img {
   width: 100%;
   height: auto;
-  max-height: 480px;
+  max-height: 360px;
   display: block;
   object-fit: cover;
 }

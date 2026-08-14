@@ -1241,14 +1241,13 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           {/* NODECK.ONLINE STYLE INTERACTIVE DECK SHOWCASE (POPS IN AFTER ZOOMING THROUGH 'O') */}
           {effectiveCostudyScroll >= 0.35 && (
             <div className={`nodeck-stage-container ${activeNodeckSlide === 1 || activeNodeckSlide === 4 ? 'bg-pink' : 'bg-cream'} fade-in`}>
-              {/* TOP NODECK BRANDING HEADER */}
+              {/* TOP BRANDING TAG BADGE */}
               <div className="nodeck-top-header">
-                <h1 className="nodeck-logo-title">NODECK</h1>
-                <span className="nodeck-subtag">
-                  {activeNodeckSlide === 1 && 'THE PROBLEM'}
-                  {activeNodeckSlide === 2 && 'THE MANIFESTO'}
-                  {activeNodeckSlide === 3 && 'WHAT WE DON\'T DO'}
-                  {activeNodeckSlide === 4 && 'WIN THE ROOM.'}
+                <span className="nodeck-top-tag-pill">
+                  {activeNodeckSlide === 1 && '01 / THE PROBLEM'}
+                  {activeNodeckSlide === 2 && '02 / THE MANIFESTO'}
+                  {activeNodeckSlide === 3 && '03 / WHAT WE DON\'T DO'}
+                  {activeNodeckSlide === 4 && '04 / WIN THE EXAM.'}
                 </span>
               </div>
 
