@@ -1252,11 +1252,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 </span>
               </div>
 
-              {/* MAIN SLIDE CONTENT CANVAS AREA */}
-              <div className="nodeck-slide-canvas">
+              {/* MAIN SLIDE CONTENT CANVAS AREA WITH 3D PAGE FLIP ANIMATION */}
+              <div className="nodeck-slide-canvas-animated">
                 {/* SLIDE 1: THE PROBLEM (PINK BG, STUDYING ALONE WITH ARTISTIC ILLUSTRATION) */}
                 {activeNodeckSlide === 1 && (
-                  <div className="nodeck-slide1-split-layout fade-in">
+                  <div key="slide-1" className="nodeck-slide1-split-layout nodeck-slide-page-flip">
                     <div className="nodeck-slide1-text-left">
                       <h2 className="nodeck-huge-headline text-left-aligned">
                         EVERY YEAR, MILLIONS OF HOURS ARE WASTED <mark className="nodeck-highlighter-green">STUDYING ALONE</mark>. CRAMMING <mark className="nodeck-highlighter-green">NOBODY ENJOYS</mark>, DISTRACTIONS <mark className="nodeck-highlighter-green">NOBODY ESCAPES</mark>, AND NOTES NOBODY REMEMBERS.
@@ -1269,25 +1269,31 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                   </div>
                 )}
 
-                {/* SLIDE 2: THE MANIFESTO (CREAM BG, THE BEST STUDY ROOM IS A SHARED ONE) */}
+                {/* SLIDE 2: THE MANIFESTO & SPLIT-SCREEN VIDEO CALL SHOWCASE */}
                 {activeNodeckSlide === 2 && (
-                  <div className="nodeck-slide-wrapper fade-in">
-                    <h2 className="nodeck-huge-headline">
-                      THE BEST STUDY SESSION IS A SHARED ONE.<sup>1</sup><br />
-                      THE BEST DESK IS A CO-STUDY DESK.<sup>2</sup><br />
-                      <mark className="nodeck-highlighter-green">THE BEST EXAM SCORE IS A TOP ONE.<sup>3</sup></mark>
-                    </h2>
-                    <div className="nodeck-footnotes-row">
-                      <span><sup>1</sup> YES, WE MEAN IT.</span>
-                      <span><sup>2</sup> VIRTUAL DESKS WITH LIVE CAMERA & LO-FI BEATS.</span>
-                      <span><sup>3</sup> IF YOU DON'T PRACTICE, YOU DON'T PASS.</span>
+                  <div key="slide-2" className="nodeck-slide2-split-layout nodeck-slide-page-flip">
+                    <div className="nodeck-slide2-text-left">
+                      <h2 className="nodeck-huge-headline text-left-aligned">
+                        THE BEST STUDY SESSION IS A SHARED ONE.<sup>1</sup><br />
+                        THE BEST DESK IS A CO-STUDY DESK.<sup>2</sup><br />
+                        <mark className="nodeck-highlighter-green">THE BEST EXAM SCORE IS A TOP ONE.<sup>3</sup></mark>
+                      </h2>
+                      <div className="nodeck-footnotes-row" style={{ justifyContent: 'flex-start' }}>
+                        <span><sup>1</sup> YES, WE MEAN IT.</span>
+                        <span><sup>2</sup> LIVE 2-WAY CAM & LO-FI BEATS.</span>
+                        <span><sup>3</sup> PRACTICE = DISTINCTIONS.</span>
+                      </div>
+                    </div>
+                    <div className="nodeck-video-art-frame">
+                      <div className="video-frame-badge">🔴 LIVE 2-WAY CAM STUDY</div>
+                      <img src="/costudy_video_split.jpg" alt="Split Screen Live Study Room" className="nodeck-art-img" />
                     </div>
                   </div>
                 )}
 
                 {/* SLIDE 3: WHAT WE DON'T DO (CREAM BG, PINNED PAPER WITH STRIKETHROUGH STUDY HABITS) */}
                 {activeNodeckSlide === 3 && (
-                  <div className="nodeck-slide3-layout fade-in">
+                  <div key="slide-3" className="nodeck-slide3-layout nodeck-slide-page-flip">
                     <div className="nodeck-slide3-left">
                       <h2>WHAT WE<br /><mark className="nodeck-highlighter-green">DON'T DO</mark></h2>
                     </div>
@@ -1309,7 +1315,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
                 {/* SLIDE 4: WIN THE EXAM (PINK BG, 3 CO-STUDY CARDS) */}
                 {activeNodeckSlide === 4 && (
-                  <div className="nodeck-cards-grid fade-in">
+                  <div key="slide-4" className="nodeck-cards-grid nodeck-slide-page-flip">
                     {/* CARD 1 */}
                     <div className="nodeck-deck-card">
                       <span className="nodeck-card-tag">01 / VIRTUAL DESKS</span>

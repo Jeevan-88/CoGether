@@ -4085,12 +4085,74 @@
   object-fit: cover;
 }
 
-.art-frame-badge {
+/* BOOK PAGE FLIP & POP-IN ZOOM SLIDE TRANSITION */
+@keyframes bookPageFlipIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) rotateY(-18deg) translateY(40px);
+    filter: blur(6px);
+  }
+  60% {
+    transform: scale(1.02) rotateY(3deg) translateY(-6px);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateY(0deg) translateY(0px);
+    filter: blur(0px);
+  }
+}
+
+.nodeck-slide-canvas-animated {
+  perspective: 1200px;
+  width: 100%;
+  max-width: 1200px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 20px 0;
+}
+
+.nodeck-slide-page-flip {
+  animation: bookPageFlipIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center left;
+  backface-visibility: hidden;
+  width: 100%;
+}
+
+/* SLIDE 2 SPLIT LAYOUT FOR LIVE VIDEO CALL SHOWCASE */
+.nodeck-slide2-split-layout {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 36px;
+  align-items: center;
+  width: 100%;
+}
+
+.nodeck-video-art-frame {
+  position: relative;
+  border: 4px solid #000000;
+  border-radius: 20px;
+  box-shadow: 10px 10px 0px #000000;
+  overflow: hidden;
+  background: #000000;
+  transform: rotate(-2deg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nodeck-video-art-frame:hover {
+  transform: rotate(0deg) scale(1.02);
+  box-shadow: 14px 14px 0px #000000;
+}
+
+.video-frame-badge {
   position: absolute;
   top: 14px;
-  left: 14px;
-  background: #CCFF00;
-  color: #000000;
+  right: 14px;
+  background: #FF0055;
+  color: #ffffff;
   border: 3px solid #000000;
   border-radius: 30px;
   padding: 6px 14px;
