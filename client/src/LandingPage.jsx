@@ -1399,9 +1399,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             PURCHASE THIS KEY TO UNLOCK COGETHER
           </h2>
 
-          {/* WAVY WIND FLOATING 3D KEY WITH HANGING THREAD PRICE TAG */}
+          {/* WAVY WIND FLOATING PLAIN KEY WITH HANGING THREAD PRICE TAG */}
           <div className="wavy-floating-key-wrapper">
-            <img src="/crystal_key_unlock.jpg" alt="Wavy Floating 3D Key" className="glowing-wavy-key-img" />
+            <img src="/plain_crystal_key.png" alt="Wavy Floating Plain Crystal Key" className="glowing-wavy-key-img" />
             <div className="hanging-thread-line" />
             <span className="hanging-price-tag-badge">🏷️ PRICE: ₹49 / MONTH</span>
           </div>

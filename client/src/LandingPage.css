@@ -4128,17 +4128,15 @@
   display: none;
 }
 
-/* CENTER INVERTED BLACK TRIANGLE SHIELD (POINTS DOWNWARDS) */
+/* CENTER BLACK KEY HERO DISPLAY (NO CLIP-PATH CUTOFFS) */
 .center-black-inverted-triangle {
   position: relative;
-  max-width: 650px;
-  margin: 0 auto 50px auto;
+  max-width: 800px;
+  margin: 0 auto 40px auto;
   background: #000000;
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  padding: 60px 40px 140px 40px;
+  padding: 20px 20px 40px 20px;
   text-align: center;
   z-index: 10;
-  border-top: 4px solid #CCFF00;
 }
 
 /* WAVY WIND FLOATING KEY CONTAINER */
@@ -4147,7 +4145,7 @@
     transform: translateY(0px) rotate(0deg) scale(1);
   }
   50% {
-    transform: translateY(-16px) rotate(5deg) scale(1.03);
+    transform: translateY(-14px) rotate(4deg) scale(1.02);
   }
   100% {
     transform: translateY(0px) rotate(0deg) scale(1);
@@ -4157,19 +4155,21 @@
 .wavy-floating-key-wrapper {
   position: relative;
   display: inline-block;
-  margin: 10px auto 30px auto;
+  margin: 20px auto 30px auto;
   animation: floatWavyWind 4s ease-in-out infinite;
 }
 
 .glowing-wavy-key-img {
   width: 100%;
-  max-width: 220px;
+  max-width: 260px;
   height: auto;
   display: block;
   margin: 0 auto;
-  border-radius: 0;
+  border: none;
+  outline: none;
   background: transparent;
-  filter: drop-shadow(0 0 20px rgba(255, 112, 166, 0.8));
+  filter: none;
+  box-shadow: none;
 }
 
 /* HANGING THREAD & PRICE TAG BADGE ATTACHED TO KEY */
