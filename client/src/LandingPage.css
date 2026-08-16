@@ -4108,53 +4108,24 @@
   margin: 20px 0;
 }
 /* ==========================================================================
-   INVERTED TRIANGLE KEY SECTION (RED/PINK/GOLD SPLIT + WAVY FLOATING KEY)
+   INVERTED TRIANGLE KEY SECTION (PURE PITCH BLACK BG + PLAIN FLOATING KEY)
    ========================================================================== */
 
 .inverted-triangle-key-section {
   position: relative;
   min-height: 100vh;
-  background: #FF0055;
+  background: #000000;
   color: #ffffff;
   padding: 80px 24px 60px 24px;
   font-family: 'Syne', 'Outfit', sans-serif;
   overflow: hidden;
 }
 
-/* 3-WAY SPLIT BACKGROUND: LEFT RED, RIGHT PINK, CENTER GOLD SLASH */
-.key-bg-split-left-red {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(135deg, #E60039 0%, #FF0055 100%);
-  z-index: 1;
-}
-
-.key-bg-split-right-pink {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(135deg, #FF70A6 0%, #ff5291 100%);
-  z-index: 1;
-}
-
+/* REMOVED COLOR SPLITS FOR PURE PITCH BLACK BACKGROUND */
+.key-bg-split-left-red,
+.key-bg-split-right-pink,
 .key-bg-split-center-gold {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80vw;
-  height: 80vw;
-  max-width: 900px;
-  max-height: 900px;
-  background: radial-gradient(circle, rgba(255, 204, 0, 0.4) 0%, rgba(204, 255, 0, 0.15) 50%, rgba(0,0,0,0) 70%);
-  border-radius: 50%;
-  z-index: 2;
-  pointer-events: none;
+  display: none;
 }
 
 /* CENTER INVERTED BLACK TRIANGLE SHIELD (POINTS DOWNWARDS) */
@@ -4162,13 +4133,12 @@
   position: relative;
   max-width: 650px;
   margin: 0 auto 50px auto;
-  background: #0a0a0c;
+  background: #000000;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   padding: 60px 40px 140px 40px;
   text-align: center;
   z-index: 10;
-  border-top: 5px solid #CCFF00;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  border-top: 4px solid #CCFF00;
 }
 
 /* WAVY WIND FLOATING KEY CONTAINER */
@@ -4177,7 +4147,7 @@
     transform: translateY(0px) rotate(0deg) scale(1);
   }
   50% {
-    transform: translateY(-18px) rotate(6deg) scale(1.04);
+    transform: translateY(-16px) rotate(5deg) scale(1.03);
   }
   100% {
     transform: translateY(0px) rotate(0deg) scale(1);
@@ -4193,11 +4163,13 @@
 
 .glowing-wavy-key-img {
   width: 100%;
-  max-width: 240px;
+  max-width: 220px;
   height: auto;
   display: block;
-  filter: drop-shadow(0 0 25px rgba(255, 112, 166, 0.8)) drop-shadow(0 0 45px rgba(204, 255, 0, 0.6));
-  border-radius: 50%;
+  margin: 0 auto;
+  border-radius: 0;
+  background: transparent;
+  filter: drop-shadow(0 0 20px rgba(255, 112, 166, 0.8));
 }
 
 /* HANGING THREAD & PRICE TAG BADGE ATTACHED TO KEY */

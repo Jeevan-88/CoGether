@@ -1390,13 +1390,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      {/* 6. INVERTED BLACK TRIANGLE KEY SECTION (RED/PINK/GOLD SPLIT + WAVY FLOATING KEY) */}
+      {/* 6. INVERTED BLACK TRIANGLE KEY SECTION (PURE PITCH BLACK BG + PLAIN FLOATING KEY) */}
       <section className="inverted-triangle-key-section">
-        {/* 3-WAY BACKGROUND COLOR SPLIT */}
-        <div className="key-bg-split-left-red" />
-        <div className="key-bg-split-right-pink" />
-        <div className="key-bg-split-center-gold" />
-
         {/* CENTER INVERTED BLACK TRIANGLE SHIELD (POINTS DOWNWARDS) */}
         <div className="center-black-inverted-triangle">
           <span className="key-gold-tag">🔑 UNLOCK EVERYTHING</span>
