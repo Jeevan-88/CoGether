@@ -4110,241 +4110,344 @@
   margin: 20px 0;
 }
 /* ==========================================================================
-   HAND-DRAWN SKETCH PRICING SECTION (DOODLES, WOBBLY BORDERS, HANDWRITTEN FONTS)
+   NO ART MUSIC & LACOSTE ACE BREAKER AESTHETIC PRICING SECTION
+   (MONOCHROME, STUDIO GREY, EDITORIAL CREAM & OBSIDIAN LUXURY BRUTALISM)
    ========================================================================== */
 
 .inverted-triangle-key-section {
   position: relative;
   min-height: 100vh;
-  background: #000000;
+  background: #080808;
   color: #ffffff;
-  padding: 90px 24px 70px 24px;
-  font-family: 'Kalam', 'Architects Daughter', cursive;
+  padding: 100px 32px 80px 32px;
+  font-family: 'Syne', 'Inter', -apple-system, sans-serif;
   overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* REMOVED COLOR SPLITS FOR PURE PITCH BLACK BACKGROUND */
+/* TECHNICAL CROSSHAIR BACKGROUND GRID */
+.inverted-triangle-key-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px, 120px 120px, 120px 120px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* REMOVED COLOR SPLITS */
 .key-bg-split-left-red,
 .key-bg-split-right-pink,
 .key-bg-split-center-gold {
   display: none;
 }
 
-/* CENTER BLACK KEY HERO DISPLAY */
+/* CENTER KEY HERO DISPLAY */
 .center-black-inverted-triangle {
   position: relative;
-  max-width: 800px;
-  margin: 0 auto 40px auto;
-  background: #000000;
-  padding: 20px 20px 40px 20px;
+  max-width: 860px;
+  margin: 0 auto 50px auto;
+  background: transparent;
+  padding: 20px;
   text-align: center;
   z-index: 10;
 }
 
-/* HAND-DRAWN BADGE TAG */
+/* NO ART STYLE TECHNICAL MONOSPACE MICRO TAG */
 .key-gold-tag {
-  display: inline-block;
-  background: #CCFF00;
-  color: #000000;
-  border: 3.5px solid #000000;
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-  padding: 8px 24px;
-  font-family: 'Permanent Marker', cursive;
-  font-size: 1.15rem;
-  letter-spacing: 0.05em;
-  box-shadow: 4px 4px 0px #000000;
-  transform: rotate(-1.5deg);
-  margin-bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e5e5e5;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  padding: 6px 18px;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
+  margin-bottom: 24px;
 }
 
 .key-section-title {
-  font-family: 'Permanent Marker', cursive;
-  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-family: 'Syne', 'Inter', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.6rem);
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
   margin: 0 0 16px 0;
-  line-height: 1.1;
-  color: #ffffff;
+  line-height: 1.0;
+  color: #FFFFFF;
 }
 
-/* WAVY WIND FLOATING KEY CONTAINER WITH SKETCH AURA */
-@keyframes floatWavyWind {
+.key-section-subtitle-mono {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.88rem;
+  color: #888888;
+  letter-spacing: 0.08em;
+  max-width: 580px;
+  margin: 0 auto 30px auto;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+/* TECHNICAL FLOATING CHROME KEY CONTAINER */
+@keyframes technicalFloat {
   0% {
-    transform: translateY(0px) rotate(0deg) scale(1);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-16px) rotate(4deg) scale(1.03);
+    transform: translateY(-12px) rotate(2deg);
   }
   100% {
-    transform: translateY(0px) rotate(0deg) scale(1);
+    transform: translateY(0px) rotate(0deg);
   }
 }
 
 .wavy-floating-key-wrapper {
   position: relative;
   display: inline-block;
-  margin: 20px auto 30px auto;
-  animation: floatWavyWind 4s ease-in-out infinite;
+  margin: 20px auto 35px auto;
+  animation: technicalFloat 5s ease-in-out infinite;
 }
 
 .glowing-wavy-key-img {
   width: 100%;
-  max-width: 250px;
+  max-width: 270px;
   height: auto;
   display: block;
   margin: 0 auto;
   border: none;
   background: transparent;
-  filter: drop-shadow(0 0 12px rgba(204, 255, 0, 0.4));
+  filter: grayscale(100%) brightness(1.2) contrast(1.1) drop-shadow(0 15px 35px rgba(255, 255, 255, 0.12));
 }
 
-/* HAND-DRAWN DASHED THREAD LINE & HANGING PRICE TAG */
+/* MINIMALIST HAIRLINE THREAD & STUDIO MONOCHROME PRICE TAG */
 .hanging-thread-line {
-  width: 3px;
-  height: 38px;
-  border-left: 3px dashed #CCFF00;
-  margin: -10px auto 0 auto;
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.35);
+  margin: -6px auto 0 auto;
 }
 
 .hanging-price-tag-badge {
   display: inline-block;
-  background: #CCFF00;
-  color: #000000;
-  border: 3.5px solid #000000;
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-  padding: 10px 26px;
-  font-family: 'Permanent Marker', cursive;
-  font-size: 1.45rem;
-  letter-spacing: 0.05em;
-  box-shadow: 5px 5px 0px #000000;
-  transform: rotate(-3.5deg);
+  background: #F5F5F0;
+  color: #080808;
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  padding: 8px 22px;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
   margin-top: 4px;
 }
 
 .btn-triangle-key-buy {
-  background: #FF70A6;
-  color: #000000;
-  border: 3.5px solid #000000;
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  background: #FFFFFF;
+  color: #080808;
+  border: 1px solid #FFFFFF;
+  border-radius: 4px;
   padding: 16px 36px;
-  font-family: 'Permanent Marker', cursive;
-  font-size: 1.3rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  box-shadow: 6px 6px 0px #ffffff;
   cursor: pointer;
-  margin-top: 20px;
-  transform: rotate(1deg);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  margin-top: 24px;
+  transition: all 0.2s ease;
 }
 
 .btn-triangle-key-buy:hover {
-  transform: rotate(-1deg) translateY(-4px) scale(1.02);
-  box-shadow: 8px 8px 0px #CCFF00;
+  background: transparent;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
 }
 
-/* HAND-DRAWN STICKY NOTE / PINNED PAPER CARDS */
+/* NO ART / LACOSTE EDITORIAL SPLIT CARDS */
 .triangle-side-cards-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  max-width: 1100px;
-  margin: 20px auto 40px auto;
+  gap: 24px;
+  max-width: 1120px;
+  margin: 30px auto 40px auto;
   position: relative;
   z-index: 20;
 }
 
 .side-psych-card {
-  border: 4px solid #000000;
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-  padding: 30px 26px;
+  border-radius: 6px;
+  padding: 36px 32px;
   box-sizing: border-box;
-  font-family: 'Kalam', 'Architects Daughter', cursive;
+  position: relative;
+  transition: transform 0.2s ease;
 }
 
+.side-psych-card:hover {
+  transform: translateY(-3px);
+}
+
+/* CARD 1: MATTE OBSIDIAN CHARCOAL */
 .side-psych-card.left-card-red {
-  background: #FFF9C4;
-  color: #000000;
-  border: 4px solid #000000;
-  box-shadow: 8px 8px 0px #000000;
-  transform: rotate(-2deg);
+  background: #121212;
+  color: #F5F5F0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
 }
 
+/* CARD 2: WARM EDITORIAL IVORY / CREAM */
 .side-psych-card.right-card-pink {
-  background: #FFD1DC;
-  color: #000000;
-  border: 4px solid #000000;
-  box-shadow: 8px 8px 0px #000000;
-  transform: rotate(2deg);
+  background: #F5F5F0;
+  color: #0c0c0c;
+  border: 1px solid #E5E2D9;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
 }
 
 .side-card-badge {
-  font-family: 'Permanent Marker', cursive;
-  font-size: 0.95rem;
-  letter-spacing: 0.05em;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   display: block;
 }
 
 .left-card-red .side-card-badge {
-  color: #d97706;
+  color: #888888;
 }
 
 .right-card-pink .side-card-badge {
-  color: #db2777;
+  color: #555555;
 }
 
 .side-card-body {
-  font-size: clamp(1.1rem, 1.5vw, 1.25rem);
-  font-weight: 700;
-  line-height: 1.5;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  font-weight: 500;
+  line-height: 1.6;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
-/* HAND-DRAWN CRAFT PAPER MOMENT OF TRUTH CARD */
-.bottom-gold-truth-card {
-  max-width: 1100px;
-  margin: 0 auto 50px auto;
-  background: #CCFF00;
+.left-card-red .side-card-body strong {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.right-card-pink .side-card-body strong {
   color: #000000;
-  border: 4px solid #000000;
-  border-radius: 255px 25px 225px 25px/25px 225px 25px 255px;
-  padding: 36px 30px;
+  font-weight: 700;
+}
+
+/* LACOSTE STYLE EDITORIAL VERDICT BANNER */
+.bottom-gold-truth-card {
+  max-width: 1120px;
+  margin: 0 auto 60px auto;
+  background: #141414;
+  color: #F5F5F0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 44px 40px;
   text-align: center;
-  box-shadow: 8px 8px 0px #000000;
-  transform: rotate(-1deg);
   position: relative;
   z-index: 20;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+.truth-mono-tag {
+  display: inline-block;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  color: #888888;
+  text-transform: uppercase;
+  margin-bottom: 18px;
 }
 
 .truth-quote-text {
-  font-family: 'Permanent Marker', cursive;
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.3rem, 2.2vw, 2.0rem);
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: -0.02em;
   line-height: 1.3;
-  margin: 0 0 20px 0;
+  margin: 0 0 26px 0;
+  color: #FFFFFF;
 }
 
 .btn-truth-claim-key {
-  background: #000000;
-  color: #CCFF00;
-  border: 3.5px solid #000000;
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-  padding: 14px 38px;
-  font-family: 'Permanent Marker', cursive;
-  font-size: 1.25rem;
+  background: #F5F5F0;
+  color: #080808;
+  border: 1px solid #FFFFFF;
+  border-radius: 4px;
+  padding: 16px 40px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 5px 5px 0px #FF70A6;
-  transform: rotate(1deg);
-  transition: transform 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-truth-claim-key:hover {
-  transform: rotate(-1deg) translateY(-3px);
-  background: #FF70A6;
-  color: #000000;
+  background: transparent;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+}
+
+/* MINIMALIST STUDIO FOOTER */
+.jeevan-official-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 36px;
+  margin-top: 40px;
+}
+
+.creator-tag {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.88rem;
+  letter-spacing: 0.18em;
+  color: #999999;
+  text-transform: uppercase;
+}
+
+.footer-links a {
+  color: #888888;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #FFFFFF;
+}
+
+.copyright-text {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #555555;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 18px;
 }
 
 .triangle-main-title {

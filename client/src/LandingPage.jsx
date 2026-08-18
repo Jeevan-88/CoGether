@@ -1392,69 +1392,73 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      {/* 6. HAND-DRAWN SKETCH PRICING SECTION (DOODLES, WOBBLY BORDERS, HANDWRITTEN FONTS) */}
+      {/* 6. NO ART MUSIC & LACOSTE EDITORIAL PRICING SECTION */}
       <section className="inverted-triangle-key-section">
-        {/* CENTER BLACK KEY HERO DISPLAY */}
+        {/* CENTER KEY HERO DISPLAY */}
         <div className="center-black-inverted-triangle">
-          <span className="key-gold-tag">✏️ HAND-DRAWN UNLOCK KEY 🔑</span>
-          <h2 className="key-section-title" style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.6rem)', margin: '10px 0' }}>
-            PURCHASE THIS KEY TO UNLOCK COGETHER
+          <span className="key-gold-tag">[ ALL_ACCESS // KEY_001 // ₹49 ]</span>
+          <h2 className="key-section-title">
+            THE MASTER KEYPASS.
           </h2>
+          <p className="key-section-subtitle-mono">
+            One pass. Millisecond-synced 4K cinema, private study desks, live game rooms & collective cart.
+          </p>
 
-          {/* WAVY WIND FLOATING PLAIN KEY WITH HAND-DRAWN THREAD PRICE TAG */}
+          {/* TECHNICAL FLOATING CHROME KEY WITH MONOCHROME PRICE TAG */}
           <div className="wavy-floating-key-wrapper">
-            <img src="/plain_crystal_key.png" alt="Wavy Floating Plain Crystal Key" className="glowing-wavy-key-img" />
+            <img src="/plain_crystal_key.png" alt="Monochrome Master Keypass" className="glowing-wavy-key-img" />
             <div className="hanging-thread-line" />
-            <span className="hanging-price-tag-badge">🏷️ PRICE: ₹49 / MONTH</span>
+            <span className="hanging-price-tag-badge">KEYPASS // ₹49 / MO</span>
           </div>
 
           <br />
           <button className="btn-triangle-key-buy" onClick={onOpenPricing}>
-            Buy The ₹49 Unlock Key ✏️ →
+            ACQUIRE KEYPASS — ₹49 →
           </button>
         </div>
 
-        {/* LEFT & RIGHT SIDE PSYCHOLOGICAL REALITY CHECK STICKY NOTES */}
+        {/* EDITORIAL REALITY CHECK CARDS (OBSIDIAN CHARCOAL & WARM CREAM) */}
         <div className="triangle-side-cards-wrapper">
-          {/* LEFT YELLOW STICKY NOTE */}
+          {/* LEFT CHARCOAL MATTE CARD */}
           <div className="side-psych-card left-card-red">
-            <span className="side-card-badge">📍 REALITY CHECK #01</span>
+            <span className="side-card-badge">[ 01 // PSYCHOLOGICAL REALITY ]</span>
             <p className="side-card-body">
-              <strong>Why would you NOT buy this key?</strong> Do you really want your crush / partner studying or watching movies with someone else while you scroll reels alone?
+              <strong>Why would you not acquire this key?</strong> Do you really want your crush or partner studying and watching cinema with someone else while you scroll feeds alone in silence?
             </p>
           </div>
 
-          {/* RIGHT PINK STICKY NOTE */}
+          {/* RIGHT EDITORIAL CREAM CARD */}
           <div className="side-psych-card right-card-pink">
-            <span className="side-card-badge">📍 REALITY CHECK #02</span>
+            <span className="side-card-badge">[ 02 // PERFORMANCE METRIC ]</span>
             <p className="side-card-body">
-              <strong>Are you really gonna let your squad get A+ grades</strong> in Co-Study rooms while you're locked out crying over laggy 480p screenshares?
+              <strong>Are you gonna let your circle hit straight A's</strong> in private 4K Co-Study rooms while you're locked out crying over laggy 480p screen shares?
             </p>
           </div>
         </div>
 
-        {/* BOTTOM HAND-DRAWN CRAFT PAPER MOMENT OF TRUTH CARD */}
+        {/* BOTTOM FULL-WIDTH EDITORIAL BANNER */}
         <div className="bottom-gold-truth-card">
+          <span className="truth-mono-tag">[ 03 // THE VERDICT ]</span>
           <p className="truth-quote-text">
-            "OH DAMN... I READ THIS PSYCHOLOGICAL REALITY CHECK & I ALREADY KNOW WHY THIS WEBSITE IS SO GENIUS. FINE BRO, I'M BUYING THE KEY FOR ₹49 NOW! 😭🔥"
+            "I READ THE REALITY CHECK. THE ARCHITECTURE IS UNDENIABLE. TAKE THE ₹49 AND UNLOCK EVERYTHING."
           </p>
           <button className="btn-truth-claim-key" onClick={onOpenPricing}>
-            Claim My ₹49 Unlock Key ✍️ →
+            CLAIM UNLIMITED ACCESS →
           </button>
         </div>
 
-        {/* BOTTOM HAND-DRAWN WATERMARK & FOOTER */}
+        {/* MINIMALIST STUDIO FOOTER */}
         <footer className="jeevan-official-footer" style={{ position: 'relative', zIndex: 20 }}>
           <div className="footer-watermark-row">
-            <span className="creator-tag">✍️ HAND-CRAFTED WITH ❤️ BY JEEVAN YADAV</span>
+            <span className="creator-tag">COGETHER® // DIRECTED BY JEEVAN YADAV</span>
             <div className="footer-links">
-              <a href="mailto:jeevan@cogether.app">📧 jeevan@cogether.app</a>
-              <a href="https://github.com/Jeevan-88/CoGether.git" target="_blank" rel="noreferrer">🐙 GitHub Repo</a>
-              <a href="#privacy">🔒 Privacy & Terms</a>
+              <a href="mailto:jeevan@cogether.app">EMAIL</a>
+              <a href="https://github.com/Jeevan-88/CoGether.git" target="_blank" rel="noreferrer">REPOSITORY</a>
+              <a href="#privacy">TERMS & PRIVACY</a>
             </div>
           </div>
           <p className="copyright-text">
-            © 2026 CoGether Inc. All rights reserved. Built by Jeevan Yadav.
+            © 2026 COGETHER INC. ALL RIGHTS RESERVED. ARCHITECTURE BY JEEVAN YADAV.
           </p>
         </footer>
       </section>
