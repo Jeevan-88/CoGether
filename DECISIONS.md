@@ -15,7 +15,7 @@ The standard SaaS landing page playbook: a purple-gradient Hero banner, 3 generi
 **The Strategy Implemented:**  
 I designed **CoGether** as an interactive, high-conviction product canvas inspired by brutalist editorial design (*No Art Music, Lacoste Ace Breaker, Studio Ghibli Lo-Fi aesthetics*). Instead of claiming the product works, the homepage **proves** the architecture:
 - **Interactive Sticky Scroll Stages**: Mathematical scroll-driven viewport lerping that walks the user step-by-step through Co-Watch (synchronous stream syncing), Co-Play (live WebGL arcade canvas), and Co-Study (split 2-way video desk).
-- **Zero Fake Social Proof**: Eliminated all fabricated 5-star ratings, invented client logos, and fake review cards. The conversion copy uses psychological reality checks focused on actual student & friend habits rather than fake corporate vanity metrics.
+- **No Fabricated Social Proof**: No fake ratings, review cards, or invented user counts anywhere on the homepage. The streaming/sports/anime logos in the marquee sections aren't testimonials or partnership claims — CoGether works as a screen-share overlay on top of whatever the user is already watching (Netflix, Hotstar, ESPN+, etc.), so those logos communicate compatibility, the same way a screen-recorder or browser extension would list the apps it works with. No platform listed has endorsed or partnered with CoGether, and none of the copy implies otherwise.
 - **Immediate Utility**: Clicking any section doesn’t trigger a fake waitlist — it drops the user directly into working 100+ game WebGL engines, cinema stream overlays, or a WebRTC peer room.
 
 ---
