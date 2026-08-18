@@ -35,6 +35,18 @@ body {
   letter-spacing: -0.02em;
 }
 
+/* ANTI-THEFT & IMAGE ASSET PROTECTION */
+img, video, canvas {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 /* Geometric High-Impact Typography (Matching Pigeon Studio Reference Screenshot) */
 h1, h2, h3, .heading-display {
   font-family: var(--font-display);
