@@ -1392,16 +1392,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </section>
       </div>
 
-      {/* 6. INVERTED BLACK TRIANGLE KEY SECTION (PURE PITCH BLACK BG + PLAIN FLOATING KEY) */}
+      {/* 6. HAND-DRAWN SKETCH PRICING SECTION (DOODLES, WOBBLY BORDERS, HANDWRITTEN FONTS) */}
       <section className="inverted-triangle-key-section">
-        {/* CENTER INVERTED BLACK TRIANGLE SHIELD (POINTS DOWNWARDS) */}
+        {/* CENTER BLACK KEY HERO DISPLAY */}
         <div className="center-black-inverted-triangle">
-          <span className="key-gold-tag">🔑 UNLOCK EVERYTHING</span>
-          <h2 className="key-section-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', margin: '10px 0' }}>
+          <span className="key-gold-tag">✏️ HAND-DRAWN UNLOCK KEY 🔑</span>
+          <h2 className="key-section-title" style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.6rem)', margin: '10px 0' }}>
             PURCHASE THIS KEY TO UNLOCK COGETHER
           </h2>
 
-          {/* WAVY WIND FLOATING PLAIN KEY WITH HANGING THREAD PRICE TAG */}
+          {/* WAVY WIND FLOATING PLAIN KEY WITH HAND-DRAWN THREAD PRICE TAG */}
           <div className="wavy-floating-key-wrapper">
             <img src="/plain_crystal_key.png" alt="Wavy Floating Plain Crystal Key" className="glowing-wavy-key-img" />
             <div className="hanging-thread-line" />
@@ -1410,43 +1410,43 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
 
           <br />
           <button className="btn-triangle-key-buy" onClick={onOpenPricing}>
-            Buy The ₹49 Unlock Key →
+            Buy The ₹49 Unlock Key ✏️ →
           </button>
         </div>
 
-        {/* LEFT & RIGHT SIDE PSYCHOLOGICAL REALITY CHECK CARDS */}
+        {/* LEFT & RIGHT SIDE PSYCHOLOGICAL REALITY CHECK STICKY NOTES */}
         <div className="triangle-side-cards-wrapper">
-          {/* LEFT RED SIDE CARD */}
+          {/* LEFT YELLOW STICKY NOTE */}
           <div className="side-psych-card left-card-red">
-            <span className="side-card-badge">💔 PSYCHOLOGICAL QUESTION #01</span>
+            <span className="side-card-badge">📍 REALITY CHECK #01</span>
             <p className="side-card-body">
               <strong>Why would you NOT buy this key?</strong> Do you really want your crush / partner studying or watching movies with someone else while you scroll reels alone?
             </p>
           </div>
 
-          {/* RIGHT PINK SIDE CARD */}
+          {/* RIGHT PINK STICKY NOTE */}
           <div className="side-psych-card right-card-pink">
-            <span className="side-card-badge">📉 PSYCHOLOGICAL QUESTION #02</span>
+            <span className="side-card-badge">📍 REALITY CHECK #02</span>
             <p className="side-card-body">
               <strong>Are you really gonna let your squad get A+ grades</strong> in Co-Study rooms while you're locked out crying over laggy 480p screenshares?
             </p>
           </div>
         </div>
 
-        {/* BOTTOM GOLD MOMENT OF TRUTH CARD */}
+        {/* BOTTOM HAND-DRAWN CRAFT PAPER MOMENT OF TRUTH CARD */}
         <div className="bottom-gold-truth-card">
           <p className="truth-quote-text">
             "OH DAMN... I READ THIS PSYCHOLOGICAL REALITY CHECK & I ALREADY KNOW WHY THIS WEBSITE IS SO GENIUS. FINE BRO, I'M BUYING THE KEY FOR ₹49 NOW! 😭🔥"
           </p>
           <button className="btn-truth-claim-key" onClick={onOpenPricing}>
-            Claim My ₹49 Unlock Key →
+            Claim My ₹49 Unlock Key ✍️ →
           </button>
         </div>
 
-        {/* BOTTOM WATERMARK & FOOTER */}
+        {/* BOTTOM HAND-DRAWN WATERMARK & FOOTER */}
         <footer className="jeevan-official-footer" style={{ position: 'relative', zIndex: 20 }}>
           <div className="footer-watermark-row">
-            <span className="creator-tag">⚡ CRAFTED WITH ❤️ BY JEEVAN YADAV</span>
+            <span className="creator-tag">✍️ HAND-CRAFTED WITH ❤️ BY JEEVAN YADAV</span>
             <div className="footer-links">
               <a href="mailto:jeevan@cogether.app">📧 jeevan@cogether.app</a>
               <a href="https://github.com/Jeevan-88/CoGether.git" target="_blank" rel="noreferrer">🐙 GitHub Repo</a>
