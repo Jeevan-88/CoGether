@@ -4128,25 +4128,6 @@
    (MONOCHROME, STUDIO GREY, EDITORIAL CREAM & OBSIDIAN LUXURY BRUTALISM)
    ========================================================================== */
 
-/* HIGH FASHION INVERTING CUSTOM CURSOR CIRCLE */
-.inverting-custom-cursor {
-  position: fixed;
-  width: 36px;
-  height: 36px;
-  background: #ffffff;
-  border-radius: 50%;
-  pointer-events: none;
-  mix-blend-mode: difference;
-  z-index: 9999999;
-  transform: translate(-50%, -50%);
-  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), height 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.inverting-custom-cursor.is-hovering {
-  width: 76px;
-  height: 76px;
-}
-
 .inverted-triangle-key-section {
   position: relative;
   min-height: 100vh;

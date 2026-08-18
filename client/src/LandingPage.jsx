@@ -140,20 +140,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [coshopScrollProgress, setCoshopScrollProgress] = useState(0);
   const [costudyScrollProgress, setCostudyScrollProgress] = useState(0);
 
-  // HIGH FASHION INVERTING CUSTOM CURSOR CIRCLE
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-  const [isCursorHovering, setIsCursorHovering] = useState(false);
-  const [isCursorActive, setIsCursorActive] = useState(false);
-
-  useEffect(() => {
-    const onMouseMove = (e) => {
-      setCursorPos({ x: e.clientX, y: e.clientY });
-      setIsCursorActive(true);
-    };
-    window.addEventListener('mousemove', onMouseMove);
-    return () => window.removeEventListener('mousemove', onMouseMove);
-  }, []);
-
   // PERFECT CIRCULAR 'O', WHITE DOTS & PINPOINT ZOOM CALIBRATOR CONFIG
   const [oTuner, setOTuner] = useState({
     dotsRadius: 43.5,
@@ -1497,17 +1483,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           </p>
         </footer>
       </section>
-
-      {/* HIGH FASHION INVERTING CUSTOM CURSOR CIRCLE */}
-      {isCursorActive && (
-        <div
-          className={`inverting-custom-cursor ${isCursorHovering ? 'is-hovering' : ''}`}
-          style={{
-            left: `${cursorPos.x}px`,
-            top: `${cursorPos.y}px`,
-          }}
-        />
-      )}
     </div>
   );
 }
