@@ -1,79 +1,110 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 7, 13, 0.85);
-  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(14px);
   z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 20px;
 }
 
-.auth-card {
+/* ── ID-CARD STYLED MODAL ── */
+.auth-id-card {
   position: relative;
   width: 100%;
-  max-width: 420px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: var(--shadow-glow), 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  max-width: 440px;
+  background: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 229, 0, 0.15);
+  color: #ffffff;
+  font-family: inherit;
+}
+
+/* Lanyard slot at top of ID card */
+.id-card-lanyard-slot {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 5px;
+  background: #222222;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background: transparent;
-  color: var(--text-muted);
+  top: 18px;
+  right: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #aaaaaa;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .modal-close:hover {
-  color: #fff;
+  background: #ffffff;
+  color: #000000;
 }
 
 .auth-header {
   text-align: center;
   margin-bottom: 24px;
+  margin-top: 8px;
 }
 
-.auth-icon-badge {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--accent-gradient);
-  display: flex;
+.id-card-top-tag {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
-  margin: 0 auto 14px;
-  box-shadow: var(--shadow-glow);
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 229, 0, 0.08);
+  border: 1px solid rgba(255, 229, 0, 0.3);
+  border-radius: 100px;
+  color: #ffe500;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 12px;
 }
 
 .auth-header h2 {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
 
 .auth-header p {
   font-size: 13px;
-  color: var(--text-muted);
+  color: #a0a0a0;
+  line-height: 1.5;
 }
 
 .auth-error-banner {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid var(--status-danger);
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
   color: #fca5a5;
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  border-radius: 8px;
   font-size: 12px;
   margin-bottom: 16px;
   text-align: center;
+  font-weight: 600;
 }
 
 .auth-form {
@@ -84,82 +115,113 @@
 
 .auth-input-field label {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #cccccc;
+  margin-bottom: 7px;
+  font-family: 'Space Mono', monospace;
 }
 
 .input-with-icon {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  gap: 12px;
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
   padding: 0 14px;
-  color: var(--text-muted);
+  color: #888888;
+  transition: all 0.2s ease;
+}
+
+.input-with-icon:focus-within {
+  border-color: #ffe500;
+  background: #1a1a1a;
+  color: #ffe500;
+  box-shadow: 0 0 0 2px rgba(255, 229, 0, 0.2);
 }
 
 .input-with-icon input {
   flex: 1;
   background: transparent;
   border: none;
-  padding: 12px 0;
-  color: var(--text-main);
+  padding: 13px 0;
+  color: #ffffff !important;
   font-size: 14px;
+  font-weight: 500;
+  outline: none;
 }
 
-.input-with-icon:focus-within {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+.input-with-icon input::placeholder {
+  color: #666666;
 }
 
 .auth-submit-btn {
   width: 100%;
   padding: 14px;
-  border-radius: var(--radius-md);
-  background: var(--accent-gradient);
-  color: #fff;
-  font-weight: 700;
+  border-radius: 10px;
+  background: #ffe500;
+  color: #000000;
+  font-weight: 800;
   font-size: 14px;
+  letter-spacing: 0.04em;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .auth-submit-btn:hover {
-  filter: brightness(1.1);
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(255, 229, 0, 0.3);
 }
 
 .demo-fill-btn {
   width: 100%;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--accent-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: #bbbbbb;
   font-size: 12px;
   font-weight: 600;
-  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .demo-fill-btn:hover {
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(255, 229, 0, 0.08);
+  border-color: #ffe500;
+  color: #ffe500;
 }
 
-.auth-footer-toggle {
+.auth-switch-mode {
   text-align: center;
-  margin-top: 20px;
-  font-size: 13px;
-  color: var(--text-muted);
+  margin-top: 18px;
+  font-size: 12px;
+  color: #888888;
 }
 
-.auth-footer-toggle span {
-  color: var(--accent-primary);
+.auth-switch-mode button {
+  background: transparent;
+  border: none;
+  color: #ffe500;
   font-weight: 700;
-  cursor: pointer;
   text-decoration: underline;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.auth-switch-mode button:hover {
+  color: #ffffff;
 }

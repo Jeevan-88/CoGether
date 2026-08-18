@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { POKI_TOP_TRENDING, POKI_WEB_EXCLUSIVES, POKI_CATEGORY_HUBS } from './pokiCatalog.js';
 import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, Box, ShoppingCart } from 'lucide-react';
 import './LandingPage.css';
 
@@ -621,8 +620,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       <div className="bubble-text">{TUTORIAL_MESSAGES[activeMsgIdx].text}</div>
                     </div>
                   </div>
-                  <div className={`teleparty-merged-view-box zero-center-line size-${camBoxSize} fade-in`}>
-                    <div className="teleparty-header-strip">
+                  <div className={`cogether-merged-view-box zero-center-line size-${camBoxSize} fade-in`}>
+                    <div className="cogether-header-strip">
                       <span className="good-icon">✓</span> CoGether Merged Room
                       <button className="quick-resize-ic" onClick={cycleCamSize}><Move size={11} /></button>
                     </div>
