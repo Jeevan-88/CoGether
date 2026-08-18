@@ -3,13 +3,14 @@ import Navbar from './Navbar.jsx';
 import LandingPage from './LandingPage.jsx';
 import VideoRoom from './VideoRoom.jsx';
 import WatchPartyRoom from './WatchPartyRoom.jsx';
+import CoWatchCinemaHub from './CoWatchCinemaHub.jsx';
 import CoPlayGamesHub from './CoPlayGamesHub.jsx';
 import MergedCameraView from './MergedCameraView.jsx';
 import AuthModal from './AuthModal.jsx';
 import PricingModal from './PricingModal.jsx';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'gamesHub' | ...
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub' | ...
   const [user, setUser] = useState(null);
   const [activeRoom, setActiveRoom] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
@@ -65,12 +66,11 @@ export default function App() {
   };
 
   if (activeRoom) {
-    if (activeRoom.mode === 'watch') {
+    if (activeRoom.mode === 'watch' || activeRoom.mode === 'cinema') {
       return (
-        <WatchPartyRoom
-          roomId={activeRoom.roomId}
-          username={activeRoom.username}
-          onLeave={handleLeaveRoom}
+        <CoWatchCinemaHub
+          onBackToHome={handleLeaveRoom}
+          initialUser={user}
         />
       );
     }
@@ -103,12 +103,21 @@ export default function App() {
     );
   }
 
+  // ── CO-WATCH OTT & CINEMA STREAMING HUB ──
+  if (activeTab === 'cinemaHub') {
+    return (
+      <CoWatchCinemaHub
+        onBackToHome={() => setActiveTab('home')}
+        initialUser={user}
+      />
+    );
+  }
+
   // ── CO-PLAY YELLOW CANVAS 100+ GAMES ARCADE HUB ──
   if (activeTab === 'gamesHub') {
     return (
       <CoPlayGamesHub
         onBackToHome={() => setActiveTab('home')}
-        onLaunchSquadRoom={(roomId, username) => handleStartRoom(roomId, username, 'games')}
         initialUser={user}
       />
     );
@@ -119,7 +128,7 @@ export default function App() {
       <Navbar
         activeTab={activeTab}
         onTabChange={(tab) => {
-          if (tab === 'watch') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'watch');
+          if (tab === 'watch' || tab === 'cowatch') setActiveTab('cinemaHub');
           else if (tab === 'games' || tab === 'coplay') setActiveTab('gamesHub');
           else if (tab === 'telepresence') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'merged');
           else setActiveTab(tab);
@@ -133,11 +142,12 @@ export default function App() {
       />
 
       <LandingPage
-        onStartWatchParty={(r, u) => handleStartRoom(r, u, 'watch')}
+        onStartWatchParty={(r, u) => setActiveTab('cinemaHub')}
         onStartGames={(r, u) => setActiveTab('gamesHub')}
         onStartMergedCam={(r, u) => handleStartRoom(r, u, 'merged')}
         onOpenPricing={() => setShowPricing(true)}
         onOpenGamesHub={() => setActiveTab('gamesHub')}
+        onOpenCinemaHub={() => setActiveTab('cinemaHub')}
       />
 
       {showAuth && (

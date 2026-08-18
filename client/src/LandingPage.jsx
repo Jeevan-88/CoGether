@@ -128,7 +128,7 @@ function AutomaticDiagonal3DRubiksCube() {
   );
 }
 
-export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing, onOpenGamesHub }) {
+export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing, onOpenGamesHub, onOpenCinemaHub }) {
   const [roomCode, setRoomCode] = useState('');
   const [username, setUsername] = useState(localStorage.getItem('sp_username') || '');
   const [isMuted, setIsMuted] = useState(true);
@@ -368,8 +368,14 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     localStorage.setItem('sp_username', finalName);
     const finalRoom = customRoomId || roomCode.trim() || generateCode();
 
-    if (mode === 'watch') onStartWatchParty(finalRoom, finalName);
-    else if (mode === 'games') onStartGames(finalRoom, finalName);
+    if (mode === 'watch') {
+      if (onOpenCinemaHub) onOpenCinemaHub();
+      else onStartWatchParty(finalRoom, finalName);
+    }
+    else if (mode === 'games') {
+      if (onOpenGamesHub) onOpenGamesHub();
+      else onStartGames(finalRoom, finalName);
+    }
     else if (mode === 'merged') onStartMergedCam(finalRoom, finalName);
   };
 
