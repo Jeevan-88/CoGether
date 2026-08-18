@@ -1,7 +1,6 @@
 /**
  * CoGether Co-Watch Cinema & OTT Streaming Catalog
  * Multi-Language: English, Hindi, Telugu, Multi-Language Pan-India & Free-to-Watch Cinema
- * Authentic High-Resolution TMDB Backdrops, Verified Stream Embeds & OTT Launchers
  */
 
 export const OTT_PLATFORMS = [
@@ -48,31 +47,20 @@ export const OTT_PLATFORMS = [
 ];
 
 export const LANGUAGE_COMPARTMENTS = [
-  { id: 'all', label: '🎬 All Languages', icon: '🌐' },
-  { id: 'free', label: '🆓 Free to Watch', icon: '✨' },
-  { id: 'telugu', label: '🔥 Telugu (Tollywood)', icon: '⚡' },
-  { id: 'hindi', label: '🍿 Hindi (Bollywood)', icon: '🎭' },
-  { id: 'english', label: '🎬 English (Hollywood)', icon: '🌟' },
-  { id: 'multilingual', label: '🌍 Multi-Language (Pan-India)', icon: '🇮🇳' }
-];
-
-export const CINEMA_CATEGORIES = [
-  { id: 'all', label: '🔥 All Categories' },
-  { id: 'free-movies', label: '🆓 Free Movies' },
-  { id: 'telugu-cinema', label: '⚡ Telugu Cinema' },
-  { id: 'hindi-cinema', label: '🎭 Hindi Cinema' },
-  { id: 'english-cinema', label: '🌟 Hollywood' },
-  { id: 'series', label: '📺 Web Series & Shows' },
-  { id: 'sports', label: '⚽ Live Sports & Cricket' },
-  { id: 'anime', label: '🎌 Anime Platform' }
+  { id: 'all', label: 'All Languages', icon: '🎬' },
+  { id: 'free', label: 'Free to Watch', icon: '🆓' },
+  { id: 'telugu', label: 'Telugu (Tollywood)', icon: '⚡' },
+  { id: 'hindi', label: 'Hindi (Bollywood)', icon: '🎭' },
+  { id: 'english', label: 'English (Hollywood)', icon: '🌟' },
+  { id: 'multilingual', label: 'Multi-Language (Pan-India)', icon: '🌍' }
 ];
 
 export const CINEMA_DATABASE = [
-  // ================= 1. FREE TO WATCH (NO SUBSCRIPTION REQUIRED) =================
+  // ================= 1. FREE TO WATCH =================
   {
     id: 'hanuman-free',
     title: 'Hanu-Man (4K Full Movie)',
-    category: 'free-movies',
+    category: 'movies',
     language: 'telugu',
     isFree: true,
     platform: 'CoGether Free Cinema',
@@ -81,15 +69,15 @@ export const CINEMA_DATABASE = [
     year: '2024',
     duration: '2h 38m',
     genre: 'Mythology / Action / Superhero',
-    poster: 'https://image.tmdb.org/t/p/w500/1XDDpv25jNqQe51uF2o96nKz9yR.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/2wT8o1k8o4M0T1bX1v0l5v6.jpg',
-    synopsis: 'An ordinary boy in the fictional village of Anjanadri gets the superpowers of Lord Hanuman and fights against the evil forces threatening his people.',
+    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'An ordinary boy in the fictional village of Anjanadri gets the superpowers of Lord Hanuman and fights against evil forces.',
     embedUrl: 'https://www.youtube.com/embed/gkJ3wZqV_9k?autoplay=1'
   },
   {
     id: 'sita-ramam-free',
     title: 'Sita Ramam (Multi-Language)',
-    category: 'free-movies',
+    category: 'movies',
     language: 'multilingual',
     isFree: true,
     platform: 'CoGether Free Cinema',
@@ -98,15 +86,15 @@ export const CINEMA_DATABASE = [
     year: '2022',
     duration: '2h 43m',
     genre: 'Romance / Drama / Classic',
-    poster: 'https://image.tmdb.org/t/p/w500/gW9NlCqT1rUeGZJv1rN1rN1rN1r.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/xJHokMbljvjADYdit5fK5VQsXEG.jpg',
+    poster: 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80',
     synopsis: 'An orphaned soldier serving at the Kashmir border receives anonymous love letters from Sita Mahalakshmi. He embarks on a mission to find her.',
     embedUrl: 'https://www.youtube.com/embed/e3D4j6rV9_0?autoplay=1'
   },
   {
     id: 'tears-of-steel-4k',
     title: 'Tears of Steel (4K Sci-Fi Classic)',
-    category: 'free-movies',
+    category: 'movies',
     language: 'english',
     isFree: true,
     platform: 'Open Source 4K',
@@ -115,9 +103,9 @@ export const CINEMA_DATABASE = [
     year: '2024',
     duration: '45m',
     genre: 'Sci-Fi / Cyberpunk / VFX',
-    poster: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg',
-    synopsis: 'In a dystopian future, a group of scientists and warriors in Amsterdam attempt to save the world with a high-tech memory reconstruction device.',
+    poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'In a dystopian future, a group of warriors in Amsterdam attempt to save the world with a high-tech memory reconstruction device.',
     embedUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'
   },
 
@@ -125,7 +113,7 @@ export const CINEMA_DATABASE = [
   {
     id: 'kalki-2898-ad',
     title: 'Kalki 2898 AD',
-    category: 'telugu-cinema',
+    category: 'movies',
     language: 'telugu',
     isFree: false,
     platform: 'Netflix / Prime Video',
@@ -134,15 +122,15 @@ export const CINEMA_DATABASE = [
     year: '2024',
     duration: '3h 1m',
     genre: 'Mythology / Sci-Fi / Action',
-    poster: 'https://image.tmdb.org/t/p/w500/9PbtCo4uvbZNu490Uaq51DkE3qZ.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/7T4J7n1m1J9k9L5o5v5.jpg',
-    synopsis: 'A modern-day avatar of Vishnu, a Hindu god, is believed to have descended to the earth in 2898 AD to protect the world from evil forces.',
+    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'A modern-day avatar of Vishnu descends in 2898 AD to protect humanity against the tyrannical ruler Supreme Yaskin.',
     embedUrl: 'https://www.youtube.com/embed/kQDd1AhGIHk?autoplay=1'
   },
   {
     id: 'rrr-telugu',
     title: 'RRR (Rise Roar Revolt)',
-    category: 'telugu-cinema',
+    category: 'movies',
     language: 'telugu',
     isFree: false,
     platform: 'Disney+ Hotstar / Netflix',
@@ -151,15 +139,15 @@ export const CINEMA_DATABASE = [
     year: '2022',
     duration: '3h 7m',
     genre: 'Action / Epic / Historical',
-    poster: 'https://image.tmdb.org/t/p/w500/wE0A75nHrnm6T9o3q943890248.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/70sqk6mYp0U6V9432.jpg',
-    synopsis: 'A fearless revolutionary and an officer in the British force decide to join forces and chart out a path towards freedom against the tyrannical rulers.',
+    poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'A fearless revolutionary and an officer in the British force decide to join forces to chart out a path towards freedom.',
     embedUrl: 'https://www.youtube.com/embed/NgBoAMQhHoc?autoplay=1'
   },
   {
     id: 'pushpa-2-the-rule',
     title: 'Pushpa 2: The Rule',
-    category: 'telugu-cinema',
+    category: 'movies',
     language: 'telugu',
     isFree: false,
     platform: 'Netflix',
@@ -168,15 +156,15 @@ export const CINEMA_DATABASE = [
     year: '2024',
     duration: '3h 4m',
     genre: 'Action / Crime / Thriller',
-    poster: 'https://image.tmdb.org/t/p/w500/6Sj0q94389024802.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/pushpa2backdrop.jpg',
-    synopsis: 'Pushpa Raj continues to reign over the red sandalwood smuggling syndicate, clashing with Bhanwar Singh Shekhawat in a war of power.',
+    poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'Pushpa Raj continues to reign over the red sandalwood smuggling syndicate, clashing in a war of absolute power.',
     embedUrl: 'https://www.youtube.com/embed/g3JUbgHBg38?autoplay=1'
   },
   {
     id: 'salaar-part-1',
     title: 'Salaar: Part 1 - Ceasefire',
-    category: 'telugu-cinema',
+    category: 'movies',
     language: 'telugu',
     isFree: false,
     platform: 'Disney+ Hotstar / Netflix',
@@ -185,34 +173,17 @@ export const CINEMA_DATABASE = [
     year: '2023',
     duration: '2h 55m',
     genre: 'Action / Gangster / Drama',
-    poster: 'https://image.tmdb.org/t/p/w500/m1b94328902.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/salaarbackdrop.jpg',
-    synopsis: 'A gang leader makes a promise to a dying friend and takes on other criminal gangs in the dystopian city of Khansaar.',
+    poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'A gang leader makes a promise to a dying friend and takes on other criminal syndicates in the dystopian city of Khansaar.',
     embedUrl: 'https://www.youtube.com/embed/4GPvYMKtrtI?autoplay=1'
-  },
-  {
-    id: 'baahubali-2',
-    title: 'Baahubali 2: The Conclusion',
-    category: 'telugu-cinema',
-    language: 'telugu',
-    isFree: false,
-    platform: 'Disney+ Hotstar',
-    platformBadge: 'ALL-TIME RECORD',
-    rating: '8.8/10',
-    year: '2017',
-    duration: '2h 47m',
-    genre: 'Action / Mythological / Epic',
-    poster: 'https://image.tmdb.org/t/p/w500/9PbtCo4uvbZNu490Uaq51DkE3qZ.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/baahubalibackdrop.jpg',
-    synopsis: 'Amarendra Baahubali must protect the kingdom of Mahishmati from the jealous and cruel Bhallaladeva while fulfilling his promise.',
-    embedUrl: 'https://www.youtube.com/embed/G62HrubdD6o?autoplay=1'
   },
 
   // ================= 3. HINDI CINEMA (BOLLYWOOD) =================
   {
     id: 'jawan-hindi',
     title: 'Jawan (Extended Cut)',
-    category: 'hindi-cinema',
+    category: 'movies',
     language: 'hindi',
     isFree: false,
     platform: 'Netflix',
@@ -221,15 +192,15 @@ export const CINEMA_DATABASE = [
     year: '2023',
     duration: '2h 49m',
     genre: 'Action / Thriller / Social',
-    poster: 'https://image.tmdb.org/t/p/w500/jawanposter.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/jawanbackdrop.jpg',
-    synopsis: 'A man is driven by a personal vendetta to rectify the wrongs in society, while keeping a promise made years ago.',
+    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'A man is driven by a personal vendetta to rectify the wrongs in society while keeping a promise made years ago.',
     embedUrl: 'https://www.youtube.com/embed/COv52Qyctws?autoplay=1'
   },
   {
     id: 'animal-hindi',
     title: 'Animal (Unrated 4K)',
-    category: 'hindi-cinema',
+    category: 'movies',
     language: 'hindi',
     isFree: false,
     platform: 'Netflix',
@@ -238,15 +209,15 @@ export const CINEMA_DATABASE = [
     year: '2023',
     duration: '3h 24m',
     genre: 'Crime / Drama / Action',
-    poster: 'https://image.tmdb.org/t/p/w500/animalposter.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/animalbackdrop.jpg',
-    synopsis: 'A son undergoes a remarkable transformation as the bond with his father begins to fracture, and he becomes consumed by a quest for vengeance.',
+    poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'A son undergoes a remarkable transformation as the bond with his father fractures, turning into a quest for vengeance.',
     embedUrl: 'https://www.youtube.com/embed/Dydmpfo68DA?autoplay=1'
   },
   {
     id: 'stree-2',
     title: 'Stree 2: Sarkate Ka Aatank',
-    category: 'hindi-cinema',
+    category: 'movies',
     language: 'hindi',
     isFree: false,
     platform: 'Prime Video',
@@ -255,9 +226,9 @@ export const CINEMA_DATABASE = [
     year: '2024',
     duration: '2h 27m',
     genre: 'Horror / Comedy / Mystery',
-    poster: 'https://image.tmdb.org/t/p/w500/stree2poster.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/stree2backdrop.jpg',
-    synopsis: 'The town of Chanderi is haunted once again, this time by a headless entity abducting women. Vicky and his friends join forces to save the town.',
+    poster: 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'The town of Chanderi is haunted once again by a headless entity abducting women. Vicky and friends join forces to save the town.',
     embedUrl: 'https://www.youtube.com/embed/KVn_0nF8XQ8?autoplay=1'
   },
 
@@ -265,7 +236,7 @@ export const CINEMA_DATABASE = [
   {
     id: 'oppenheimer',
     title: 'Oppenheimer',
-    category: 'english-cinema',
+    category: 'movies',
     language: 'english',
     isFree: false,
     platform: 'Universal / Prime Video',
@@ -274,15 +245,15 @@ export const CINEMA_DATABASE = [
     year: '2023',
     duration: '3h 0m',
     genre: 'Biography / Drama / History',
-    poster: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg',
-    synopsis: 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb during World War II.',
+    poster: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=1600&q=80',
+    synopsis: 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.',
     embedUrl: 'https://www.youtube.com/embed/uYPbbksJxIg?autoplay=1'
   },
   {
     id: 'interstellar',
     title: 'Interstellar (4K IMAX)',
-    category: 'english-cinema',
+    category: 'movies',
     language: 'english',
     isFree: false,
     platform: 'Paramount / Netflix',
@@ -291,15 +262,15 @@ export const CINEMA_DATABASE = [
     year: '2014',
     duration: '2h 49m',
     genre: 'Sci-Fi / Adventure',
-    poster: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/xJHokMbljvjADYdit5fK5VQsXEG.jpg',
+    poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80',
     synopsis: 'A team of explorers travel through a wormhole in space in an attempt to ensure humanity\'s survival.',
     embedUrl: 'https://www.youtube.com/embed/zSWdZVtXT7E?autoplay=1'
   },
   {
     id: 'dune-part-two',
     title: 'Dune: Part Two',
-    category: 'english-cinema',
+    category: 'movies',
     language: 'english',
     isFree: false,
     platform: 'HBO Max / Prime Video',
@@ -308,79 +279,9 @@ export const CINEMA_DATABASE = [
     year: '2024',
     duration: '2h 46m',
     genre: 'Sci-Fi / Adventure / Epic',
-    poster: 'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s52u0Ce.jpg',
+    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80',
+    backdrop: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80',
     synopsis: 'Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family.',
     embedUrl: 'https://www.youtube.com/embed/Way9Dexny3w?autoplay=1'
-  },
-  {
-    id: 'avengers-endgame',
-    title: 'Avengers: Endgame',
-    category: 'english-cinema',
-    language: 'english',
-    isFree: false,
-    platform: 'Disney+ Hotstar',
-    platformBadge: 'MARVEL CINEMATIC',
-    rating: '8.4/10',
-    year: '2019',
-    duration: '3h 1m',
-    genre: 'Action / Sci-Fi',
-    poster: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg',
-    synopsis: 'After the devastating events of Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more.',
-    embedUrl: 'https://www.youtube.com/embed/TcMBFSGVi1c?autoplay=1'
-  },
-
-  // ================= 5. WEB SERIES & ANIME =================
-  {
-    id: 'stranger-things',
-    title: 'Stranger Things (Season 4)',
-    category: 'series',
-    language: 'english',
-    isFree: false,
-    platform: 'Netflix',
-    platformBadge: 'NETFLIX ORIGINAL',
-    rating: '8.7/10',
-    year: '2022',
-    duration: '9 Episodes',
-    genre: 'Horror / Drama / Sci-Fi',
-    poster: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/56v2KjUmLeLo5aMw75YgSwhYifb.jpg',
-    synopsis: 'When a young boy vanishes, a small town uncovers a mystery involving secret experiments and terrifying supernatural forces.',
-    embedUrl: 'https://www.youtube.com/embed/yQEondeGvKo?autoplay=1'
-  },
-  {
-    id: 'demon-slayer',
-    title: 'Demon Slayer: Hashira Training',
-    category: 'anime',
-    language: 'multilingual',
-    isFree: false,
-    platform: 'Crunchyroll / Netflix',
-    platformBadge: 'ANIME SPECIAL',
-    rating: '8.7/10',
-    year: '2024',
-    duration: '8 Episodes',
-    genre: 'Action / Supernatural / Fantasy',
-    poster: 'https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/nTvM4mhqZlHIkw29XBeENiq73b.jpg',
-    synopsis: 'Tanjiro undergoes rigorous training with the Stone Hashira, Himejima, in preparation for the upcoming battle against Muzan Kibutsuji.',
-    embedUrl: 'https://www.youtube.com/embed/S94b2G9S7pI?autoplay=1'
-  },
-  {
-    id: 'icc-world-cup',
-    title: 'ICC Cricket World Cup Highlights (4K)',
-    category: 'sports',
-    language: 'multilingual',
-    isFree: true,
-    platform: 'Disney+ Hotstar / Star Sports',
-    platformBadge: 'LIVE CRICKET',
-    rating: '9.2/10',
-    year: '2024',
-    duration: '45m Match Reel',
-    genre: 'Cricket / Live Sports / 4K',
-    poster: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg',
-    synopsis: 'Watch thrilling 4K synchronized highlights, super-overs, and sixes with your inner circle.',
-    embedUrl: 'https://www.youtube.com/embed/d3Wb4rG1Yp0?autoplay=1'
   }
 ];

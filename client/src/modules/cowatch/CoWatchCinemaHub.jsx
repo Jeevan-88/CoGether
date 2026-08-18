@@ -7,7 +7,6 @@ import {
 import { 
   OTT_PLATFORMS, 
   LANGUAGE_COMPARTMENTS,
-  CINEMA_CATEGORIES, 
   CINEMA_DATABASE 
 } from './cinemaCatalog.js';
 import './CoWatchCinemaHub.css';
