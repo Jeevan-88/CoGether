@@ -65,7 +65,7 @@ export function initSecurityGuard() {
     setInterval(() => {
       console.clear();
       console.log(
-        '%c⛔ STOP! COGETHER PROPRIETARY CODEBASE',
+        '%cSTOP! COGETHER PROPRIETARY CODEBASE',
         'color: #ff0055; font-size: 24px; font-weight: bold; -webkit-text-stroke: 1px black;'
       );
       console.log(

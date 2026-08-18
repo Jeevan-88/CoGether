@@ -1449,7 +1449,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             onMouseEnter={() => setIsCursorHovering(true)}
             onMouseLeave={() => setIsCursorHovering(false)}
           >
-            ACQUIRE KEYPASS — ₹49 →
+            ACQUIRE KEYPASS - ₹49 →
           </button>
         </div>
 
@@ -1503,7 +1503,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         {/* MINIMALIST STUDIO FOOTER */}
         <footer className="jeevan-official-footer" style={{ position: 'relative', zIndex: 20 }}>
           <div className="footer-watermark-row">
-            <span className="creator-tag">COGETHER® // DIRECTED BY JEEVAN YADAV</span>
+            <span className="creator-tag">COGETHER // DIRECTED BY JEEVAN YADAV</span>
             <div className="footer-links">
               <a href="mailto:jeevan@cogether.app">EMAIL</a>
               <a href="https://github.com/Jeevan-88/CoGether.git" target="_blank" rel="noreferrer">REPOSITORY</a>
