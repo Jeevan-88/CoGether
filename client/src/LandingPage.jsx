@@ -128,7 +128,7 @@ function AutomaticDiagonal3DRubiksCube() {
   );
 }
 
-export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing }) {
+export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing, onOpenGamesHub }) {
   const [roomCode, setRoomCode] = useState('');
   const [username, setUsername] = useState(localStorage.getItem('sp_username') || '');
   const [isMuted, setIsMuted] = useState(true);
@@ -817,18 +817,44 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 </div>
               </div>
 
-              {/* RIGHT HALF: 1000+ RUBIK'S CUBE */}
-              <div className="right-games-rubiks-hub">
+              {/* RIGHT HALF: 100+ ONLINE GAMES ARCADE HUB */}
+              <div 
+                className="right-games-rubiks-hub" 
+                onClick={onOpenGamesHub || onStartGames}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="vertical-filled-typography-column text-center-all">
                   <h3 className="hero-word-top text-center">P L A Y</h3>
                   <div className="giant-1000-cube-overlay-stack">
-                    <h2 className="hero-word-giant-1000-behind">1,000+</h2>
+                    <h2 className="hero-word-giant-1000-behind">100+</h2>
                     <div className="embedded-diagonal-cube-box center-front-cube">
                       <AutomaticDiagonal3DRubiksCube />
                     </div>
                   </div>
                   <h4 className="hero-word-multiplayer text-center">MULTIPLAYER & ONLINE GAMES</h4>
-                  <h4 className="hero-word-friends text-center">LIVE WITH FRIENDS</h4>
+                  <button 
+                    className="btn-arcade-explore-pill" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onOpenGamesHub) onOpenGamesHub();
+                      else if (onStartGames) onStartGames();
+                    }}
+                    style={{
+                      marginTop: '14px',
+                      background: '#FFE500',
+                      color: '#000000',
+                      border: '3px solid #000000',
+                      borderRadius: '30px',
+                      padding: '10px 24px',
+                      fontFamily: "'Impact', sans-serif",
+                      fontSize: '1.05rem',
+                      letterSpacing: '0.04em',
+                      cursor: 'pointer',
+                      boxShadow: '4px 4px 0px #000000'
+                    }}
+                  >
+                    🎮 OPEN 100+ GAMES ARCADE →
+                  </button>
                 </div>
               </div>
 

@@ -4,12 +4,13 @@ import LandingPage from './LandingPage.jsx';
 import VideoRoom from './VideoRoom.jsx';
 import WatchPartyRoom from './WatchPartyRoom.jsx';
 import GamePortal from './GamePortal.jsx';
+import CoPlayGamesHub from './CoPlayGamesHub.jsx';
 import MergedCameraView from './MergedCameraView.jsx';
 import AuthModal from './AuthModal.jsx';
 import PricingModal from './PricingModal.jsx';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'gamesHub' | ...
   const [user, setUser] = useState(null);
   const [activeRoom, setActiveRoom] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
@@ -104,13 +105,24 @@ export default function App() {
     );
   }
 
+  // ── CO-PLAY YELLOW CANVAS 100+ GAMES ARCADE HUB ──
+  if (activeTab === 'gamesHub') {
+    return (
+      <CoPlayGamesHub
+        onBackToHome={() => setActiveTab('home')}
+        onLaunchSquadRoom={(roomId, username) => handleStartRoom(roomId, username, 'games')}
+        initialUser={user}
+      />
+    );
+  }
+
   return (
     <div className="app-container">
       <Navbar
         activeTab={activeTab}
         onTabChange={(tab) => {
           if (tab === 'watch') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'watch');
-          else if (tab === 'games') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'games');
+          else if (tab === 'games' || tab === 'coplay') setActiveTab('gamesHub');
           else if (tab === 'telepresence') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'merged');
           else setActiveTab(tab);
         }}
@@ -124,9 +136,10 @@ export default function App() {
 
       <LandingPage
         onStartWatchParty={(r, u) => handleStartRoom(r, u, 'watch')}
-        onStartGames={(r, u) => handleStartRoom(r, u, 'games')}
+        onStartGames={(r, u) => setActiveTab('gamesHub')}
         onStartMergedCam={(r, u) => handleStartRoom(r, u, 'merged')}
         onOpenPricing={() => setShowPricing(true)}
+        onOpenGamesHub={() => setActiveTab('gamesHub')}
       />
 
       {showAuth && (
