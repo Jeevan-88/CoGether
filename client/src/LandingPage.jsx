@@ -140,6 +140,20 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [coshopScrollProgress, setCoshopScrollProgress] = useState(0);
   const [costudyScrollProgress, setCostudyScrollProgress] = useState(0);
 
+  // HIGH FASHION INVERTING CUSTOM CURSOR CIRCLE
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const [isCursorHovering, setIsCursorHovering] = useState(false);
+  const [isCursorActive, setIsCursorActive] = useState(false);
+
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+      setIsCursorActive(true);
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    return () => window.removeEventListener('mousemove', onMouseMove);
+  }, []);
+
   // PERFECT CIRCULAR 'O', WHITE DOTS & PINPOINT ZOOM CALIBRATOR CONFIG
   const [oTuner, setOTuner] = useState({
     dotsRadius: 43.5,
@@ -1396,7 +1410,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
       <section className="inverted-triangle-key-section">
         {/* CENTER KEY HERO DISPLAY */}
         <div className="center-black-inverted-triangle">
-          <span className="key-gold-tag">[ ALL_ACCESS // KEY_001 // ₹49 ]</span>
           <h2 className="key-section-title">
             THE MASTER KEYPASS.
           </h2>
@@ -1404,7 +1417,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             One pass. Millisecond-synced 4K cinema, private study desks, live game rooms & collective cart.
           </p>
 
-          {/* TECHNICAL FLOATING CHROME KEY WITH MONOCHROME PRICE TAG */}
+          {/* STATIC CHROME KEY WITH SLEEK WHITE EDGE GLOW & MONOCHROME PRICE TAG */}
           <div className="wavy-floating-key-wrapper">
             <img src="/plain_crystal_key.png" alt="Monochrome Master Keypass" className="glowing-wavy-key-img" />
             <div className="hanging-thread-line" />
@@ -1412,7 +1425,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           </div>
 
           <br />
-          <button className="btn-triangle-key-buy" onClick={onOpenPricing}>
+          <button 
+            className="btn-triangle-key-buy" 
+            onClick={onOpenPricing}
+            onMouseEnter={() => setIsCursorHovering(true)}
+            onMouseLeave={() => setIsCursorHovering(false)}
+          >
             ACQUIRE KEYPASS — ₹49 →
           </button>
         </div>
@@ -1420,7 +1438,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         {/* EDITORIAL REALITY CHECK CARDS (OBSIDIAN CHARCOAL & WARM CREAM) */}
         <div className="triangle-side-cards-wrapper">
           {/* LEFT CHARCOAL MATTE CARD */}
-          <div className="side-psych-card left-card-red">
+          <div 
+            className="side-psych-card left-card-red"
+            onMouseEnter={() => setIsCursorHovering(true)}
+            onMouseLeave={() => setIsCursorHovering(false)}
+          >
             <span className="side-card-badge">[ 01 // PSYCHOLOGICAL REALITY ]</span>
             <p className="side-card-body">
               <strong>Why would you not acquire this key?</strong> Do you really want your crush or partner studying and watching cinema with someone else while you scroll feeds alone in silence?
@@ -1428,7 +1450,11 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           </div>
 
           {/* RIGHT EDITORIAL CREAM CARD */}
-          <div className="side-psych-card right-card-pink">
+          <div 
+            className="side-psych-card right-card-pink"
+            onMouseEnter={() => setIsCursorHovering(true)}
+            onMouseLeave={() => setIsCursorHovering(false)}
+          >
             <span className="side-card-badge">[ 02 // PERFORMANCE METRIC ]</span>
             <p className="side-card-body">
               <strong>Are you gonna let your circle hit straight A's</strong> in private 4K Co-Study rooms while you're locked out crying over laggy 480p screen shares?
@@ -1437,12 +1463,21 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
 
         {/* BOTTOM FULL-WIDTH EDITORIAL BANNER */}
-        <div className="bottom-gold-truth-card">
+        <div 
+          className="bottom-gold-truth-card"
+          onMouseEnter={() => setIsCursorHovering(true)}
+          onMouseLeave={() => setIsCursorHovering(false)}
+        >
           <span className="truth-mono-tag">[ 03 // THE VERDICT ]</span>
           <p className="truth-quote-text">
             "I READ THE REALITY CHECK. THE ARCHITECTURE IS UNDENIABLE. TAKE THE ₹49 AND UNLOCK EVERYTHING."
           </p>
-          <button className="btn-truth-claim-key" onClick={onOpenPricing}>
+          <button 
+            className="btn-truth-claim-key" 
+            onClick={onOpenPricing}
+            onMouseEnter={() => setIsCursorHovering(true)}
+            onMouseLeave={() => setIsCursorHovering(false)}
+          >
             CLAIM UNLIMITED ACCESS →
           </button>
         </div>
@@ -1462,6 +1497,17 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           </p>
         </footer>
       </section>
+
+      {/* HIGH FASHION INVERTING CUSTOM CURSOR CIRCLE */}
+      {isCursorActive && (
+        <div
+          className={`inverting-custom-cursor ${isCursorHovering ? 'is-hovering' : ''}`}
+          style={{
+            left: `${cursorPos.x}px`,
+            top: `${cursorPos.y}px`,
+          }}
+        />
+      )}
     </div>
   );
 }
