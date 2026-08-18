@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './Navbar.jsx';
-import LandingPage from './LandingPage.jsx';
-import VideoRoom from './VideoRoom.jsx';
-import WatchPartyRoom from './WatchPartyRoom.jsx';
-import CoWatchCinemaHub from './CoWatchCinemaHub.jsx';
-import CoPlayGamesHub from './CoPlayGamesHub.jsx';
-import MergedCameraView from './MergedCameraView.jsx';
-import AuthModal from './AuthModal.jsx';
-import PricingModal from './PricingModal.jsx';
+import Navbar from './components/common/Navbar.jsx';
+import LandingPage from './modules/landing/LandingPage.jsx';
+import VideoRoom from './modules/videoroom/VideoRoom.jsx';
+import WatchPartyRoom from './modules/cowatch/WatchPartyRoom.jsx';
+import CoWatchCinemaHub from './modules/cowatch/CoWatchCinemaHub.jsx';
+import CoPlayGamesHub from './modules/coplay/CoPlayGamesHub.jsx';
+import MergedCameraView from './modules/costudy/MergedCameraView.jsx';
+import AuthModal from './modules/auth/AuthModal.jsx';
+import PricingModal from './modules/pricing/PricingModal.jsx';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub' | ...
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub'
   const [user, setUser] = useState(null);
   const [activeRoom, setActiveRoom] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
@@ -113,7 +113,7 @@ export default function App() {
     );
   }
 
-  // ── CO-PLAY YELLOW CANVAS 100+ GAMES ARCADE HUB ──
+  // ── CO-PLAY 100+ GAMES ARCADE HUB ──
   if (activeTab === 'gamesHub') {
     return (
       <CoPlayGamesHub
@@ -153,7 +153,7 @@ export default function App() {
       {showAuth && (
         <AuthModal
           onClose={() => setShowAuth(false)}
-          onLoginSuccess={(u) => setUser(u)}
+          onLoginSuccess={(loggedInUser) => setUser(loggedInUser)}
         />
       )}
 

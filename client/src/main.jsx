@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
-import { initSecurityGuard } from './securityGuard.js';
+import { initSecurityGuard } from './core/securityGuard.js';
 
 // Initialize anti-theft & inspection protection
 initSecurityGuard();

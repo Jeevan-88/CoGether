@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useWebRTC } from './useWebRTC.js';
+import { useWebRTC } from '../../core/useWebRTC.js';
 import VideoTile from './VideoTile.jsx';
 import ChatPanel from './ChatPanel.jsx';
 import ControlBar from './ControlBar.jsx';

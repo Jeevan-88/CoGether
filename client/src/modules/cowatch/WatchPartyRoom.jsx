@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useWebRTC } from './useWebRTC.js';
-import VideoTile from './VideoTile.jsx';
-import ChatPanel from './ChatPanel.jsx';
-import ControlBar from './ControlBar.jsx';
+import { useWebRTC } from '../../core/useWebRTC.js';
+import VideoTile from '../videoroom/VideoTile.jsx';
+import ChatPanel from '../videoroom/ChatPanel.jsx';
+import ControlBar from '../videoroom/ControlBar.jsx';
 import { Tv, Play, Pause, RotateCcw, Link, Copy, Check, Users, MessageSquare, Sparkles } from 'lucide-react';
 import './WatchPartyRoom.css';
 

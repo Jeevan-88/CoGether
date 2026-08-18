@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useWebRTC } from './useWebRTC.js';
-import VideoTile from './VideoTile.jsx';
-import ChatPanel from './ChatPanel.jsx';
-import ControlBar from './ControlBar.jsx';
+import { useWebRTC } from '../../core/useWebRTC.js';
+import VideoTile from '../videoroom/VideoTile.jsx';
+import ChatPanel from '../videoroom/ChatPanel.jsx';
+import ControlBar from '../videoroom/ControlBar.jsx';
 import { Sparkles, Users, Layers, ShieldCheck, Wand2, Tv, Gamepad2 } from 'lucide-react';
 import './MergedCameraView.css';
 
