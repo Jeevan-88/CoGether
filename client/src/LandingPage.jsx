@@ -384,8 +384,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const burstOpacity = isBurstActive ? Math.sin(((heroScroll - 0.02) / 0.83) * Math.PI) : 0;
   const crossScale = Math.min((heroScroll - 0.02) * 3.5, 1);
 
-  // STEP 2: FULL 360-DEGREE INWARD ZIGZAG DOOR SPIN (Red -> Yellow) (scrollProgress 0.10 -> 0.70)
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.10) * 1.67, 0), 1);
+  // STEP 2: FULL 360-DEGREE INWARD ZIGZAG DOOR SPIN (Red -> Yellow) (scrollProgress 0.08 -> 0.50)
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.08) * 2.38, 0), 1);
   let doorSpinAngle = spinProgress * 360;
 
   if (spinProgress > 0.90 && spinProgress <= 0.97) {
@@ -409,14 +409,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   }
 
   const isFullyLockedYellow = spinProgress >= 0.99;
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.75) * 4.0, 0), 1);
+  // Bullets finish revealing smoothly from 0.50 to 0.75, then HOLD 100% from 0.75 to 1.00 for a 2s reading pause!
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.50) * 4.0, 0), 1);
 
   // STEP 4: CO-PLAY STICKY SCROLL ZOOM
-  const coplayZoomProgress = Math.min(Math.max((coplayScrollProgress - 0.15) * 4.0, 0), 1);
+  // Zoom: 0.08 -> 0.35 | GameBoy Blend: 0.35 -> 0.58 | Split Door Reveal: 0.58 -> 0.78 | 0.78 -> 1.00: 2s HOLD READING PAUSE
+  const coplayZoomProgress = Math.min(Math.max((coplayScrollProgress - 0.08) * 3.7, 0), 1);
   const coplayZoomScale = 1 + coplayZoomProgress * 14.0;
-  const textZoomOpacity = coplayScrollProgress < 0.15 ? 1 : Math.max(1 - Math.max((coplayScrollProgress - 0.15) * 4.5, 0), 0);
-  const gameboyBlendOpacity = Math.min(Math.max((coplayScrollProgress - 0.38) * 5.0, 0), 1);
-  const coplaySplitProgress = Math.min(Math.max((coplayScrollProgress - 0.65) * 5.0, 0), 1);
+  const textZoomOpacity = coplayScrollProgress < 0.08 ? 1 : Math.max(1 - Math.max((coplayScrollProgress - 0.08) * 4.5, 0), 0);
+  const gameboyBlendOpacity = Math.min(Math.max((coplayScrollProgress - 0.35) * 4.35, 0), 1);
+  const coplaySplitProgress = Math.min(Math.max((coplayScrollProgress - 0.58) * 5.0, 0), 1);
 
   const COPLAY_TYPO_ITEMS = Array(12).fill('CO-PLAY');
 
@@ -540,7 +542,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
       </section>
 
       {/* 2. STICKY PINNED RED CO-WATCH SECTION WITH 360-DEGREE INWARD ZIGZAG DOOR SPIN */}
-      <section className="sticky-pinned-red-stage-wrapper">
+      <section className="sticky-pinned-red-stage-wrapper" style={{ height: '450vh', position: 'relative' }}>
         <div className={`sticky-pinned-red-stage-inner ${isFullyLockedYellow || isYellowStage ? 'bg-full-yellow' : ''}`}>
           {/* BACKGROUND VOID BOLD CONDENSED REVEAL TYPOGRAPHY */}
           <div
@@ -797,7 +799,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
       <div style={{ height: '60vh', background: '#000000' }} />
 
       {/* 3. CO-PLAY: STICKY PINNED 3D ZOOM & VERTICAL SPLIT DOOR SECTION */}
-      <section className="sticky-pinned-coplay-stage-wrapper">
+      <section className="sticky-pinned-coplay-stage-wrapper" style={{ height: '450vh', position: 'relative' }}>
         <div className="sticky-pinned-coplay-stage-inner">
           <div className="underlying-white-page-reveal">
             <div className="white-page-grid-split">
@@ -1206,7 +1208,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
       </div>
 
       {/* 5. STICKY PINNED CO-STUDY SHOWCASE SECTION */}
-      <div className="sticky-pinned-costudy-stage-wrapper">
+      <div className="sticky-pinned-costudy-stage-wrapper" style={{ height: '450vh', position: 'relative' }}>
         <section className="costudy-sticky-stage">
           {effectiveCostudyScroll < 0.65 && (
             <div
