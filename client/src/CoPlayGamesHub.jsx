@@ -98,13 +98,10 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
 
   const handleShareSquadRoom = () => {
     const roomCode = 'squad-' + Math.floor(1000 + Math.random() * 9000);
-    const link = `${window.location.origin}?room=${roomCode}&mode=games`;
+    const link = `${window.location.origin}?room=${roomCode}&mode=coplay`;
     navigator.clipboard.writeText(link);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2500);
-    if (onLaunchSquadRoom) {
-      onLaunchSquadRoom(roomCode, currentUser.name);
-    }
   };
 
   return (

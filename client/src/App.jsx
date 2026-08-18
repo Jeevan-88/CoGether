@@ -3,7 +3,6 @@ import Navbar from './Navbar.jsx';
 import LandingPage from './LandingPage.jsx';
 import VideoRoom from './VideoRoom.jsx';
 import WatchPartyRoom from './WatchPartyRoom.jsx';
-import GamePortal from './GamePortal.jsx';
 import CoPlayGamesHub from './CoPlayGamesHub.jsx';
 import MergedCameraView from './MergedCameraView.jsx';
 import AuthModal from './AuthModal.jsx';
@@ -76,12 +75,11 @@ export default function App() {
       );
     }
 
-    if (activeRoom.mode === 'games') {
+    if (activeRoom.mode === 'games' || activeRoom.mode === 'coplay') {
       return (
-        <GamePortal
-          roomId={activeRoom.roomId}
-          username={activeRoom.username}
-          onLeave={handleLeaveRoom}
+        <CoPlayGamesHub
+          onBackToHome={handleLeaveRoom}
+          initialUser={user}
         />
       );
     }
