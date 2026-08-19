@@ -1262,7 +1262,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       const angle = (i * 30 * Math.PI) / 180;
                       const cx = 50 + 43.5 * Math.cos(angle);
                       const cy = 50 + 43.5 * Math.sin(angle);
-                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r="3.0" fill="#ffffff" />;
+                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r="3.0" fill="#000000" />;
                     })}
                   </svg>
                 </div>
@@ -1272,7 +1272,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             </div>
           )}
           {/* NODECK.ONLINE STYLE INTERACTIVE DECK SHOWCASE (POPS IN AFTER ZOOMING THROUGH 'O') */}
-          {effectiveCostudyScroll >= 0.35 && (
+          {effectiveCostudyScroll >= 0.50 && (
             <div className={`nodeck-stage-container ${activeNodeckSlide === 1 || activeNodeckSlide === 4 ? 'bg-pink' : 'bg-cream'} fade-in`}>
               {/* TOP BRANDING TAG BADGE */}
               <div className="nodeck-top-header">
