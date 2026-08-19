@@ -3247,13 +3247,16 @@
   font-size: clamp(5.2rem, 15vw, 18rem);
   max-width: 95vw;
   font-weight: 900;
-  font-stretch: ultra-condensed;
   color: #000000;
-  letter-spacing: -0.04em;
+  letter-spacing: 0.02em;
   line-height: 0.85;
   text-transform: uppercase;
   user-select: none;
   white-space: nowrap;
+}
+
+.costudy-text-row .char-study {
+  letter-spacing: 0.03em;
 }
 
 .co-letter-o-custom-circle {
