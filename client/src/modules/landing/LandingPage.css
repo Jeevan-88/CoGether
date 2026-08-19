@@ -3272,17 +3272,16 @@
   transition: transform 0.1s ease;
 }
 
-/* GRADUATION CAP / MORTARBOARD ON TOP OF 'O' 🎓 */
+/* GRADUATION CAP / MORTARBOARD ON TOP OF 'C' 🎓 */
 .o-graduation-cap {
   position: absolute;
-  top: -44%;
-  left: 50%;
-  transform: translateX(-50%) rotate(-8deg);
-  width: 0.92em;
+  top: -48%;
+  left: -78%;
+  transform: translateX(-50%) rotate(-30deg);
+  width: 0.95em;
   height: auto;
   pointer-events: none;
   z-index: 10;
-  filter: none;
 }
 
 .o-black-circle-body {
