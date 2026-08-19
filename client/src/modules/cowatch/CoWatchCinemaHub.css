@@ -12,12 +12,12 @@
   padding-bottom: 80px;
 }
 
-/* ── PURE BLACK LUXURY NAVBAR WITH RED OUTLINE ALL SIDES ── */
+/* ── PURE BLACK NAVBAR WITH WHITE OUTLINE ALL SIDES ── */
 .cinema-top-header {
   height: 86px;
   background: #000000 !important;
-  border: 3.5px solid #ff0033 !important;
-  box-shadow: 0 0 25px rgba(255, 0, 51, 0.45), inset 0 0 15px rgba(255, 0, 51, 0.15);
+  border: 2px solid #ffffff !important;
+  box-shadow: none !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -43,74 +43,61 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #111111;
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: #000000;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  padding: 6px 14px 6px 6px;
-  border-radius: 50px;
+  padding: 6px 18px 6px 6px;
+  border-radius: 30px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .btn-profile-trigger:hover,
 .btn-profile-trigger.active {
-  background: #1a1a1a;
-  border-color: #ff0033;
-  box-shadow: 0 0 12px rgba(255, 0, 51, 0.35);
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
 }
 
-.profile-avatar-circle {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #ff0033, #b30024);
+.profile-avatar-square {
+  width: 32px;
+  height: 32px;
+  background: #ff0033;
   color: #ffffff;
-  border-radius: 50%;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-}
-
-.profile-online-badge {
-  width: 9px;
-  height: 9px;
-  background: #22c55e;
-  border: 2px solid #000000;
-  border-radius: 50%;
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  box-shadow: 0 0 6px #22c55e;
 }
 
 .profile-user-name {
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
-  font-size: 13px;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 12px;
   font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 0.02em;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: inherit;
 }
 
 .profile-chevron {
-  color: #888888;
+  color: inherit;
   transition: transform 0.2s ease;
 }
 
 .profile-chevron.rotated {
   transform: rotate(180deg);
-  color: #ff0033;
 }
 
-/* ── PROFILE DROPDOWN CARD ── */
+/* ── PROFILE DROPDOWN CARD (ATTACHED TO NAVBAR) ── */
 .profile-dropdown-card {
   position: absolute;
-  top: calc(100% + 14px);
+  top: calc(100% + 4px);
   left: 0;
-  width: 320px;
-  background: #0d0d0d;
-  border: 2px solid #ff0033;
-  border-radius: 14px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 0, 51, 0.35);
+  width: 330px;
+  background: #000000;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 1);
   padding: 20px;
   z-index: 1000;
   animation: dropdownPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -119,7 +106,7 @@
 @keyframes dropdownPop {
   from {
     opacity: 0;
-    transform: translateY(-8px) scale(0.96);
+    transform: translateY(-6px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -133,71 +120,73 @@
   gap: 14px;
 }
 
-.dropdown-avatar-lg {
+.dropdown-avatar-sq-lg {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, #ff0033, #7a0016);
-  border-radius: 50%;
+  background: #ff0033;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  box-shadow: 0 0 12px rgba(255, 0, 51, 0.4);
 }
 
 .dropdown-user-details h4 {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
   color: #ffffff;
-  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif;
 }
 
 .user-role-tag {
   font-size: 10px;
   font-family: 'Space Mono', monospace;
-  font-weight: 700;
-  color: #22c55e;
-  letter-spacing: 0.06em;
+  font-weight: 800;
+  color: #ff0033;
+  letter-spacing: 0.08em;
   display: block;
   margin-top: 3px;
 }
 
 .dropdown-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   margin: 14px 0;
 }
 
 .dropdown-section {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .dropdown-section-label {
   font-size: 10px;
   font-family: 'Space Mono', monospace;
   font-weight: 700;
-  color: #888888;
-  letter-spacing: 0.08em;
+  color: #ffffff;
+  letter-spacing: 0.1em;
   margin-bottom: 6px;
   display: block;
+  text-transform: uppercase;
 }
 
 .dropdown-copy-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #161616;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0a0a0a;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .dropdown-copy-box:hover {
-  border-color: #ff0033;
-  background: #1c1c1c;
+  border-color: #FFE500;
+  background: #111111;
 }
 
 .mono-code {
@@ -205,13 +194,13 @@
   font-size: 13px;
   font-weight: 800;
   color: #FFE500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
 .mono-link-preview {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
-  color: #cccccc;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -222,19 +211,26 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #000000;
+  border: 1.5px solid #ffffff;
   color: #ffffff;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 4px;
   font-size: 10px;
   font-family: 'Space Mono', monospace;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.copied-green {
-  color: #22c55e;
+.btn-inline-copy:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.copied-yellow {
+  color: #FFE500;
 }
 
 .dropdown-leave-btn {
@@ -243,24 +239,24 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: rgba(255, 0, 51, 0.1);
-  border: 1px solid rgba(255, 0, 51, 0.4);
-  color: #ff4d6d;
-  padding: 9px;
-  border-radius: 8px;
+  background: #ff0033;
+  border: 2px solid #ff0033;
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 6px;
   font-size: 11px;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Inter', sans-serif;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .dropdown-leave-btn:hover {
-  background: #ff0033;
-  color: #ffffff;
-  border-color: #ff0033;
-  box-shadow: 0 0 14px rgba(255, 0, 51, 0.4);
+  background: #ffffff;
+  color: #ff0033;
+  border-color: #ffffff;
 }
 
 /* ── CENTER: BOLD YELLOW CO-WATCH + ITALIC CURSIVE SUBTITLE ── */
@@ -284,25 +280,25 @@
 
 .cowatch-bold-yellow-title {
   margin: 0;
-  font-family: 'Space Grotesk', 'Anton', 'Outfit', 'Arial Black', sans-serif;
-  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  font-family: 'Space Grotesk', 'Anton', 'Impact', sans-serif;
+  font-size: clamp(2rem, 3.8vw, 2.7rem);
   font-weight: 900;
   color: #FFE500 !important;
   letter-spacing: -0.02em;
   line-height: 0.9;
   text-transform: uppercase;
-  text-shadow: 0 0 20px rgba(255, 229, 0, 0.5), 0 0 40px rgba(255, 229, 0, 0.2);
+  text-shadow: none !important;
 }
 
 .cowatch-cursive-subtitle {
-  font-family: 'Dancing Script', 'Caveat', 'Brush Script MT', cursive;
+  font-family: 'Dancing Script', 'Caveat', cursive;
   font-size: 15px;
   font-style: italic;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 0.05em;
-  margin-top: 1px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+  text-shadow: none !important;
 }
 
 /* ── RIGHT: QUICK BACK BUTTON ── */
@@ -316,23 +312,24 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #111111;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #000000;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 800;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .btn-cinema-back-subtle:hover {
-  background: #FFE500;
+  background: #ffffff;
   color: #000000;
-  border-color: #FFE500;
-  box-shadow: 0 0 12px rgba(255, 229, 0, 0.4);
+  border-color: #ffffff;
 }
 
 @keyframes pulseRed {

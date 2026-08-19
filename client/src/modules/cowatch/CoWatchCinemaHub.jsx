@@ -88,7 +88,7 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
 
   return (
     <div className="cowatch-cinema-universe fade-in">
-      {/* ── PURE BLACK LUXURY NAVBAR WITH RED OUTLINE ALL SIDES ── */}
+      {/* ── PURE BLACK NAVBAR WITH WHITE OUTLINE ALL SIDES ── */}
       <header className="cinema-top-header">
         {/* LEFT: Profile Icon + Dropdown Menu */}
         <div className="cinema-header-left">
@@ -98,11 +98,10 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               title="Party Profile & Squad Link"
             >
-              <div className="profile-avatar-circle">
-                <User size={18} />
-                <span className="profile-online-badge" />
+              <div className="profile-avatar-square">
+                <User size={17} />
               </div>
-              <span className="profile-user-name">{initialUser?.name || 'Party Host'}</span>
+              <span className="profile-user-name">{initialUser?.name || 'PARTY HOST'}</span>
               <ChevronDown size={14} className={`profile-chevron ${isProfileOpen ? 'rotated' : ''}`} />
             </button>
 
@@ -110,11 +109,11 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
             {isProfileOpen && (
               <div className="profile-dropdown-card fade-in">
                 <div className="dropdown-user-header">
-                  <div className="dropdown-avatar-lg">
+                  <div className="dropdown-avatar-sq-lg">
                     <User size={24} />
                   </div>
                   <div className="dropdown-user-details">
-                    <h4>{initialUser?.name || 'Party Host'}</h4>
+                    <h4>{initialUser?.name || 'PARTY HOST'}</h4>
                     <span className="user-role-tag">● ACTIVE IN ROOM</span>
                   </div>
                 </div>
@@ -127,8 +126,8 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
                   <div className="dropdown-copy-box" onClick={handleCopyRoomCode}>
                     <span className="mono-code">{roomCode}</span>
                     <button className="btn-inline-copy">
-                      {isRoomCopied ? <Check size={14} className="copied-green" /> : <Copy size={14} />}
-                      <span>{isRoomCopied ? 'Copied' : 'Copy'}</span>
+                      {isRoomCopied ? <Check size={13} className="copied-yellow" /> : <Copy size={13} />}
+                      <span>{isRoomCopied ? 'COPIED' : 'COPY'}</span>
                     </button>
                   </div>
                 </div>
@@ -139,8 +138,8 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
                   <div className="dropdown-copy-box" onClick={handleCopyPartyLink}>
                     <span className="mono-link-preview">{`${window.location.origin}?room=${roomCode}&mode=watch`}</span>
                     <button className="btn-inline-copy">
-                      {isCopied ? <Check size={14} className="copied-green" /> : <Copy size={14} />}
-                      <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                      {isCopied ? <Check size={13} className="copied-yellow" /> : <Copy size={13} />}
+                      <span>{isCopied ? 'COPIED' : 'COPY'}</span>
                     </button>
                   </div>
                 </div>
@@ -149,7 +148,7 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
 
                 {/* Leave / Back to Home Action */}
                 <button className="dropdown-leave-btn" onClick={onBackToHome}>
-                  <LogOut size={15} /> <span>LEAVE PARTY & GO HOME</span>
+                  <LogOut size={14} /> <span>LEAVE PARTY & GO HOME</span>
                 </button>
               </div>
             )}
@@ -164,10 +163,10 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
           </div>
         </div>
 
-        {/* RIGHT: Quick Back to Home & Theater Status */}
+        {/* RIGHT: Quick Back to Home */}
         <div className="cinema-header-right">
           <button className="btn-cinema-back-subtle" onClick={onBackToHome}>
-            <ArrowLeft size={14} /> <span>BACK TO HOME</span>
+            <ArrowLeft size={13} /> <span>BACK TO HOME</span>
           </button>
         </div>
       </header>
