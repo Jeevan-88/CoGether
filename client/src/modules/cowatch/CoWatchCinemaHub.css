@@ -1,18 +1,19 @@
 /* ==========================================================================
-   CO-WATCH CINEMA & OTT ENTERTAINMENT HUB CSS
-   Theme: Pitch Black (#000000), Electric Yellow (#FFE500), Vivid Red (#E50914)
+   CO-WATCH CINEMA & ENTERTAINMENT UNIVERSE CSS
+   Strict 4-Color Palette: Pitch Black (#000000), Crisp White (#ffffff), 
+   Electric Yellow (#FFE500), Crimson Red (#ff0033)
    ========================================================================== */
 
 .cowatch-cinema-universe {
   min-height: 100vh;
-  background-color: #050505 !important;
+  background-color: #000000 !important;
   color: #ffffff;
-  font-family: 'Syne', 'Inter', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   overflow-x: hidden;
-  padding-bottom: 80px;
+  padding-bottom: 90px;
 }
 
-/* ── PURE BLACK NAVBAR WITH WHITE OUTLINE ALL SIDES & LIGHT CURVE ── */
+/* ── 1. FLOATING PURE BLACK NAVBAR (1PX WHITE OUTLINE & LIGHT CURVE) ── */
 .cinema-top-header {
   height: 84px;
   background: #000000 !important;
@@ -31,7 +32,6 @@
   z-index: 500;
 }
 
-/* ── LEFT: PROFILE BUTTON & DROPDOWN ── */
 .cinema-header-left {
   display: flex;
   align-items: center;
@@ -255,7 +255,7 @@
   border-color: #ffffff !important;
 }
 
-/* ── CENTER: BOLD YELLOW CO-WATCH + ITALIC CURSIVE SUBTITLE ── */
+/* ── CENTER BRANDING ── */
 .cinema-header-center {
   position: absolute;
   left: 50%;
@@ -297,7 +297,7 @@
   text-shadow: none !important;
 }
 
-/* ── RIGHT: QUICK BACK BUTTON ── */
+/* ── RIGHT BACK BUTTON ── */
 .cinema-header-right {
   display: flex;
   align-items: center;
@@ -328,669 +328,827 @@
   border-color: #ffffff;
 }
 
-@keyframes pulseRed {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.3); }
+/* ── 2. TOP-LEVEL ENTERTAINMENT PILLARS STRIP ── */
+.entertainment-pillars-section {
+  padding: 24px 24px 0 24px;
+  max-width: 1540px;
+  margin: 0 auto;
 }
 
-.room-label {
-  color: #888888;
+.pillars-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
-.party-room-badge strong {
-  color: #FFE500;
-}
-
-.btn-copy-party-link {
+.pillars-switch-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #E50914;
+  justify-content: center;
+  gap: 16px;
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 8px 12px;
+  border-radius: 50px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pillar-switch-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid transparent;
   color: #ffffff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.pillar-switch-btn:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.pillar-switch-btn.active {
+  background: #FFE500;
+  color: #000000;
+  border-color: #FFE500;
+  box-shadow: 0 4px 20px rgba(255, 229, 0, 0.35);
+}
+
+.pillar-btn-icon {
+  font-size: 18px;
+}
+
+.pillar-tagline-text {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  color: #aaaaaa;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 4px 0 0 0;
+  text-align: center;
 }
 
-.btn-copy-party-link:hover {
-  background: #ff2a2a;
-  transform: translateY(-1px);
-}
-
-/* ── MULTI-LANGUAGE COMPARTMENTS BAR ── */
-.language-compartments-strip {
-  background: #0d0d0d;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 12px 32px;
-}
-
-.compartment-container {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 1440px;
+/* ── 3. OTT STREAMING PLATFORMS ROW ── */
+.ott-platforms-strip {
+  padding: 18px 24px;
+  max-width: 1540px;
   margin: 0 auto;
+}
+
+.platforms-container {
   overflow-x: auto;
   scrollbar-width: none;
 }
-
-.compartment-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 800;
-  color: #888888;
-  letter-spacing: 0.1em;
-  flex-shrink: 0;
+.platforms-container::-webkit-scrollbar {
+  display: none;
 }
 
-.compartment-pills {
+.platforms-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 2px;
+}
+
+.platform-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.platform-pill-btn:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: #141414;
+}
+
+.platform-pill-btn.active {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.platform-pill-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 900;
+  background: #ff0033;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+}
+
+.platform-pill-btn.active .platform-pill-badge {
+  background: #000000;
+  color: #FFE500;
+}
+
+.platform-pill-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ── 4. SYNCHRONIZED THEATER STAGE ── */
+.live-theater-stage-container {
+  max-width: 1540px;
+  margin: 20px auto;
+  padding: 0 24px;
+}
+
+.theater-inner-box {
+  background: #050505;
+  border: 1px solid #ff0033;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95);
+}
+
+.theater-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #0d0d0d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.live-red-indicator {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #ff0033;
+  letter-spacing: 0.1em;
+  display: block;
+}
+
+.theater-title {
+  margin: 4px 0 2px 0;
+  font-size: 18px;
+  font-weight: 900;
+  color: #FFE500;
+}
+
+.theater-submeta {
+  font-size: 11px;
+  color: #888888;
+  font-family: 'Space Mono', monospace;
+}
+
+.btn-close-theater {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-close-theater:hover {
+  background: #ff0033;
+  border-color: #ff0033;
+}
+
+.theater-screen-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 52%; /* 16:9 theater ratio */
+  background: #000000;
+}
+
+.theater-iframe-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.theater-floating-squad {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.squad-cam-card {
+  width: 110px;
+  height: 75px;
+  background: #111111;
+  border: 1px solid #FFE500;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cam-sim-avatar {
+  width: 28px;
+  height: 28px;
+  background: #FFE500;
+  color: #000000;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.friend-avatar {
+  background: #ff0033;
+  color: #ffffff;
+}
+
+.cam-user-name {
+  font-size: 9px;
+  font-family: 'Space Mono', monospace;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+.cam-audio-pulse {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+}
+
+.floating-party-emoji {
+  position: absolute;
+  bottom: 30px;
+  font-size: 32px;
+  animation: floatUp 2s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(0.8); opacity: 1; }
+  100% { transform: translateY(-120px) scale(1.4); opacity: 0; }
+}
+
+.theater-bottom-deck {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: #0d0d0d;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.theater-controls-left {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.compartment-pill-btn {
+.btn-theater-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-theater-control.active {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.theater-reactions-row {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.btn-reaction-tap {
   background: #181818;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #dddddd;
-  padding: 8px 16px;
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 16px;
+  padding: 6px 12px;
+  border-radius: 6px;
   cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: transform 0.15s ease;
 }
 
-.compartment-pill-btn:hover {
+.btn-reaction-tap:hover {
+  transform: scale(1.2);
   border-color: #FFE500;
-  color: #FFE500;
 }
 
-.compartment-pill-btn.active {
+.btn-invite-squad-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: #FFE500;
+  border: 1px solid #FFE500;
   color: #000000;
-  border-color: #FFE500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
   font-weight: 800;
+  cursor: pointer;
 }
 
-/* ── HERO SPOTLIGHT BANNER ── */
-.cinema-hero-spotlight {
+/* ── 5. SPOTLIGHT HERO BANNER ── */
+.cowatch-hero-spotlight {
+  max-width: 1540px;
+  margin: 10px auto 28px auto;
+  padding: 0 24px;
+}
+
+.hero-spotlight-card {
   position: relative;
-  height: 520px;
-  background-size: cover;
-  background-position: center 30%;
-  background-color: #111111;
+  min-height: 440px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
   display: flex;
   align-items: flex-end;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.hero-spotlight-overlay {
+.hero-spotlight-backdrop {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(0deg, #050505 5%, rgba(5, 5, 5, 0.8) 50%, rgba(5, 5, 5, 0.4) 100%),
-              linear-gradient(90deg, #050505 0%, rgba(5, 5, 5, 0.85) 45%, transparent 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 48px;
-  max-width: 820px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center 25%;
+  z-index: 1;
 }
 
-.spotlight-badge-row {
+.hero-spotlight-gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(0deg, #000000 0%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.2) 100%),
+              linear-gradient(90deg, #000000 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
+  z-index: 2;
+}
+
+.hero-spotlight-content {
+  position: relative;
+  z-index: 3;
+  padding: 40px;
+  max-width: 780px;
+}
+
+.spotlight-top-tags {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
-.badge-exclusive-tag {
+.badge-featured {
+  background: #FFE500;
+  color: #000000;
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 800;
-  color: #FFE500;
-  background: rgba(255, 229, 0, 0.12);
-  border: 1px solid rgba(255, 229, 0, 0.4);
-  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+}
+
+.badge-platform {
+  background: #ff0033;
+  color: #ffffff;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 8px;
   border-radius: 4px;
 }
 
-.badge-platform-tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 800;
+.badge-rating {
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   color: #ffffff;
-  background: #E50914;
-  padding: 4px 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 8px;
   border-radius: 4px;
 }
 
 .spotlight-title {
-  font-size: 46px;
+  font-family: 'Space Grotesk', 'Anton', sans-serif;
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
   font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  margin: 0 0 12px 0;
   color: #ffffff;
-}
-
-.spotlight-metadata-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.meta-pill {
-  font-size: 12px;
-  color: #cccccc;
-  font-weight: 600;
-}
-
-.rating-pill {
-  color: #FFE500;
-  font-weight: 800;
-}
-
-.genre-pill {
-  color: #aaaaaa;
+  margin: 0 0 12px 0;
+  line-height: 1.05;
+  text-transform: uppercase;
 }
 
 .spotlight-synopsis {
   font-size: 14px;
   line-height: 1.6;
   color: #cccccc;
-  margin-bottom: 24px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  margin: 0 0 18px 0;
+  max-width: 680px;
 }
 
-.spotlight-cta-row {
+.spotlight-metadata-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
+  font-size: 12px;
+  color: #aaaaaa;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
-.btn-spotlight-play {
+.spotlight-metadata-row strong {
+  color: #ffffff;
+}
+
+.spotlight-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-spotlight-watch-now {
   display: flex;
   align-items: center;
   gap: 10px;
   background: #FFE500;
+  border: 2px solid #FFE500;
   color: #000000;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 8px;
+  padding: 12px 28px;
+  border-radius: 40px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
   font-weight: 900;
-  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-spotlight-play:hover {
+.btn-spotlight-watch-now:hover {
   background: #ffffff;
+  border-color: #ffffff;
   transform: translateY(-2px);
 }
 
-.btn-spotlight-party {
+.btn-spotlight-copy-code {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #ffffff;
   color: #ffffff;
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 14px;
+  padding: 12px 24px;
+  border-radius: 40px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-spotlight-party:hover {
-  background: rgba(255, 255, 255, 0.2);
+.btn-spotlight-copy-code:hover {
+  background: #ffffff;
+  color: #000000;
 }
 
-/* ── OTT PLATFORMS COMPARTMENTS ── */
-.cinema-platforms-strip {
-  padding: 36px 32px 20px;
-  max-width: 1440px;
+/* ── 6. GIANT CINEMATIC CARDS GRID ── */
+.giant-cinema-cards-section {
+  max-width: 1540px;
   margin: 0 auto;
+  padding: 0 24px;
 }
 
-.section-header-compact {
+.section-title-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 20px;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.eyebrow-accent {
+.section-tag-mono {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FFE500;
+  letter-spacing: 0.12em;
   display: block;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 800;
-  color: #FFE500;
-  letter-spacing: 0.15em;
-  margin-bottom: 4px;
 }
 
-.section-header-compact h3 {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  margin: 0;
+.section-heading {
+  margin: 4px 0 0 0;
+  font-size: 22px;
+  font-weight: 900;
   color: #ffffff;
+  letter-spacing: -0.01em;
 }
 
-.ott-platforms-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.ott-platform-card {
-  background: #111111;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 20px;
-  text-decoration: none;
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.25s ease;
-}
-
-.ott-platform-card:hover {
-  border-color: #FFE500;
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
-}
-
-.platform-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.platform-logo-img {
-  height: 28px !important;
-  max-width: 110px !important;
-  object-fit: contain;
-}
-
-.ext-link-icon {
-  color: #666666;
-}
-
-.platform-name {
-  font-size: 16px;
-  font-weight: 800;
-  margin: 0 0 6px 0;
-}
-
-.platform-tagline {
-  font-size: 12px;
-  color: #888888;
-  line-height: 1.4;
-  margin: 0 0 16px 0;
-}
-
-.platform-action-badge {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 800;
-  color: #FFE500;
-  letter-spacing: 0.05em;
-}
-
-/* ── MOVIE CATALOG GRID ── */
-.cinema-catalog-section {
-  padding: 32px 32px 60px;
-  max-width: 1440px;
-  margin: 0 auto;
-}
-
-.total-movies-count {
+.count-pill {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
-  color: #FFE500;
-  font-weight: 700;
-}
-
-.cinema-movies-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.cinema-movie-card {
+  font-weight: 800;
   background: #111111;
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.giant-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+}
+
+.giant-movie-card {
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  cursor: pointer;
-  transition: all 0.25s ease;
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 
-.cinema-movie-card:hover {
-  transform: translateY(-5px);
+.giant-movie-card:hover {
+  transform: translateY(-8px);
   border-color: #FFE500;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 16px rgba(255, 229, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
 }
 
-.poster-image-wrapper {
+.card-poster-wrapper {
   position: relative;
-  aspect-ratio: 2 / 3;
   width: 100%;
+  padding-top: 56.25%; /* 16:9 ratio */
+  background: #111111;
   overflow: hidden;
-  background: #1a1a1a;
+  cursor: pointer;
 }
 
-.movie-poster-img {
+.card-poster-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
 
-.cinema-movie-card:hover .movie-poster-img {
-  transform: scale(1.05);
+.giant-movie-card:hover .card-poster-img {
+  transform: scale(1.06);
 }
 
-.poster-overlay-gradient {
+.card-poster-vignette {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 40%, rgba(0,0,0,0.9) 100%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 40%, rgba(0,0,0,0.85) 100%);
 }
 
-.poster-top-badges {
+.card-badge-container {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
+  top: 12px;
+  left: 12px;
+  right: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  z-index: 2;
 }
 
-.badge-free-pill {
-  background: #E50914;
-  color: #ffffff;
+.platform-tag-pill {
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 9px;
+  font-weight: 900;
+  background: #ff0033;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+}
+
+.rating-tag-pill {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 900;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #FFE500;
   padding: 3px 8px;
   border-radius: 4px;
 }
 
-.badge-rating-pill {
-  background: rgba(0, 0, 0, 0.75);
-  color: #FFE500;
-  font-size: 10px;
-  font-weight: 800;
-  padding: 3px 7px;
-  border-radius: 4px;
-  margin-left: auto;
-}
-
-.poster-hover-play-btn {
+.card-hover-overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.7);
-  width: 50px;
-  height: 50px;
-  background: #FFE500;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: all 0.25s ease;
-}
-
-.cinema-movie-card:hover .poster-hover-play-btn {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.movie-card-details {
-  padding: 14px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.movie-platform-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  color: #FFE500;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.movie-card-title {
-  font-size: 14px;
-  font-weight: 800;
-  margin: 0;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.movie-card-meta {
-  font-size: 11px;
-  color: #777777;
-  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 3;
 }
 
-/* ── THEATER SCREEN PLAYER SECTION ── */
-.cinema-theater-screen-section {
-  background: #000000;
-  border-bottom: 2px solid #E50914;
-  padding: 24px 32px 36px;
+.giant-movie-card:hover .card-hover-overlay {
+  opacity: 1;
 }
 
-.theater-screen-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.theater-player-container {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  width: 100%;
-  background: #000000;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.theater-video-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
-}
-
-/* Floating Squad Cam */
-.floating-squad-cam-dock {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(0, 0, 0, 0.88);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 12px;
-  width: 190px;
-  z-index: 50;
-}
-
-.dock-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 800;
-  color: #ffffff;
-  margin-bottom: 8px;
-}
-
-.live-rec-dot {
-  width: 6px;
-  height: 6px;
-  background: #E50914;
+.hover-play-circle {
+  width: 52px;
+  height: 52px;
+  background: #FFE500;
   border-radius: 50%;
-  animation: pulseRed 1s infinite;
-}
-
-.squad-cam-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.squad-cam-tile {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #222222;
-}
-
-.squad-cam-tile img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.cam-name-tag {
-  position: absolute;
-  bottom: 2px;
-  left: 4px;
-  font-size: 8px;
-  color: #ffffff;
-  background: rgba(0,0,0,0.6);
-  padding: 1px 4px;
-  border-radius: 3px;
-}
-
-.squad-cam-controls {
-  display: flex;
-  gap: 6px;
-}
-
-.btn-cam-ctrl {
-  flex: 1;
-  padding: 5px;
-  border-radius: 4px;
-  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  transform: scale(0.9);
+  transition: transform 0.2s ease;
 }
 
-.btn-cam-ctrl.active {
-  background: #FFE500;
-  color: #000000;
+.giant-movie-card:hover .hover-play-circle {
+  transform: scale(1);
 }
 
-.btn-cam-ctrl.muted {
-  background: #E50914;
+.hover-cta-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
   color: #ffffff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.theater-info-bar {
+.card-info-box {
+  padding: 20px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 20px 0;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
-.theater-title-block h2 {
-  font-size: 24px;
-  font-weight: 800;
-  margin: 4px 0 6px 0;
-  color: #ffffff;
-}
-
-.theater-title-block p {
-  font-size: 13px;
-  color: #888888;
+.card-title-text {
   margin: 0;
-  max-width: 650px;
-}
-
-.theater-badge-tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  color: #FFE500;
+  font-size: 17px;
   font-weight: 800;
-}
-
-.theater-action-group {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.reaction-emoji-bar {
-  display: flex;
-  gap: 6px;
-  background: #141414;
-  padding: 6px 10px;
-  border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-emoji-send {
-  background: transparent;
-  border: none;
-  font-size: 18px;
+  color: #ffffff;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: transform 0.15s ease;
 }
 
-.btn-emoji-send:hover {
-  transform: scale(1.3);
+.card-title-text:hover {
+  color: #FFE500;
 }
 
-.btn-close-theater {
-  background: rgba(229, 9, 20, 0.15);
-  color: #E50914;
-  border: 1px solid #E50914;
-  padding: 8px 16px;
-  border-radius: 6px;
+.card-year-tag {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
-  font-weight: 800;
+  color: #888888;
+  font-weight: 700;
+}
+
+.card-sub-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #aaaaaa;
+  margin-bottom: 12px;
+}
+
+.card-dot-sep {
+  color: #555555;
+}
+
+.card-synopsis-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #999999;
+  margin: 0 0 14px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-cast-text {
+  font-size: 11px;
+  color: #777777;
+  margin-bottom: 18px;
+  margin-top: auto;
+}
+
+.card-cast-text strong {
+  color: #aaaaaa;
+}
+
+.btn-card-launch-party {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #FFE500;
+  border: 1px solid #FFE500;
+  color: #000000;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-close-theater:hover {
-  background: #E50914;
-  color: #ffffff;
+.btn-card-launch-party:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+/* ── RESPONSIVE MOBILE TWEAKS ── */
+@media (max-width: 768px) {
+  .cinema-top-header {
+    width: calc(100% - 24px);
+    padding: 0 14px;
+    height: 76px;
+  }
+  .cowatch-bold-yellow-title {
+    font-size: 1.8rem;
+  }
+  .giant-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-spotlight-content {
+    padding: 24px 18px;
+  }
 }

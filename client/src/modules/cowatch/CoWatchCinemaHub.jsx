@@ -3,18 +3,18 @@ import {
   Tv, Play, Users, Sparkles, ArrowLeft, ExternalLink, Film, 
   Volume2, VolumeX, Flame, Star, Compass, Clapperboard, 
   Mic, Camera, MessageSquare, Copy, Check, ShieldCheck, Heart, Smile,
-  User, ChevronDown, LogOut, Share2, Key, Link2
+  User, ChevronDown, LogOut, Share2, Key, Link2, MonitorPlay, Radio, Trophy, Zap
 } from 'lucide-react';
 import { 
+  ENTERTAINMENT_PILLARS,
   OTT_PLATFORMS, 
-  LANGUAGE_COMPARTMENTS,
   CINEMA_DATABASE 
 } from './cinemaCatalog.js';
 import './CoWatchCinemaHub.css';
 
 export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
-  const [selectedLanguage, setSelectedLanguage] = useState('all');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedPillar, setSelectedPillar] = useState('movies'); // 'movies' | 'anime' | 'sports'
+  const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [activeMedia, setActiveMedia] = useState(CINEMA_DATABASE[0]);
   const [isPlayingTheater, setIsPlayingTheater] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -38,24 +38,15 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter movies based on Language & Category compartments
+  // Filter media based on Active Entertainment Pillar & OTT Platform
   const filteredMedia = CINEMA_DATABASE.filter(item => {
-    // Language check
-    let matchesLanguage = true;
-    if (selectedLanguage === 'free') {
-      matchesLanguage = item.isFree === true;
-    } else if (selectedLanguage !== 'all') {
-      matchesLanguage = item.language === selectedLanguage;
-    }
-
-    // Category check
-    let matchesCategory = true;
-    if (selectedCategory !== 'all') {
-      matchesCategory = item.category === selectedCategory;
-    }
-
-    return matchesLanguage && matchesCategory;
+    const matchesPillar = item.pillar === selectedPillar;
+    const matchesPlatform = selectedPlatform === 'all' || item.platformId === selectedPlatform;
+    return matchesPillar && matchesPlatform;
   });
+
+  // Spotlight banner media item
+  const spotlightItem = filteredMedia[0] || CINEMA_DATABASE.find(item => item.pillar === selectedPillar) || CINEMA_DATABASE[0];
 
   const handleLaunchWatchParty = (media) => {
     setActiveMedia(media);
@@ -88,7 +79,7 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
 
   return (
     <div className="cowatch-cinema-universe fade-in">
-      {/* ── PURE BLACK NAVBAR WITH WHITE OUTLINE ALL SIDES ── */}
+      {/* ── 1. PURE BLACK NAVBAR WITH THIN WHITE OUTLINE & LIGHT CURVE ── */}
       <header className="cinema-top-header">
         {/* LEFT: Profile Icon + Dropdown Menu */}
         <div className="cinema-header-left">
@@ -170,114 +161,127 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
         </div>
       </header>
 
-      {/* ── MULTI-LANGUAGE COMPARTMENTS BAR ── */}
-      <div className="language-compartments-strip">
-        <div className="compartment-container">
-          <span className="compartment-label">COMPARTMENTS:</span>
-          <div className="compartment-pills">
-            {LANGUAGE_COMPARTMENTS.map(lang => (
+      {/* ── 2. TOP-LEVEL ENTERTAINMENT PILLARS STRIP ── */}
+      <section className="entertainment-pillars-section">
+        <div className="pillars-container">
+          <div className="pillars-switch-bar">
+            {ENTERTAINMENT_PILLARS.map(pillar => (
               <button
-                key={lang.id}
-                className={`compartment-pill-btn ${selectedLanguage === lang.id ? 'active' : ''}`}
-                onClick={() => setSelectedLanguage(lang.id)}
+                key={pillar.id}
+                className={`pillar-switch-btn ${selectedPillar === pillar.id ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedPillar(pillar.id);
+                  setSelectedPlatform('all');
+                }}
               >
-                <span className="pill-icon">{lang.icon}</span>
-                <span>{lang.label}</span>
+                <span className="pillar-btn-icon">{pillar.icon}</span>
+                <span className="pillar-btn-label">{pillar.label}</span>
+                {selectedPillar === pillar.id && <span className="pillar-active-underline" />}
+              </button>
+            ))}
+          </div>
+          <p className="pillar-tagline-text">
+            {ENTERTAINMENT_PILLARS.find(p => p.id === selectedPillar)?.tagline}
+          </p>
+        </div>
+      </section>
+
+      {/* ── 3. OTT STREAMING PLATFORMS FILTER ROW ── */}
+      <section className="ott-platforms-strip">
+        <div className="platforms-container">
+          <div className="platforms-pills-row">
+            {OTT_PLATFORMS.map(platform => (
+              <button
+                key={platform.id}
+                className={`platform-pill-btn ${selectedPlatform === platform.id ? 'active' : ''}`}
+                onClick={() => setSelectedPlatform(platform.id)}
+              >
+                <span className="platform-pill-badge">{platform.badge}</span>
+                <span className="platform-pill-name">{platform.name}</span>
               </button>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ── THEATER STREAMING SCREEN (IF PLAYING) ── */}
-      {isPlayingTheater && (
-        <section className="cinema-theater-screen-section fade-in">
-          <div className="theater-screen-wrapper">
-            <div className="theater-player-container">
-              {activeMedia.embedUrl.endsWith('.mp4') ? (
-                <video 
-                  src={activeMedia.embedUrl} 
-                  controls 
-                  autoPlay 
-                  className="theater-video-frame"
-                />
-              ) : (
-                <iframe
-                  src={activeMedia.embedUrl}
-                  title={activeMedia.title}
-                  className="theater-video-frame"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              )}
-
-              {/* FLOATING 2-WAY LIVE SQUAD CAM OVERLAY */}
-              <div className="floating-squad-cam-dock">
-                <div className="dock-header">
-                  <span className="live-rec-dot" />
-                  <span>SQUAD CAM</span>
-                </div>
-                <div className="squad-cam-grid">
-                  <div className="squad-cam-tile">
-                    <img 
-                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" 
-                      alt="You" 
-                    />
-                    <span className="cam-name-tag">You (Host)</span>
-                  </div>
-                  <div className="squad-cam-tile">
-                    <img 
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" 
-                      alt="Alex" 
-                    />
-                    <span className="cam-name-tag">Alex</span>
-                  </div>
-                </div>
-
-                <div className="squad-cam-controls">
-                  <button 
-                    className={`btn-cam-ctrl ${isMicOn ? 'active' : 'muted'}`} 
-                    onClick={() => setIsMicOn(!isMicOn)}
-                  >
-                    <Mic size={12} />
-                  </button>
-                  <button 
-                    className={`btn-cam-ctrl ${isCamOn ? 'active' : 'muted'}`} 
-                    onClick={() => setIsCamOn(!isCamOn)}
-                  >
-                    <Camera size={12} />
-                  </button>
-                </div>
+      {/* ── 4. SYNCHRONIZED THEATER STAGE (WHEN ACTIVE) ── */}
+      {isPlayingTheater && activeMedia && (
+        <section className="live-theater-stage-container">
+          <div className="theater-inner-box">
+            {/* Theater Stage Header */}
+            <div className="theater-header-bar">
+              <div className="theater-meta-left">
+                <span className="live-red-indicator">● LIVE SYNCHRONIZED STREAM</span>
+                <h2 className="theater-title">{activeMedia.title}</h2>
+                <span className="theater-submeta">{activeMedia.platformName} • {activeMedia.category} • {activeMedia.duration}</span>
               </div>
-
-              {/* FLOATING EMOJI REACTIONS */}
-              <div className="floating-reactions-canvas">
-                {activeReactions.map(r => (
-                  <div key={r.id} className="reaction-bubble" style={{ left: `${r.x}%` }}>
-                    {r.emoji}
-                  </div>
-                ))}
+              <div className="theater-meta-right">
+                <button className="btn-close-theater" onClick={() => setIsPlayingTheater(false)}>
+                  ✕ MINIMIZE THEATER
+                </button>
               </div>
             </div>
 
-            {/* THEATER CONTROLS & INFO BAR */}
-            <div className="theater-info-bar">
-              <div className="theater-title-block">
-                <span className="theater-badge-tag">{activeMedia.platformBadge}</span>
-                <h2>{activeMedia.title}</h2>
-                <p>{activeMedia.synopsis}</p>
+            {/* Video Player + WebRTC Camera Overlay */}
+            <div className="theater-screen-wrapper">
+              <iframe
+                src={activeMedia.embedUrl}
+                title={activeMedia.title}
+                className="theater-iframe-player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+
+              {/* Floating Squad Floating Cam Tiles */}
+              <div className="theater-floating-squad">
+                <div className="squad-cam-card">
+                  <div className="cam-sim-avatar">
+                    <User size={20} />
+                  </div>
+                  <span className="cam-user-name">You (Host)</span>
+                  <span className="cam-audio-pulse" />
+                </div>
+                <div className="squad-cam-card remote-friend">
+                  <div className="cam-sim-avatar friend-avatar">
+                    <User size={20} />
+                  </div>
+                  <span className="cam-user-name">Friend #1</span>
+                  <span className="cam-audio-pulse" />
+                </div>
               </div>
 
-              <div className="theater-action-group">
-                <div className="reaction-emoji-bar">
-                  {['🍿', '🔥', '❤️', '😱', '😂', '👏'].map(emoji => (
-                    <button key={emoji} className="btn-emoji-send" onClick={() => handleSendReaction(emoji)}>
-                      {emoji}
-                    </button>
-                  ))}
+              {/* Floating Reaction Hearts & Emojis */}
+              {activeReactions.map(r => (
+                <div key={r.id} className="floating-party-emoji" style={{ left: `${r.x}%` }}>
+                  {r.emoji}
                 </div>
-                <button className="btn-close-theater" onClick={() => setIsPlayingTheater(false)}>
-                  CLOSE THEATER ✕
+              ))}
+            </div>
+
+            {/* Theater Control Deck */}
+            <div className="theater-bottom-deck">
+              <div className="theater-controls-left">
+                <button className={`btn-theater-control ${isMicOn ? 'active' : ''}`} onClick={() => setIsMicOn(!isMicOn)}>
+                  <Mic size={15} /> <span>{isMicOn ? 'MIC LIVE' : 'MIC MUTED'}</span>
+                </button>
+                <button className={`btn-theater-control ${isCamOn ? 'active' : ''}`} onClick={() => setIsCamOn(!isCamOn)}>
+                  <Camera size={15} /> <span>{isCamOn ? 'CAM ACTIVE' : 'CAM OFF'}</span>
+                </button>
+              </div>
+
+              {/* Quick Reaction Emoji Bar */}
+              <div className="theater-reactions-row">
+                {['🔥', '🍿', '😂', '🤯', '❤️', '👏'].map(emoji => (
+                  <button key={emoji} className="btn-reaction-tap" onClick={() => handleSendReaction(emoji)}>
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+
+              <div className="theater-controls-right">
+                <button className="btn-invite-squad-action" onClick={handleCopyPartyLink}>
+                  {isCopied ? <Check size={14} /> : <Share2 size={14} />}
+                  <span>{isCopied ? 'LINK COPIED!' : 'INVITE FRIENDS'}</span>
                 </button>
               </div>
             </div>
@@ -285,108 +289,106 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
         </section>
       )}
 
-      {/* ── SPOTLIGHT HERO CINEMA BANNER ── */}
-      {!isPlayingTheater && (
-        <section className="cinema-hero-spotlight" style={{ backgroundImage: `url(${activeMedia.backdrop})` }}>
-          <div className="hero-spotlight-overlay">
-            <div className="spotlight-badge-row">
-              <span className="badge-exclusive-tag">[ 4K ULTRA HD SYNC ]</span>
-              <span className="badge-platform-tag">{activeMedia.platformBadge}</span>
-            </div>
-
-            <h1 className="spotlight-title">{activeMedia.title}</h1>
-
-            <div className="spotlight-metadata-row">
-              <span className="meta-pill rating-pill">★ {activeMedia.rating}</span>
-              <span className="meta-pill">{activeMedia.year}</span>
-              <span className="meta-pill">{activeMedia.duration}</span>
-              <span className="meta-pill genre-pill">{activeMedia.genre}</span>
-            </div>
-
-            <p className="spotlight-synopsis">{activeMedia.synopsis}</p>
-
-            <div className="spotlight-cta-row">
-              <button className="btn-spotlight-play" onClick={() => handleLaunchWatchParty(activeMedia)}>
-                <Play size={18} fill="#000000" /> <span>PLAY 4K STREAM</span>
-              </button>
-              <button className="btn-spotlight-party" onClick={handleCopyPartyLink}>
-                <Users size={18} /> <span>CREATE SQUAD ROOM</span>
-              </button>
+      {/* ── 5. SPOTLIGHT HERO BANNER ── */}
+      {!isPlayingTheater && spotlightItem && (
+        <section className="cowatch-hero-spotlight">
+          <div className="hero-spotlight-card">
+            <div 
+              className="hero-spotlight-backdrop" 
+              style={{ backgroundImage: `url(${spotlightItem.backdrop || spotlightItem.poster})` }}
+            />
+            <div className="hero-spotlight-gradient-overlay" />
+            
+            <div className="hero-spotlight-content">
+              <div className="spotlight-top-tags">
+                <span className="badge-featured">⭐ SPOTLIGHT SHOWCASE</span>
+                <span className="badge-platform">{spotlightItem.platformBadge}</span>
+                <span className="badge-rating">{spotlightItem.rating} ★</span>
+              </div>
+              <h2 className="spotlight-title">{spotlightItem.title}</h2>
+              <p className="spotlight-synopsis">{spotlightItem.synopsis}</p>
+              <div className="spotlight-metadata-row">
+                <span><strong>Platform:</strong> {spotlightItem.platformName}</span>
+                <span><strong>Genre:</strong> {spotlightItem.category}</span>
+                <span><strong>Runtime:</strong> {spotlightItem.duration}</span>
+                <span><strong>Cast:</strong> {spotlightItem.cast}</span>
+              </div>
+              <div className="spotlight-actions-row">
+                <button className="btn-spotlight-watch-now" onClick={() => handleLaunchWatchParty(spotlightItem)}>
+                  <Play size={18} fill="#000000" />
+                  <span>WATCH WITH FRIENDS NOW</span>
+                </button>
+                <button className="btn-spotlight-copy-code" onClick={handleCopyPartyLink}>
+                  <Link2 size={16} />
+                  <span>GET SQUAD ROOM LINK</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* ── OTT PLATFORM COMPARTMENTS (NETFLIX, HOTSTAR, PRIME, YOUTUBE) ── */}
-      <section className="cinema-platforms-strip">
-        <div className="section-header-compact">
-          <div className="header-title-wrapper">
-            <span className="eyebrow-accent">DIRECT LAUNCHERS</span>
-            <h3>SUPPORTED OTT PLATFORMS</h3>
+      {/* ── 6. GIANT CINEMATIC CARDS DECK ── */}
+      <section className="giant-cinema-cards-section">
+        <div className="section-title-header">
+          <div className="title-left">
+            <span className="section-tag-mono">[ STREAMING CATALOG ]</span>
+            <h3 className="section-heading">
+              {selectedPillar === 'movies' && 'Blockbusters, Series & 4K Cinema'}
+              {selectedPillar === 'anime' && 'Anime Universe & Simulcasts'}
+              {selectedPillar === 'sports' && 'Live Stadium Matches & Arena Action'}
+            </h3>
+          </div>
+          <div className="title-right">
+            <span className="count-pill">{filteredMedia.length} TITLES AVAILABLE</span>
           </div>
         </div>
 
-        <div className="ott-platforms-grid">
-          {OTT_PLATFORMS.map(platform => (
-            <a 
-              key={platform.id} 
-              href={platform.directUrl} 
-              target="_blank" 
-              rel="noreferrer" 
-              className="ott-platform-card"
-              style={{ '--platform-accent': platform.accentColor }}
-            >
-              <div className="platform-card-top">
-                <img src={platform.logo} alt={platform.name} className="platform-logo-img" />
-                <ExternalLink size={14} className="ext-link-icon" />
-              </div>
-              <h4 className="platform-name">{platform.name}</h4>
-              <p className="platform-tagline">{platform.tagline}</p>
-              <div className="platform-action-badge">LAUNCH WITH EXTENSION →</div>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* ── MOVIE COMPARTMENT GRID ── */}
-      <section className="cinema-catalog-section">
-        <div className="section-header-compact">
-          <div className="header-title-wrapper">
-            <span className="eyebrow-accent">STREAMING LIBRARY</span>
-            <h3>{selectedLanguage === 'free' ? 'FREE TO WATCH MOVIES' : 'FEATURED MOVIES & SERIES'}</h3>
-          </div>
-          <div className="total-movies-count">{filteredMedia.length} TITLES AVAILABLE</div>
-        </div>
-
-        <div className="cinema-movies-grid">
-          {filteredMedia.map(media => (
-            <div 
-              key={media.id} 
-              className="cinema-movie-card"
-              onClick={() => handleLaunchWatchParty(media)}
-            >
-              <div className="poster-image-wrapper">
-                <img src={media.poster} alt={media.title} className="movie-poster-img" />
-                <div className="poster-overlay-gradient" />
+        {/* The Grid of Giant Netflix-Style Cards */}
+        <div className="giant-cards-grid">
+          {filteredMedia.map(item => (
+            <div key={item.id} className="giant-movie-card">
+              {/* Card Poster Frame */}
+              <div className="card-poster-wrapper" onClick={() => handleLaunchWatchParty(item)}>
+                <img src={item.poster} alt={item.title} className="card-poster-img" loading="lazy" />
+                <div className="card-poster-vignette" />
                 
-                <div className="poster-top-badges">
-                  {media.isFree && <span className="badge-free-pill">FREE</span>}
-                  <span className="badge-rating-pill">★ {media.rating}</span>
+                {/* Platform Badge on Top */}
+                <div className="card-badge-container">
+                  <span className="platform-tag-pill">{item.platformBadge}</span>
+                  <span className="rating-tag-pill">{item.rating} ★</span>
                 </div>
 
-                <div className="poster-hover-play-btn">
-                  <Play size={24} fill="#000000" />
+                {/* Hover Play Button Trigger */}
+                <div className="card-hover-overlay">
+                  <div className="hover-play-circle">
+                    <Play size={24} fill="#000000" />
+                  </div>
+                  <span className="hover-cta-label">WATCH TOGETHER</span>
                 </div>
               </div>
 
-              <div className="movie-card-details">
-                <span className="movie-platform-label">{media.platformBadge}</span>
-                <h4 className="movie-card-title">{media.title}</h4>
-                <div className="movie-card-meta">
-                  <span>{media.year}</span>
-                  <span className="bullet-sep">•</span>
-                  <span>{media.duration}</span>
+              {/* Card Meta Description */}
+              <div className="card-info-box">
+                <div className="card-title-row">
+                  <h4 className="card-title-text" onClick={() => handleLaunchWatchParty(item)}>{item.title}</h4>
+                  <span className="card-year-tag">{item.year}</span>
                 </div>
+                <div className="card-sub-info">
+                  <span className="card-platform-text">{item.platformName}</span>
+                  <span className="card-dot-sep">•</span>
+                  <span className="card-duration-text">{item.duration}</span>
+                </div>
+                <p className="card-synopsis-text">{item.synopsis}</p>
+                <div className="card-cast-text">
+                  <strong>Cast:</strong> {item.cast}
+                </div>
+
+                {/* Instant Launch Action Button */}
+                <button className="btn-card-launch-party" onClick={() => handleLaunchWatchParty(item)}>
+                  <Play size={14} fill="#000000" />
+                  <span>START SQUAD WATCH PARTY →</span>
+                </button>
               </div>
             </div>
           ))}
