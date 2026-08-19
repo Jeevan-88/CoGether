@@ -1,0 +1,57 @@
+/* ============================================
+   LANDING FOOTER STYLES
+   ============================================ */
+
+.jeevan-official-footer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px 60px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: 'Courier New', monospace;
+}
+
+.footer-watermark-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .footer-watermark-row {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+}
+
+.creator-tag {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-links a {
+  font-size: 11px;
+  color: #9ca3af;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.15s ease;
+}
+
+.footer-links a:hover {
+  color: #FFE500;
+}
+
+.copyright-text {
+  font-size: 10px;
+  color: #6b7280;
+  margin: 0;
+}

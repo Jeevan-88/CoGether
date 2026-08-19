@@ -1,0 +1,184 @@
+/* ============================================
+   KEYPASS PRICING STAGE STYLES
+   ============================================ */
+
+.inverted-triangle-key-section-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.center-black-inverted-triangle {
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  padding: 60px 40px;
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto 60px auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.key-section-title {
+  font-family: 'Impact', 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.key-section-subtitle-mono {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #9ca3af;
+  max-width: 540px;
+  margin: 0 auto 40px auto;
+  line-height: 1.5;
+}
+
+.wavy-floating-key-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 20px 0;
+}
+
+.glowing-wavy-key-img {
+  width: 240px;
+  height: auto;
+  filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.6));
+  animation: keyFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes keyFloat {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-12px) rotate(2deg); }
+}
+
+.hanging-thread-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.hanging-price-tag-badge {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.btn-triangle-key-buy {
+  background: #FFE500;
+  color: #000000;
+  border: 3px solid #000000;
+  border-radius: 30px;
+  padding: 16px 36px;
+  font-family: 'Impact', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #ffffff;
+  transition: transform 0.15s ease;
+}
+
+.btn-triangle-key-buy:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #ffffff;
+}
+
+.triangle-side-cards-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1000px;
+  width: 100%;
+  margin-bottom: 60px;
+}
+
+@media (max-width: 768px) {
+  .triangle-side-cards-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.side-psych-card {
+  padding: 32px;
+  border-radius: 16px;
+  border: 2px solid #000000;
+}
+
+.side-psych-card.left-card-red {
+  background: #18181b;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.side-psych-card.right-card-pink {
+  background: #fef3c7;
+  color: #000000;
+}
+
+.side-card-badge {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.side-card-body {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.bottom-gold-truth-card {
+  background: #FFE500;
+  color: #000000;
+  border: 3px solid #000000;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 1000px;
+  width: 100%;
+  box-shadow: 8px 8px 0px #000000;
+  margin-bottom: 80px;
+  text-align: center;
+}
+
+.truth-mono-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.truth-quote-text {
+  font-family: 'Impact', sans-serif;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.btn-truth-claim-key {
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 30px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+}

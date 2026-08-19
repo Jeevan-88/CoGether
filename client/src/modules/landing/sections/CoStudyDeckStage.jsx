@@ -1,4 +1,5 @@
 import React from 'react';
+import './CoStudyDeckStage.css';
 import { ArrowRight } from 'lucide-react';
 
 /**

@@ -1,4 +1,5 @@
 import React from 'react';
+import './CoShopSlantedStage.css';
 
 const REAL_WOODEN_LETTERS = [
   { id: 'c1', char: 'C', img: '/letters/wood_letter_C.png' },

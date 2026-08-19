@@ -1,0 +1,280 @@
+/* ============================================
+   CO-SHOP SLANTED LOG, PAC-MAN & 3D ROOM STYLES
+   ============================================ */
+
+.sticky-pinned-coshop-stage-wrapper {
+  contain: layout paint;
+}
+
+.coshop-static-center-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.static-wooden-log-shelf-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  will-change: transform, opacity;
+}
+
+.static-wooden-log-shelf-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.shelf-jade-plant {
+  object-fit: contain;
+  will-change: transform, opacity;
+}
+
+.static-letters-sitting-track {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.static-wood-letter-wrapper {
+  position: relative;
+  display: inline-block;
+  will-change: opacity;
+}
+
+.static-wood-letter-img {
+  width: auto;
+  object-fit: contain;
+}
+
+.static-wood-hyphen-bulb-img {
+  width: auto;
+  object-fit: contain;
+}
+
+.hanging-tote-bag-on-letter {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.classic-svg-pacman-wrapper {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  height: 160px;
+  pointer-events: none;
+  will-change: left;
+}
+
+.pacman-seamless-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.pacman-animated-mouth-path {
+  animation: pacmanChomp 0.28s infinite alternate ease-in-out;
+  transform-origin: 50% 50%;
+}
+
+@keyframes pacmanChomp {
+  0% { d: path('M 50 50 L 98 22 A 48 48 0 1 0 98 78 Z'); }
+  100% { d: path('M 50 50 L 98 48 A 48 48 0 1 0 98 52 Z'); }
+}
+
+.coshop-vertical-split-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 25;
+}
+
+.coshop-left-vertical-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: url('/coshop_room_split.jpg') no-repeat left center;
+  background-size: 200% 100%;
+  will-change: transform;
+}
+
+.coshop-right-vertical-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: url('/coshop_room_split.jpg') no-repeat right center;
+  background-size: 200% 100%;
+  will-change: transform;
+}
+
+.coshop-tablet-screen-overlay {
+  position: absolute;
+  background: #000000;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  z-index: 35;
+  will-change: transform, opacity;
+}
+
+.tablet-coshop-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: rgba(18, 18, 22, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  color: #ffffff;
+}
+
+.store-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.live-red-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e50914;
+  box-shadow: 0 0 6px #e50914;
+}
+
+.shared-cart-pill {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+}
+
+.tablet-video-content-body {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 32px);
+  background: #050505;
+}
+
+.tablet-coshop-live-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.friend-video-avatar {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.friend-video-avatar.avatar-left {
+  top: 12px;
+  left: 12px;
+}
+
+.friend-video-avatar.avatar-right {
+  top: 12px;
+  right: 12px;
+  align-items: flex-end;
+}
+
+.avatar-video-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #22c55e;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.avatar-video-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.live-cam-badge {
+  display: none;
+}
+
+.reaction-bubble-pop {
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tablet-product-bottom-card {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  right: 12px;
+  background: rgba(18, 18, 22, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 25;
+}
+
+.product-info-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prod-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.prod-price {
+  font-size: 11px;
+  font-weight: 800;
+  color: #22c55e;
+}
+
+.old-price {
+  color: #888888;
+  font-size: 9px;
+  margin-left: 4px;
+}
+
+.btn-buy-together-now {
+  background: #FFE500;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 800;
+  font-size: 10px;
+  cursor: pointer;
+}

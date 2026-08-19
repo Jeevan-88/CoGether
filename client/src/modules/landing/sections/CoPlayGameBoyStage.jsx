@@ -1,4 +1,5 @@
 import React from 'react';
+import './CoPlayGameBoyStage.css';
 
 // FAMOUS HIGH-RES ONLINE GAME LOGOS FOR 3D CUBE FACES
 const FAMOUS_GAME_TILES_FACE1 = [

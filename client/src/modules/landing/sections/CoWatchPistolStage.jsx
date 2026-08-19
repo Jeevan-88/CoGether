@@ -1,4 +1,5 @@
 import React from 'react';
+import './CoWatchPistolStage.css';
 import { ArrowRight, Maximize2, Volume2, VolumeX, MessageSquare, Move } from 'lucide-react';
 
 const MOVIE_STREAMING_APPS = [

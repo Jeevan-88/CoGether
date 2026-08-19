@@ -1,0 +1,116 @@
+/* ============================================
+   HERO SECTION STYLES
+   Fullscreen Black Hero, GEn-Z Tagline, and Laser Starburst
+   ============================================ */
+
+.fullscreen-pure-black-hero {
+  width: 100%;
+  height: 150vh;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  contain: layout paint;
+}
+
+.hero-center-content-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  margin-top: 75vh;
+}
+
+/* Clean 18px uppercase white Gen-Z tagline */
+.genz-tagline-container {
+  position: relative;
+  text-align: center;
+  display: inline-block;
+  transition: opacity 0.2s ease;
+}
+
+.genz-tagline-text {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 4.5px;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+/* Pure Procedural Laser Rays Flare Centered Directly Over Tagline Text */
+.procedural-lightburst-flare {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 250px;
+  pointer-events: none;
+  z-index: 240;
+  mix-blend-mode: screen;
+  transition: transform 0.1s linear, opacity 0.1s linear;
+  will-change: transform, opacity;
+}
+
+.flare-core-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #d8b4fe 40%, #a855f7 70%, transparent 100%);
+  box-shadow: 0 0 50px #ffffff, 0 0 100px #c084fc;
+  transform: translate(-50%, -50%);
+  filter: blur(3px);
+}
+
+.horizontal-laser-beam {
+  position: absolute;
+  top: 50%;
+  left: -100vw;
+  right: -100vw;
+  height: 5px;
+  background: linear-gradient(90deg, transparent 0%, #c084fc 25%, #ffffff 50%, #c084fc 75%, transparent 100%);
+  transform: translateY(-50%);
+}
+
+.vertical-laser-beam {
+  position: absolute;
+  left: 50%;
+  top: -100vh;
+  bottom: -100vh;
+  width: 5px;
+  background: linear-gradient(180deg, transparent 0%, #c084fc 25%, #ffffff 50%, #c084fc 75%, transparent 100%);
+  transform: translateX(-50%);
+}
+
+.diagonal-laser-beam-1 {
+  position: absolute;
+  top: 50%;
+  left: -80vw;
+  right: -80vw;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #d8b4fe 30%, #ffffff 50%, #d8b4fe 70%, transparent 100%);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.diagonal-laser-beam-2 {
+  position: absolute;
+  top: 50%;
+  left: -80vw;
+  right: -80vw;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #d8b4fe 30%, #ffffff 50%, #d8b4fe 70%, transparent 100%);
+  transform: translateY(-50%) rotate(-45deg);
+}

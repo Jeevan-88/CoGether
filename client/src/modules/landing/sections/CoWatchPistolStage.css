@@ -1,0 +1,423 @@
+/* ============================================
+   CO-WATCH PISTOL STAGE STYLES
+   360-Degree Door Spin, Ink Pistols, Flying Bullets,
+   Torn Paper Marquees & Video Player Overlay
+   ============================================ */
+
+.sticky-pinned-red-stage-wrapper {
+  position: relative;
+  width: 100%;
+  height: 350vh;
+  background: #000000;
+  z-index: 20;
+  contain: layout paint;
+}
+
+.sticky-pinned-red-stage-inner {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  perspective: 1400px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background: #000000;
+  transition: background 0.3s ease;
+}
+
+.sticky-pinned-red-stage-inner.bg-full-yellow {
+  background: #ffcc00;
+}
+
+.center-void-condensed-typography {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  text-align: center;
+  pointer-events: none;
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 20px;
+  opacity: 1;
+}
+
+.katapult-condensed-headline {
+  font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
+  font-size: clamp(90px, 16vw, 220px);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: 6px;
+  color: #ffffff;
+  text-transform: uppercase;
+  margin: 0;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+}
+
+.door-half-panel {
+  width: 50.1%;
+  height: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 5;
+  backface-visibility: hidden;
+  transition: background 0.3s ease, transform 0.05s linear;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.door-panel-left {
+  transform-origin: left center;
+}
+
+.door-panel-left.is-spinning {
+  width: 50.5%;
+  clip-path: polygon(
+    0% 0%, 100% 0%, 97.5% 5%, 100% 10%, 97.5% 15%, 100% 20%, 97.5% 25%, 100% 30%, 97.5% 35%, 100% 40%, 97.5% 45%, 100% 50%, 97.5% 55%, 100% 60%, 97.5% 65%, 100% 70%, 97.5% 75%, 100% 80%, 97.5% 85%, 100% 90%, 97.5% 95%, 100% 100%, 0% 100%
+  ) !important;
+}
+
+.door-panel-right {
+  transform-origin: right center;
+}
+
+.door-panel-right.is-spinning {
+  width: 50.5%;
+  margin-left: -1px;
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% 100%, 0% 100%, 2.5% 95%, 0% 90%, 2.5% 85%, 0% 80%, 2.5% 75%, 0% 70%, 2.5% 65%, 0% 60%, 2.5% 55%, 0% 50%, 2.5% 45%, 0% 40%, 2.5% 35%, 0% 30%, 2.5% 25%, 0% 20%, 2.5% 15%, 0% 10%, 2.5% 5%
+  ) !important;
+}
+
+.door-half-panel.bg-red {
+  background: #e50914;
+  color: #ffffff;
+}
+
+.door-half-panel.bg-yellow {
+  background: #ffcc00;
+  color: #111111;
+}
+
+.door-half-panel.no-clip {
+  clip-path: none !important;
+  transform: none !important;
+  width: 50.1% !important;
+  background: #ffcc00 !important;
+}
+
+.door-content-left-red {
+  padding: 80px 48px;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+}
+
+.door-content-right-red {
+  padding: 80px 48px;
+  width: 100%;
+  max-width: 600px;
+  margin-right: auto;
+}
+
+/* PISTOL BULLET PIERCING & TORN PAPER MARQUEE STAGE */
+.pistol-bullet-torn-paper-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #ffcc00;
+  color: #111111;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.ink-stage-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.torn-banners-container-3 {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.pistol-banner-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.pistol-static-wrapper {
+  flex-shrink: 0;
+  width: 250px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.pistol-ink-img {
+  width: 230px;
+  height: auto;
+  object-fit: contain;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transition: transform 0.2s ease;
+}
+
+.pistol-ink-img.facing-left {
+  transform: scaleX(-1);
+}
+
+.bullet-flying-wrapper {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  pointer-events: none;
+  transition: left 0.04s linear, right 0.04s linear, opacity 0.15s ease;
+  will-change: transform, left, right;
+}
+
+.bullet-img {
+  width: 80px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+}
+
+.bullet-img.facing-left {
+  transform: scaleX(-1);
+}
+
+.torn-paper-white-banner {
+  width: 100%;
+  background: #ffffff;
+  border-top: 3.5px solid #111111;
+  border-bottom: 3.5px solid #111111;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 14px 0;
+  transition: transform 0.2s ease;
+  clip-path: polygon(
+    0% 4px, 2% 0px, 4% 6px, 6% 1px, 8% 7px, 10% 2px, 12% 8px, 14% 1px, 16% 6px, 18% 0px, 20% 7px, 22% 2px, 24% 8px, 26% 1px, 28% 6px, 30% 0px, 32% 7px, 34% 2px, 36% 8px, 38% 1px, 40% 6px, 42% 0px, 44% 7px, 46% 2px, 48% 8px, 50% 1px, 52% 6px, 54% 0px, 56% 7px, 58% 2px, 60% 8px, 62% 1px, 64% 6px, 66% 0px, 68% 7px, 70% 2px, 72% 8px, 74% 1px, 76% 6px, 78% 0px, 80% 7px, 82% 2px, 84% 8px, 86% 1px, 88% 6px, 90% 0px, 92% 7px, 94% 2px, 96% 8px, 98% 1px, 100% 4px,
+    100% calc(100% - 4px), 98% 100%, 96% calc(100% - 6px), 94% calc(100% - 1px), 92% calc(100% - 7px), 90% calc(100% - 2px), 88% calc(100% - 8px), 86% calc(100% - 1px), 84% calc(100% - 6px), 82% 100%, 80% calc(100% - 7px), 78% calc(100% - 2px), 76% calc(100% - 8px), 74% calc(100% - 1px), 72% calc(100% - 6px), 70% 100%, 68% calc(100% - 7px), 66% calc(100% - 2px), 64% calc(100% - 8px), 62% calc(100% - 1px), 60% calc(100% - 6px), 58% 100%, 56% calc(100% - 7px), 54% calc(100% - 2px), 52% calc(100% - 8px), 50% calc(100% - 1px), 48% calc(100% - 6px), 46% 100%, 44% calc(100% - 7px), 42% calc(100% - 2px), 40% calc(100% - 8px), 38% calc(100% - 1px), 36% calc(100% - 6px), 34% 100%, 32% calc(100% - 7px), 30% calc(100% - 2px), 28% calc(100% - 8px), 26% calc(100% - 1px), 24% calc(100% - 6px), 22% 100%, 20% calc(100% - 7px), 18% calc(100% - 2px), 16% calc(100% - 8px), 14% calc(100% - 1px), 12% calc(100% - 6px), 10% 100%, 8% calc(100% - 7px), 6% calc(100% - 2px), 4% calc(100% - 8px), 2% calc(100% - 1px), 0% calc(100% - 4px)
+  );
+}
+
+.torn-paper-white-banner:hover {
+  transform: scale(1.01);
+}
+
+.banner-content-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.banner-badge-tag {
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #ffffff;
+  background: #111111;
+  padding: 8px 24px;
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: 6px 0 16px rgba(0, 0, 0, 0.2);
+}
+
+.banner-badge-tag.sports-tag {
+  background: #002B66;
+}
+
+.banner-badge-tag.anime-tag {
+  background: #e50914;
+}
+
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.scroll-left {
+  animation: marqueeLeft 22s linear infinite;
+}
+
+.scroll-right {
+  animation: marqueeRight 22s linear infinite;
+}
+
+@keyframes marqueeLeft {
+  from { transform: translateX(0%); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marqueeRight {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0%); }
+}
+
+.marquee-app-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffcc00;
+  border: 2.5px solid #111111;
+  padding: 6px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.marquee-app-item:hover {
+  transform: scale(1.1);
+}
+
+.marquee-app-item img {
+  height: 24px;
+  width: auto;
+  max-width: 90px;
+  object-fit: contain;
+}
+
+.marquee-app-item span {
+  font-size: 14px;
+  font-weight: 900;
+  color: #111111;
+}
+
+.vertical-zigzag-crack-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 40px;
+  height: 100%;
+  z-index: 30;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 0.3s ease;
+}
+
+.vertical-zigzag-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.red-section-container {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 960px) {
+  .red-section-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.watch-together-badge {
+  display: inline-block;
+  background: #ffffff;
+  color: #e50914;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 6px 14px;
+  border-radius: 20px;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+}
+
+.red-section-headline {
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.red-section-sub {
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0.95;
+  margin-bottom: 28px;
+  max-width: 520px;
+}
+
+.btn-black-launch-party {
+  padding: 16px 32px;
+  border-radius: 12px;
+  background: #000000;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-black-launch-party:hover {
+  background: #121318;
+  transform: translateY(-2px);
+}
+
+.video-player-box-red {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 0, 0, 0.4);
+  aspect-ratio: 16 / 10;
+  background: #000;
+}
+
+.video-overlay-bar {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 30;
+}
+
+.commercial-cinematic-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
