@@ -3275,14 +3275,14 @@
 /* GRADUATION CAP / MORTARBOARD ON TOP OF 'O' 🎓 */
 .o-graduation-cap {
   position: absolute;
-  top: -48%;
-  left: -78%;
-  transform: translateX(-50%) rotate(-30deg);
-  width: 0.95em;
+  top: -44%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-8deg);
+  width: 0.92em;
   height: auto;
   pointer-events: none;
   z-index: 10;
-  mix-blend-mode: multiply;
+  filter: none;
 }
 
 .o-black-circle-body {
