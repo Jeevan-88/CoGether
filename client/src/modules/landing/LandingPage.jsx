@@ -184,7 +184,7 @@ export default function LandingPage({
   const crossScale = Math.min((heroScroll - 0.02) * 3.5, 1);
 
   // STEP 2: 360-Degree Door Spin Calculations
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.08) * 2.38, 0), 1);
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.10) * 1.8, 0), 1);
   let doorSpinAngle = spinProgress * 360;
 
   if (spinProgress > 0.90 && spinProgress <= 0.97) {
@@ -195,8 +195,8 @@ export default function LandingPage({
   }
 
   const isSpinning = doorSpinAngle > 1 && doorSpinAngle < 359;
-  const isYellowCanvas = spinProgress > 0.40;
-  const isYellowStage = spinProgress >= 0.96;
+  const isYellowCanvas = spinProgress > 0.45;
+  const isYellowStage = spinProgress >= 0.95;
 
   let whiteLineOpacity = 0;
   if (scrollProgress >= 0.005 && spinProgress < 0.005) {
@@ -207,8 +207,8 @@ export default function LandingPage({
     whiteLineOpacity = 1 - (spinProgress - 0.97) / 0.02;
   }
 
-  const isFullyLockedYellow = spinProgress >= 0.99;
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.50) * 4.0, 0), 1);
+  const isFullyLockedYellow = spinProgress >= 0.98;
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.65) * 4.0, 0), 1);
 
   // STEP 3: Co-Play Zoom Calculations
   const coplayZoomProgress = Math.min(Math.max((coplayScrollProgress - 0.08) * 3.7, 0), 1);
