@@ -3248,7 +3248,7 @@
   max-width: 95vw;
   font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
   font-weight: 900;
-  color: #ffffff;
+  color: #000000;
   letter-spacing: 0.03em;
   line-height: 0.85;
   text-transform: uppercase;
@@ -3279,13 +3279,13 @@
   height: auto;
   pointer-events: none;
   z-index: 10;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
 }
 
 .o-black-circle-body {
   width: 100%;
   height: 100%;
-  background: #ffffff;
+  background: #000000;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -3293,7 +3293,7 @@
 }
 
 .o-cream-center-hole {
-  background: #000000;
+  background: #FFFFE3;
   border-radius: 50%;
   transition: width 0.15s ease, height 0.15s ease;
 }

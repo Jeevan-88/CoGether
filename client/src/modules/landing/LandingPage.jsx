@@ -1262,7 +1262,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       const angle = (i * 30 * Math.PI) / 180;
                       const cx = 50 + 43.5 * Math.cos(angle);
                       const cy = 50 + 43.5 * Math.sin(angle);
-                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r="3.0" fill="#000000" />;
+                      return <circle key={i} cx={cx.toFixed(1)} cy={cy.toFixed(1)} r="3.0" fill="#ffffff" />;
                     })}
                   </svg>
                 </div>
