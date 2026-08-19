@@ -205,144 +205,61 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // MASTER SCROLL RATE LIMITER — Intercepts wheel events and caps scroll speed.
-  // No matter how fast the user scrolls, the PAGE ITSELF moves slowly so every
-  // sticky animation section has enough time to fully play through.
+  // NATIVE SYNCHRONIZED SCROLL PROGRESS TRACKER
+  // Tracks each sticky section's progress directly and responsively.
   // ─────────────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    let targetScrollY = window.scrollY;
-    let currentScrollY = window.scrollY;
-    let scrollRafId;
-
-    const onWheel = (e) => {
-      e.preventDefault(); // Block native scroll entirely
-
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-
-      // Cap each wheel tick to 60px max (prevents trackpad inertia from flying)
-      // Then apply 0.45 sensitivity multiplier (45% of normal scroll speed)
-      const cappedDelta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 60) * 0.45;
-      targetScrollY = Math.max(0, Math.min(maxScroll, targetScrollY + cappedDelta));
-    };
-
-    const onKeyDown = (e) => {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-        e.preventDefault();
-        targetScrollY = Math.min(maxScroll, targetScrollY + 120);
-      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-        e.preventDefault();
-        targetScrollY = Math.max(0, targetScrollY - 120);
-      } else if (e.key === 'End') {
-        e.preventDefault();
-        targetScrollY = maxScroll;
-      } else if (e.key === 'Home') {
-        e.preventDefault();
-        targetScrollY = 0;
-      }
-    };
-
-    const scrollLoop = () => {
-      // Smooth lerp: page glides slowly toward target (factor 0.07 = silky glide)
-      currentScrollY += (targetScrollY - currentScrollY) * 0.07;
-
-      // Snap when very close to avoid floating-point jitter
-      if (Math.abs(targetScrollY - currentScrollY) < 0.5) {
-        currentScrollY = targetScrollY;
-      }
-
-      window.scrollTo({ top: currentScrollY, behavior: 'instant' });
-      scrollRafId = requestAnimationFrame(scrollLoop);
-    };
-
-    document.addEventListener('wheel', onWheel, { passive: false });
-    document.addEventListener('keydown', onKeyDown, { passive: false });
-    scrollLoop();
-
-    return () => {
-      document.removeEventListener('wheel', onWheel);
-      document.removeEventListener('keydown', onKeyDown);
-      cancelAnimationFrame(scrollRafId);
-    };
-  }, []);
-
-  // SCROLL SPEED LIMITER — animations always play at full pace regardless of how fast user scrolls
-  useEffect(() => {
-    let animId;
-    let currStageVal = 0;
-    let currHeroVal = 0;
-    let currCoplayVal = 0;
-    let currCoshopVal = 0;
-    let currCostudyVal = 0;
-
-    // MAX STEP PER FRAME: controls how fast each section's animation plays at 60fps
-    // Lower = slower max animation speed. At 60fps, full 0→1 range:
-    //   0.002 = ~8s minimum | 0.003 = ~5.5s | 0.004 = ~4s
-    const HERO_MAX_STEP    = 0.008; // Hero tagline — quick fade
-    const STAGE_MAX_STEP   = 0.003; // Pistol/bullet reveal — cinematic slow
-    const COPLAY_MAX_STEP  = 0.003; // Co-Play door/cube — cinematic slow
-    const COSHOP_MAX_STEP  = 0.002; // Co-Shop Pac-Man devour — very slow, full detail
-
-    const clampedStep = (current, target, maxStep) => {
-      const diff = target - current;
-      if (Math.abs(diff) <= maxStep) return target;
-      return current + maxStep * Math.sign(diff);
-    };
-
-    const loop = () => {
+    const handleScroll = () => {
       const scrollY = window.scrollY;
       const vh = window.innerHeight;
 
-      // 1. Hero Scroll — velocity capped
+      // 1. Hero Scroll
       const targetHero = Math.min(scrollY / (vh * 0.65), 1);
-      currHeroVal = clampedStep(currHeroVal, targetHero, HERO_MAX_STEP);
-      setHeroScroll(currHeroVal);
+      setHeroScroll(targetHero);
 
-      // 2. Stage Section (Pistol/Bullet Reveal) — velocity capped
+      // 2. Co-Watch Stage (Pistol/Bullet Reveal)
       const stageWrapper = document.querySelector('.sticky-pinned-red-stage-wrapper');
       if (stageWrapper) {
         const rect = stageWrapper.getBoundingClientRect();
         const totalScroll = stageWrapper.clientHeight - vh;
         const targetStage = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currStageVal = clampedStep(currStageVal, targetStage, STAGE_MAX_STEP);
-        setScrollProgress(currStageVal);
+        setScrollProgress(targetStage);
       }
 
-      // 3. Co-Play Section (Door Spin / Cube Zoom) — velocity capped
+      // 3. Co-Play Section (3D Rubik's Cube / GameBoy Zoom)
       const coplayWrapper = document.querySelector('.sticky-pinned-coplay-stage-wrapper');
       if (coplayWrapper) {
         const rect = coplayWrapper.getBoundingClientRect();
         const totalScroll = coplayWrapper.clientHeight - vh;
         const targetCoplay = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currCoplayVal = clampedStep(currCoplayVal, targetCoplay, COPLAY_MAX_STEP);
-        setCoplayScrollProgress(currCoplayVal);
+        setCoplayScrollProgress(targetCoplay);
       }
 
-      // 4. Co-Shop Section (HD Pause → Pac-Man Devour → Diagonal Split) — velocity capped
+      // 4. Co-Shop Section (Wooden Shelf → Pac-Man Devour → Split Hub)
       const coshopWrapper = document.querySelector('.sticky-pinned-coshop-stage-wrapper');
       if (coshopWrapper) {
         const rect = coshopWrapper.getBoundingClientRect();
         const totalScroll = coshopWrapper.clientHeight - vh;
         const targetCoshop = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currCoshopVal = clampedStep(currCoshopVal, targetCoshop, COSHOP_MAX_STEP);
-        setCoshopScrollProgress(currCoshopVal);
+        setCoshopScrollProgress(targetCoshop);
       }
 
-      // 5. Co-Study Section (NOTHIN'-style Typography + Cards Reveal) — velocity capped
+      // 5. Co-Study Section (Letter 'O' Portal Zoom + 4-Slide Interactive Deck)
       const costudyWrapper = document.querySelector('.sticky-pinned-costudy-stage-wrapper');
       if (costudyWrapper) {
         const rect = costudyWrapper.getBoundingClientRect();
         const totalScroll = costudyWrapper.clientHeight - vh;
         const targetCostudy = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currCostudyVal = clampedStep(currCostudyVal, targetCostudy, 0.003);
-        setCostudyScrollProgress(currCostudyVal);
+        setCostudyScrollProgress(targetCostudy);
       }
-
-      animId = requestAnimationFrame(loop);
     };
 
-    loop();
-    return () => cancelAnimationFrame(animId);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
