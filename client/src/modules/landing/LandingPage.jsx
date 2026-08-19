@@ -155,6 +155,53 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     overrideScroll: null
   });
 
+  // GRADUATION CAP LIVE TUNER (WASD to Move, Q/E to Rotate, Shift+W/S to Scale)
+  const [hatTuner, setHatTuner] = useState({
+    topPct: -50,   // top offset (%)
+    leftPct: -82,  // left offset (%)
+    rotateDeg: -28,// rotation (deg)
+    widthEm: 0.96  // width (em)
+  });
+
+  // ⌨️ WASD + Q/E KEYBOARD LISTENER TO NUDGE GRADUATION CAP LIVE!
+  useEffect(() => {
+    const handleHatKey = (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
+      const key = e.key.toLowerCase();
+      if (key === 'w') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          setHatTuner(prev => ({ ...prev, widthEm: parseFloat((prev.widthEm + 0.02).toFixed(2)) }));
+        } else {
+          setHatTuner(prev => ({ ...prev, topPct: prev.topPct - 2 }));
+        }
+      } else if (key === 's') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          setHatTuner(prev => ({ ...prev, widthEm: parseFloat(Math.max(0.3, prev.widthEm - 0.02).toFixed(2)) }));
+        } else {
+          setHatTuner(prev => ({ ...prev, topPct: prev.topPct + 2 }));
+        }
+      } else if (key === 'a') {
+        e.preventDefault();
+        setHatTuner(prev => ({ ...prev, leftPct: prev.leftPct - 2 }));
+      } else if (key === 'd') {
+        e.preventDefault();
+        setHatTuner(prev => ({ ...prev, leftPct: prev.leftPct + 2 }));
+      } else if (key === 'q') {
+        e.preventDefault();
+        setHatTuner(prev => ({ ...prev, rotateDeg: prev.rotateDeg - 2 }));
+      } else if (key === 'e') {
+        e.preventDefault();
+        setHatTuner(prev => ({ ...prev, rotateDeg: prev.rotateDeg + 2 }));
+      }
+    };
+
+    window.addEventListener('keydown', handleHatKey);
+    return () => window.removeEventListener('keydown', handleHatKey);
+  }, []);
+
   // NODECK.ONLINE INTERACTIVE DECK SLIDE STATE
   const [activeNodeckSlide, setActiveNodeckSlide] = useState(1);
 
@@ -1255,7 +1302,17 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 <span className="char-c">C</span>
                 <div className="co-letter-o-custom-circle">
                   {/* GRADUATION CAP / MORTARBOARD ON TOP-LEFT CURVE OF 'C' 🎓 */}
-                  <img src="/graduation_cap.png" alt="Graduation Cap" className="o-graduation-cap" />
+                  <img
+                    src="/graduation_cap.png"
+                    alt="Graduation Cap"
+                    className="o-graduation-cap"
+                    style={{
+                      top: `${hatTuner.topPct}%`,
+                      left: `${hatTuner.leftPct}%`,
+                      transform: `translateX(-50%) rotate(${hatTuner.rotateDeg}deg)`,
+                      width: `${hatTuner.widthEm}em`
+                    }}
+                  />
                   <div className="o-black-circle-body"><div className="o-cream-center-hole" style={{ width: `46%`, height: `46%` }} /></div>
                   <svg className="o-dots-ring-perfect" viewBox="0 0 100 100" style={{ transform: `translate(-50%, -50%) rotate(${dotsRotationDeg}deg)` }}>
                     {Array.from({ length: 12 }).map((_, i) => {
@@ -1514,6 +1571,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           </p>
         </footer>
       </section>
+
+      {/* ⌨️ DISCREET LIVE KEYBOARD TOAST FOR GRADUATION CAP */}
+      <div className="o-nudge-keyboard-toast">
+        <span>🎓 Hat: <strong>Top: {hatTuner.topPct}%</strong> | <strong>Left: {hatTuner.leftPct}%</strong> | <strong>{hatTuner.rotateDeg}°</strong> | <strong>{hatTuner.widthEm}em</strong></span>
+        <span className="toast-subtext">WASD: Move | Q / E: Rotate | Shift+W / S: Scale</span>
+      </div>
     </div>
   );
 }

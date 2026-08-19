@@ -3275,10 +3275,10 @@
 /* GRADUATION CAP / MORTARBOARD ON TOP-LEFT CURVE OF 'C' 🎓 */
 .o-graduation-cap {
   position: absolute;
-  top: -56%;
-  left: -86%;
-  transform: translateX(-50%) rotate(-32deg);
-  width: 0.95em;
+  top: -50%;
+  left: -82%;
+  transform: translateX(-50%) rotate(-28deg);
+  width: 0.96em;
   height: auto;
   pointer-events: none;
   z-index: 10;
