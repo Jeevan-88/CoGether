@@ -12,18 +12,22 @@
   padding-bottom: 80px;
 }
 
-/* ── PURE BLACK NAVBAR WITH WHITE OUTLINE ALL SIDES ── */
+/* ── PURE BLACK NAVBAR WITH WHITE OUTLINE ALL SIDES & LIGHT CURVE ── */
 .cinema-top-header {
   height: 86px;
   background: #000000 !important;
   border: 2px solid #ffffff !important;
+  border-radius: 16px;
+  margin: 14px auto 0 auto;
+  width: calc(100% - 48px);
+  max-width: 1540px;
   box-shadow: none !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
   position: sticky;
-  top: 0;
+  top: 14px;
   z-index: 500;
 }
 
@@ -62,12 +66,13 @@
 .profile-avatar-square {
   width: 32px;
   height: 32px;
-  background: #ff0033;
-  color: #ffffff;
+  background: #FFE500;
+  color: #000000;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 900;
 }
 
 .profile-user-name {
@@ -91,12 +96,12 @@
 /* ── PROFILE DROPDOWN CARD (ATTACHED TO NAVBAR) ── */
 .profile-dropdown-card {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 8px);
   left: 0;
   width: 330px;
   background: #000000;
   border: 2px solid #ffffff;
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 1);
   padding: 20px;
   z-index: 1000;
@@ -123,12 +128,13 @@
 .dropdown-avatar-sq-lg {
   width: 44px;
   height: 44px;
-  background: #ff0033;
+  background: #FFE500;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: #000000;
+  font-weight: 900;
 }
 
 .dropdown-user-details h4 {
@@ -139,16 +145,6 @@
   letter-spacing: 1.5px;
   text-transform: uppercase;
   font-family: 'Inter', sans-serif;
-}
-
-.user-role-tag {
-  font-size: 10px;
-  font-family: 'Space Mono', monospace;
-  font-weight: 800;
-  color: #ff0033;
-  letter-spacing: 0.08em;
-  display: block;
-  margin-top: 3px;
 }
 
 .dropdown-divider {
@@ -239,14 +235,14 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: #ff0033;
-  border: 2px solid #ff0033;
-  color: #ffffff;
+  background: #FFE500 !important;
+  border: 2px solid #FFE500 !important;
+  color: #ff0000 !important;
   padding: 10px;
   border-radius: 6px;
   font-size: 11px;
   font-family: 'Inter', sans-serif;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   cursor: pointer;
@@ -254,9 +250,9 @@
 }
 
 .dropdown-leave-btn:hover {
-  background: #ffffff;
-  color: #ff0033;
-  border-color: #ffffff;
+  background: #ffffff !important;
+  color: #ff0000 !important;
+  border-color: #ffffff !important;
 }
 
 /* ── CENTER: BOLD YELLOW CO-WATCH + ITALIC CURSIVE SUBTITLE ── */

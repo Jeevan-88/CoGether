@@ -114,7 +114,6 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
                   </div>
                   <div className="dropdown-user-details">
                     <h4>{initialUser?.name || 'PARTY HOST'}</h4>
-                    <span className="user-role-tag">● ACTIVE IN ROOM</span>
                   </div>
                 </div>
 
