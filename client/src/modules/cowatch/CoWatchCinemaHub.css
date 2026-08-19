@@ -12,100 +12,327 @@
   padding-bottom: 80px;
 }
 
-/* ── TOP HEADER ── */
+/* ── PURE BLACK LUXURY NAVBAR WITH RED OUTLINE ALL SIDES ── */
 .cinema-top-header {
-  height: 76px;
-  background: rgba(10, 10, 10, 0.95);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  height: 86px;
+  background: #000000 !important;
+  border: 3.5px solid #ff0033 !important;
+  box-shadow: 0 0 25px rgba(255, 0, 51, 0.45), inset 0 0 15px rgba(255, 0, 51, 0.15);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 0 28px;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 500;
 }
 
+/* ── LEFT: PROFILE BUTTON & DROPDOWN ── */
 .cinema-header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  position: relative;
+  z-index: 510;
 }
 
-.btn-cinema-back {
+.profile-menu-wrapper {
+  position: relative;
+}
+
+.btn-profile-trigger {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  gap: 10px;
+  background: #111111;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
   color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
+  padding: 6px 14px 6px 6px;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-cinema-back:hover {
-  background: #FFE500;
-  color: #000000;
-  border-color: #FFE500;
+.btn-profile-trigger:hover,
+.btn-profile-trigger.active {
+  background: #1a1a1a;
+  border-color: #ff0033;
+  box-shadow: 0 0 12px rgba(255, 0, 51, 0.35);
 }
 
-.cinema-brand-title {
+.profile-avatar-circle {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #ff0033, #b30024);
+  color: #ffffff;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  position: relative;
 }
 
-.brand-dot-red {
-  width: 10px;
-  height: 10px;
-  background: #E50914;
+.profile-online-badge {
+  width: 9px;
+  height: 9px;
+  background: #22c55e;
+  border: 2px solid #000000;
   border-radius: 50%;
-  box-shadow: 0 0 10px #E50914;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  box-shadow: 0 0 6px #22c55e;
 }
 
-.cinema-brand-title h1 {
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  margin: 0;
+.profile-user-name {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
   color: #ffffff;
+  letter-spacing: 0.02em;
 }
 
-.cinema-brand-title h1 span {
+.profile-chevron {
+  color: #888888;
+  transition: transform 0.2s ease;
+}
+
+.profile-chevron.rotated {
+  transform: rotate(180deg);
+  color: #ff0033;
+}
+
+/* ── PROFILE DROPDOWN CARD ── */
+.profile-dropdown-card {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 0;
+  width: 320px;
+  background: #0d0d0d;
+  border: 2px solid #ff0033;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 0, 51, 0.35);
+  padding: 20px;
+  z-index: 1000;
+  animation: dropdownPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownPop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-user-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dropdown-avatar-lg {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #ff0033, #7a0016);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 0, 51, 0.4);
+}
+
+.dropdown-user-details h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.user-role-tag {
+  font-size: 10px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  color: #22c55e;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-top: 3px;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 14px 0;
+}
+
+.dropdown-section {
+  margin-bottom: 12px;
+}
+
+.dropdown-section-label {
+  font-size: 10px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  color: #888888;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.dropdown-copy-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-copy-box:hover {
+  border-color: #ff0033;
+  background: #1c1c1c;
+}
+
+.mono-code {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 800;
   color: #FFE500;
+  letter-spacing: 0.06em;
 }
 
+.mono-link-preview {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #cccccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.btn-inline-copy {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.copied-green {
+  color: #22c55e;
+}
+
+.dropdown-leave-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 0, 51, 0.1);
+  border: 1px solid rgba(255, 0, 51, 0.4);
+  color: #ff4d6d;
+  padding: 9px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-leave-btn:hover {
+  background: #ff0033;
+  color: #ffffff;
+  border-color: #ff0033;
+  box-shadow: 0 0 14px rgba(255, 0, 51, 0.4);
+}
+
+/* ── CENTER: BOLD YELLOW CO-WATCH + ITALIC CURSIVE SUBTITLE ── */
+.cinema-header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cowatch-center-branding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.cowatch-bold-yellow-title {
+  margin: 0;
+  font-family: 'Space Grotesk', 'Anton', 'Outfit', 'Arial Black', sans-serif;
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  font-weight: 900;
+  color: #FFE500 !important;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(255, 229, 0, 0.5), 0 0 40px rgba(255, 229, 0, 0.2);
+}
+
+.cowatch-cursive-subtitle {
+  font-family: 'Dancing Script', 'Caveat', 'Brush Script MT', cursive;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  margin-top: 1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* ── RIGHT: QUICK BACK BUTTON ── */
 .cinema-header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
-.party-room-badge {
+.btn-cinema-back-subtle {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #141414;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 6px 14px;
-  border-radius: 6px;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.live-pulse-dot {
-  width: 8px;
-  height: 8px;
-  background: #E50914;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #E50914;
-  animation: pulseRed 1.5s infinite ease-in-out;
+.btn-cinema-back-subtle:hover {
+  background: #FFE500;
+  color: #000000;
+  border-color: #FFE500;
+  box-shadow: 0 0 12px rgba(255, 229, 0, 0.4);
 }
 
 @keyframes pulseRed {

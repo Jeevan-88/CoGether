@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Tv, Play, Users, Sparkles, ArrowLeft, ExternalLink, Film, 
   Volume2, VolumeX, Flame, Star, Compass, Clapperboard, 
-  Mic, Camera, MessageSquare, Copy, Check, ShieldCheck, Heart, Smile
+  Mic, Camera, MessageSquare, Copy, Check, ShieldCheck, Heart, Smile,
+  User, ChevronDown, LogOut, Share2, Key, Link2
 } from 'lucide-react';
 import { 
   OTT_PLATFORMS, 
@@ -17,10 +18,25 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
   const [activeMedia, setActiveMedia] = useState(CINEMA_DATABASE[0]);
   const [isPlayingTheater, setIsPlayingTheater] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isRoomCopied, setIsRoomCopied] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCamOn, setIsCamOn] = useState(true);
   const [activeReactions, setActiveReactions] = useState([]);
   const [roomCode] = useState(() => 'CW-' + Math.floor(100000 + Math.random() * 900000));
+  
+  const profileMenuRef = useRef(null);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Filter movies based on Language & Category compartments
   const filteredMedia = CINEMA_DATABASE.filter(item => {
@@ -47,11 +63,19 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleCopyPartyLink = () => {
+  const handleCopyPartyLink = (e) => {
+    e?.stopPropagation();
     const link = `${window.location.origin}?room=${roomCode}&mode=watch`;
     navigator.clipboard.writeText(link);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2500);
+  };
+
+  const handleCopyRoomCode = (e) => {
+    e?.stopPropagation();
+    navigator.clipboard.writeText(roomCode);
+    setIsRoomCopied(true);
+    setTimeout(() => setIsRoomCopied(false), 2500);
   };
 
   const handleSendReaction = (emoji) => {
@@ -64,27 +88,86 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
 
   return (
     <div className="cowatch-cinema-universe fade-in">
-      {/* ── TOP LUXURY CINEMA HEADER ── */}
+      {/* ── PURE BLACK LUXURY NAVBAR WITH RED OUTLINE ALL SIDES ── */}
       <header className="cinema-top-header">
+        {/* LEFT: Profile Icon + Dropdown Menu */}
         <div className="cinema-header-left">
-          <button className="btn-cinema-back" onClick={onBackToHome}>
-            <ArrowLeft size={16} /> <span>BACK TO HOME</span>
-          </button>
-          <div className="cinema-brand-title">
-            <span className="brand-dot-red" />
-            <h1>CO-WATCH <span>4K CINEMA</span></h1>
+          <div className="profile-menu-wrapper" ref={profileMenuRef}>
+            <button 
+              className={`btn-profile-trigger ${isProfileOpen ? 'active' : ''}`}
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              title="Party Profile & Squad Link"
+            >
+              <div className="profile-avatar-circle">
+                <User size={18} />
+                <span className="profile-online-badge" />
+              </div>
+              <span className="profile-user-name">{initialUser?.name || 'Party Host'}</span>
+              <ChevronDown size={14} className={`profile-chevron ${isProfileOpen ? 'rotated' : ''}`} />
+            </button>
+
+            {/* Profile Dropdown Card */}
+            {isProfileOpen && (
+              <div className="profile-dropdown-card fade-in">
+                <div className="dropdown-user-header">
+                  <div className="dropdown-avatar-lg">
+                    <User size={24} />
+                  </div>
+                  <div className="dropdown-user-details">
+                    <h4>{initialUser?.name || 'Party Host'}</h4>
+                    <span className="user-role-tag">● ACTIVE IN ROOM</span>
+                  </div>
+                </div>
+
+                <div className="dropdown-divider" />
+
+                {/* Room Code Compartment */}
+                <div className="dropdown-section">
+                  <span className="dropdown-section-label">ROOM CODE</span>
+                  <div className="dropdown-copy-box" onClick={handleCopyRoomCode}>
+                    <span className="mono-code">{roomCode}</span>
+                    <button className="btn-inline-copy">
+                      {isRoomCopied ? <Check size={14} className="copied-green" /> : <Copy size={14} />}
+                      <span>{isRoomCopied ? 'Copied' : 'Copy'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Squad Sync Link Compartment */}
+                <div className="dropdown-section">
+                  <span className="dropdown-section-label">SQUAD SYNC LINK</span>
+                  <div className="dropdown-copy-box" onClick={handleCopyPartyLink}>
+                    <span className="mono-link-preview">{`${window.location.origin}?room=${roomCode}&mode=watch`}</span>
+                    <button className="btn-inline-copy">
+                      {isCopied ? <Check size={14} className="copied-green" /> : <Copy size={14} />}
+                      <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="dropdown-divider" />
+
+                {/* Leave / Back to Home Action */}
+                <button className="dropdown-leave-btn" onClick={onBackToHome}>
+                  <LogOut size={15} /> <span>LEAVE PARTY & GO HOME</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="cinema-header-right">
-          <div className="party-room-badge">
-            <span className="live-pulse-dot" />
-            <span className="room-label">ROOM:</span>
-            <strong>{roomCode}</strong>
+        {/* CENTER: BOLD YELLOW CO-WATCH + ITALIC CURSIVE SUBTITLE */}
+        <div className="cinema-header-center">
+          <div className="cowatch-center-branding">
+            <h1 className="cowatch-bold-yellow-title">CO-WATCH</h1>
+            <span className="cowatch-cursive-subtitle">watch together</span>
           </div>
-          <button className="btn-copy-party-link" onClick={handleCopyPartyLink}>
-            {isCopied ? <Check size={14} /> : <Copy size={14} />}
-            <span>{isCopied ? 'LINK COPIED!' : 'SQUAD SYNC LINK'}</span>
+        </div>
+
+        {/* RIGHT: Quick Back to Home & Theater Status */}
+        <div className="cinema-header-right">
+          <button className="btn-cinema-back-subtle" onClick={onBackToHome}>
+            <ArrowLeft size={14} /> <span>BACK TO HOME</span>
           </button>
         </div>
       </header>
