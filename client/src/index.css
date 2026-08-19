@@ -30,7 +30,7 @@ body {
   background-color: var(--bg-page);
   color: var(--text-dark);
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.02em;
 }
