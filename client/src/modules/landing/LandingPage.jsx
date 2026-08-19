@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, Box, ShoppingCart } from 'lucide-react';
+import HeroSection from './sections/HeroSection.jsx';
 import './LandingPage.css';
 
 const MOVIE_STREAMING_APPS = [
@@ -511,40 +512,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   return (
     <div className="landing-page-official fade-in">
       {/* 1. TALL FULLSCREEN BLACK HERO SECTION */}
-      <section className="fullscreen-pure-black-hero">
-        <div className="hero-center-content-wrapper">
-          <div className="genz-tagline-container">
-            <p
-              className="genz-tagline-text"
-              style={{
-                opacity: heroScroll < 0.80 ? 1 : 0,
-                filter: burstOpacity > 0 ? `brightness(${1 + burstOpacity * 3.5})` : 'none'
-              }}
-            >
-              WATCH • PLAY • SHOP • STUDY WITH YOUR INNER CIRCLE
-            </p>
-
-            {/* HORIZONTAL & VERTICAL CROSS LASER BEAMS + CENTER STARBURST FLARE */}
-            {isBurstActive && (
-              <div
-                className="procedural-lightburst-flare"
-                style={{
-                  opacity: burstOpacity,
-                  transform: `translate(-50%, -50%) scale(${0.7 + burstOpacity * 2.2})`,
-                  pointerEvents: 'none',
-                  display: 'block'
-                }}
-              >
-                <div className="flare-core-burst" />
-                <div className="horizontal-laser-beam" style={{ transform: `translateY(-50%) scaleX(${1 + crossScale * 2})` }} />
-                <div className="vertical-laser-beam" style={{ transform: `translateX(-50%) scaleY(${1 + crossScale * 2})` }} />
-                <div className="diagonal-laser-beam-1" />
-                <div className="diagonal-laser-beam-2" />
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      <HeroSection
+        heroScroll={heroScroll}
+        isBurstActive={isBurstActive}
+        burstOpacity={burstOpacity}
+        crossScale={crossScale}
+      />
 
       {/* 2. STICKY PINNED RED CO-WATCH SECTION WITH 360-DEGREE INWARD ZIGZAG DOOR SPIN */}
       <section className="sticky-pinned-red-stage-wrapper" style={{ height: '450vh', position: 'relative' }}>
