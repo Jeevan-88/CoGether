@@ -1,9 +1,6 @@
-/* ============================================
-   CO-SHOP SLANTED LOG, PAC-MAN & 3D ROOM STYLES
-   ============================================ */
-
 .sticky-pinned-coshop-stage-wrapper {
-  contain: layout paint;
+  position: relative;
+  width: 100%;
 }
 
 .coshop-static-center-container {

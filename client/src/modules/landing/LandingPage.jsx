@@ -80,85 +80,19 @@ export default function LandingPage({
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // MASTER SCROLL RATE LIMITER — Intercepts wheel events and caps scroll speed.
+  // NATIVE HIGH-PERFORMANCE 60FPS SCROLL TRACKER
+  // Direct synchronized stage progression without drifting or lag.
   // ─────────────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    let targetScrollY = window.scrollY;
-    let currentScrollY = window.scrollY;
-    let scrollRafId;
-
-    const onWheel = (e) => {
-      e.preventDefault();
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const cappedDelta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 60) * 0.45;
-      targetScrollY = Math.max(0, Math.min(maxScroll, targetScrollY + cappedDelta));
-    };
-
-    const onKeyDown = (e) => {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-        e.preventDefault();
-        targetScrollY = Math.min(maxScroll, targetScrollY + 120);
-      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-        e.preventDefault();
-        targetScrollY = Math.max(0, targetScrollY - 120);
-      } else if (e.key === 'End') {
-        e.preventDefault();
-        targetScrollY = maxScroll;
-      } else if (e.key === 'Home') {
-        e.preventDefault();
-        targetScrollY = 0;
-      }
-    };
-
-    const scrollLoop = () => {
-      currentScrollY += (targetScrollY - currentScrollY) * 0.07;
-      if (Math.abs(targetScrollY - currentScrollY) < 0.5) {
-        currentScrollY = targetScrollY;
-      }
-      window.scrollTo({ top: currentScrollY, behavior: 'instant' });
-      scrollRafId = requestAnimationFrame(scrollLoop);
-    };
-
-    document.addEventListener('wheel', onWheel, { passive: false });
-    document.addEventListener('keydown', onKeyDown, { passive: false });
-    scrollLoop();
-
-    return () => {
-      document.removeEventListener('wheel', onWheel);
-      document.removeEventListener('keydown', onKeyDown);
-      cancelAnimationFrame(scrollRafId);
-    };
-  }, []);
-
-  // SCROLL SPEED LIMITER — 60fps frame clamped animation steps
-  useEffect(() => {
     let animId;
-    let currStageVal = 0;
-    let currHeroVal = 0;
-    let currCoplayVal = 0;
-    let currCoshopVal = 0;
-    let currCostudyVal = 0;
 
-    const HERO_MAX_STEP    = 0.008;
-    const STAGE_MAX_STEP   = 0.003;
-    const COPLAY_MAX_STEP  = 0.003;
-    const COSHOP_MAX_STEP  = 0.002;
-
-    const clampedStep = (current, target, maxStep) => {
-      const diff = target - current;
-      if (Math.abs(diff) <= maxStep) return target;
-      return current + maxStep * Math.sign(diff);
-    };
-
-    const loop = () => {
+    const handleScroll = () => {
       const scrollY = window.scrollY;
       const vh = window.innerHeight;
 
       // 1. Hero Scroll
       const targetHero = Math.min(scrollY / (vh * 0.65), 1);
-      currHeroVal = clampedStep(currHeroVal, targetHero, HERO_MAX_STEP);
-      setHeroScroll(currHeroVal);
+      setHeroScroll(targetHero);
 
       // 2. Co-Watch Stage
       const stageWrapper = document.querySelector('.sticky-pinned-red-stage-wrapper');
@@ -166,8 +100,7 @@ export default function LandingPage({
         const rect = stageWrapper.getBoundingClientRect();
         const totalScroll = stageWrapper.clientHeight - vh;
         const targetProgress = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currStageVal = clampedStep(currStageVal, targetProgress, STAGE_MAX_STEP);
-        setScrollProgress(currStageVal);
+        setScrollProgress(targetProgress);
       }
 
       // 3. Co-Play Stage
@@ -176,8 +109,7 @@ export default function LandingPage({
         const rect = coplayWrapper.getBoundingClientRect();
         const totalScroll = coplayWrapper.clientHeight - vh;
         const targetCoplay = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currCoplayVal = clampedStep(currCoplayVal, targetCoplay, COPLAY_MAX_STEP);
-        setCoplayScrollProgress(currCoplayVal);
+        setCoplayScrollProgress(targetCoplay);
       }
 
       // 4. Co-Shop Stage
@@ -186,8 +118,7 @@ export default function LandingPage({
         const rect = coshopWrapper.getBoundingClientRect();
         const totalScroll = coshopWrapper.clientHeight - vh;
         const targetCoshop = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currCoshopVal = clampedStep(currCoshopVal, targetCoshop, COSHOP_MAX_STEP);
-        setCoshopScrollProgress(currCoshopVal);
+        setCoshopScrollProgress(targetCoshop);
       }
 
       // 5. Co-Study Stage
@@ -196,15 +127,16 @@ export default function LandingPage({
         const rect = costudyWrapper.getBoundingClientRect();
         const totalScroll = costudyWrapper.clientHeight - vh;
         const targetCostudy = Math.min(Math.max(-rect.top / totalScroll, 0), 1);
-        currCostudyVal = clampedStep(currCostudyVal, targetCostudy, 0.003);
-        setCostudyScrollProgress(currCostudyVal);
+        setCostudyScrollProgress(targetCostudy);
       }
-
-      animId = requestAnimationFrame(loop);
     };
 
-    loop();
-    return () => cancelAnimationFrame(animId);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   useEffect(() => {

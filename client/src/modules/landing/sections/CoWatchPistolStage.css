@@ -10,7 +10,6 @@
   height: 350vh;
   background: #000000;
   z-index: 20;
-  contain: layout paint;
 }
 
 .sticky-pinned-red-stage-inner {

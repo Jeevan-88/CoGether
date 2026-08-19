@@ -1,10 +1,6 @@
-/* ============================================
-   CO-STUDY DECK STAGE STYLES
-   Letter 'O' Portal Zoom, Rotating Dot Ring & 4-Slide Interactive Manifesto
-   ============================================ */
-
 .sticky-pinned-costudy-stage-wrapper {
-  contain: layout paint;
+  position: relative;
+  width: 100%;
 }
 
 .costudy-sticky-stage {
