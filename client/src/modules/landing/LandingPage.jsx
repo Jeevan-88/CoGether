@@ -183,8 +183,12 @@ export default function LandingPage({
   const burstOpacity = isBurstActive ? Math.sin(((heroScroll - 0.02) / 0.83) * Math.PI) : 0;
   const crossScale = Math.min((heroScroll - 0.02) * 3.5, 1);
 
-  // STEP 2: 360-Degree Door Spin Calculations
-  const spinProgress = Math.min(Math.max((scrollProgress - 0.10) * 1.8, 0), 1);
+  // STEP 2: 360-Degree Door Spin Calculations (Mapped across 550vh stage)
+  // 0.00 -> 0.15: Red room pause
+  // 0.15 -> 0.55: 360-degree door spin (Red -> Yellow)
+  // 0.55 -> 0.85: Pistols & flying bullet rays
+  // 0.85 -> 1.00: Full yellow stage pause
+  const spinProgress = Math.min(Math.max((scrollProgress - 0.15) * 2.5, 0), 1);
   let doorSpinAngle = spinProgress * 360;
 
   if (spinProgress > 0.90 && spinProgress <= 0.97) {
@@ -208,14 +212,14 @@ export default function LandingPage({
   }
 
   const isFullyLockedYellow = spinProgress >= 0.98;
-  const bulletProgress = Math.min(Math.max((scrollProgress - 0.65) * 4.0, 0), 1);
+  const bulletProgress = Math.min(Math.max((scrollProgress - 0.55) * 3.3, 0), 1);
 
   // STEP 3: Co-Play Zoom Calculations
-  const coplayZoomProgress = Math.min(Math.max((coplayScrollProgress - 0.08) * 3.7, 0), 1);
+  const coplayZoomProgress = Math.min(Math.max((coplayScrollProgress - 0.10) * 3.0, 0), 1);
   const coplayZoomScale = 1 + coplayZoomProgress * 14.0;
-  const textZoomOpacity = coplayScrollProgress < 0.08 ? 1 : Math.max(1 - Math.max((coplayScrollProgress - 0.08) * 4.5, 0), 0);
-  const gameboyBlendOpacity = Math.min(Math.max((coplayScrollProgress - 0.35) * 4.35, 0), 1);
-  const coplaySplitProgress = Math.min(Math.max((coplayScrollProgress - 0.58) * 5.0, 0), 1);
+  const textZoomOpacity = coplayScrollProgress < 0.10 ? 1 : Math.max(1 - Math.max((coplayScrollProgress - 0.10) * 4.0, 0), 0);
+  const gameboyBlendOpacity = Math.min(Math.max((coplayScrollProgress - 0.35) * 4.0, 0), 1);
+  const coplaySplitProgress = Math.min(Math.max((coplayScrollProgress - 0.60) * 4.0, 0), 1);
 
   // STEP 5: Co-Study Zoom Calculations
   const handleSetTargetPoint = (e) => {
@@ -280,9 +284,6 @@ export default function LandingPage({
         whiteLineOpacity={whiteLineOpacity}
       />
 
-      {/* ── PAUSE SPACER: 60vh breathing room before Co-Play ── */}
-      <div style={{ height: '60vh', background: '#000000' }} />
-
       {/* 3. CO-PLAY: STICKY PINNED 3D ZOOM & VERTICAL SPLIT DOOR SECTION */}
       <CoPlayGameBoyStage
         coplaySplitProgress={coplaySplitProgress}
@@ -292,9 +293,6 @@ export default function LandingPage({
         onOpenGamesHub={onOpenGamesHub}
         onStartGames={onStartGames}
       />
-
-      {/* ── PAUSE SPACER: 60vh breathing room before Co-Shop ── */}
-      <div style={{ height: '60vh', background: '#11151c' }} />
 
       {/* 4. PINNED CO-SHOP HUB SECTION */}
       <CoShopSlantedStage
