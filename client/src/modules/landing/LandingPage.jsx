@@ -146,9 +146,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     holeSize: 46,
     oScale: 1.00,
     oOffsetY: 0,
-    zoomTargetX: 30.5,
+    zoomTargetX: 27.5,
     zoomTargetY: 50.0,
-    panX: 30.5,
+    panX: 27.5,
     maxZoom: 65,
     showReticle: false,
     showTuner: false,
@@ -488,7 +488,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   // Smooth camera pan offset + Exponential Zoom directly into the letter 'O'
   const zoomFactor = Math.min(Math.max((effectiveCostudyScroll - 0.08) * 2.5, 0), 1);
   const portalZoomScale = 1 + Math.pow(zoomFactor, 3.2) * 65;
-  const oPanShiftPct = zoomFactor * 30.5; // Shifts text rightward to center 'O' precisely at 50vw during zoom
+  const oPanShiftPct = zoomFactor * 27.5; // Shifts text rightward to center 'O' precisely at 50vw during zoom
   const portalOpacity = effectiveCostudyScroll > 0.50 ? Math.max(0, 1 - (effectiveCostudyScroll - 0.50) * 7) : 1;
 
   // 4 Diagonal Black Square Wipe Cards (Top-Left, Bottom-Right, Top-Right, Bottom-Left)
