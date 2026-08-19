@@ -1254,8 +1254,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
               <div className="costudy-text-row">
                 <span className="char-c">C</span>
                 <div className="co-letter-o-custom-circle">
-                  {/* GRADUATION CAP / MORTARBOARD ON TOP OF 'O' 🎓 */}
-                  <img src="/graduation_cap.png" alt="Graduation Cap" className="o-graduation-cap" />
+                  {/* GRADUATION CAP / MORTARBOARD ON TOP-LEFT CURVE OF 'C' 🎓 */}
+                  <img src="/graduation_cap.svg" alt="Graduation Cap" className="o-graduation-cap" />
                   <div className="o-black-circle-body"><div className="o-cream-center-hole" style={{ width: `46%`, height: `46%` }} /></div>
                   <svg className="o-dots-ring-perfect" viewBox="0 0 100 100" style={{ transform: `translate(-50%, -50%) rotate(${dotsRotationDeg}deg)` }}>
                     {Array.from({ length: 12 }).map((_, i) => {

@@ -1,0 +1,22 @@
+const fs = require('fs');
+
+// Simple PNG uncompressed / raw filtering or using pure clean canvas
+const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90" width="100%" height="100%">
+  <!-- Mortarboard Diamond Top with 3D Bevel -->
+  <polygon points="60,10 114,32 60,54 6,32" fill="#0d0d11" stroke="#000000" stroke-width="2.5" stroke-linejoin="round" />
+  <polygon points="60,13 110,32 60,51 10,32" fill="#18181f" />
+  <polygon points="60,14 60,50 11,32" fill="#24242e" />
+  <!-- Skull Cap Underneath -->
+  <path d="M28,42 L28,60 C28,74 92,74 92,60 L92,42 C82,50 72,53 60,53 C48,53 38,50 28,42 Z" fill="#0d0d11" stroke="#000000" stroke-width="2" />
+  <path d="M32,45 L32,58 C32,70 88,70 88,58 L88,45 C80,51 70,54 60,54 C50,54 40,51 32,45 Z" fill="#1c1c24" />
+  <!-- Gold Center Button -->
+  <ellipse cx="60" cy="32" rx="4" ry="2.8" fill="#eab308" stroke="#ca8a04" stroke-width="1" />
+  <!-- Gold Tassel Cord -->
+  <path d="M60,32 C38,34 26,48 24,68" stroke="#eab308" stroke-width="2.5" fill="none" stroke-linecap="round" />
+  <!-- Gold Tassel Fringe -->
+  <polygon points="20,67 28,67 30,84 18,84" fill="#eab308" stroke="#ca8a04" stroke-width="0.8" />
+  <line x1="24" y1="67" x2="24" y2="84" stroke="#ca8a04" stroke-width="1" />
+</svg>`;
+
+fs.writeFileSync('client/public/graduation_cap.svg', svgContent);
+console.log('Saved SVG');
