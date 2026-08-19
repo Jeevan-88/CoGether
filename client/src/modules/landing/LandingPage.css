@@ -3243,13 +3243,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.06em;
+  gap: 0.08em;
   font-size: clamp(5.2rem, 15vw, 18rem);
   max-width: 95vw;
-  font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
   font-weight: 900;
+  font-stretch: ultra-condensed;
   color: #000000;
-  letter-spacing: 0.03em;
+  letter-spacing: -0.04em;
   line-height: 0.85;
   text-transform: uppercase;
   user-select: none;
@@ -3264,7 +3264,7 @@
   align-items: center;
   justify-content: center;
   margin: 0 0.04em;
-  transform: translateY(8px);
+  transform: translateY(12px);
   transform-origin: center center;
   transition: transform 0.1s ease;
 }
@@ -3272,14 +3272,14 @@
 /* GRADUATION CAP / MORTARBOARD ON TOP OF 'O' 🎓 */
 .o-graduation-cap {
   position: absolute;
-  top: -42%;
-  left: 50%;
-  transform: translateX(-50%) rotate(-6deg);
-  width: 0.92em;
+  top: -48%;
+  left: -78%;
+  transform: translateX(-50%) rotate(-30deg);
+  width: 0.95em;
   height: auto;
   pointer-events: none;
   z-index: 10;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+  mix-blend-mode: multiply;
 }
 
 .o-black-circle-body {
@@ -3290,6 +3290,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 .o-cream-center-hole {
