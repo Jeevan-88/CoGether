@@ -245,13 +245,13 @@
 
 .card-game-title {
   margin: 0;
-  font-family: 'Space Grotesk', 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1.8px;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   color: #ffffff;
-  line-height: 1.35;
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

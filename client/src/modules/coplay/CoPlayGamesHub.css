@@ -63,8 +63,8 @@
 }
 
 .arcade-title {
-  font-family: 'Space Grotesk', 'Outfit', 'Inter', sans-serif;
-  font-size: 1.15rem;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -397,14 +397,14 @@
 }
 
 .spotlight-title {
-  font-family: 'Space Grotesk', 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  font-weight: 600;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: clamp(2.8rem, 4.5vw, 4rem);
+  font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
   margin: 0 0 12px 0;
   color: #ffffff;
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
 .spotlight-desc {
@@ -497,9 +497,9 @@
 }
 
 .section-heading {
-  font-family: 'Space Grotesk', 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 1.45rem;
+  font-weight: 700;
   letter-spacing: 2.5px;
   text-transform: uppercase;
   margin: 0;
