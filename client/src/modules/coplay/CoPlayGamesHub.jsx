@@ -189,6 +189,24 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
   // Featured Spotlight Game (Playable verified hit)
   const spotlightGame = AUTHORIZED_GAMES_DATABASE.find(g => g.id === '2048-classic') || AUTHORIZED_GAMES_DATABASE[0];
 
+  // When a game is launched, render the dedicated GamePlayer exclusively (no yellow catalog background)
+  if (activePlayGame) {
+    return (
+      <GamePlayer
+        game={activePlayGame}
+        initialMode={activePlayMode}
+        initialRoomId={activePlayRoomId}
+        currentUsername={currentUser?.name}
+        onClose={() => {
+          setActivePlayGame(null);
+          setActivePlayMode('SINGLE_PLAYER');
+          setActivePlayRoomId(null);
+        }}
+        onLaunchSquadRoom={handleSquadGame}
+      />
+    );
+  }
+
   return (
     <div className="coplay-yellow-canvas-wrapper fade-in">
       {/* ── 1. ARCADE TOP NAVIGATION HEADER ── */}
@@ -356,21 +374,6 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
         />
       )}
 
-      {/* ── 6. UNIVERSAL GAME PLAYER THEATER ── */}
-      {activePlayGame && (
-        <GamePlayer
-          game={activePlayGame}
-          initialMode={activePlayMode}
-          initialRoomId={activePlayRoomId}
-          currentUsername={currentUser?.name}
-          onClose={() => {
-            setActivePlayGame(null);
-            setActivePlayMode('SINGLE_PLAYER');
-            setActivePlayRoomId(null);
-          }}
-          onLaunchSquadRoom={handleSquadGame}
-        />
-      )}
 
       {/* ── 7. LOGIN & CLOUD PROGRESS MODAL ── */}
       {showAuthModal && (

@@ -15,6 +15,103 @@
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+  <style>
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      overflow: hidden !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: #faf8ef !important;
+    }
+    .container {
+      margin: 0 auto !important;
+      width: 500px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+    }
+    .heading {
+      margin-bottom: 4px !important;
+      width: 500px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+    }
+    h1.title {
+      font-size: 44px !important;
+      line-height: 1 !important;
+      margin: 0 !important;
+      float: none !important;
+    }
+    .scores-container {
+      float: none !important;
+      display: flex !important;
+      gap: 8px !important;
+    }
+    .score-container, .best-container {
+      margin-top: 0 !important;
+      padding: 6px 16px !important;
+      font-size: 18px !important;
+      height: 28px !important;
+      line-height: 38px !important;
+      border-radius: 4px !important;
+    }
+    .score-container:after, .best-container:after {
+      font-size: 10px !important;
+      top: 6px !important;
+    }
+    .above-game {
+      width: 500px !important;
+      margin-bottom: 6px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+    }
+    .above-game .game-intro {
+      margin: 0 !important;
+      font-size: 14px !important;
+      width: auto !important;
+    }
+    .above-game .restart-button {
+      margin: 0 !important;
+      padding: 8px 18px !important;
+      height: auto !important;
+      line-height: normal !important;
+      font-size: 14px !important;
+      float: none !important;
+      display: inline-block !important;
+      width: auto !important;
+    }
+    .game-container {
+      margin: 0 !important;
+      width: 500px !important;
+      height: 500px !important;
+      padding: 15px !important;
+      box-sizing: border-box !important;
+    }
+    .game-explanation, hr, .container > p {
+      display: none !important;
+    }
+    @media (max-height: 640px) {
+      .container {
+        transform: scale(0.86);
+        transform-origin: center center;
+      }
+    }
+    @media (max-height: 540px) {
+      .container {
+        transform: scale(0.72);
+        transform-origin: center center;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">

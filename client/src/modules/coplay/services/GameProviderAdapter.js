@@ -100,8 +100,8 @@ export class CoGetherOpenSourceProvider extends GameProviderAdapter {
       iframe.title = this.game.title;
       iframe.className = 'game-embedded-viewport-frame';
 
-      // Minimum necessary sandbox permissions: strictly NO allow-same-origin
-      iframe.setAttribute('sandbox', 'allow-scripts allow-fullscreen');
+      // Necessary sandbox permissions for local first-party games
+      iframe.setAttribute('sandbox', 'allow-scripts allow-fullscreen allow-same-origin');
       iframe.setAttribute('allow', 'fullscreen; gamepad; accelerometer; gyroscope');
       iframe.setAttribute('allowFullScreen', 'true');
       iframe.setAttribute('tabindex', '0');
