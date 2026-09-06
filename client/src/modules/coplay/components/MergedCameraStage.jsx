@@ -1,54 +1,60 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Layers, Image, UserCheck, UserX, Settings2 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { 
+  Sparkles, Layers, Image as ImageIcon, UserCheck, UserX, 
+  Upload, AlertTriangle, RefreshCw, Sliders 
+} from 'lucide-react';
+import { BUILTIN_BACKGROUNDS, getBackgroundById } from '../camera/BackgroundLibrary.js';
+import { PersonSegmenter } from '../camera/PersonSegmenter.js';
+import { MaskProcessor } from '../camera/MaskProcessor.js';
+import { MergeCompositor } from '../camera/MergeCompositor.js';
 import './MergedCameraStage.css';
-
-const VIRTUAL_BACKGROUNDS = [
-  {
-    id: 'arcade-neon',
-    name: 'Cyber Arcade',
-    url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80'
-  },
-  {
-    id: 'vip-lounge',
-    name: 'VIP Lounge',
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'
-  },
-  {
-    id: 'cinema-vip',
-    name: 'Retro Cinema',
-    url: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80'
-  }
-];
 
 export default function MergedCameraStage({
   localStream,
   remoteStreams = {},
   currentUsername = 'You',
+  cameraEnabled = true,
   onToggleMergeOptOut,
-  optedOutPeers = {}
+  optedOutPeers = {},
+  onFallbackToNormal
 }) {
-  const [selectedBg, setSelectedBg] = useState('arcade-neon');
+  const [selectedBgId, setSelectedBgId] = useState('cogether-stage');
+  const [customBgUrl, setCustomBgUrl] = useState(null);
   const [showBgSelector, setShowBgSelector] = useState(false);
+  const [qualityMode, setQualityMode] = useState('AUTO'); // 'AUTO' | 'HIGH' | 'MED' | 'LOW'
+  const [status, setStatus] = useState('loading'); // 'loading' | 'ready' | 'error'
+  const [errorMessage, setErrorMessage] = useState('');
 
   const canvasRef = useRef(null);
+  const compositorRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // Segmentation & Video references
   const localVideoRef = useRef(document.createElement('video'));
   const remoteVideoRefs = useRef({});
-  const bgImageRef = useRef(new window.Image());
-  const animRef = useRef(null);
 
-  // Setup local video element
+  const segmenterRef = useRef(null);
+  const maskProcessorsRef = useRef(new Map()); // id -> MaskProcessor
+  const animFrameRef = useRef(null);
+  const segmentIntervalRef = useRef(null);
+  const isTabVisibleRef = useRef(!document.hidden);
+
+  // 1. Initialize Local Video Stream
   useEffect(() => {
     const video = localVideoRef.current;
     video.autoplay = true;
     video.muted = true;
     video.playsInline = true;
-    if (localStream) {
+
+    if (localStream && cameraEnabled) {
       video.srcObject = localStream;
       video.play().catch(() => {});
+    } else {
+      video.srcObject = null;
     }
-  }, [localStream]);
+  }, [localStream, cameraEnabled]);
 
-  // Setup remote video elements
+  // 2. Initialize Remote Video Streams
   useEffect(() => {
     Object.entries(remoteStreams).forEach(([id, peer]) => {
       if (!remoteVideoRefs.current[id]) {
@@ -58,162 +64,308 @@ export default function MergedCameraStage({
         v.playsInline = true;
         remoteVideoRefs.current[id] = v;
       }
-      if (peer.stream && remoteVideoRefs.current[id].srcObject !== peer.stream) {
-        remoteVideoRefs.current[id].srcObject = peer.stream;
-        remoteVideoRefs.current[id].play().catch(() => {});
+      const v = remoteVideoRefs.current[id];
+      if (peer.stream && peer.cameraEnabled !== false && v.srcObject !== peer.stream) {
+        v.srcObject = peer.stream;
+        v.play().catch(() => {});
+      } else if (peer.cameraEnabled === false) {
+        v.srcObject = null;
       }
     });
 
-    // Cleanup disconnected
+    // Cleanup disconnected remote streams
     Object.keys(remoteVideoRefs.current).forEach((id) => {
       if (!remoteStreams[id]) {
+        if (compositorRef.current) {
+          compositorRef.current.removeParticipant(id);
+        }
         delete remoteVideoRefs.current[id];
+        maskProcessorsRef.current.delete(id);
       }
     });
   }, [remoteStreams]);
 
-  // Load selected background
+  // 3. Tab Visibility Handler (Throttles processing when hidden)
   useEffect(() => {
-    const bg = VIRTUAL_BACKGROUNDS.find((b) => b.id === selectedBg) || VIRTUAL_BACKGROUNDS[0];
-    bgImageRef.current.crossOrigin = 'anonymous';
-    bgImageRef.current.src = bg.url;
-  }, [selectedBg]);
+    const handleVisibilityChange = () => {
+      isTabVisibleRef.current = !document.hidden;
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
-  // Main Canvas Rendering Loop
+  // 4. Initialize Local MediaPipe Segmenter & Compositor
   useEffect(() => {
+    let isMounted = true;
+    setStatus('loading');
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
 
-    const render = () => {
-      const w = canvas.width;
-      const h = canvas.height;
+    // Initialize Compositor
+    const compositor = new MergeCompositor(canvas, {
+      enableShadows: true,
+      enableRimGlow: true
+    });
+    compositorRef.current = compositor;
 
-      // 1. Draw Virtual Background
-      if (bgImageRef.current.complete && bgImageRef.current.naturalWidth > 0) {
-        ctx.drawImage(bgImageRef.current, 0, 0, w, h);
-      } else {
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, w, h);
-      }
+    // Set Initial Background
+    const bg = getBackgroundById(selectedBgId, customBgUrl);
+    compositor.setBackground(bg.dataUrl);
 
-      // Subtle dark vignette gradient
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, 'rgba(0,0,0,0.2)');
-      grad.addColorStop(1, 'rgba(0,0,0,0.65)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+    // Initialize PersonSegmenter
+    const segmenter = new PersonSegmenter({
+      quality: qualityMode,
+      modelSelection: 1 // landscape model
+    });
+    segmenterRef.current = segmenter;
 
-      // Collect participants who are merged (not opted out)
-      const participants = [];
-      if (!optedOutPeers['local'] && localStream) {
-        participants.push({
-          id: 'local',
-          name: currentUsername,
-          video: localVideoRef.current,
-          isLocal: true
-        });
-      }
-
-      Object.entries(remoteStreams).forEach(([id, peer]) => {
-        if (!optedOutPeers[id] && remoteVideoRefs.current[id]) {
-          participants.push({
-            id,
-            name: peer.username || 'Friend',
-            video: remoteVideoRefs.current[id],
-            isLocal: false
-          });
-        }
+    segmenter
+      .init()
+      .then(() => {
+        if (!isMounted) return;
+        setStatus('ready');
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        console.error('[MergedCameraStage] MediaPipe Segmenter failed to initialize:', err);
+        setStatus('error');
+        setErrorMessage("Live background segmentation couldn't start on this device.");
       });
 
-      const count = participants.length;
-      if (count > 0) {
-        const slotWidth = w / count;
+    return () => {
+      isMounted = false;
+      if (segmenterRef.current) {
+        segmenterRef.current.dispose();
+        segmenterRef.current = null;
+      }
+      if (compositorRef.current) {
+        compositorRef.current.dispose();
+        compositorRef.current = null;
+      }
+    };
+  }, []);
 
-        participants.forEach((p, index) => {
-          const v = p.video;
-          if (!v || v.readyState < 2) return;
+  // 5. Update Background on selection change
+  useEffect(() => {
+    if (compositorRef.current) {
+      const bg = getBackgroundById(selectedBgId, customBgUrl);
+      compositorRef.current.setBackground(bg.dataUrl);
+    }
+  }, [selectedBgId, customBgUrl]);
 
-          const cx = slotWidth * index + slotWidth / 2;
-          const cy = h * 0.58;
-          const radius = Math.min(slotWidth * 0.42, h * 0.42);
+  // 6. Helper: get or create MaskProcessor for a participant
+  const getMaskProcessor = (id) => {
+    if (!maskProcessorsRef.current.has(id)) {
+      maskProcessorsRef.current.set(id, new MaskProcessor({ temporalSmoothing: 0.72 }));
+    }
+    return maskProcessorsRef.current.get(id);
+  };
 
-          // Draw Person Cutout (Rounded organic portrait with soft blur rim)
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.clip();
+  // 7. Segmentation Processing Loop (~18 FPS inference loop)
+  useEffect(() => {
+    if (status !== 'ready') return;
 
-          // Draw video feed mirrored for local
-          if (p.isLocal) {
-            ctx.translate(cx + radius, cy - radius);
-            ctx.scale(-1, 1);
-            ctx.drawImage(v, 0, 0, radius * 2, radius * 2);
-          } else {
-            ctx.drawImage(v, cx - radius, cy - radius, radius * 2, radius * 2);
+    const runSegmentation = async () => {
+      if (!isTabVisibleRef.current) return;
+      const segmenter = segmenterRef.current;
+      const compositor = compositorRef.current;
+      if (!segmenter || !compositor) return;
+
+      // Process Local Stream
+      if (!optedOutPeers['local'] && cameraEnabled && localStream) {
+        const localVid = localVideoRef.current;
+        if (localVid && localVid.readyState >= 2 && localVid.videoWidth > 0 && localVid.videoHeight > 0) {
+          try {
+            const rawResult = await segmenter.segment(localVid);
+            if (rawResult && rawResult.maskCanvas) {
+              const processor = getMaskProcessor('local');
+              const smoothedMask = processor.process(rawResult.maskCanvas);
+
+              compositor.updateParticipant('local', {
+                video: localVid,
+                maskCanvas: smoothedMask,
+                isLocal: true,
+                name: currentUsername,
+                bounds: rawResult.bounds,
+                cameraEnabled: true
+              });
+            }
+          } catch (e) {
+            console.warn('[MergedCameraStage] Local segmentation error:', e);
           }
-          ctx.restore();
-
-          // Glowing Outline Rim
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-          ctx.lineWidth = 3;
-          ctx.strokeStyle = '#FFE500';
-          ctx.shadowColor = '#FFE500';
-          ctx.shadowBlur = 10;
-          ctx.stroke();
-          ctx.restore();
-
-          // Name Tag below player
-          ctx.save();
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-          ctx.roundRect(cx - 50, cy + radius + 6, 100, 20, 6);
-          ctx.fill();
-          ctx.font = '600 11px Barlow, sans-serif';
-          ctx.fillStyle = '#ffffff';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(p.name, cx, cy + radius + 16);
-          ctx.restore();
-        });
+        }
+      } else {
+        compositor.removeParticipant('local');
       }
 
-      animRef.current = requestAnimationFrame(render);
+      // Process Remote Streams (up to 3 peers)
+      for (const [id, peer] of Object.entries(remoteStreams)) {
+        if (!optedOutPeers[id] && peer.cameraEnabled !== false && peer.stream) {
+          const remoteVid = remoteVideoRefs.current[id];
+          if (remoteVid && remoteVid.readyState >= 2 && remoteVid.videoWidth > 0 && remoteVid.videoHeight > 0) {
+            try {
+              const rawResult = await segmenter.segment(remoteVid);
+              if (rawResult && rawResult.maskCanvas) {
+                const processor = getMaskProcessor(id);
+                const smoothedMask = processor.process(rawResult.maskCanvas);
+
+                compositor.updateParticipant(id, {
+                  video: remoteVid,
+                  maskCanvas: smoothedMask,
+                  isLocal: false,
+                  name: peer.username || 'Friend',
+                  bounds: rawResult.bounds,
+                  cameraEnabled: true
+                });
+              }
+            } catch (e) {
+              console.warn(`[MergedCameraStage] Remote segmentation error for ${id}:`, e);
+            }
+          }
+        } else {
+          compositor.removeParticipant(id);
+        }
+      }
     };
 
-    animRef.current = requestAnimationFrame(render);
+    // Run segmentation at a steady ~18 FPS (every 55ms)
+    const intervalId = setInterval(runSegmentation, 55);
+    segmentIntervalRef.current = intervalId;
+
     return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
+      clearInterval(intervalId);
     };
-  }, [optedOutPeers, localStream, remoteStreams, currentUsername]);
+  }, [status, optedOutPeers, cameraEnabled, localStream, remoteStreams, currentUsername]);
+
+  // 8. 60 FPS GPU/Canvas Compositor Render Loop
+  useEffect(() => {
+    const renderLoop = () => {
+      if (compositorRef.current && isTabVisibleRef.current) {
+        compositorRef.current.render();
+      }
+      animFrameRef.current = requestAnimationFrame(renderLoop);
+    };
+
+    animFrameRef.current = requestAnimationFrame(renderLoop);
+    return () => {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+      }
+    };
+  }, []);
+
+  // 9. Custom Background File Upload Handler
+  const handleCustomUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload a valid image file (JPG, PNG, WebP).');
+      return;
+    }
+
+    if (file.size > 8 * 1024 * 1024) {
+      alert('Image file is too large (maximum 8MB).');
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setCustomBgUrl(objectUrl);
+    setSelectedBgId('custom');
+    setShowBgSelector(false);
+  };
 
   return (
-    <div className="merged-camera-stage-wrapper">
-      <canvas ref={canvasRef} width={480} height={260} className="merged-composite-canvas" />
+    <div className="merged-camera-stage-root">
+      {/* Hidden mounted video elements for active MediaStream decoding & WebGL sinks */}
+      <video
+        ref={localVideoRef}
+        autoPlay
+        playsInline
+        muted
+        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+      />
+      {Object.entries(remoteStreams).map(([id, peer]) => (
+        <video
+          key={id}
+          ref={(el) => {
+            if (el) {
+              remoteVideoRefs.current[id] = el;
+              if (peer.stream && el.srcObject !== peer.stream) {
+                el.srcObject = peer.stream;
+                el.play().catch(() => {});
+              }
+            }
+          }}
+          autoPlay
+          playsInline
+          muted={false}
+          style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+        />
+      ))}
 
-      {/* Top Floating Mini Controls */}
-      <div className="merged-stage-top-bar">
-        <button
-          type="button"
-          className="btn-merged-bg-toggle"
-          onClick={() => setShowBgSelector(!showBgSelector)}
-          title="Change Virtual Background"
-        >
-          <Layers size={13} />
-          <span>BG</span>
-        </button>
+      {/* Compositor Canvas (16:9 widescreen arcade resolution) */}
+      <canvas
+        ref={canvasRef}
+        width={640}
+        height={360}
+        className="merged-composite-canvas"
+      />
 
-        {/* Opt-out Badges list */}
-        <div className="merged-opt-list">
+      {/* Loading Overlay */}
+      {status === 'loading' && (
+        <div className="merged-stage-loading-overlay">
+          <div className="merge-spinner" />
+          <span className="merge-loading-text">PREPARING MERGE STAGE...</span>
+          <span className="merge-loading-subtext">Loading local AI human segmentation</span>
+        </div>
+      )}
+
+      {/* Error Fallback Banner */}
+      {status === 'error' && (
+        <div className="merged-stage-error-overlay">
+          <AlertTriangle size={24} className="error-icon" />
+          <p className="error-text">{errorMessage}</p>
+          <button
+            type="button"
+            className="btn-merge-fallback"
+            onClick={onFallbackToNormal}
+          >
+            USE NORMAL CAMERAS
+          </button>
+        </div>
+      )}
+
+      {/* Top Floating Controls Bar */}
+      <div className="merged-stage-top-controls">
+        <div className="top-ctrl-left">
+          <button
+            type="button"
+            className={`btn-merged-bg-toggle ${showBgSelector ? 'active' : ''}`}
+            onClick={() => setShowBgSelector(!showBgSelector)}
+            title="Change Scene Background"
+          >
+            <Layers size={12} />
+            <span>BG</span>
+          </button>
+
+          <span className="merged-scene-tag">
+            {getBackgroundById(selectedBgId, customBgUrl).name}
+          </span>
+        </div>
+
+        {/* Participant Opt-Out Buttons */}
+        <div className="merged-stage-opt-list">
           <button
             type="button"
             className={`btn-opt-pill ${optedOutPeers['local'] ? 'is-out' : ''}`}
             onClick={() => onToggleMergeOptOut && onToggleMergeOptOut('local')}
-            title={optedOutPeers['local'] ? 'Include You in Merged View' : 'Exclude You from Merged View'}
+            title={optedOutPeers['local'] ? 'Add You to Merged Stage' : 'Opt Out You from Merge'}
           >
-            {optedOutPeers['local'] ? <UserX size={11} /> : <UserCheck size={11} />}
+            {optedOutPeers['local'] ? <UserX size={10} /> : <UserCheck size={10} />}
             <span>You</span>
           </button>
 
@@ -223,10 +375,10 @@ export default function MergedCameraStage({
               type="button"
               className={`btn-opt-pill ${optedOutPeers[id] ? 'is-out' : ''}`}
               onClick={() => onToggleMergeOptOut && onToggleMergeOptOut(id)}
-              title={optedOutPeers[id] ? `Include ${peer.username} in Merged View` : `Exclude ${peer.username}`}
+              title={optedOutPeers[id] ? `Add ${peer.username} to Merged Stage` : `Opt Out ${peer.username}`}
             >
-              {optedOutPeers[id] ? <UserX size={11} /> : <UserCheck size={11} />}
-              <span>{peer.username || 'Peer'}</span>
+              {optedOutPeers[id] ? <UserX size={10} /> : <UserCheck size={10} />}
+              <span>{peer.username || 'Friend'}</span>
             </button>
           ))}
         </div>
@@ -235,20 +387,66 @@ export default function MergedCameraStage({
       {/* Background Selector Drawer */}
       {showBgSelector && (
         <div className="merged-bg-drawer fade-in">
-          {VIRTUAL_BACKGROUNDS.map((bg) => (
+          <div className="bg-drawer-header">
+            <span>SELECT SHARED ENVIRONMENT</span>
             <button
-              key={bg.id}
               type="button"
-              className={`bg-thumb-option ${selectedBg === bg.id ? 'active' : ''}`}
-              onClick={() => {
-                setSelectedBg(bg.id);
-                setShowBgSelector(false);
-              }}
+              className="btn-drawer-close"
+              onClick={() => setShowBgSelector(false)}
             >
-              <img src={bg.url} alt={bg.name} />
-              <span>{bg.name}</span>
+              ✕
             </button>
-          ))}
+          </div>
+
+          <div className="bg-grid-options">
+            {BUILTIN_BACKGROUNDS.map((bg) => (
+              <button
+                key={bg.id}
+                type="button"
+                className={`bg-thumb-card ${selectedBgId === bg.id ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedBgId(bg.id);
+                  setShowBgSelector(false);
+                }}
+              >
+                <img
+                  src={bg.dataUrl}
+                  alt={bg.name}
+                  className="bg-thumb-preview"
+                />
+                <span className="bg-thumb-label">{bg.name}</span>
+              </button>
+            ))}
+
+            {/* Custom Image Option */}
+            <button
+              type="button"
+              className={`bg-thumb-card custom-upload-card ${selectedBgId === 'custom' ? 'active' : ''}`}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <div className="bg-thumb-preview custom-preview">
+                {customBgUrl ? (
+                  <div
+                    className="custom-img-fill"
+                    style={{ backgroundImage: `url(${customBgUrl})` }}
+                  />
+                ) : (
+                  <Upload size={18} className="upload-icon" />
+                )}
+              </div>
+              <span className="bg-thumb-label">
+                {customBgUrl ? 'Custom Image' : '+ Upload Image'}
+              </span>
+            </button>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleCustomUpload}
+          />
         </div>
       )}
     </div>

@@ -1,13 +1,13 @@
 /* ══════════════════════════════════════════════════════════════════════
    MERGEDCAMERASTAGE.CSS
-   Virtual Background Composite Camera View
+   Real-Time Body Cutout Compositor & Shared Environment UI
    ══════════════════════════════════════════════════════════════════════ */
 
-.merged-camera-stage-wrapper {
+.merged-camera-stage-root {
   width: 100%;
   height: 100%;
   position: relative;
-  background: #000000;
+  background: #07070a;
   border-radius: 10px;
   overflow: hidden;
   display: flex;
@@ -22,8 +22,94 @@
   display: block;
 }
 
-/* ── Top Bar Controls ── */
-.merged-stage-top-bar {
+/* ── Loading Overlay ── */
+.merged-stage-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 15, 0.88);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 15;
+  user-select: none;
+}
+
+.merge-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid rgba(255, 229, 0, 0.2);
+  border-top-color: #FFE500;
+  border-radius: 50%;
+  animation: merge-spin 0.8s linear infinite;
+}
+
+@keyframes merge-spin {
+  to { transform: rotate(360deg); }
+}
+
+.merge-loading-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFE500;
+  letter-spacing: 1.5px;
+}
+
+.merge-loading-subtext {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+/* ── Error Overlay ── */
+.merged-stage-error-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 14, 20, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  text-align: center;
+  z-index: 20;
+}
+
+.error-icon {
+  color: #f59e0b;
+}
+
+.error-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.btn-merge-fallback {
+  background: #FFE500;
+  color: #000000;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: opacity 0.15s ease;
+}
+
+.btn-merge-fallback:hover {
+  opacity: 0.9;
+}
+
+/* ── Top Floating Controls Bar ── */
+.merged-stage-top-controls {
   position: absolute;
   top: 8px;
   left: 8px;
@@ -33,13 +119,20 @@
   justify-content: space-between;
   gap: 6px;
   z-index: 10;
+  pointer-events: auto;
+}
+
+.top-ctrl-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .btn-merged-bg-toggle {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(14, 14, 19, 0.85);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 229, 0, 0.4);
   color: #FFE500;
@@ -47,17 +140,29 @@
   border-radius: 6px;
   font-family: 'Barlow', sans-serif;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.btn-merged-bg-toggle:hover {
+.btn-merged-bg-toggle:hover,
+.btn-merged-bg-toggle.active {
   background: #FFE500;
   color: #000000;
 }
 
-.merged-opt-list {
+.merged-scene-tag {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.merged-stage-opt-list {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -67,15 +172,15 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(14, 14, 19, 0.8);
   backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   color: #cbd5e1;
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'Barlow', sans-serif;
   font-size: 10px;
-  font-weight: 400;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -97,42 +202,104 @@
   position: absolute;
   top: 36px;
   left: 8px;
-  background: rgba(14, 14, 18, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 229, 0, 0.4);
+  right: 8px;
+  background: rgba(14, 14, 20, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 229, 0, 0.45);
   border-radius: 8px;
-  padding: 8px;
+  padding: 10px;
+  z-index: 25;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  z-index: 20;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
 }
 
-.bg-thumb-option {
+.bg-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #FFE500;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+}
+
+.btn-drawer-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-drawer-close:hover {
+  color: #ffffff;
+}
+
+.bg-grid-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.bg-thumb-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 4px;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  background: transparent;
-  border: 1.5px solid transparent;
-  border-radius: 6px;
-  padding: 2px;
-  cursor: pointer;
-  color: #cbd5e1;
-  font-family: 'Barlow', sans-serif;
-  font-size: 9px;
   transition: all 0.15s ease;
 }
 
-.bg-thumb-option img {
-  width: 54px;
-  height: 36px;
+.bg-thumb-card:hover,
+.bg-thumb-card.active {
+  border-color: #FFE500;
+  background: rgba(255, 229, 0, 0.08);
+}
+
+.bg-thumb-preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
+  display: block;
   border-radius: 4px;
 }
 
-.bg-thumb-option:hover,
-.bg-thumb-option.active {
-  border-color: #FFE500;
+.custom-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.upload-icon {
   color: #FFE500;
+}
+
+.custom-img-fill {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
+}
+
+.bg-thumb-label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  color: #cbd5e1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }

@@ -73,8 +73,8 @@ function DraggableFloatingTile({ stream, label, isLocal, micEnabled, cameraEnabl
  * DraggableCameraOverlay
  * Full-featured Floating Camera System supporting:
  * - Up to 3 players
- * - Resizable sizing presets (S / M / L)
- * - Modes: GROUPED, SEPARATE (individual draggable locations), MERGED (virtual background with face cutout)
+ * - Resizable sizing presets (S / M / L) + interactive drag-resize handle
+ * - Modes: GROUPED, SEPARATE (individual draggable locations), MERGED (real-time body cutout compositor)
  * - Per-player merge opt-out
  * - Visible in fullscreen
  */
@@ -90,20 +90,38 @@ export default function DraggableCameraOverlay({
 }) {
   // Layout mode: 'GROUPED' | 'SEPARATE' | 'MERGED'
   const [layoutMode, setLayoutMode] = useState('GROUPED');
-  // Sizing mode: 'S' (220px) | 'M' (320px) | 'L' (440px)
+  // Sizing mode: 'S' | 'M' | 'L'
   const [sizePreset, setSizePreset] = useState('M');
+  const [customSize, setCustomSize] = useState(null); // { width, height }
   const [optedOutPeers, setOptedOutPeers] = useState({});
 
   // Grouped position (default: bottom-left)
   const [position, setPosition] = useState({
     x: 24,
-    y: Math.max(80, window.innerHeight - 270)
+    y: Math.max(80, window.innerHeight - 340)
   });
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
 
   const dragStartPos = useRef({ x: 0, y: 0 });
   const elementStartPos = useRef({ x: 0, y: 0 });
+  const resizeStartPos = useRef({ x: 0, y: 0, w: 0, h: 0 });
+  const overlayRef = useRef(null);
+
+  // Compute active dimensions
+  const getPresetDimensions = useCallback(() => {
+    if (layoutMode === 'MERGED') {
+      if (sizePreset === 'S') return { width: 440, height: 280 };
+      if (sizePreset === 'L') return { width: 660, height: 420 };
+      return { width: 540, height: 340 };
+    }
+    if (sizePreset === 'S') return { width: 330, height: 190 };
+    if (sizePreset === 'L') return { width: 560, height: 300 };
+    return { width: 420, height: 230 };
+  }, [layoutMode, sizePreset]);
+
+  const activeDimensions = customSize || getPresetDimensions();
 
   const handleDragStart = useCallback((clientX, clientY) => {
     setIsDragging(true);
@@ -112,24 +130,35 @@ export default function DraggableCameraOverlay({
   }, [position]);
 
   const onMouseDown = (e) => {
-    if (e.target.closest('button') || e.target.closest('video') || e.target.closest('canvas')) return;
+    if (
+      e.target.closest('button') || 
+      e.target.closest('video') || 
+      e.target.closest('canvas') ||
+      e.target.closest('.overlay-resize-handle')
+    ) return;
     handleDragStart(e.clientX, e.clientY);
   };
 
   const onTouchStart = (e) => {
-    if (e.target.closest('button') || e.target.closest('video') || e.target.closest('canvas')) return;
+    if (
+      e.target.closest('button') || 
+      e.target.closest('video') || 
+      e.target.closest('canvas') ||
+      e.target.closest('.overlay-resize-handle')
+    ) return;
     const touch = e.touches[0];
     handleDragStart(touch.clientX, touch.clientY);
   };
 
+  // Dragging reposition loop
   useEffect(() => {
     const handleMove = (clientX, clientY) => {
       if (!isDragging) return;
       const deltaX = clientX - dragStartPos.current.x;
       const deltaY = clientY - dragStartPos.current.y;
 
-      const overlayWidth = sizePreset === 'S' ? 220 : sizePreset === 'L' ? 440 : 320;
-      const overlayHeight = isMinimized ? 44 : 220;
+      const overlayWidth = activeDimensions.width;
+      const overlayHeight = isMinimized ? 44 : activeDimensions.height;
 
       const maxX = Math.max(0, window.innerWidth - overlayWidth - 10);
       const maxY = Math.max(52, window.innerHeight - overlayHeight - 10);
@@ -160,7 +189,49 @@ export default function DraggableCameraOverlay({
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', handleDragEnd);
     };
-  }, [isDragging, isMinimized, sizePreset]);
+  }, [isDragging, isMinimized, activeDimensions]);
+
+  // Interactive Drag-to-Resize Handler
+  const handleResizeStart = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsResizing(true);
+    resizeStartPos.current = {
+      x: e.clientX,
+      y: e.clientY,
+      w: activeDimensions.width,
+      h: activeDimensions.height
+    };
+  };
+
+  useEffect(() => {
+    const handleResizeMove = (e) => {
+      if (!isResizing) return;
+      const dx = e.clientX - resizeStartPos.current.x;
+      const dy = e.clientY - resizeStartPos.current.y;
+
+      const minW = layoutMode === 'MERGED' ? 400 : 300;
+      const minH = layoutMode === 'MERGED' ? 240 : 160;
+      const maxW = window.innerWidth - position.x - 10;
+      const maxH = window.innerHeight - position.y - 10;
+
+      const newW = Math.min(Math.max(minW, resizeStartPos.current.w + dx), maxW);
+      const newH = Math.min(Math.max(minH, resizeStartPos.current.h + dy), maxH);
+
+      setCustomSize({ width: Math.round(newW), height: Math.round(newH) });
+    };
+
+    const handleResizeEnd = () => setIsResizing(false);
+
+    if (isResizing) {
+      window.addEventListener('mousemove', handleResizeMove);
+      window.addEventListener('mouseup', handleResizeEnd);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleResizeMove);
+      window.removeEventListener('mouseup', handleResizeEnd);
+    };
+  }, [isResizing, position, layoutMode]);
 
   const toggleMergeOptOut = (id) => {
     setOptedOutPeers((prev) => ({
@@ -172,11 +243,10 @@ export default function DraggableCameraOverlay({
   const remotePeerIds = Object.keys(remoteStreams);
   const totalTiles = 1 + remotePeerIds.length;
 
-  // If in SEPARATE mode, render individual draggable floating tiles across the screen
+  // IF SEPARATE MODE: render individual floating tiles
   if (layoutMode === 'SEPARATE') {
     return (
       <div className="separate-cameras-container">
-        {/* Floating Switcher Pill */}
         <div className="separate-mode-switcher-pill" style={{ left: `${position.x}px`, top: `${position.y}px` }}>
           <span className="switcher-label">SEPARATE CAMS ({totalTiles})</span>
           <button
@@ -185,7 +255,7 @@ export default function DraggableCameraOverlay({
             onClick={() => setLayoutMode('GROUPED')}
             title="Switch to Grouped Dock"
           >
-            <LayoutGrid size={13} />
+            <LayoutGrid size={12} />
             <span>Group</span>
           </button>
           <button
@@ -194,7 +264,7 @@ export default function DraggableCameraOverlay({
             onClick={() => setLayoutMode('MERGED')}
             title="Switch to Merged Virtual Room"
           >
-            <Sparkles size={13} />
+            <Sparkles size={12} />
             <span>Merge</span>
           </button>
         </div>
@@ -209,7 +279,7 @@ export default function DraggableCameraOverlay({
           initialPos={{ x: 24, y: window.innerHeight - 220 }}
         />
 
-        {/* Remote Peers (up to 2) */}
+        {/* Remote Peers */}
         {remotePeerIds.map((peerId, idx) => {
           const peer = remoteStreams[peerId];
           return (
@@ -231,72 +301,88 @@ export default function DraggableCameraOverlay({
   // GROUPED or MERGED mode
   return (
     <div
-      className={`draggable-camera-overlay mode-${layoutMode.toLowerCase()} size-${sizePreset.toLowerCase()} ${isDragging ? 'is-dragging' : ''} ${isMinimized ? 'is-minimized' : ''}`}
-      style={{ left: `${position.x}px`, top: `${position.y}px` }}
+      ref={overlayRef}
+      className={`draggable-camera-overlay mode-${layoutMode.toLowerCase()} size-${sizePreset.toLowerCase()} ${isDragging ? 'is-dragging' : ''} ${isResizing ? 'is-resizing' : ''} ${isMinimized ? 'is-minimized' : ''}`}
+      style={{
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        width: isMinimized ? '280px' : `${activeDimensions.width}px`
+      }}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
       aria-label="Floating Camera Overlay"
     >
-      {/* ── Drag Header Bar ── */}
+      {/* ── Drag Header Bar with Anti-Collision Layout ── */}
       <div className="camera-overlay-drag-handle">
+        {/* Left: Grip & Player Tag */}
         <div className="handle-left">
           <GripHorizontal size={14} className="grip-icon" />
           <span className="handle-title">
             {totalTiles > 1 ? `${totalTiles} PLAYERS` : 'CAMERA'}
           </span>
-
-          {/* Mode Switchers */}
-          <div className="overlay-mode-pills">
-            <button
-              type="button"
-              className={`btn-mode-tab ${layoutMode === 'GROUPED' ? 'active' : ''}`}
-              onClick={() => setLayoutMode('GROUPED')}
-              title="Grouped Cameras"
-            >
-              Group
-            </button>
-            <button
-              type="button"
-              className={`btn-mode-tab ${layoutMode === 'SEPARATE' ? 'active' : ''}`}
-              onClick={() => setLayoutMode('SEPARATE')}
-              title="Separate Draggable Tiles"
-            >
-              Separate
-            </button>
-            <button
-              type="button"
-              className={`btn-mode-tab ${layoutMode === 'MERGED' ? 'active' : ''}`}
-              onClick={() => setLayoutMode('MERGED')}
-              title="Merged Shared Background"
-            >
-              Merge
-            </button>
-          </div>
         </div>
 
+        {/* Center: Mode Tabs */}
+        <div className="overlay-mode-pills">
+          <button
+            type="button"
+            className={`btn-mode-tab ${layoutMode === 'GROUPED' ? 'active' : ''}`}
+            onClick={() => setLayoutMode('GROUPED')}
+            title="Grouped Cameras"
+          >
+            Group
+          </button>
+          <button
+            type="button"
+            className={`btn-mode-tab ${layoutMode === 'SEPARATE' ? 'active' : ''}`}
+            onClick={() => setLayoutMode('SEPARATE')}
+            title="Separate Draggable Tiles"
+          >
+            Separate
+          </button>
+          <button
+            type="button"
+            className={`btn-mode-tab ${layoutMode === 'MERGED' ? 'active' : ''}`}
+            onClick={() => setLayoutMode('MERGED')}
+            title="Merged Body Cutout Scene"
+          >
+            <Sparkles size={10} className="tab-icon" />
+            <span>Merge</span>
+          </button>
+        </div>
+
+        {/* Right: Sizing Presets & Actions */}
         <div className="handle-right-actions">
-          {/* Size Preset Toggle */}
           <div className="overlay-size-selector">
             <button
               type="button"
-              className={`btn-size-opt ${sizePreset === 'S' ? 'active' : ''}`}
-              onClick={() => setSizePreset('S')}
+              className={`btn-size-opt ${sizePreset === 'S' && !customSize ? 'active' : ''}`}
+              onClick={() => {
+                setSizePreset('S');
+                setCustomSize(null);
+              }}
               title="Compact Size"
             >
               S
             </button>
             <button
               type="button"
-              className={`btn-size-opt ${sizePreset === 'M' ? 'active' : ''}`}
-              onClick={() => setSizePreset('M')}
+              className={`btn-size-opt ${sizePreset === 'M' && !customSize ? 'active' : ''}`}
+              onClick={() => {
+                setSizePreset('M');
+                setCustomSize(null);
+              }}
               title="Regular Size"
             >
               M
             </button>
             <button
               type="button"
-              className={`btn-size-opt ${sizePreset === 'L' ? 'active' : ''}`}
-              onClick={() => setSizePreset('L')}
+              className={`btn-size-opt ${sizePreset === 'L' && !customSize ? 'active' : ''}`}
+              onClick={() => {
+                setSizePreset('L');
+                setCustomSize(null);
+              }}
               title="Large Size"
             >
               L
@@ -310,7 +396,7 @@ export default function DraggableCameraOverlay({
             title={isMinimized ? 'Expand Camera' : 'Minimize Camera'}
             aria-label={isMinimized ? 'Expand Camera' : 'Minimize Camera'}
           >
-            {isMinimized ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {isMinimized ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
           </button>
           {onClose && (
             <button
@@ -320,7 +406,7 @@ export default function DraggableCameraOverlay({
               title="Close Camera"
               aria-label="Close Camera"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           )}
         </div>
@@ -328,15 +414,20 @@ export default function DraggableCameraOverlay({
 
       {/* ── Camera Feeds Body ── */}
       {!isMinimized && (
-        <div className="camera-overlay-body-wrapper">
+        <div 
+          className="camera-overlay-body-wrapper"
+          style={{ height: `${activeDimensions.height - 38}px` }}
+        >
           {layoutMode === 'MERGED' ? (
             <div className="overlay-merged-viewport">
               <MergedCameraStage
                 localStream={localStream}
                 remoteStreams={remoteStreams}
                 currentUsername={currentUsername}
+                cameraEnabled={cameraEnabled}
                 onToggleMergeOptOut={toggleMergeOptOut}
                 optedOutPeers={optedOutPeers}
+                onFallbackToNormal={() => setLayoutMode('GROUPED')}
               />
             </div>
           ) : (
@@ -370,28 +461,14 @@ export default function DraggableCameraOverlay({
         </div>
       )}
 
-      {/* ── Quick Controls Bar ── */}
+      {/* ── Interactive Drag-to-Resize Handle on Bottom-Right ── */}
       {!isMinimized && (
-        <div className="camera-overlay-controls">
-          <div className="overlay-ctrl-group">
-            <button
-              type="button"
-              className={`overlay-ctrl-btn ${!micEnabled ? 'is-off' : ''}`}
-              onClick={onToggleMic}
-              title={micEnabled ? 'Mute Mic' : 'Unmute Mic'}
-            >
-              {micEnabled ? <Mic size={13} /> : <MicOff size={13} />}
-            </button>
-            <button
-              type="button"
-              className={`overlay-ctrl-btn ${!cameraEnabled ? 'is-off' : ''}`}
-              onClick={onToggleCamera}
-              title={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
-            >
-              {cameraEnabled ? <Video size={13} /> : <VideoOff size={13} />}
-            </button>
-          </div>
-          <span className="overlay-identity-tag">COGETHER CAM</span>
+        <div
+          className="overlay-resize-handle"
+          onMouseDown={handleResizeStart}
+          title="Drag to resize camera overlay"
+        >
+          <div className="resize-lines" />
         </div>
       )}
     </div>

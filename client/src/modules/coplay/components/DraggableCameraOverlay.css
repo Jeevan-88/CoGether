@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════════════════════════
    DRAGGABLECAMERAOVERLAY.CSS
-   Advanced Floating Camera Overlay with Fullscreen Persistence
+   Advanced Floating Camera Overlay with Fullscreen Persistence & Drag-Resize
    ══════════════════════════════════════════════════════════════════════ */
 
 .draggable-camera-overlay {
@@ -14,22 +14,7 @@
   display: flex;
   flex-direction: column;
   user-select: none;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-/* Sizing presets */
-.draggable-camera-overlay.size-s {
-  width: 220px;
-}
-.draggable-camera-overlay.size-m {
-  width: 320px;
-}
-.draggable-camera-overlay.size-l {
-  width: 440px;
-}
-
-.draggable-camera-overlay.mode-merged {
-  width: 460px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .draggable-camera-overlay.is-dragging {
@@ -38,33 +23,41 @@
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 229, 0, 0.4);
 }
 
-.draggable-camera-overlay.is-minimized {
-  width: 260px !important;
+.draggable-camera-overlay.is-resizing {
+  cursor: se-resize;
+  border-color: #FFE500;
 }
 
-/* ── Drag Header Bar ── */
+.draggable-camera-overlay.is-minimized {
+  width: 280px !important;
+  height: auto !important;
+}
+
+/* ── Drag Header Bar (Anti-Collision Architecture) ── */
 .camera-overlay-drag-handle {
   height: 38px;
   background: #14141a;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0 10px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: grab;
   gap: 8px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .draggable-camera-overlay.is-dragging .camera-overlay-drag-handle {
   cursor: grabbing;
 }
 
+/* Left Section: Grip + Tag */
 .handle-left {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-width: 0;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .grip-icon {
@@ -75,32 +68,40 @@
 .handle-title {
   font-family: 'Barlow', sans-serif;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   color: #e2e8f0;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* Layout Mode Tabs */
+/* Center Section: Layout Mode Tabs */
 .overlay-mode-pills {
   display: flex;
   align-items: center;
-  gap: 2px;
-  background: rgba(0, 0, 0, 0.5);
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.6);
   border-radius: 6px;
   padding: 2px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .btn-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   background: transparent;
   border: none;
   color: #94a3b8;
   font-family: 'Barlow', sans-serif;
   font-size: 10px;
-  padding: 2px 6px;
+  font-weight: 500;
+  padding: 2px 7px;
   border-radius: 4px;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.15s ease;
 }
 
@@ -111,18 +112,30 @@
 .btn-mode-tab.active {
   background: #FFE500;
   color: #000000;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-/* Size Selector */
+.tab-icon {
+  color: currentColor;
+}
+
+/* Right Section: Size Selectors & Window Actions */
+.handle-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
 .overlay-size-selector {
   display: flex;
   align-items: center;
   gap: 2px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 4px;
   padding: 1px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
 }
 
 .btn-size-opt {
@@ -131,21 +144,21 @@
   color: #94a3b8;
   font-family: 'Space Mono', monospace;
   font-size: 9px;
+  font-weight: 600;
   padding: 2px 5px;
   border-radius: 3px;
   cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-size-opt:hover {
+  color: #ffffff;
 }
 
 .btn-size-opt.active {
   background: rgba(255, 255, 255, 0.2);
   color: #FFE500;
   font-weight: 700;
-}
-
-.handle-right-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .btn-overlay-action {
@@ -158,6 +171,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   transition: all 0.15s ease;
 }
 
@@ -171,13 +185,18 @@
   color: #ef4444;
 }
 
-/* ── Body Feeds ── */
+/* ── Body Feeds Container ── */
 .camera-overlay-body-wrapper {
-  padding: 8px;
+  padding: 6px;
   background: #0a0a0e;
+  overflow: hidden;
+  display: flex;
+  position: relative;
 }
 
 .camera-overlay-body {
+  width: 100%;
+  height: 100%;
   display: grid;
   grid-template-columns: 1fr;
   gap: 6px;
@@ -192,71 +211,110 @@
 }
 
 .overlay-tile-slot {
-  aspect-ratio: 4 / 3;
+  width: 100%;
+  height: 100%;
   border-radius: 8px;
   overflow: hidden;
   background: #14141c;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
 }
 
-.overlay-tile-slot .video-tile-container {
+.overlay-tile-slot .video-tile {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.overlay-tile-slot .tile-video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Compact Username Badge in Small Video Tiles (Unobtrusive / No Face Covering) ── */
+.overlay-tile-slot .tile-overlay-bottom {
+  position: absolute;
+  bottom: 5px !important;
+  left: 5px !important;
+  right: auto !important;
+  top: auto !important;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.overlay-tile-slot .tile-user-info {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  background: rgba(14, 14, 19, 0.85) !important;
+  backdrop-filter: blur(6px) !important;
+  padding: 2px 7px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 229, 0, 0.35) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6) !important;
+}
+
+.overlay-tile-slot .user-label {
+  font-family: 'Barlow', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #f1f5f9 !important;
+  max-width: 75px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.overlay-tile-slot .mic-badge {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.overlay-tile-slot .mic-badge svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* Hide bulky fullscreen expand icon that was hiding video */
+.overlay-tile-slot .tile-fs-btn {
+  display: none !important;
+}
+
+/* ── Merged Viewport Container ── */
+.overlay-merged-viewport {
   width: 100%;
   height: 100%;
 }
 
-.overlay-merged-viewport {
-  width: 100%;
-  height: 230px;
-}
-
-/* ── Overlay Bottom Controls ── */
-.camera-overlay-controls {
-  height: 32px;
-  background: #121218;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0 10px;
+/* ── Interactive Drag-to-Resize Grip Handle ── */
+.overlay-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  cursor: se-resize;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 2px;
+  z-index: 50;
 }
 
-.overlay-ctrl-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.resize-lines {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #FFE500;
+  border-bottom: 2px solid #FFE500;
+  border-bottom-right-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
 }
 
-.overlay-ctrl-btn {
-  background: #1c1c24;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #cbd5e1;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.overlay-ctrl-btn:hover {
-  background: #FFE500;
-  color: #000000;
-}
-
-.overlay-ctrl-btn.is-off {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.4);
-}
-
-.overlay-identity-tag {
-  font-family: 'Barlow', sans-serif;
-  font-size: 10px;
-  letter-spacing: 1px;
-  color: #64748b;
-  font-weight: 500;
+.overlay-resize-handle:hover .resize-lines {
+  opacity: 1;
 }
 
 /* ── SEPARATE MODE FLOATING TILES ── */
@@ -311,7 +369,7 @@
 
 .separate-floating-camera-tile {
   position: fixed;
-  width: 170px;
+  width: 180px;
   background: #111116;
   border: 1.5px solid rgba(255, 229, 0, 0.45);
   border-radius: 10px;
@@ -347,7 +405,7 @@
   background: #000000;
 }
 
-.separate-tile-video-wrap .video-tile-container {
+.separate-tile-video-wrap .video-tile {
   width: 100%;
   height: 100%;
 }
