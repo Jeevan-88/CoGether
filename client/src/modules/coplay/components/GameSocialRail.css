@@ -1,6 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════════
    GAME SOCIAL RAIL (WEBRTC CAMERAS & IN-CALL CHAT)
    Dedicated non-overlapping sidebar. Pure CoGether dark charcoal arcade UI.
+   Zero document scroll: only chat history scrolls internally.
    ══════════════════════════════════════════════════════════════════════ */
 
 .game-social-rail {
@@ -11,21 +12,23 @@
   flex-direction: column;
   flex-shrink: 0;
   height: 100%;
+  max-height: 100%;
   box-sizing: border-box;
   position: relative;
   z-index: 40;
+  overflow: hidden;
   transition: width 0.2s ease;
 }
 
 .game-social-rail.rail-collapsed {
-  width: 48px;
+  width: 44px;
 }
 
 /* ── Top Header ── */
 .rail-top-header {
-  height: 48px;
-  padding: 0 14px;
-  background: #131318;
+  height: 42px;
+  padding: 0 12px;
+  background: #14141a;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
@@ -41,8 +44,8 @@
 }
 
 .live-status-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #10b981;
   box-shadow: 0 0 6px #10b981;
@@ -52,7 +55,7 @@
 .rail-count-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-family: 'Space Mono', monospace;
   font-size: 10px;
   font-weight: 800;
@@ -66,7 +69,7 @@
   border: none;
   color: #94a3b8;
   cursor: pointer;
-  padding: 4px;
+  padding: 3px;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -78,15 +81,16 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
-/* ── Scrollable Body ── */
+/* ── Fixed Body (Zero Page Scroll) ── */
 .rail-scrollable-body {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 12px;
-  gap: 12px;
+  overflow: hidden;
+  padding: 8px 10px;
+  gap: 8px;
+  box-sizing: border-box;
 }
 
 /* ── Challenge Readiness Card ── */
@@ -94,10 +98,11 @@
   background: #14141a;
   border: 1px solid #FFE500;
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .challenge-card-header {
@@ -105,7 +110,7 @@
   align-items: center;
   gap: 6px;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 900;
   color: #FFE500;
   letter-spacing: 0.05em;
@@ -118,13 +123,13 @@
 .challenge-players-ready-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
 }
 
 .player-ready-pill {
   display: flex;
   flex-direction: column;
-  padding: 6px 8px;
+  padding: 4px 6px;
   border-radius: 6px;
   background: #09090c;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -136,7 +141,7 @@
 }
 
 .player-ready-pill .player-name {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   color: #ffffff;
   white-space: nowrap;
@@ -146,9 +151,9 @@
 
 .player-ready-pill .ready-indicator {
   font-family: 'Space Mono', monospace;
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 800;
-  margin-top: 2px;
+  margin-top: 1px;
   color: #94a3b8;
 }
 
@@ -162,13 +167,13 @@
   justify-content: center;
   gap: 6px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 6px 10px;
   background: #1e1e26;
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
   border-radius: 6px;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.18s ease;
@@ -186,11 +191,17 @@
   font-weight: 900;
 }
 
-/* ── Live Video Stream Grid ── */
+/* ── Live Video Stream Grid (Cameras on Top) ── */
 .rail-video-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  flex-shrink: 0;
+  max-height: 220px;
+}
+
+.rail-video-grid:has(.rail-video-tile-container:nth-child(2)) {
+  grid-template-columns: 1fr 1fr;
 }
 
 .rail-video-tile-container {
@@ -199,9 +210,9 @@
   border-radius: 8px;
   overflow: hidden;
   background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
   position: relative;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .rail-video-tile-container .video-tile {
@@ -225,12 +236,12 @@
   align-items: center;
   justify-content: center;
   background: #141418;
-  gap: 6px;
+  gap: 4px;
 }
 
 .rail-video-tile-container .avatar-circle-tile {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #FFE500;
   color: #000000;
@@ -238,11 +249,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .rail-video-tile-container .avatar-name {
-  font-size: 11px;
+  font-size: 10px;
   color: #94a3b8;
 }
 
@@ -252,7 +263,7 @@
   left: 0;
   right: 0;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
-  padding: 6px 8px;
+  padding: 4px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -260,16 +271,16 @@
 
 .rail-video-tile-container .user-label {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 10.5px;
+  font-size: 9.5px;
   font-weight: 800;
   color: #ffffff;
 }
 
 .rail-video-tile-container .mic-badge {
   display: inline-flex;
-  padding: 2px 4px;
-  border-radius: 4px;
-  margin-left: 6px;
+  padding: 1px 3px;
+  border-radius: 3px;
+  margin-left: 4px;
 }
 
 .rail-video-tile-container .mic-badge.mic-on {
@@ -288,48 +299,51 @@
   padding: 2px;
 }
 
-/* ── Real-Time Chat Section ── */
+/* ── Real-Time Chat Section (Directly Below Camera) ── */
 .rail-chat-section {
   flex: 1;
-  min-height: 180px;
-  background: #121217;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 0;
+  background: #141418;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .chat-section-header {
-  padding: 8px 12px;
-  background: #17171e;
+  padding: 6px 10px;
+  background: #191922;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   gap: 6px;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
   color: #94a3b8;
   letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
 
 .rail-chat-messages-box {
   flex: 1;
-  padding: 10px;
+  min-height: 0;
+  padding: 8px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .chat-empty-hint {
   margin: auto;
   text-align: center;
-  font-size: 11px;
+  font-size: 10.5px;
   color: #64748b;
-  padding: 10px;
+  padding: 8px;
 }
 
 .chat-message-row {
@@ -350,8 +364,8 @@
 .msg-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 9.5px;
+  gap: 5px;
+  font-size: 9px;
   color: #64748b;
 }
 
@@ -369,21 +383,21 @@
 }
 
 .msg-bubble {
-  padding: 7px 11px;
-  border-radius: 8px;
-  font-size: 12px;
-  line-height: 1.4;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  line-height: 1.35;
   word-break: break-word;
 }
 
 .chat-message-row.msg-me .msg-bubble {
-  background: #23232c;
+  background: #242430;
   border: 1px solid rgba(255, 229, 0, 0.35);
   color: #ffffff;
 }
 
 .chat-message-row.msg-peer .msg-bubble {
-  background: #18181f;
+  background: #1c1c24;
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #e2e8f0;
 }
@@ -391,16 +405,16 @@
 /* ── Emoji Quick Picker Popover ── */
 .emoji-quick-picker-popover {
   position: absolute;
-  bottom: 48px;
-  left: 10px;
-  right: 10px;
+  bottom: 44px;
+  left: 8px;
+  right: 8px;
   background: #1c1c24;
   border: 1.5px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  padding: 8px;
+  padding: 6px;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
+  gap: 4px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   z-index: 50;
 }
@@ -408,9 +422,9 @@
 .emoji-popover-item {
   background: transparent;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
-  padding: 4px;
+  padding: 3px;
   border-radius: 4px;
   transition: background 0.15s ease;
 }
@@ -421,12 +435,13 @@
 
 /* ── Chat Input Form ── */
 .rail-chat-form {
-  padding: 8px;
-  background: #15151c;
+  padding: 6px 8px;
+  background: #181820;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .chat-emoji-btn {
@@ -450,9 +465,9 @@
   background: #09090c;
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #ffffff;
-  padding: 7px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
   outline: none;
 }
 
@@ -461,12 +476,12 @@
 }
 
 .chat-send-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: #FFE500;
   border: none;
   color: #000000;
-  border-radius: 6px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -479,20 +494,21 @@
   cursor: not-allowed;
 }
 
-/* ── Bottom Controls Bar ── */
+/* ── Bottom Controls Bar (Compact Equal-Weighted Buttons) ── */
 .rail-controls-bar {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 8px 4px 0 4px;
+  padding: 4px 2px 2px 2px;
   flex-shrink: 0;
+  height: 38px;
 }
 
 .control-circle-btn {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: #1a1a22;
+  background: #181820;
   border: 1.5px solid rgba(255, 255, 255, 0.18);
   color: #ffffff;
   display: flex;
@@ -505,7 +521,7 @@
 .control-circle-btn:hover {
   border-color: #FFE500;
   color: #FFE500;
-  background: #23232c;
+  background: #22222a;
 }
 
 .control-circle-btn.is-off {
@@ -526,23 +542,18 @@
   color: #ffffff;
 }
 
-/* ── Responsive Stacking for Small Screens ── */
+/* ── Mobile Stacking ── */
 @media (max-width: 860px) {
   .game-social-rail {
     width: 100%;
-    height: auto;
-    max-height: 45vh;
+    height: 40vh;
+    max-height: 40vh;
     border-left: none;
     border-top: 1.5px solid rgba(255, 255, 255, 0.1);
   }
 
   .rail-video-grid {
-    flex-direction: row;
-    overflow-x: auto;
-  }
-
-  .rail-video-tile-container {
-    width: 180px;
-    flex-shrink: 0;
+    grid-template-columns: 1fr 1fr;
+    max-height: 100px;
   }
 }
