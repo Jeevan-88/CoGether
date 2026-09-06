@@ -166,13 +166,16 @@
 
 .bottom-game-title {
   margin: 0;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 13px;
-  font-weight: 800;
+  font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 300;
   color: #ffffff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.1;
 }
 
 .bottom-game-category {

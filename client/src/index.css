@@ -1,7 +1,57 @@
+/* Barlow Typography — Premium Rounded & Thin Geometric Font (barlow.zip) */
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('/fonts/barlow/Barlow-Thin.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('/fonts/barlow/Barlow-ExtraLight.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/barlow/Barlow-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/barlow/Barlow-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/barlow/Barlow-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/barlow/Barlow-Bold.ttf') format('truetype');
+}
+
 :root {
   --font-display: 'Outfit', 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-extended: 'Syne', 'Space Grotesk', sans-serif;
   --font-mono: 'Space Grotesk', monospace;
+  --font-game-title: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
   --bg-page: #ffffff;
   --bg-dark: #090b12;

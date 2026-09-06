@@ -52,15 +52,28 @@
   flex-shrink: 0;
 }
 
-.rail-count-badge {
+.rail-room-title {
+  font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.rail-count-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 800;
-  color: #e2e8f0;
-  letter-spacing: 0.04em;
+  gap: 4px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #FFE500;
+  background: rgba(255, 229, 0, 0.1);
+  border: 1px solid rgba(255, 229, 0, 0.25);
+  padding: 1px 7px;
+  border-radius: 10px;
   white-space: nowrap;
 }
 

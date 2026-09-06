@@ -76,9 +76,11 @@ export default function GameHeader({
 
           <div className="header-meta-group">
             <h1 className="header-game-title">{displayTitle}</h1>
-            <span className={`header-mode-badge ${modeBadgeClass}`}>
-              {modeLabel}
-            </span>
+            {mode === 'CHALLENGE' && (
+              <span className="header-mode-badge mode-challenge">
+                CHALLENGE
+              </span>
+            )}
           </div>
         </div>
 

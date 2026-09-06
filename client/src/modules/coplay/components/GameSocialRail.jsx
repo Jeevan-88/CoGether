@@ -70,9 +70,10 @@ export default function GameSocialRail({
       <div className="rail-top-header">
         <div className="rail-room-info">
           <div className="live-status-dot" title={connected ? 'Connected' : 'Connecting'} />
-          <span className="rail-count-badge">
-            <Users size={13} />
-            <span>{totalCount} {totalCount === 1 ? 'PLAYER' : 'PLAYERS'} IN ROOM</span>
+          <span className="rail-room-title">Party Room</span>
+          <span className="rail-count-pill" title={`${totalCount} in room`}>
+            <Users size={12} />
+            <span>{totalCount}</span>
           </span>
         </div>
         <button

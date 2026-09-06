@@ -146,12 +146,7 @@ export default function GameViewport({
           </div>
 
           <div className="bottom-bar-right">
-            {game?.controls?.p1 && (
-              <div className="bottom-controls-hint" title={game.controls.p1}>
-                <Keyboard size={13} className="ctrl-icon" />
-                <span className="ctrl-text">{game.controls.p1}</span>
-              </div>
-            )}
+
 
             <button
               type="button"
