@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 375" width="600" height="375">
+  <rect width="600" height="375" fill="#0d0d12"/>
+  <rect x="25" y="25" width="550" height="325" rx="20" fill="#bbada0" stroke="#FFE500" stroke-width="4"/>
+  <!-- Grid Background -->
+  <g fill="#cdc1b4">
+    <rect x="45" y="45" width="115" height="135" rx="8"/>
+    <rect x="175" y="45" width="115" height="135" rx="8"/>
+    <rect x="305" y="45" width="115" height="135" rx="8"/>
+    <rect x="435" y="45" width="115" height="135" rx="8"/>
+    <rect x="45" y="195" width="115" height="135" rx="8"/>
+    <rect x="175" y="195" width="115" height="135" rx="8"/>
+    <rect x="305" y="195" width="115" height="135" rx="8"/>
+    <rect x="435" y="195" width="115" height="135" rx="8"/>
+  </g>
+  <!-- Number Tiles -->
+  <rect x="45" y="45" width="115" height="135" rx="8" fill="#eee4da"/>
+  <text x="102" y="128" font-family="'Impact', 'Arial Black', sans-serif" font-size="52" fill="#776e65" text-anchor="middle">2</text>
+
+  <rect x="175" y="45" width="115" height="135" rx="8" fill="#ede0c8"/>
+  <text x="232" y="128" font-family="'Impact', 'Arial Black', sans-serif" font-size="52" fill="#776e65" text-anchor="middle">8</text>
+
+  <rect x="305" y="45" width="115" height="135" rx="8" fill="#f2b179"/>
+  <text x="362" y="128" font-family="'Impact', 'Arial Black', sans-serif" font-size="46" fill="#f9f6f2" text-anchor="middle">64</text>
+
+  <rect x="435" y="45" width="115" height="135" rx="8" fill="#f59563"/>
+  <text x="492" y="128" font-family="'Impact', 'Arial Black', sans-serif" font-size="40" fill="#f9f6f2" text-anchor="middle">128</text>
+
+  <rect x="45" y="195" width="115" height="135" rx="8" fill="#f67c5f"/>
+  <text x="102" y="278" font-family="'Impact', 'Arial Black', sans-serif" font-size="40" fill="#f9f6f2" text-anchor="middle">512</text>
+
+  <rect x="175" y="195" width="245" height="135" rx="8" fill="#edc22e" stroke="#ffffff" stroke-width="4"/>
+  <text x="297" y="282" font-family="'Impact', 'Arial Black', sans-serif" font-size="64" fill="#f9f6f2" text-anchor="middle">2048</text>
+
+  <rect x="435" y="195" width="115" height="135" rx="8" fill="#edc850"/>
+  <text x="492" y="278" font-family="'Impact', 'Arial Black', sans-serif" font-size="36" fill="#f9f6f2" text-anchor="middle">1024</text>
+  <!-- Overlay badge -->
+  <rect x="35" y="35" width="160" height="30" rx="6" fill="#000000"/>
+  <text x="115" y="55" font-family="'Space Mono', monospace" font-size="11" font-weight="bold" fill="#FFE500" text-anchor="middle">MIT OPEN SOURCE</text>
+</svg>
