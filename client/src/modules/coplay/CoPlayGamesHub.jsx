@@ -234,17 +234,6 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
           <div className="coplay-logo-brand" onClick={onBackToHome}>
             <span className="arcade-title">CO-PLAY</span>
           </div>
-          <button 
-            type="button" 
-            className="btn-header-coshop" 
-            onClick={() => {
-              window.location.href = '/?mode=shop';
-            }}
-            title="Visit Co-Shop"
-          >
-            <ShoppingBag size={14} />
-            <span>CO-SHOP</span>
-          </button>
         </div>
 
         {/* CENTER SEARCH PILL */}

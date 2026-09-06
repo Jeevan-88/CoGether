@@ -1,0 +1,138 @@
+/* ══════════════════════════════════════════════════════════════════════
+   MERGEDCAMERASTAGE.CSS
+   Virtual Background Composite Camera View
+   ══════════════════════════════════════════════════════════════════════ */
+
+.merged-camera-stage-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000000;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.merged-composite-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Top Bar Controls ── */
+.merged-stage-top-bar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  z-index: 10;
+}
+
+.btn-merged-bg-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 229, 0, 0.4);
+  color: #FFE500;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-merged-bg-toggle:hover {
+  background: #FFE500;
+  color: #000000;
+}
+
+.merged-opt-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-opt-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #cbd5e1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-opt-pill:hover {
+  border-color: #FFE500;
+  color: #FFE500;
+}
+
+.btn-opt-pill.is-out {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  text-decoration: line-through;
+}
+
+/* ── Background Drawer ── */
+.merged-bg-drawer {
+  position: absolute;
+  top: 36px;
+  left: 8px;
+  background: rgba(14, 14, 18, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 229, 0, 0.4);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  z-index: 20;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
+}
+
+.bg-thumb-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  padding: 2px;
+  cursor: pointer;
+  color: #cbd5e1;
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px;
+  transition: all 0.15s ease;
+}
+
+.bg-thumb-option img {
+  width: 54px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.bg-thumb-option:hover,
+.bg-thumb-option.active {
+  border-color: #FFE500;
+  color: #FFE500;
+}

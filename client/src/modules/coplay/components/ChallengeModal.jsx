@@ -52,11 +52,11 @@ export default function ChallengeModal({
         <div className="challenge-modal-header">
           <div className="challenge-badge">
             <Swords size={15} />
-            <span>COGETHER DUEL</span>
+            <span>COGETHER DUEL ARENA • UP TO 3 PLAYERS</span>
           </div>
-          <h2 className="challenge-title">CHALLENGE A FRIEND</h2>
+          <h2 className="challenge-title">CHALLENGE FRIENDS</h2>
           <p className="challenge-subtitle">
-            Play <strong className="game-name-highlight">{game?.title}</strong> simultaneously with synchronized 3-2-1 countdown and live camera video.
+            Battle up to 3 players in <strong className="game-name-highlight">{game?.title}</strong> with synchronized 3-2-1 countdown, live split-screen gameplay, live scores, and cameras!
           </p>
         </div>
 
@@ -98,8 +98,8 @@ export default function ChallengeModal({
           <div className={`status-pulse-circle ${connectedPeerCount > 0 ? 'is-connected' : 'is-waiting'}`} />
           <span className="status-label">
             {connectedPeerCount > 0
-              ? 'FRIEND CONNECTED! READY TO ENTER DUEL'
-              : 'WAITING FOR FRIEND TO JOIN WITH LINK...'}
+              ? `${connectedPeerCount + 1}/3 PLAYERS READY FOR SPLIT-SCREEN DUEL`
+              : '1/3 PLAYERS (WAITING FOR UP TO 2 FRIENDS TO JOIN)'}
           </span>
         </div>
 
@@ -110,7 +110,7 @@ export default function ChallengeModal({
             icon={Swords}
             fullWidth={true}
           >
-            {connectedPeerCount > 0 ? 'ENTER DUEL ARENA →' : 'ENTER & WAIT IN ROOM →'}
+            {connectedPeerCount > 0 ? 'ENTER SPLIT ARENA →' : 'ENTER & WAIT IN ROOM →'}
           </CoGetherButton>
         </div>
       </div>

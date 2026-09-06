@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Mic, MicOff, Video, VideoOff, Monitor, MessageSquare, 
-  Users, Send, Smile, LogOut, Swords, CheckCircle2, ChevronRight, ChevronDown 
+  Users, Send, Smile, LogOut, Swords, CheckCircle2, ChevronRight, ChevronDown, Zap 
 } from 'lucide-react';
 import VideoTile from '../../videoroom/VideoTile.jsx';
 import './GameSocialRail.css';
@@ -36,7 +36,8 @@ export default function GameSocialRail({
   isChallengeMode = false,
   isLocalReady = false,
   isPeerReady = false,
-  onToggleReady
+  onToggleReady,
+  onStartPracticeDuel
 }) {
   const [chatInput, setChatInput] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -113,14 +114,28 @@ export default function GameSocialRail({
               </div>
 
               {onToggleReady && (
-                <button
-                  type="button"
-                  className={`btn-challenge-ready-toggle ${isLocalReady ? 'ready-active' : ''}`}
-                  onClick={onToggleReady}
-                >
-                  <CheckCircle2 size={15} />
-                  <span>{isLocalReady ? 'YOU ARE READY' : 'CLICK WHEN READY'}</span>
-                </button>
+                <div className="ready-btn-group">
+                  <button
+                    type="button"
+                    className={`btn-challenge-ready-toggle ${isLocalReady ? 'ready-active' : ''}`}
+                    onClick={onToggleReady}
+                  >
+                    <CheckCircle2 size={15} />
+                    <span>{isLocalReady ? 'YOU ARE READY' : 'CLICK WHEN READY'}</span>
+                  </button>
+
+                  {remotePeerIds.length === 0 && onStartPracticeDuel && (
+                    <button
+                      type="button"
+                      className="btn-practice-duel-trigger"
+                      onClick={onStartPracticeDuel}
+                      title="Launch Split Arena against practice bot"
+                    >
+                      <Zap size={13} />
+                      <span>START SPLIT DUEL NOW</span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}

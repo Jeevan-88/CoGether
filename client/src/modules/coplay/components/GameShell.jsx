@@ -4,104 +4,21 @@ import { GameMode } from '../gameSchema.js';
 import { useWebRTC } from '../../../core/useWebRTC.js';
 import GameHeader from './GameHeader.jsx';
 import GameViewport from './GameViewport.jsx';
-import GameInfo from './GameInfo.jsx';
 import GameSocialRail from './GameSocialRail.jsx';
 import ChallengeModal from './ChallengeModal.jsx';
-import GameResultOverlay from './GameResultOverlay.jsx';
 import DraggableCameraOverlay from './DraggableCameraOverlay.jsx';
 import './GameShell.css';
 
 const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
 
 /**
- * GameSocialRailContainer
- * Isolated wrapper that executes useWebRTC ONLY when challenge/social mode is active.
- * Guarantees zero camera prompts and zero socket overhead during default single-player sessions.
- */
-function GameSocialRailContainer({
-  roomId,
-  username,
-  isChallengeMode,
-  isLocalReady,
-  onToggleReady,
-  onLeaveSession,
-  onPeerReadyChange,
-  onCountdownTrigger,
-  onPeerScoreChange
-}) {
-  const webrtc = useWebRTC(roomId, username, SIGNALING_URL, { autoStartMedia: isChallengeMode });
-
-  useEffect(() => {
-    if (onPeerReadyChange) {
-      onPeerReadyChange(webrtc.peerReady);
-    }
-  }, [webrtc.peerReady, onPeerReadyChange]);
-
-  useEffect(() => {
-    if (webrtc.challengeCountdown && onCountdownTrigger) {
-      onCountdownTrigger(webrtc.challengeCountdown);
-    }
-  }, [webrtc.challengeCountdown, onCountdownTrigger]);
-
-  useEffect(() => {
-    if (webrtc.peerScore && onPeerScoreChange) {
-      onPeerScoreChange(webrtc.peerScore);
-    }
-  }, [webrtc.peerScore, onPeerScoreChange]);
-
-  const handleToggleReady = () => {
-    const nextState = !isLocalReady;
-    onToggleReady(nextState);
-    webrtc.sendChallengeReady(nextState);
-  };
-
-  return (
-    <>
-      <GameSocialRail
-        roomId={roomId}
-        currentUsername={username}
-        localStream={webrtc.localStream}
-        remoteStreams={webrtc.remoteStreams}
-        micEnabled={webrtc.micEnabled}
-        cameraEnabled={webrtc.cameraEnabled}
-        isScreenSharing={webrtc.isScreenSharing}
-        connected={webrtc.connected}
-        chatMessages={webrtc.chatMessages}
-        onToggleMic={webrtc.toggleMic}
-        onToggleCamera={webrtc.toggleCamera}
-        onToggleScreenShare={webrtc.toggleScreenShare}
-        onSendMessage={webrtc.sendChatMessage}
-        onLeaveSession={onLeaveSession}
-        isChallengeMode={isChallengeMode}
-        isLocalReady={isLocalReady}
-        isPeerReady={webrtc.peerReady}
-        onToggleReady={handleToggleReady}
-      />
-
-      {webrtc.cameraEnabled && (
-        <DraggableCameraOverlay
-          localStream={webrtc.localStream}
-          remoteStreams={webrtc.remoteStreams}
-          currentUsername={username}
-          micEnabled={webrtc.micEnabled}
-          cameraEnabled={webrtc.cameraEnabled}
-          onToggleMic={webrtc.toggleMic}
-          onToggleCamera={webrtc.toggleCamera}
-          onClose={webrtc.toggleCamera}
-        />
-      )}
-    </>
-  );
-}
-
-/**
  * GameShell
  * The core production gameplay environment for CoGether.
- * Architectural hierarchy:
- * 1. ACTUAL GAME (centered hero container, 65-80% viewport)
- * 2. Top Header (compact, verified metadata, native fullscreen, exit confirmation)
- * 3. Social Layer (dedicated non-overlapping rail, 100% hidden in default single-player)
- * 4. Game Info (minimal, clean metadata below the game)
+ * Features:
+ * 1. Sandboxed Game runtime
+ * 2. Seamless transition to Split-Screen Arena on challenge start (up to 3 players)
+ * 3. Real-time board sync & automated win/loss resolution
+ * 4. Advanced Camera Overlay (Grouped, Separate, Merged with virtual background) visible in both normal & fullscreen mode
  */
 export default function GameShell({
   game,
@@ -117,16 +34,22 @@ export default function GameShell({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showChallengeModal, setShowChallengeModal] = useState(false);
 
-  // Challenge Sync State
+  // Challenge Sync & Arena State
   const [isLocalReady, setIsLocalReady] = useState(false);
-  const [isPeerReady, setIsPeerReady] = useState(false);
   const [countdown, setCountdown] = useState(null);
-  const [resultData, setResultData] = useState(null);
+  const [challengeStarted, setChallengeStarted] = useState(false);
+  const [localScore, setLocalScore] = useState(0);
+  const [localOver, setLocalOver] = useState(false);
+  const [localWon, setLocalWon] = useState(false);
 
   const containerRef = useRef(null);
   const viewportRef = useRef(null);
   const adapterRef = useRef(null);
   const countdownTimerRef = useRef(null);
+
+  // WebRTC Connection for real-time duel, cameras, and data sync
+  const isChallenge = activeMode === 'CHALLENGE';
+  const webrtc = useWebRTC(roomId, currentUsername, SIGNALING_URL, { autoStartMedia: isChallenge });
 
   // Launch game session via sandboxed provider adapter
   const launchGame = useCallback(async () => {
@@ -189,7 +112,7 @@ export default function GameShell({
     };
   }, [launchGame]);
 
-  // Fullscreen Management via native browser API
+  // Fullscreen Management via native browser API on the top-level game shell root
   const handleToggleFullscreen = () => {
     if (!containerRef.current) return;
 
@@ -214,7 +137,7 @@ export default function GameShell({
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // Challenge Synchronized Countdown: 3, 2, 1, GO!
+  // Synchronized Countdown: 3, 2, 1, GO! -> Split Screen Opens
   const startCountdownSequence = useCallback(() => {
     let currentStep = 3;
     setCountdown(currentStep);
@@ -227,22 +150,122 @@ export default function GameShell({
         setCountdown(currentStep);
       } else if (currentStep === 0) {
         setCountdown('GO!');
-        // Restart/re-focus game instance cleanly for both players
-        launchGame();
+        setChallengeStarted(true);
+        setLocalOver(false);
+        setLocalWon(false);
+        setLocalScore(0);
       } else {
         clearInterval(countdownTimerRef.current);
         countdownTimerRef.current = null;
         setCountdown(null);
       }
     }, 1000);
-  }, [launchGame]);
+  }, []);
 
-  // When both players are ready, trigger countdown
+  // When challenge starts, launch game into the newly mounted split viewport
   useEffect(() => {
-    if (activeMode === 'CHALLENGE' && isLocalReady && isPeerReady && countdown === null) {
+    if (challengeStarted) {
+      const timer = setTimeout(() => {
+        launchGame();
+      }, 80);
+      return () => clearTimeout(timer);
+    }
+  }, [challengeStarted, launchGame]);
+
+  // When readiness aligns or socket trigger received
+  useEffect(() => {
+    if (activeMode === 'CHALLENGE' && isLocalReady && webrtc.peerReady && countdown === null && !challengeStarted) {
       startCountdownSequence();
     }
-  }, [activeMode, isLocalReady, isPeerReady, countdown, startCountdownSequence]);
+  }, [activeMode, isLocalReady, webrtc.peerReady, countdown, challengeStarted, startCountdownSequence]);
+
+  useEffect(() => {
+    if (webrtc.challengeCountdown && countdown === null && !challengeStarted) {
+      startCountdownSequence();
+    }
+  }, [webrtc.challengeCountdown, countdown, challengeStarted, startCountdownSequence]);
+
+  // Listen for iframe game state postMessages (scores, tile grids, game over, game won)
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (!event.data || event.data.type !== 'COPLAY_GAME_SYNC') return;
+
+      const { score = 0, over = false, won = false, grid = [] } = event.data;
+      setLocalScore(score);
+      if (over) setLocalOver(true);
+      if (won) setLocalWon(true);
+
+      if (activeMode === 'CHALLENGE') {
+        webrtc.sendChallengeBoardSync({ score, over, won, grid });
+        if (over) webrtc.sendPlayerEliminated(score);
+        if (won) webrtc.sendPlayerWon(score);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [activeMode, webrtc]);
+
+  const [isPractice, setIsPractice] = useState(false);
+  const [practiceOpponent, setPracticeOpponent] = useState(null);
+
+  const handleStartPracticeDuel = () => {
+    setIsPractice(true);
+    setPracticeOpponent({
+      id: 'ghost_arcade',
+      username: 'ArcadeBot_99',
+      score: 128,
+      grid: [
+        [null, null, null, { value: 2 }],
+        [null, { value: 4 }, null, null],
+        [{ value: 8 }, null, { value: 16 }, null],
+        [null, null, { value: 32 }, { value: 64 }]
+      ],
+      over: false,
+      won: false
+    });
+    startCountdownSequence();
+  };
+
+  useEffect(() => {
+    if (!isPractice || !challengeStarted) return;
+    const botTimer = setInterval(() => {
+      setPracticeOpponent((prev) => {
+        if (!prev || prev.over || prev.won) return prev;
+        const newScore = prev.score + Math.floor(Math.random() * 8 + 4) * 4;
+        return {
+          ...prev,
+          score: newScore,
+          grid: [
+            [null, null, { value: 2 }, { value: 4 }],
+            [null, { value: 4 }, null, { value: 8 }],
+            [{ value: 16 }, null, { value: 32 }, null],
+            [null, { value: 64 }, { value: 128 }, { value: 256 }]
+          ]
+        };
+      });
+    }, 2800);
+    return () => clearInterval(botTimer);
+  }, [isPractice, challengeStarted]);
+
+  // Construct opponents array for Split Screen
+  const opponents = Object.entries(webrtc.remoteStreams).map(([id, peer]) => {
+    const board = webrtc.peerBoards[id] || {};
+    const eliminated = webrtc.peerEliminated[id];
+    const won = webrtc.peerWon?.peerId === id;
+    return {
+      id,
+      username: peer.username || board.username || 'Opponent',
+      score: eliminated ? eliminated.score : (board.score || 0),
+      grid: board.grid || [],
+      over: Boolean(eliminated || board.over),
+      won: Boolean(won || board.won)
+    };
+  });
+
+  if (opponents.length === 0 && isPractice && practiceOpponent) {
+    opponents.push(practiceOpponent);
+  }
 
   const handleOpenChallenge = () => {
     setShowChallengeModal(true);
@@ -256,16 +279,29 @@ export default function GameShell({
   const handleLeaveSession = () => {
     setActiveMode('SINGLE_PLAYER');
     setIsLocalReady(false);
-    setIsPeerReady(false);
-    setResultData(null);
+    setChallengeStarted(false);
+    setIsPractice(false);
+    setPracticeOpponent(null);
+    setLocalOver(false);
+    setLocalWon(false);
+  };
+
+  const handleToggleReady = () => {
+    const nextState = !isLocalReady;
+    setIsLocalReady(nextState);
+    webrtc.sendChallengeReady(nextState);
   };
 
   const handlePlayAgain = () => {
-    setResultData(null);
     setIsLocalReady(false);
-    setIsPeerReady(false);
+    setChallengeStarted(false);
+    setLocalOver(false);
+    setLocalWon(false);
+    setLocalScore(0);
     launchGame();
   };
+
+  const connectedPeerCount = Object.keys(webrtc.remoteStreams).length;
 
   return (
     <div className={`game-shell-root fade-in ${isFullscreen ? 'is-fullscreen' : ''}`} ref={containerRef}>
@@ -280,10 +316,9 @@ export default function GameShell({
         hasActiveSession={activeMode === 'CHALLENGE'}
       />
 
-      {/* ── Main Gameplay Body (Game Hero + Right-Side Social Rail) ── */}
+      {/* ── Main Gameplay Body (Game Hero / Split Screen + Right Social Rail) ── */}
       <div className="game-shell-body">
         <div className="game-stage-column">
-          {/* Centered Game Viewport (Dominant 65-80% area) */}
           <GameViewport
             game={game}
             viewportRef={viewportRef}
@@ -295,53 +330,64 @@ export default function GameShell({
             isFullscreen={isFullscreen}
             onToggleFullscreen={handleToggleFullscreen}
             onOpenChallenge={handleOpenChallenge}
-            resultOverlay={
-              resultData ? (
-                <GameResultOverlay
-                  isChallenge={activeMode === 'CHALLENGE'}
-                  playerName={currentUsername}
-                  peerName="Opponent"
-                  playerScore={resultData.playerScore}
-                  peerScore={resultData.peerScore}
-                  winner={resultData.winner}
-                  onPlayAgain={handlePlayAgain}
-                  onBackToArcade={onClose}
-                />
-              ) : null
-            }
+            isSplitArena={activeMode === 'CHALLENGE' && challengeStarted}
+            currentUsername={currentUsername}
+            localScore={localScore}
+            localOver={localOver}
+            localWon={localWon}
+            opponents={opponents}
+            onPlayAgain={handlePlayAgain}
           />
         </div>
 
-        {/* ── Non-Overlapping Social Rail (Right-side chat & players) ── */}
-        {!isFullscreen && (
-          <GameSocialRailContainer
+        {/* ── Right-Side Social Rail (Always active in Challenge Mode) ── */}
+        {!isFullscreen && activeMode === 'CHALLENGE' && (
+          <GameSocialRail
             roomId={roomId}
-            username={currentUsername}
-            isChallengeMode={activeMode === 'CHALLENGE'}
-            isLocalReady={isLocalReady}
-            onToggleReady={setIsLocalReady}
+            currentUsername={currentUsername}
+            localStream={webrtc.localStream}
+            remoteStreams={webrtc.remoteStreams}
+            micEnabled={webrtc.micEnabled}
+            cameraEnabled={webrtc.cameraEnabled}
+            isScreenSharing={webrtc.isScreenSharing}
+            connected={webrtc.connected}
+            chatMessages={webrtc.chatMessages}
+            onToggleMic={webrtc.toggleMic}
+            onToggleCamera={webrtc.toggleCamera}
+            onToggleScreenShare={webrtc.toggleScreenShare}
+            onSendMessage={webrtc.sendChatMessage}
             onLeaveSession={handleLeaveSession}
-            onPeerReadyChange={setIsPeerReady}
-            onCountdownTrigger={startCountdownSequence}
-            onPeerScoreChange={(scoreData) => {
-              setResultData((prev) => ({
-                ...prev,
-                peerScore: scoreData.score,
-                winner: scoreData.score > (prev?.playerScore || 0) ? 'Opponent' : currentUsername
-              }));
-            }}
+            isChallengeMode={true}
+            isLocalReady={isLocalReady}
+            isPeerReady={webrtc.peerReady}
+            onToggleReady={handleToggleReady}
+            onStartPracticeDuel={handleStartPracticeDuel}
           />
         )}
       </div>
 
-      {/* ── Challenge Room Invitation Modal ── */}
+      {/* ── Advanced Floating Camera Overlay (Visible in BOTH normal & fullscreen modes) ── */}
+      {webrtc.cameraEnabled && (
+        <DraggableCameraOverlay
+          localStream={webrtc.localStream}
+          remoteStreams={webrtc.remoteStreams}
+          currentUsername={currentUsername}
+          micEnabled={webrtc.micEnabled}
+          cameraEnabled={webrtc.cameraEnabled}
+          onToggleMic={webrtc.toggleMic}
+          onToggleCamera={webrtc.toggleCamera}
+          onClose={webrtc.toggleCamera}
+        />
+      )}
+
+      {/* ── Challenge Room Invitation Modal (up to 3 players) ── */}
       {showChallengeModal && (
         <ChallengeModal
           game={game}
           roomId={roomId}
           onClose={() => setShowChallengeModal(false)}
           onStartDuel={handleEnterDuelArena}
-          connectedPeerCount={isPeerReady ? 1 : 0}
+          connectedPeerCount={connectedPeerCount}
         />
       )}
     </div>

@@ -190,6 +190,33 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('challenge-board-sync', (payload) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('challenge-peer-board-sync', {
+      peerId: socket.id,
+      username: socket.username,
+      ...payload
+    });
+  });
+
+  socket.on('challenge-player-eliminated', ({ score }) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('challenge-peer-eliminated', {
+      peerId: socket.id,
+      username: socket.username,
+      score
+    });
+  });
+
+  socket.on('challenge-player-won', ({ score }) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('challenge-peer-won', {
+      peerId: socket.id,
+      username: socket.username,
+      score
+    });
+  });
+
   socket.on('disconnect', () => {
     if (socket.roomId && rooms.has(socket.roomId)) {
       const room = rooms.get(socket.roomId);

@@ -32,6 +32,25 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
       }
     }
 
+    // CoGether Challenge Sync Bridge
+    try {
+      if (window.parent && window.parent !== window) {
+        var serializedCells = grid.cells.map(function (col) {
+          return col.map(function (cell) {
+            return cell ? { x: cell.x, y: cell.y, value: cell.value } : null;
+          });
+        });
+        window.parent.postMessage({
+          type: 'COPLAY_GAME_SYNC',
+          gameId: '2048',
+          score: metadata.score,
+          over: Boolean(metadata.over),
+          won: Boolean(metadata.won),
+          terminated: Boolean(metadata.terminated),
+          grid: serializedCells
+        }, '*');
+      }
+    } catch (e) {}
   });
 };
 

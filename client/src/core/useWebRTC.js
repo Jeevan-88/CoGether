@@ -22,6 +22,9 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
   const [peerReady, setPeerReady] = useState(false);
   const [challengeCountdown, setChallengeCountdown] = useState(null);
   const [peerScore, setPeerScore] = useState(null);
+  const [peerBoards, setPeerBoards] = useState({}); // peerId -> { score, grid, over, won, username }
+  const [peerEliminated, setPeerEliminated] = useState({}); // peerId -> { score, username }
+  const [peerWon, setPeerWon] = useState(null); // { peerId, username, score }
 
   const socketRef = useRef(null);
   const peersRef = useRef({}); // id -> RTCPeerConnection
@@ -229,6 +232,27 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
         setPeerScore({ score, finalResult });
       });
 
+      socket.on('challenge-peer-board-sync', (payload) => {
+        setPeerBoards((prev) => ({
+          ...prev,
+          [payload.peerId]: {
+            ...prev[payload.peerId],
+            ...payload
+          }
+        }));
+      });
+
+      socket.on('challenge-peer-eliminated', (payload) => {
+        setPeerEliminated((prev) => ({
+          ...prev,
+          [payload.peerId]: payload
+        }));
+      });
+
+      socket.on('challenge-peer-won', (payload) => {
+        setPeerWon(payload);
+      });
+
       // User Left
       socket.on('user-left', (id) => {
         if (peersRef.current[id]) {
@@ -388,6 +412,18 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
     socketRef.current?.emit('challenge-score', { score, finalResult });
   };
 
+  const sendChallengeBoardSync = (payload) => {
+    socketRef.current?.emit('challenge-board-sync', payload);
+  };
+
+  const sendPlayerEliminated = (score) => {
+    socketRef.current?.emit('challenge-player-eliminated', { score });
+  };
+
+  const sendPlayerWon = (score) => {
+    socketRef.current?.emit('challenge-player-won', { score });
+  };
+
   return {
     localStream,
     remoteStreams,
@@ -400,6 +436,9 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
     peerReady,
     challengeCountdown,
     peerScore,
+    peerBoards,
+    peerEliminated,
+    peerWon,
     toggleMic,
     toggleCamera,
     toggleScreenShare,
@@ -407,6 +446,9 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
     sendChallengeReady,
     sendChallengeStart,
     sendChallengeScore,
+    sendChallengeBoardSync,
+    sendPlayerEliminated,
+    sendPlayerWon,
     socket: socketRef.current
   };
 }
