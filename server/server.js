@@ -162,6 +162,34 @@ io.on('connection', (socket) => {
     io.to(socket.roomId).emit('chat-message', messagePayload);
   });
 
+  // CoGether Challenge Mode Synchronization
+  socket.on('challenge-ready', ({ ready }) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('challenge-peer-ready', {
+      peerId: socket.id,
+      username: socket.username,
+      ready
+    });
+  });
+
+  socket.on('challenge-start', ({ countdownSeconds = 3 }) => {
+    if (!socket.roomId) return;
+    io.to(socket.roomId).emit('challenge-countdown-start', {
+      countdownSeconds,
+      timestamp: Date.now()
+    });
+  });
+
+  socket.on('challenge-score', ({ score, finalResult = false }) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('challenge-peer-score', {
+      peerId: socket.id,
+      username: socket.username,
+      score,
+      finalResult
+    });
+  });
+
   socket.on('disconnect', () => {
     if (socket.roomId && rooms.has(socket.roomId)) {
       const room = rooms.get(socket.roomId);

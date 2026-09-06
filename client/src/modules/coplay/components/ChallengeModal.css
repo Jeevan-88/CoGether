@@ -1,0 +1,237 @@
+/* ══════════════════════════════════════════════════════════════════════
+   CHALLENGE MODAL
+   Room creation and link sharing dialog in dark arcade styling
+   ══════════════════════════════════════════════════════════════════════ */
+
+.challenge-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.challenge-modal-card {
+  background: #0d0d12;
+  border: 1.5px solid #FFE500;
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 229, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.challenge-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: #181820;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.challenge-close-btn:hover {
+  background: #e11d48;
+  border-color: #e11d48;
+}
+
+.challenge-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.challenge-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FFE500;
+  background: rgba(255, 229, 0, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.challenge-title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.challenge-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.game-name-highlight {
+  color: #ffffff;
+}
+
+/* ── Room Code Box ── */
+.challenge-code-deck {
+  background: #14141a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.code-box-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.code-box-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  color: #FFE500;
+  letter-spacing: 0.1em;
+}
+
+.btn-copy-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #20202a;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-copy-code:hover {
+  background: #FFE500;
+  color: #000000;
+  border-color: #FFE500;
+}
+
+/* ── Link Sharing Box ── */
+.challenge-link-deck {
+  display: flex;
+  gap: 8px;
+}
+
+.challenge-link-input {
+  flex: 1;
+  background: #09090c;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  outline: none;
+}
+
+.challenge-link-input:focus {
+  border-color: #FFE500;
+  color: #ffffff;
+}
+
+.btn-copy-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #181820;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.btn-copy-link:hover {
+  background: #FFE500;
+  color: #000000;
+  border-color: #FFE500;
+}
+
+/* ── Status Indicator ── */
+.challenge-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+}
+
+.status-pulse-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-pulse-circle.is-waiting {
+  background: #eab308;
+  box-shadow: 0 0 8px #eab308;
+  animation: pulseWait 1.5s infinite alternate;
+}
+
+.status-pulse-circle.is-connected {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+@keyframes pulseWait {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.status-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #cbd5e1;
+}
+
+.text-green {
+  color: #10b981;
+}

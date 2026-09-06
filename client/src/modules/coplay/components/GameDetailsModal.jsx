@@ -5,6 +5,7 @@ import {
   CheckCircle, ArrowRight 
 } from 'lucide-react';
 import { GameMode, LicenseStatus, DistributionStatus } from '../gameSchema.js';
+import CoGetherButton from './CoGetherButton.jsx';
 import './GameDetailsModal.css';
 
 export default function GameDetailsModal({
@@ -152,73 +153,73 @@ export default function GameDetailsModal({
         <div className="details-footer-actions">
           {isPendingLicense ? (
             <div className="pending-actions-bar">
-              <button type="button" className="btn-details-disabled" disabled>
-                <AlertTriangle size={15} />
-                <span>PLAYBACK UNAVAILABLE (RIGHTS PENDING)</span>
-              </button>
+              <CoGetherButton
+                variant="ghost"
+                disabled={true}
+                icon={AlertTriangle}
+                fullWidth={true}
+              >
+                PLAYBACK UNAVAILABLE (RIGHTS PENDING)
+              </CoGetherButton>
             </div>
           ) : isLocalCoop ? (
-            <button 
-              type="button" 
-              className="btn-details-launch btn-launch-primary"
+            <CoGetherButton
+              variant="primary"
               onClick={() => {
                 onClose();
                 onPlay(game);
               }}
+              icon={Gamepad2}
+              fullWidth={true}
             >
-              <Gamepad2 size={16} />
-              <span>LAUNCH LOCAL 2-PLAYER MATCH</span>
-            </button>
+              LAUNCH LOCAL 2-PLAYER MATCH
+            </CoGetherButton>
           ) : isMultiplayer ? (
             <div className="dual-launch-actions">
-              <button 
-                type="button" 
-                className="btn-details-launch btn-launch-secondary"
+              <CoGetherButton
+                variant="secondary"
                 onClick={() => {
                   onClose();
                   onPlay(game);
                 }}
+                icon={Play}
               >
-                <Play size={15} fill="#ffffff" />
-                <span>PLAY SOLO</span>
-              </button>
-              <button 
-                type="button" 
-                className="btn-details-launch btn-launch-primary"
+                PLAY SOLO
+              </CoGetherButton>
+              <CoGetherButton
+                variant="primary"
                 onClick={() => {
                   onClose();
                   onSquad(game);
                 }}
+                icon={Users}
               >
-                <Users size={16} />
-                <span>CREATE SQUAD ROOM</span>
-              </button>
+                CREATE SQUAD ROOM
+              </CoGetherButton>
             </div>
           ) : (
             <div className="dual-launch-actions">
-              <button 
-                type="button" 
-                className="btn-details-launch btn-launch-primary"
+              <CoGetherButton
+                variant="primary"
                 onClick={() => {
                   onClose();
                   onPlay(game);
                 }}
+                icon={Play}
               >
-                <Play size={15} fill="#000000" />
-                <span>PLAY NOW</span>
-              </button>
+                PLAY NOW
+              </CoGetherButton>
               {game.challengeSupported && (
-                <button 
-                  type="button" 
-                  className="btn-details-launch btn-launch-challenge"
+                <CoGetherButton
+                  variant="secondary"
                   onClick={() => {
                     onClose();
                     onChallenge(game);
                   }}
+                  icon={Swords}
                 >
-                  <Swords size={16} />
-                  <span>CHALLENGE A FRIEND</span>
-                </button>
+                  CHALLENGE A FRIEND
+                </CoGetherButton>
               )}
             </div>
           )}

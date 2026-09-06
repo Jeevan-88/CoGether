@@ -18,6 +18,9 @@ export function useWebRTC(roomId, username, signalingUrl) {
   const [connected, setConnected] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
   const [mediaError, setMediaError] = useState(null);
+  const [peerReady, setPeerReady] = useState(false);
+  const [challengeCountdown, setChallengeCountdown] = useState(null);
+  const [peerScore, setPeerScore] = useState(null);
 
   const socketRef = useRef(null);
   const peersRef = useRef({}); // id -> RTCPeerConnection
@@ -210,6 +213,19 @@ export function useWebRTC(roomId, username, signalingUrl) {
         setChatMessages((prev) => [...prev, messagePayload]);
       });
 
+      // CoGether Challenge Sync Events
+      socket.on('challenge-peer-ready', ({ ready }) => {
+        setPeerReady(ready);
+      });
+
+      socket.on('challenge-countdown-start', ({ countdownSeconds }) => {
+        setChallengeCountdown(countdownSeconds);
+      });
+
+      socket.on('challenge-peer-score', ({ score, finalResult }) => {
+        setPeerScore({ score, finalResult });
+      });
+
       // User Left
       socket.on('user-left', (id) => {
         if (peersRef.current[id]) {
@@ -315,6 +331,19 @@ export function useWebRTC(roomId, username, signalingUrl) {
     }
   };
 
+  // CoGether Challenge Sync Actions
+  const sendChallengeReady = (ready) => {
+    socketRef.current?.emit('challenge-ready', { ready });
+  };
+
+  const sendChallengeStart = (countdownSeconds = 3) => {
+    socketRef.current?.emit('challenge-start', { countdownSeconds });
+  };
+
+  const sendChallengeScore = (score, finalResult = false) => {
+    socketRef.current?.emit('challenge-score', { score, finalResult });
+  };
+
   return {
     localStream,
     remoteStreams,
@@ -324,9 +353,16 @@ export function useWebRTC(roomId, username, signalingUrl) {
     connected,
     chatMessages,
     mediaError,
+    peerReady,
+    challengeCountdown,
+    peerScore,
     toggleMic,
     toggleCamera,
     toggleScreenShare,
-    sendChatMessage
+    sendChatMessage,
+    sendChallengeReady,
+    sendChallengeStart,
+    sendChallengeScore,
+    socket: socketRef.current
   };
 }

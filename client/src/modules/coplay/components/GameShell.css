@@ -1,0 +1,56 @@
+/* ══════════════════════════════════════════════════════════════════════
+   GAMESHELL MASTER CONTAINER
+   Full-screen theater with black/yellow arcade branding and clean focus
+   ══════════════════════════════════════════════════════════════════════ */
+
+.game-shell-root {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.game-shell-root.is-fullscreen {
+  background: #000000;
+}
+
+/* ── Main Gameplay Body ── */
+.game-shell-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* ── Game Stage Column (Holds Centered Viewport & Minimal Info Tray) ── */
+.game-stage-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  padding-bottom: 8px;
+  box-sizing: border-box;
+}
+
+/* ── Responsive Adaptations ── */
+@media (max-width: 860px) {
+  .game-shell-body {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .game-stage-column {
+    flex: none;
+    width: 100%;
+  }
+}

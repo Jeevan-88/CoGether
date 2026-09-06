@@ -20,7 +20,7 @@ export const AUTHORIZED_GAMES_DATABASE = [
   // =========================================================================
   {
     id: '2048',
-    title: '2048 (Official Open-Source)',
+    title: '2048 — Open Source',
     description: 'Join the numbers to reach the 2048 tile! Authentic, self-contained open-source edition created by Gabriele Cirulli. 100% local, zero tracking, instant playback.',
     thumbnail: '/games/thumbnails/2048.svg',
     category: GameCategory.PUZZLE,

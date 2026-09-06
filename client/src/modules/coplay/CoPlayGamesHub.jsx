@@ -18,6 +18,8 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
   // Game Modals & Player State
   const [detailsGame, setDetailsGame] = useState(null);
   const [activePlayGame, setActivePlayGame] = useState(null);
+  const [activePlayMode, setActivePlayMode] = useState('SINGLE_PLAYER');
+  const [activePlayRoomId, setActivePlayRoomId] = useState(null);
 
   const [favorites, setFavorites] = useState(() => {
     try {
@@ -62,6 +64,30 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
     }
   }, [currentUser]);
 
+  // Read URL query parameters for direct game or challenge link sharing
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const challengeId = params.get('challenge');
+    const gameId = params.get('game');
+    const roomId = params.get('room');
+
+    if (challengeId) {
+      const match = AUTHORIZED_GAMES_DATABASE.find(g => g.id === challengeId);
+      if (match) {
+        setActivePlayGame(match);
+        setActivePlayMode('CHALLENGE');
+        setActivePlayRoomId(roomId || ('duel-' + Math.floor(1000 + Math.random() * 9000)));
+      }
+    } else if (gameId) {
+      const match = AUTHORIZED_GAMES_DATABASE.find(g => g.id === gameId);
+      if (match) {
+        setActivePlayGame(match);
+        setActivePlayMode('SINGLE_PLAYER');
+        setActivePlayRoomId(null);
+      }
+    }
+  }, []);
+
   // Filter Games by Category & Search Query
   const filteredGames = useMemo(() => {
     return AUTHORIZED_GAMES_DATABASE.filter((game) => {
@@ -99,6 +125,8 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
       setDetailsGame(game);
       return;
     }
+    setActivePlayMode('SINGLE_PLAYER');
+    setActivePlayRoomId(null);
     setActivePlayGame(game);
     // Award +50 XP for playing games
     setCurrentUser((prev) => ({
@@ -118,6 +146,8 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
     navigator.clipboard.writeText(link);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2500);
+    setActivePlayMode('CHALLENGE');
+    setActivePlayRoomId(challengeRoomId);
     setActivePlayGame(game);
   };
 
@@ -330,7 +360,14 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
       {activePlayGame && (
         <GamePlayer
           game={activePlayGame}
-          onClose={() => setActivePlayGame(null)}
+          initialMode={activePlayMode}
+          initialRoomId={activePlayRoomId}
+          currentUsername={currentUser?.name}
+          onClose={() => {
+            setActivePlayGame(null);
+            setActivePlayMode('SINGLE_PLAYER');
+            setActivePlayRoomId(null);
+          }}
           onLaunchSquadRoom={handleSquadGame}
         />
       )}

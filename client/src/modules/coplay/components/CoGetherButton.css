@@ -1,0 +1,137 @@
+/* ══════════════════════════════════════════════════════════════════════
+   STANDARDIZED COGETHER ARCADE BUTTON SYSTEM
+   Uniform dimensions: height 48px, min-width 160px, padding 0 24px
+   ══════════════════════════════════════════════════════════════════════ */
+
+.cogether-arcade-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  white-space: nowrap;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* ── Standard Sizing (Mandatory for Game Actions) ── */
+.cogether-arcade-btn.btn-size-standard {
+  height: 48px;
+  min-width: 160px;
+  padding: 0 24px;
+}
+
+/* ── Compact Sizing (For Top Header / Small Utility Actions) ── */
+.cogether-arcade-btn.btn-size-compact {
+  height: 38px;
+  min-width: 120px;
+  padding: 0 16px;
+  font-size: 12px;
+}
+
+/* ── Full Width Option (For Modals & Mobile Drawers) ── */
+.cogether-arcade-btn.btn-full-width {
+  width: 100%;
+  min-width: 100%;
+}
+
+/* ── Primary Action (Arcade Yellow) ── */
+.cogether-arcade-btn.btn-arcade-primary {
+  background: #FFE500;
+  color: #000000;
+  border: 2px solid #FFE500;
+  box-shadow: 0 2px 8px rgba(255, 229, 0, 0.25);
+}
+
+.cogether-arcade-btn.btn-arcade-primary:hover:not(:disabled) {
+  background: #fff033;
+  border-color: #fff033;
+  box-shadow: 0 4px 14px rgba(255, 229, 0, 0.45);
+  transform: translateY(-1px);
+}
+
+.cogether-arcade-btn.btn-arcade-primary:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(255, 229, 0, 0.3);
+}
+
+/* ── Secondary Action (Dark Charcoal with Subtle Border) ── */
+.cogether-arcade-btn.btn-arcade-secondary {
+  background: #141418;
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+}
+
+.cogether-arcade-btn.btn-arcade-secondary:hover:not(:disabled) {
+  background: #1e1e24;
+  border-color: #FFE500;
+  color: #FFE500;
+  transform: translateY(-1px);
+}
+
+.cogether-arcade-btn.btn-arcade-secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* ── Danger Action (Crimson / Destructive) ── */
+.cogether-arcade-btn.btn-arcade-danger {
+  background: #e11d48;
+  color: #ffffff;
+  border: 1.5px solid #e11d48;
+}
+
+.cogether-arcade-btn.btn-arcade-danger:hover:not(:disabled) {
+  background: #f43f5e;
+  border-color: #f43f5e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+}
+
+.cogether-arcade-btn.btn-arcade-danger:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* ── Ghost Action (Subtle Transparent) ── */
+.cogether-arcade-btn.btn-arcade-ghost {
+  background: transparent;
+  color: #cbd5e1;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+}
+
+.cogether-arcade-btn.btn-arcade-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Focus State (Accessibility) ── */
+.cogether-arcade-btn:focus-visible {
+  outline: 2px solid #FFE500;
+  outline-offset: 3px;
+}
+
+/* ── Disabled State ── */
+.cogether-arcade-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.6);
+}
+
+/* ── Responsive Adaptations ── */
+@media (max-width: 640px) {
+  .cogether-arcade-btn.btn-size-standard {
+    height: 44px;
+    min-width: 140px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+}

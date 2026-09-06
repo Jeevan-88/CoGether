@@ -1,0 +1,125 @@
+/* ══════════════════════════════════════════════════════════════════════
+   MINIMAL GAME INFORMATION BAR
+   Clean, scannable tray below game viewport with 0 redundant clutter
+   ══════════════════════════════════════════════════════════════════════ */
+
+.game-minimal-info-bar {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px 16px;
+  background: #0d0d10;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.info-primary-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.info-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.info-title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.info-category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.info-license-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.info-controls-snippet {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #cbd5e1;
+}
+
+.snippet-icon {
+  color: #FFE500;
+  flex-shrink: 0;
+}
+
+.snippet-label {
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.snippet-value {
+  color: #f1f5f9;
+}
+
+.info-secondary-meta {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.info-source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.18s ease;
+}
+
+.info-source-link:hover {
+  color: #FFE500;
+  border-color: #FFE500;
+  background: rgba(255, 229, 0, 0.05);
+}
+
+@media (max-width: 640px) {
+  .game-minimal-info-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

@@ -1,0 +1,548 @@
+/* ══════════════════════════════════════════════════════════════════════
+   GAME SOCIAL RAIL (WEBRTC CAMERAS & IN-CALL CHAT)
+   Dedicated non-overlapping sidebar. Pure CoGether dark charcoal arcade UI.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.game-social-rail {
+  width: 320px;
+  background: #0d0d11;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 40;
+  transition: width 0.2s ease;
+}
+
+.game-social-rail.rail-collapsed {
+  width: 48px;
+}
+
+/* ── Top Header ── */
+.rail-top-header {
+  height: 48px;
+  padding: 0 14px;
+  background: #131318;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.rail-room-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.live-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  flex-shrink: 0;
+}
+
+.rail-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #e2e8f0;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.rail-collapse-toggle {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rail-collapse-toggle:hover {
+  color: #FFE500;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Scrollable Body ── */
+.rail-scrollable-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+  gap: 12px;
+}
+
+/* ── Challenge Readiness Card ── */
+.rail-challenge-status-card {
+  background: #14141a;
+  border: 1px solid #FFE500;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.challenge-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: #FFE500;
+  letter-spacing: 0.05em;
+}
+
+.swords-icon {
+  color: #FFE500;
+}
+
+.challenge-players-ready-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.player-ready-pill {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #09090c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.player-ready-pill.is-ready {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.player-ready-pill .player-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-ready-pill .ready-indicator {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 800;
+  margin-top: 2px;
+  color: #94a3b8;
+}
+
+.player-ready-pill.is-ready .ready-indicator {
+  color: #10b981;
+}
+
+.btn-challenge-ready-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  background: #1e1e26;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-challenge-ready-toggle:hover {
+  border-color: #FFE500;
+  color: #FFE500;
+}
+
+.btn-challenge-ready-toggle.ready-active {
+  background: #10b981;
+  border-color: #10b981;
+  color: #000000;
+  font-weight: 900;
+}
+
+/* ── Live Video Stream Grid ── */
+.rail-video-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rail-video-tile-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.rail-video-tile-container .video-tile {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.rail-video-tile-container .tile-video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rail-video-tile-container .avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #141418;
+  gap: 6px;
+}
+
+.rail-video-tile-container .avatar-circle-tile {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #FFE500;
+  color: #000000;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.rail-video-tile-container .avatar-name {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.rail-video-tile-container .tile-overlay-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rail-video-tile-container .user-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.rail-video-tile-container .mic-badge {
+  display: inline-flex;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+.rail-video-tile-container .mic-badge.mic-on {
+  color: #10b981;
+}
+
+.rail-video-tile-container .mic-badge.mic-off {
+  color: #e11d48;
+}
+
+.rail-video-tile-container .tile-fs-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 2px;
+}
+
+/* ── Real-Time Chat Section ── */
+.rail-chat-section {
+  flex: 1;
+  min-height: 180px;
+  background: #121217;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.chat-section-header {
+  padding: 8px 12px;
+  background: #17171e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.rail-chat-messages-box {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-empty-hint {
+  margin: auto;
+  text-align: center;
+  font-size: 11px;
+  color: #64748b;
+  padding: 10px;
+}
+
+.chat-message-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 90%;
+}
+
+.chat-message-row.msg-me {
+  align-self: flex-end;
+}
+
+.chat-message-row.msg-peer {
+  align-self: flex-start;
+}
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9.5px;
+  color: #64748b;
+}
+
+.chat-message-row.msg-me .msg-meta {
+  justify-content: flex-end;
+}
+
+.msg-author {
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.chat-message-row.msg-me .msg-author {
+  color: #FFE500;
+}
+
+.msg-bubble {
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.chat-message-row.msg-me .msg-bubble {
+  background: #23232c;
+  border: 1px solid rgba(255, 229, 0, 0.35);
+  color: #ffffff;
+}
+
+.chat-message-row.msg-peer .msg-bubble {
+  background: #18181f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+/* ── Emoji Quick Picker Popover ── */
+.emoji-quick-picker-popover {
+  position: absolute;
+  bottom: 48px;
+  left: 10px;
+  right: 10px;
+  background: #1c1c24;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 50;
+}
+
+.emoji-popover-item {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.emoji-popover-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Chat Input Form ── */
+.rail-chat-form {
+  padding: 8px;
+  background: #15151c;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-emoji-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.chat-emoji-btn:hover {
+  color: #FFE500;
+}
+
+.rail-chat-input {
+  flex: 1;
+  background: #09090c;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+
+.rail-chat-input:focus {
+  border-color: #FFE500;
+}
+
+.chat-send-btn {
+  width: 32px;
+  height: 32px;
+  background: #FFE500;
+  border: none;
+  color: #000000;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Bottom Controls Bar ── */
+.rail-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 8px 4px 0 4px;
+  flex-shrink: 0;
+}
+
+.control-circle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #1a1a22;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.control-circle-btn:hover {
+  border-color: #FFE500;
+  color: #FFE500;
+  background: #23232c;
+}
+
+.control-circle-btn.is-off {
+  background: #2d1217;
+  border-color: #e11d48;
+  color: #e11d48;
+}
+
+.control-circle-btn.is-active {
+  background: rgba(255, 229, 0, 0.15);
+  border-color: #FFE500;
+  color: #FFE500;
+}
+
+.control-circle-btn.btn-leave-room:hover {
+  background: #e11d48;
+  border-color: #e11d48;
+  color: #ffffff;
+}
+
+/* ── Responsive Stacking for Small Screens ── */
+@media (max-width: 860px) {
+  .game-social-rail {
+    width: 100%;
+    height: auto;
+    max-height: 45vh;
+    border-left: none;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .rail-video-grid {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .rail-video-tile-container {
+    width: 180px;
+    flex-shrink: 0;
+  }
+}

@@ -1,0 +1,332 @@
+/* ══════════════════════════════════════════════════════════════════════
+   GAME VIEWPORT & FRAMING STAGE
+   Primary visual hero: centered, 65-80% viewport, responsive aspect ratio
+   ══════════════════════════════════════════════════════════════════════ */
+
+.game-viewport-stage {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  padding: 16px 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.game-viewport-stage.stage-fullscreen {
+  padding: 0;
+  background: #000000;
+}
+
+/* ── Centered Game Frame ── */
+.game-frame-container {
+  position: relative;
+  background: #09090c;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 229, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* ── Aspect Ratio Preservations ── */
+/* Standard Square / 1:1 or 4:3 (2048, Hextris, Block Puzzle) */
+.game-frame-container.frame-aspect-standard {
+  aspect-ratio: 1 / 1;
+  width: min(85vw, 680px);
+  max-width: 100%;
+  max-height: calc(100vh - 140px);
+}
+
+/* Portrait (Clumsy Bird, Flappy, Mobile Runners) */
+.game-frame-container.frame-aspect-portrait {
+  aspect-ratio: 9 / 16;
+  width: min(52vh, 440px);
+  max-width: 100%;
+  max-height: calc(100vh - 140px);
+}
+
+/* Fullscreen override: Maximize viewport area maintaining aspect ratio */
+.game-viewport-stage.stage-fullscreen .game-frame-container {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.game-viewport-stage.stage-fullscreen .game-frame-container.frame-aspect-standard {
+  width: min(96vw, 96vh);
+  max-height: 98vh;
+  max-width: 98vw;
+}
+
+.game-viewport-stage.stage-fullscreen .game-frame-container.frame-aspect-portrait {
+  width: calc(96vh * (9 / 16));
+  max-height: 98vh;
+  max-width: 98vw;
+}
+
+/* ── Sandboxed Game Iframe Mount Slot ── */
+.game-iframe-mount-point {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #050507;
+  display: flex;
+}
+
+.game-iframe-mount-point.has-error {
+  display: none;
+}
+
+.game-embedded-viewport-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  display: block;
+}
+
+/* ── Poki-Level Clean Arcade Loading Progress ── */
+.game-loading-scrim {
+  position: absolute;
+  inset: 0;
+  background: #09090c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+  padding: 24px;
+}
+
+.loading-card-arcade {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  gap: 14px;
+}
+
+.loading-thumbnail-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #141418;
+  border: 1.5px solid rgba(255, 229, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.loading-meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.loading-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.loading-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.loading-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #1c1c24;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loading-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 45%;
+  background: #FFE500;
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(255, 229, 0, 0.7);
+  animation: arcadeProgressSweep 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes arcadeProgressSweep {
+  0% { left: 0%; width: 25%; }
+  50% { width: 55%; }
+  100% { left: 75%; width: 25%; }
+}
+
+.loading-badge-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #FFE500;
+  background: rgba(255, 229, 0, 0.08);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 229, 0, 0.2);
+}
+
+/* ── Synchronized Challenge Countdown (3-2-1-GO) ── */
+.game-countdown-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  backdrop-filter: blur(4px);
+}
+
+.countdown-number-bounce {
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-size: 88px;
+  font-weight: 900;
+  color: #FFE500;
+  text-shadow: 0 0 30px rgba(255, 229, 0, 0.8), 0 4px 10px #000000;
+  animation: countdownPop 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  letter-spacing: -0.04em;
+}
+
+@keyframes countdownPop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.countdown-subtext {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.1em;
+  margin-top: 8px;
+}
+
+/* ── Launch Error Recovery Deck ── */
+.game-unavailable-error-card {
+  position: absolute;
+  inset: 0;
+  background: #09090c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  z-index: 28;
+}
+
+.error-icon-shield {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(225, 29, 72, 0.12);
+  border: 1.5px solid #e11d48;
+  color: #e11d48;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.error-headline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.error-subtext {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 0 16px 0;
+}
+
+.error-reason-box {
+  background: #141418;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  max-width: 440px;
+}
+
+.error-code-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #e11d48;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.error-message {
+  font-size: 12px;
+  color: #cbd5e1;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.error-actions-deck {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Responsive Viewport ── */
+@media (max-width: 768px) {
+  .game-viewport-stage {
+    padding: 12px 14px;
+  }
+  
+  .game-frame-container.frame-aspect-standard {
+    width: 100%;
+    max-height: 52vh;
+  }
+
+  .game-frame-container.frame-aspect-portrait {
+    width: min(85vw, 360px);
+    max-height: 55vh;
+  }
+
+  .countdown-number-bounce {
+    font-size: 64px;
+  }
+}
