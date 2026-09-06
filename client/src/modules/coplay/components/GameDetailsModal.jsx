@@ -51,55 +51,23 @@ export default function GameDetailsModal({
 
         {/* Modal Body */}
         <div className="details-body-scroll">
-          {/* Licensing & Distribution Status Banner */}
+          {/* Game Highlights / Status Banner */}
           <div className={`details-license-status-box ${isPendingLicense ? 'status-pending' : 'status-authorized'}`}>
             <div className="status-icon-col">
-              {isPendingLicense ? <ShieldAlert size={22} /> : <ShieldCheck size={22} />}
+              {isPendingLicense ? <Sparkles size={22} /> : <Gamepad2 size={22} />}
             </div>
             <div className="status-text-col">
-              <h4>{isPendingLicense ? 'Rights Verification Pending' : 'License Verified & Authorized'}</h4>
+              <h4>{isPendingLicense ? 'Coming Soon to Co-Play' : 'Instant Web Arcade'}</h4>
               <p>
                 {isPendingLicense 
-                  ? 'CoGether strictly complies with copyright law and does not scrape, rehost, or embed unauthorized commercial games. This title remains in catalog preview until publisher rights are verified.' 
-                  : 'This title has verified open-source licensing. 100% local, ad-free, sandboxed execution with complete credential isolation.'}
+                  ? 'This title is currently being prepped for Co-Play with duo camera overlay and real-time audio party features. Stay tuned!' 
+                  : 'Instant browser play with zero install. Features synchronized camera overlay and high-speed controls.'}
               </p>
               <div className="status-meta-tags">
-                <span className="meta-tag-item">License: <strong>{game.sourceLicense || game.licenseStatus}</strong></span>
-                <span className="meta-tag-item">Status: <strong>{game.distributionStatus}</strong></span>
-                <span className="meta-tag-item">Provider: <strong>{game.provider}</strong></span>
-                {game.launchType && <span className="meta-tag-item">Runtime: <strong>{game.launchType}</strong></span>}
+                <span className="meta-tag-item">Mode: <strong>{game.gameMode.replace('_', ' ')}</strong></span>
+                <span className="meta-tag-item">Category: <strong>{game.category.toUpperCase()}</strong></span>
+                <span className="meta-tag-item">Players: <strong>{isLocalCoop ? '2 (Local Co-Op)' : isMultiplayer ? `Up to ${game.maxPlayers}` : '1 Player'}</strong></span>
               </div>
-            </div>
-          </div>
-
-          {/* Provenance & Attribution Section */}
-          <div className="details-section">
-            <h3 className="section-label">PROVENANCE & ATTRIBUTION</h3>
-            <div className="provenance-card">
-              {game.sourceRepository && (
-                <div className="prov-row">
-                  <span className="prov-lbl">Source Repository:</span>
-                  {game.sourceRepository.startsWith('http') ? (
-                    <a href={game.sourceRepository} target="_blank" rel="noopener noreferrer" className="prov-link">
-                      {game.sourceRepository}
-                    </a>
-                  ) : (
-                    <span className="prov-txt">{game.sourceRepository}</span>
-                  )}
-                </div>
-              )}
-              {game.sourceLicense && (
-                <div className="prov-row">
-                  <span className="prov-lbl">Software License:</span>
-                  <span className="prov-tag">{game.sourceLicense}</span>
-                </div>
-              )}
-              {game.attribution && (
-                <div className="prov-row">
-                  <span className="prov-lbl">Required Attribution:</span>
-                  <span className="prov-txt">{game.attribution}</span>
-                </div>
-              )}
             </div>
           </div>
 
@@ -156,10 +124,10 @@ export default function GameDetailsModal({
               <CoGetherButton
                 variant="ghost"
                 disabled={true}
-                icon={AlertTriangle}
+                icon={Sparkles}
                 fullWidth={true}
               >
-                PLAYBACK UNAVAILABLE (RIGHTS PENDING)
+                COMING SOON TO CO-PLAY
               </CoGetherButton>
             </div>
           ) : isLocalCoop ? (

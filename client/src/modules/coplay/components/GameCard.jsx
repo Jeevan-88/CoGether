@@ -65,29 +65,23 @@ export default function GameCard({
         {/* Game Mode Badge */}
         <div className="card-mode-badge-wrap">
           {isPendingLicense ? (
-            <span className="badge-mode badge-pending">
-              <ShieldAlert size={11} />
-              <span>RIGHTS PENDING</span>
-            </span>
-          ) : game.licenseStatus === LicenseStatus.LICENSE_VERIFIED ? (
-            <span className="badge-mode badge-verified">
-              <ShieldCheck size={11} />
-              <span>LICENSE VERIFIED</span>
+            <span className="badge-mode badge-soon">
+              <span>SOON</span>
             </span>
           ) : isLocalCoop ? (
             <span className="badge-mode badge-local">
               <Gamepad2 size={11} />
-              <span>LOCAL 2 PLAYER</span>
+              <span>2 PLAYER</span>
             </span>
           ) : isMultiplayer ? (
             <span className="badge-mode badge-multi">
               <Users size={11} />
-              <span>MULTIPLAYER</span>
+              <span>SQUAD</span>
             </span>
           ) : (
             <span className="badge-mode badge-solo">
               <User size={11} />
-              <span>SINGLE PLAYER</span>
+              <span>SOLO</span>
             </span>
           )}
         </div>
@@ -132,7 +126,7 @@ export default function GameCard({
           <span className="meta-players-count">
             <Users size={12} />
             <span>
-              {isLocalCoop ? '2 Players (Same PC)' : isMultiplayer ? `Up to ${game.maxPlayers}` : '1 Player'}
+              {isLocalCoop ? '2 Players' : isMultiplayer ? `Up to ${game.maxPlayers}` : '1 Player'}
             </span>
           </span>
         </div>
@@ -142,11 +136,10 @@ export default function GameCard({
           {isPendingLicense ? (
             <button 
               type="button" 
-              className="btn-card-action btn-pending-details"
+              className="btn-card-action btn-soon-action"
               onClick={() => onViewDetails(game)}
             >
-              <Info size={13} />
-              <span>RIGHTS PENDING</span>
+              <span>COMING SOON</span>
             </button>
           ) : isLocalCoop ? (
             <button 
@@ -155,7 +148,7 @@ export default function GameCard({
               onClick={() => onPlay(game)}
             >
               <Gamepad2 size={14} />
-              <span>2 PLAYER</span>
+              <span>PLAY 2P</span>
             </button>
           ) : isMultiplayer ? (
             <>
@@ -163,7 +156,7 @@ export default function GameCard({
                 type="button" 
                 className="btn-card-action btn-primary-arcade"
                 onClick={() => onPlay(game)}
-                title="Play alone in this game"
+                title="Play game"
               >
                 <Play size={13} fill="#000000" />
                 <span>PLAY</span>
@@ -186,7 +179,7 @@ export default function GameCard({
                 onClick={() => onPlay(game)}
               >
                 <Play size={13} fill="#000000" />
-                <span>PLAY NOW</span>
+                <span>PLAY</span>
               </button>
               {game.challengeSupported && (
                 <button 
@@ -196,7 +189,7 @@ export default function GameCard({
                   title="Challenge a friend with split-screen cameras"
                 >
                   <Swords size={13} />
-                  <span>CHALLENGE</span>
+                  <span>DUEL</span>
                 </button>
               )}
             </>

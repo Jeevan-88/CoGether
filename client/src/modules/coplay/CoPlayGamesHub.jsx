@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Gamepad2, Search, Play, Users, Flame, Star, Trophy, ArrowLeft, 
   X, Maximize, Minimize, Share2, Copy, Check, Heart, User, 
-  LogIn, Sparkles, Zap, Car, Crosshair, Brain, ShieldCheck, Swords
+  LogIn, Sparkles, Zap, Car, Crosshair, Brain, Swords, Bell, ShoppingBag
 } from 'lucide-react';
 import { AUTHORIZED_GAMES_DATABASE, GAME_CATEGORIES } from './authorizedGamesCatalog.js';
 import { GameMode, LicenseStatus, DistributionStatus } from './gameSchema.js';
@@ -14,6 +14,7 @@ import './CoPlayGamesHub.css';
 export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initialUser }) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sidebarHovered, setSidebarHovered] = useState(false);
   
   // Game Modals & Player State
   const [detailsGame, setDetailsGame] = useState(null);
@@ -94,6 +95,8 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
       let matchesCat = true;
       if (activeCategory === 'all') {
         matchesCat = true;
+      } else if (activeCategory === 'popular') {
+        matchesCat = ['2048', 'hextris', 'block-puzzle', 'retro-pong-2p'].includes(game.id);
       } else if (activeCategory === 'local_coop') {
         matchesCat = game.gameMode === GameMode.LOCAL_COOP;
       } else if (activeCategory === 'multiplayer') {
@@ -111,6 +114,19 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
       return matchesCat && matchesSearch;
     });
   }, [activeCategory, searchQuery]);
+
+  const renderCatIcon = (iconName, size = 18) => {
+    switch (iconName) {
+      case 'Flame': return <Flame size={size} />;
+      case 'Sparkles': return <Sparkles size={size} />;
+      case 'Gamepad2': return <Gamepad2 size={size} />;
+      case 'Brain': return <Brain size={size} />;
+      case 'Zap': return <Zap size={size} />;
+      case 'Users': return <Users size={size} />;
+      case 'Trophy': return <Trophy size={size} />;
+      default: return <Gamepad2 size={size} />;
+    }
+  };
 
   const toggleFavorite = (gameId, e) => {
     e.stopPropagation();
@@ -209,24 +225,34 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
 
   return (
     <div className="coplay-yellow-canvas-wrapper fade-in">
-      {/* ── 1. ARCADE TOP NAVIGATION HEADER ── */}
+      {/* ── 1. TOP NAVIGATION HEADER (PLAYHOP STYLE) ── */}
       <header className="coplay-header-bar">
         <div className="coplay-header-left">
-          <button className="btn-back-home" onClick={onBackToHome}>
-            <ArrowLeft size={16} /> BACK TO HOME
+          <button className="btn-back-home" onClick={onBackToHome} title="Back to Home">
+            <ArrowLeft size={16} />
           </button>
-          <div className="coplay-logo-brand">
-            <span className="arcade-tag-pill">CO-PLAY ARCADE</span>
-            <h1 className="arcade-title">PLAY • CONNECT • COMPETE</h1>
+          <div className="coplay-logo-brand" onClick={onBackToHome}>
+            <span className="arcade-title">CO-PLAY</span>
           </div>
+          <button 
+            type="button" 
+            className="btn-header-coshop" 
+            onClick={() => {
+              window.location.href = '/?mode=shop';
+            }}
+            title="Visit Co-Shop"
+          >
+            <ShoppingBag size={14} />
+            <span>CO-SHOP</span>
+          </button>
         </div>
 
-        {/* SEARCH BAR */}
+        {/* CENTER SEARCH PILL */}
         <div className="coplay-search-box">
-          <Search size={17} className="search-icon" />
+          <Search size={16} className="search-icon" />
           <input
             type="text"
-            placeholder="Search titles, modes (Solo, Local 2-Player, Squad)..."
+            placeholder="Find game or genre..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -237,131 +263,148 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
           )}
         </div>
 
-        {/* USER PROFILE & SQUAD ROOM LAUNCH */}
+        {/* RIGHT ACTIONS: XP, NOTIFICATION, AVATAR, SQUAD LAUNCH */}
         <div className="coplay-header-right">
-          <button className="btn-squad-party-launch" onClick={handleShareSquadRoom}>
-            <Users size={16} /> {copiedCode ? 'SQUAD LINK COPIED!' : 'CREATE SQUAD ROOM'}
+          <div className="header-xp-pill" title="Arcade XP Level">
+            <Zap size={14} className="xp-icon" />
+            <span>{currentUser?.xp || 1450} XP</span>
+          </div>
+
+          <button className="header-icon-btn" title="Notifications">
+            <Bell size={18} />
+            <span className="notif-badge-dot" />
           </button>
 
-          {currentUser?.isLoggedIn ? (
-            <div className="user-profile-pill" onClick={() => setShowAuthModal(true)}>
-              <span className="user-avatar">{currentUser.avatar}</span>
-              <div className="user-info-text">
-                <span className="user-name">{currentUser.name}</span>
-                <span className="user-level">LVL {currentUser.level} • {currentUser.xp} XP</span>
-              </div>
-            </div>
-          ) : (
-            <button className="btn-arcade-login" onClick={() => setShowAuthModal(true)}>
-              <LogIn size={15} /> LOGIN / PROGRESS
-            </button>
-          )}
+          <div 
+            className="header-avatar-circle" 
+            onClick={() => setShowAuthModal(true)} 
+            title={`${currentUser?.name} (LVL ${currentUser?.level || 1})`}
+          >
+            <span>{currentUser?.avatar || '🎮'}</span>
+          </div>
+
+          <button className="btn-squad-party-launch" onClick={handleShareSquadRoom}>
+            <Users size={15} /> 
+            <span>{copiedCode ? 'LINK COPIED!' : 'CREATE SQUAD ROOM'}</span>
+          </button>
         </div>
       </header>
 
-      {/* ── 2. CATEGORY FILTER TABS ── */}
-      <nav className="coplay-category-tabs" aria-label="Game categories">
-        <div className="category-scroll-track">
-          {GAME_CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className={`cat-pill-btn ${activeCategory === cat.id ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat.id)}
-            >
-              <span>{cat.label}</span>
-            </button>
-          ))}
-        </div>
-      </nav>
-
-      {/* ── 3. FEATURED SPOTLIGHT HERO BANNER ── */}
-      {!searchQuery && activeCategory === 'all' && spotlightGame && (
-        <section className="coplay-spotlight-hero">
-          <div className="spotlight-banner-left">
-            <div className="spotlight-badge-row">
-              <span className="spotlight-tag">FEATURED ARCADE HIT</span>
-              <span className="spotlight-license-verified">
-                <ShieldCheck size={13} />
-                <span>AUTHORIZED PLAYBACK</span>
-              </span>
-            </div>
-            <h2 className="spotlight-title">{spotlightGame.title}</h2>
-            <p className="spotlight-desc">{spotlightGame.description}</p>
-            <div className="spotlight-actions">
-              <button 
-                type="button"
-                className="btn-spotlight-play" 
-                onClick={() => handlePlayGame(spotlightGame)}
+      {/* ── 2. EXPANDABLE LEFT SIDEBAR DRAWER (PLAYHOP STYLE) ── */}
+      <aside 
+        className={`coplay-left-sidebar ${sidebarHovered ? 'expanded' : ''}`}
+        onMouseEnter={() => setSidebarHovered(true)}
+        onMouseLeave={() => setSidebarHovered(false)}
+        aria-label="Game categories drawer"
+      >
+        <div className="sidebar-track">
+          {GAME_CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                className={`sidebar-cat-btn ${isActive ? 'active' : ''}`}
+                onClick={() => setActiveCategory(cat.id)}
+                title={cat.label}
               >
-                <Play size={18} fill="#000000" /> PLAY INSTANTLY
+                <div className="cat-icon-wrap">
+                  {renderCatIcon(cat.iconName, 18)}
+                </div>
+                <span className="cat-label-text">{cat.label}</span>
               </button>
-              {spotlightGame.challengeSupported && (
+            );
+          })}
+        </div>
+      </aside>
+
+      {/* ── 3. MAIN CONTENT AREA (OFFSET BESIDE SIDEBAR) ── */}
+      <div className="coplay-main-body">
+        {/* Featured Spotlight Hero Banner */}
+        {!searchQuery && activeCategory === 'all' && spotlightGame && (
+          <section className="coplay-spotlight-hero">
+            <div className="spotlight-banner-left">
+              <div className="spotlight-badge-row">
+                <span className="spotlight-tag">FEATURED ARCADE HIT</span>
+                <span className="spotlight-genre-pill">{spotlightGame.category.toUpperCase()}</span>
+              </div>
+              <h2 className="spotlight-title">{spotlightGame.title}</h2>
+              <p className="spotlight-desc">{spotlightGame.description}</p>
+              <div className="spotlight-actions">
                 <button 
                   type="button"
-                  className="btn-spotlight-squad" 
-                  onClick={() => handleChallengeGame(spotlightGame)}
+                  className="btn-spotlight-play" 
+                  onClick={() => handlePlayGame(spotlightGame)}
                 >
-                  <Swords size={16} /> CHALLENGE FRIEND
+                  <Play size={18} fill="#000000" /> PLAY INSTANTLY
                 </button>
-              )}
+                {spotlightGame.challengeSupported && (
+                  <button 
+                    type="button" 
+                    className="btn-spotlight-squad" 
+                    onClick={() => handleChallengeGame(spotlightGame)}
+                  >
+                    <Swords size={16} /> CHALLENGE FRIEND
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="spotlight-banner-right">
-            <img 
-              src={spotlightGame.thumbnail} 
-              alt={spotlightGame.title} 
-              className="spotlight-img"
-              onClick={() => handlePlayGame(spotlightGame)}
-            />
-          </div>
-        </section>
-      )}
-
-      {/* ── 4. PRODUCTION GAME CARDS GRID ── */}
-      <main className="coplay-games-grid-section">
-        <div className="grid-header-row">
-          <div>
-            <h3 className="section-heading">
-              {activeCategory === 'all' ? 'COGETHER GAME ARCADE' : `${activeCategory.replace('_', ' ').toUpperCase()} GAMES`}
-            </h3>
-            <span className="section-subtext">Verified HTML5 direct play • Transparent licensing disclosure</span>
-          </div>
-          <span className="games-counter-badge">{filteredGames.length} GAMES CATALOGED</span>
-        </div>
-
-        {filteredGames.length === 0 ? (
-          <div className="coplay-empty-state">
-            <Gamepad2 size={36} className="empty-icon" />
-            <h4>No games found in this category</h4>
-            <p>Try clearing your search query or selecting "All Games".</p>
-            <button 
-              type="button" 
-              className="btn-clear-filters"
-              onClick={() => {
-                setActiveCategory('all');
-                setSearchQuery('');
-              }}
-            >
-              Reset Filters
-            </button>
-          </div>
-        ) : (
-          <div className="poki-style-cards-grid">
-            {filteredGames.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                onPlay={handlePlayGame}
-                onChallenge={handleChallengeGame}
-                onSquad={handleSquadGame}
-                onViewDetails={(g) => setDetailsGame(g)}
-                isFavorite={favorites.includes(game.id)}
-                onToggleFavorite={toggleFavorite}
+            <div className="spotlight-banner-right">
+              <img 
+                src={spotlightGame.thumbnail} 
+                alt={spotlightGame.title} 
+                className="spotlight-img"
+                onClick={() => handlePlayGame(spotlightGame)}
               />
-            ))}
-          </div>
+            </div>
+          </section>
         )}
-      </main>
+
+        {/* Game Cards Grid */}
+        <main className="coplay-games-grid-section">
+          <div className="grid-header-row">
+            <div>
+              <h3 className="section-heading">
+                {activeCategory === 'all' ? 'ALL GAMES' : activeCategory === 'popular' ? 'POPULAR GAMES' : `${activeCategory.replace('_', ' ').toUpperCase()} GAMES`}
+              </h3>
+              <span className="section-subtext">Instant browser play • Duo camera overlay ready • Real-time challenge</span>
+            </div>
+            <span className="games-counter-badge">{filteredGames.length} GAMES</span>
+          </div>
+
+          {filteredGames.length === 0 ? (
+            <div className="coplay-empty-state">
+              <Gamepad2 size={36} className="empty-icon" />
+              <h4>No games found in this category</h4>
+              <p>Try clearing your search query or selecting "All Games".</p>
+              <button 
+                type="button" 
+                className="btn-clear-filters"
+                onClick={() => {
+                  setActiveCategory('all');
+                  setSearchQuery('');
+                }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div className="poki-style-cards-grid">
+              {filteredGames.map((game) => (
+                <GameCard
+                  key={game.id}
+                  game={game}
+                  onPlay={handlePlayGame}
+                  onChallenge={handleChallengeGame}
+                  onSquad={handleSquadGame}
+                  onViewDetails={(g) => setDetailsGame(g)}
+                  isFavorite={favorites.includes(game.id)}
+                  onToggleFavorite={toggleFavorite}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
 
       {/* ── 5. GAME DETAILS MODAL ── */}
       {detailsGame && (
@@ -383,7 +426,7 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
               <X size={18} />
             </button>
             <div className="auth-header">
-              <span className="auth-badge">CO-PLAY CLOUD PROGRESS</span>
+              <span className="auth-badge">CO-PLAY PROFILE</span>
               <h2>{authMode === 'login' ? 'LOGIN TO SAVE PROGRESS' : 'CREATE FREE ARCADE ACCOUNT'}</h2>
               <p>Save your high scores, unlock gamer avatars, and invite friends to private squad lobbies.</p>
             </div>
