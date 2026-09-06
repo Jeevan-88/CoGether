@@ -1,18 +1,17 @@
-import React from 'react';
-import { RotateCw, ArrowLeft, AlertOctagon, ShieldCheck, Keyboard } from 'lucide-react';
+import React, { useState } from 'react';
+import { RotateCw, ArrowLeft, AlertOctagon, ShieldCheck, Keyboard, Maximize, Minimize, Volume2, VolumeX, Swords, Heart } from 'lucide-react';
 import CoGetherButton from './CoGetherButton.jsx';
 import './GameViewport.css';
 
 /**
  * GameViewport
- * The central physical arcade stage for CoGether gameplay.
- * 3-Layer Physical Neomorphic Architecture:
- * - Layer 1: Dark Page Backdrop
- * - Layer 2: Raised Arcade Yellow Neomorphic Stage (--cog-neo-stage-raised)
- * - Layer 3: Recessed Dark Inset Game Frame (--cog-neo-frame-inset)
- * - Layer 4: Live Sandboxed Game Canvas
- * 
- * Fits strictly within viewport height (zero page scrolling).
+ * Clean dark theater layout matching modern gaming platforms (CrazyGames / Poki style).
+ * Features:
+ * - Dominant centered dark canvas (zero bright yellow panel)
+ * - Exact aspect ratio preservation without vertical/horizontal cropping
+ * - Integrated bottom metadata bar directly under game canvas
+ * - Inset sandbox mount point with Poki-clean loading progress
+ * - Responsive 100dvh framing
  */
 export default function GameViewport({
   game,
@@ -23,31 +22,30 @@ export default function GameViewport({
   onBack,
   countdown = null, // e.g. 3, 2, 1, 'GO!'
   resultOverlay = null,
-  isFullscreen = false
+  isFullscreen = false,
+  onToggleFullscreen,
+  onOpenChallenge
 }) {
+  const [isLiked, setIsLiked] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
   const isPortrait = game?.orientation === 'portrait';
   const frameAspectClass = isPortrait ? 'frame-aspect-portrait' : 'frame-aspect-standard';
 
+  const displayTitle = game?.title?.replace(/\(Official Open-Source\)/i, '— Open Source') || 'Game';
+
   return (
     <div className={`game-viewport-stage ${isFullscreen ? 'stage-fullscreen' : ''}`}>
-      {/* ── LAYER 2: Large Yellow Neomorphic Stage ── */}
-      <div className="yellow-neomorphic-stage">
-        {/* Physical Cabinet Header Accent */}
-        <div className="stage-cabinet-header">
-          <div className="cabinet-louver-strip" aria-hidden="true" />
-          <span className="cabinet-model-text">COGETHER ARCADE • STAGE 1</span>
-          <div className="cabinet-louver-strip" aria-hidden="true" />
-        </div>
-
-        {/* ── LAYER 3: Dark Recessed Inset Game Frame ── */}
-        <div className={`inset-game-frame ${frameAspectClass}`}>
-          {/* ── LAYER 4: Actual Sandboxed Game Iframe Mount Slot ── */}
+      <div className="dark-theater-stage">
+        {/* ── Center Stage Game Canvas Frame ── */}
+        <div className={`dark-game-frame ${frameAspectClass}`}>
+          {/* Actual Sandboxed Game Iframe Mount Slot */}
           <div
             ref={viewportRef}
             className={`game-iframe-mount-point ${launchError ? 'has-error' : ''}`}
           />
 
-          {/* ── Poki-Level Clean Arcade Loading Progress ── */}
+          {/* Clean Arcade Loading Progress */}
           {loading && !launchError && (
             <div className="game-loading-scrim fade-in">
               <div className="loading-card-arcade">
@@ -62,7 +60,7 @@ export default function GameViewport({
                   </div>
                 )}
                 <div className="loading-meta-info">
-                  <span className="loading-title">{game?.title || 'Loading Game'}</span>
+                  <span className="loading-title">{displayTitle}</span>
                   <span className="loading-sub">INITIALIZING SECURE SANDBOX...</span>
                 </div>
                 <div className="loading-bar-track">
@@ -76,7 +74,7 @@ export default function GameViewport({
             </div>
           )}
 
-          {/* ── Synchronized Challenge Countdown (3-2-1-GO) ── */}
+          {/* Synchronized Challenge Countdown (3-2-1-GO) */}
           {countdown !== null && (
             <div className="game-countdown-scrim fade-in">
               <div className="countdown-number-bounce" key={countdown}>
@@ -86,10 +84,10 @@ export default function GameViewport({
             </div>
           )}
 
-          {/* ── Game Result / Game Over Overlay ── */}
+          {/* Game Result / Game Over Overlay */}
           {resultOverlay}
 
-          {/* ── Launch Error Recovery Deck ── */}
+          {/* Launch Error Recovery Deck */}
           {launchError && (
             <div className="game-unavailable-error-card fade-in">
               <div className="error-icon-shield">
@@ -123,19 +121,73 @@ export default function GameViewport({
           )}
         </div>
 
-        {/* Physical Cabinet Footer Accent */}
-        <div className="stage-cabinet-footer">
-          <div className="cabinet-controls-pill">
-            <Keyboard size={13} className="cabinet-ctrl-icon" />
-            <span className="cabinet-ctrl-text">
-              {game?.controls?.p1 || 'Arrow Keys / Touch to Play'}
-            </span>
+        {/* ── Bottom Metadata & Control Bar (CrazyGames Style) ── */}
+        <div className="dark-stage-bottom-bar">
+          <div className="bottom-bar-left">
+            {game?.thumbnail && (
+              <div className="bottom-bar-thumb">
+                <img
+                  src={game.thumbnail}
+                  alt={game.title}
+                  className="bottom-thumb-img"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              </div>
+            )}
+            <div className="bottom-bar-titles">
+              <h2 className="bottom-game-title">{displayTitle}</h2>
+              <span className="bottom-game-category">{game?.category || 'Arcade'}</span>
+            </div>
+            {game?.sourceLicense && (
+              <span className="bottom-license-badge">
+                {game.sourceLicense}
+              </span>
+            )}
           </div>
-          {game?.sourceLicense && (
-            <span className="cabinet-license-tag">
-              {game.sourceLicense} VERIFIED
-            </span>
-          )}
+
+          <div className="bottom-bar-right">
+            {game?.controls?.p1 && (
+              <div className="bottom-controls-hint" title={game.controls.p1}>
+                <Keyboard size={13} className="ctrl-icon" />
+                <span className="ctrl-text">{game.controls.p1}</span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className={`btn-stage-action ${isLiked ? 'is-liked' : ''}`}
+              onClick={() => setIsLiked(!isLiked)}
+              title="Add to Favorites"
+              aria-label="Add to Favorites"
+            >
+              <Heart size={15} fill={isLiked ? '#e11d48' : 'none'} color={isLiked ? '#e11d48' : 'currentColor'} />
+            </button>
+
+            {game?.challengeSupported && onOpenChallenge && (
+              <button
+                type="button"
+                className="btn-stage-action btn-challenge-quick"
+                onClick={onOpenChallenge}
+                title="Challenge a Friend"
+                aria-label="Challenge a Friend"
+              >
+                <Swords size={15} />
+                <span>CHALLENGE</span>
+              </button>
+            )}
+
+            {onToggleFullscreen && (
+              <button
+                type="button"
+                className="btn-stage-action"
+                onClick={onToggleFullscreen}
+                title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+                aria-label={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+              >
+                {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

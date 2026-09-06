@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Users, Heart, ShieldAlert, ShieldCheck, Swords, Info, Gamepad2, User } from 'lucide-react';
+import { Play, Users, Heart, ShieldAlert, ShieldCheck, Swords, Info, Gamepad2, User, ExternalLink } from 'lucide-react';
 import { GameMode, LicenseStatus, DistributionStatus } from '../gameSchema.js';
 import './GameCard.css';
 
@@ -92,6 +92,20 @@ export default function GameCard({
           )}
         </div>
 
+        {/* Open in new tab button on hover */}
+        <button 
+          type="button" 
+          className="btn-card-tab-peek"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(`?mode=coplay&game=${game.id}`, '_blank');
+          }}
+          title="Play in New Tab"
+          aria-label="Play in New Tab"
+        >
+          <ExternalLink size={13} />
+        </button>
+
         {/* Info button on hover */}
         <button 
           type="button" 
@@ -101,6 +115,7 @@ export default function GameCard({
             onViewDetails(game);
           }}
           title="View game details & controls"
+          aria-label="View game details & controls"
         >
           <Info size={14} />
         </button>

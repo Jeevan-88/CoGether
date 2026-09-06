@@ -41,15 +41,21 @@ export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const roomParam = params.get('room');
-    const modeParam = params.get('mode') || 'video';
+    const modeParam = params.get('mode');
+    const gameParam = params.get('game');
+    const challengeParam = params.get('challenge');
 
     if (roomParam) {
       const storedName = localStorage.getItem('sp_username') || 'Guest_' + Math.floor(100 + Math.random() * 900);
       setActiveRoom({
         roomId: roomParam,
         username: storedName,
-        mode: modeParam
+        mode: modeParam || 'video'
       });
+    } else if (modeParam === 'coplay' || modeParam === 'games' || gameParam || challengeParam) {
+      setActiveTab('gamesHub');
+    } else if (modeParam === 'watch' || modeParam === 'cinema') {
+      setActiveTab('cinemaHub');
     }
   }, []);
 
@@ -84,7 +90,7 @@ export default function App() {
       );
     }
 
-    if (activeRoom.mode === 'merged') {
+    if (activeRoom.mode === 'merged' || activeRoom.mode === 'duo' || activeRoom.mode === 'camera') {
       return (
         <MergedCameraView
           roomId={activeRoom.roomId}

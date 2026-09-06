@@ -1,138 +1,638 @@
-.merged-view-layout {
+/* ══════════════════════════════════════════════════════════════════════
+   SEAMLESS SINGLE-CAMERA SAME-ROOM STUDIO (ZERO SPLIT LINE • BRIGHT VIVID ROOM)
+   Palette: Pure Black (#000000), Crisp White (#ffffff), Electric Yellow (#FFE500), Crimson Red (#ff0033)
+   ══════════════════════════════════════════════════════════════════════ */
+
+.seamless-merged-universe {
   min-height: 100vh;
-  background-color: #090b12;
-  color: #f8fafc;
+  background: #000000;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.merged-header {
-  height: 64px;
-  padding: 0 28px;
+/* ── 1. TOP HEADER (1PX WHITE OUTLINE, PURE BLACK) ── */
+.seamless-camera-header {
+  height: 72px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(14, 14, 18, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #000000;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+  z-index: 100;
   position: sticky;
   top: 0;
-  z-index: 100;
+  gap: 12px;
 }
 
-.brand-logo {
+.header-left-col {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: 800;
-  color: #fff;
+  gap: 16px;
 }
 
-.sparkle-glow {
-  color: #a855f7;
-}
-
-.backdrop-selector {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #cbd5e1;
-}
-
-.backdrop-dropdown {
-  padding: 6px 14px;
-  border-radius: 10px;
-  background: #181b28;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  outline: none;
-  cursor: pointer;
-}
-
-.privacy-pill {
-  display: flex;
+.btn-header-back {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(168, 85, 247, 0.15);
-  border: 1px solid rgba(168, 85, 247, 0.4);
-  color: #a855f7;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
+  background: #0d0d0d;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* AI SINGLE SHARED VIRTUAL BACKGROUND STAGE */
-.merged-stage-ai-shared {
-  flex: 1;
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px;
-  position: relative;
-  transition: background-image 0.4s ease;
+.btn-header-back:hover {
+  background: #ffffff;
+  color: #000000;
 }
 
-.ai-single-background-wrapper {
-  max-width: 900px;
-  width: 100%;
-  background: rgba(14, 14, 18, 0.75);
-  backdrop-filter: blur(16px);
-  border: 2px solid #a855f7;
-  border-radius: 28px;
-  padding: 24px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(168, 85, 247, 0.4);
+.studio-branding-wrap {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
-.ai-badge-banner {
+.studio-title-yellow {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  color: #FFE500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.studio-subtitle-cursive {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  color: #888888;
+  letter-spacing: 0.06em;
+}
+
+.header-center-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-choose-backdrop-trigger {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(168, 85, 247, 0.2);
-  border: 1px solid rgba(168, 85, 247, 0.5);
-  color: #a855f7;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 800;
-  margin-bottom: 24px;
+  background: #FFE500;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #ffffff;
+  transition: all 0.2s ease;
 }
 
-.wand-ic { color: #a855f7; }
+.btn-choose-backdrop-trigger:hover,
+.btn-choose-backdrop-trigger.active {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
 
-/* Both Camera Feeds Composited Side-by-Side on 1 Single Background */
-.ai-merged-person-strip {
+.cutout-mode-switcher-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #0d0d0d;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  padding: 3px;
+  border-radius: 24px;
+}
+
+.btn-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #888888;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-mode-toggle:hover {
+  color: #ffffff;
+}
+
+.btn-mode-toggle.active-toggle {
+  background: #FFE500;
+  color: #000000;
+  box-shadow: 0 0 12px rgba(255, 229, 0, 0.3);
+}
+
+.studio-brightness-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #0d0d0d;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.sun-icon {
+  color: #FFE500;
+}
+
+.brightness-slider {
+  width: 70px;
+  height: 4px;
+  accent-color: #FFE500;
+  cursor: pointer;
+}
+
+.bright-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FFE500;
+}
+
+.chevron-ic {
+  transition: transform 0.2s ease;
+}
+
+.chevron-ic.rotated {
+  transform: rotate(180deg);
+}
+
+.header-right-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-room-code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0d0d0d;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.btn-room-code-badge:hover {
+  border-color: #FFE500;
+}
+
+.code-label {
+  color: #888888;
+  font-size: 9px;
+}
+
+.code-val {
+  color: #FFE500;
+  font-weight: 900;
+}
+
+.copied-yellow {
+  color: #FFE500;
+}
+
+.participants-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.btn-fs-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  width: 36px;
+  height: 36px;
+  background: #0d0d0d;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-fs-toggle:hover {
+  border-color: #FFE500;
+  color: #FFE500;
+}
+
+/* ── 2. BACKGROUND CHOOSER POPUP MODAL ── */
+.backdrop-picker-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.backdrop-picker-card {
   width: 100%;
+  max-width: 820px;
+  background: #080808;
+  border: 2px solid #FFE500;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255, 229, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.ai-person-slot {
-  flex: 1;
-  aspect-ratio: 16 / 10;
-  border-radius: 20px;
+.picker-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 14px;
+}
+
+.picker-main-title {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  font-weight: 900;
+  color: #FFE500;
+  text-transform: uppercase;
+}
+
+.picker-subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: #aaaaaa;
+}
+
+.btn-close-picker {
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.backdrops-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.backdrop-preset-tile {
+  position: relative;
+  height: 120px;
+  border-radius: 16px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-  background: #000;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.ai-person-slot.local {
-  border-color: #a855f7;
+.backdrop-preset-tile:hover {
+  border-color: #FFE500;
+  transform: translateY(-3px);
 }
 
-.ai-person-slot.remote {
-  border-color: #3b82f6;
+.backdrop-preset-tile.active-tile {
+  border-color: #FFE500;
+  box-shadow: 0 0 20px rgba(255, 229, 0, 0.4);
+}
+
+.backdrop-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.backdrop-tile-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.backdrop-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.backdrop-cat {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: #FFE500;
+}
+
+.active-check-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  background: #FFE500;
+  color: #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.custom-bg-input-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 16px;
+  flex-wrap: wrap;
+}
+
+.custom-url-form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.url-form-icon {
+  color: #FFE500;
+}
+
+.input-custom-bg-url {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  outline: none;
+}
+
+.btn-apply-custom-url {
+  background: #FFE500;
+  border: none;
+  color: #000000;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.btn-upload-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #111111;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-upload-file:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* ── 3. MAIN UNIFIED SINGLE CAMERA CANVAS STAGE (ZERO SPLIT LINE) ── */
+.seamless-camera-stage-viewport {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+}
+
+.studio-media-error-pill {
+  position: absolute;
+  top: 14px;
+  background: #ff0033;
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  z-index: 20;
+}
+
+/* 
+   THE UNIFIED SINGLE-CAMERA CANVAS WRAPPER
+   16:9 bright cinematic studio stage with NO split line and NO dimming!
+*/
+.unified-single-camera-wrapper {
+  width: 100%;
+  max-width: 1380px;
+  height: calc(100vh - 190px);
+  min-height: 520px;
+  border-radius: 28px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  background: #000000;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 45px rgba(255, 229, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unified-composite-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Participant Discreet Name Pills */
+.studio-participant-tags-row {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.studio-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.local-pill {
+  border-color: #FFE500;
+}
+
+.remote-pill {
+  border-color: #ffffff;
+}
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.green-dot {
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.pill-mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pill-mic.mic-on {
+  color: #22c55e;
+}
+
+.pill-mic.mic-off {
+  color: #ff0033;
+}
+
+/* Waiting Buddy Pill */
+.studio-waiting-buddy-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1.5px dashed #FFE500;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.2s ease;
+}
+
+.studio-waiting-buddy-card:hover {
+  background: #FFE500;
+  color: #000000;
+}
+
+.yellow-txt {
+  color: #FFE500;
+}
+
+/* Top Watermark */
+.studio-top-watermark {
+  position: absolute;
+  top: 18px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+  z-index: 10;
+}
+
+.watermark-live-dot {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 900;
+  color: #22c55e;
+  letter-spacing: 0.08em;
+}
+
+.watermark-info {
+  font-size: 11px;
+  color: #cccccc;
+  font-weight: 600;
+}
+
+/* ── 4. CONTROL BAR (BOTTOM DECK) ── */
+.seamless-bottom-deck {
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 90;
+}
+
+/* Mobile Tweaks */
+@media (max-width: 900px) {
+  .unified-single-camera-wrapper {
+    height: calc(100vh - 180px);
+  }
+  .backdrops-preset-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

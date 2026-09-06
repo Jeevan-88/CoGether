@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   X, Play, Users, Swords, Gamepad2, ShieldCheck, 
   ShieldAlert, Sparkles, Monitor, RotateCcw, AlertTriangle, 
-  CheckCircle, ArrowRight 
+  CheckCircle, ArrowRight, ExternalLink 
 } from 'lucide-react';
 import { GameMode, LicenseStatus, DistributionStatus } from '../gameSchema.js';
 import CoGetherButton from './CoGetherButton.jsx';
@@ -221,6 +221,16 @@ export default function GameDetailsModal({
                   CHALLENGE A FRIEND
                 </CoGetherButton>
               )}
+              <CoGetherButton
+                variant="ghost"
+                onClick={() => {
+                  onClose();
+                  window.open(`?mode=coplay&game=${game.id}`, '_blank');
+                }}
+                icon={ExternalLink}
+              >
+                PLAY IN NEW TAB
+              </CoGetherButton>
             </div>
           )}
         </div>

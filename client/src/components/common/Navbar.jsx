@@ -95,7 +95,7 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
             className={`nav-menu-btn ${activeTab === 'telepresence' ? 'active' : ''}`}
             onClick={() => onTabChange('telepresence')}
           >
-            Co-Study
+            Duo Camera
           </button>
         </nav>
 

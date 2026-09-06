@@ -1,7 +1,8 @@
 /* ==========================================================================
-   CO-WATCH CINEMA & ENTERTAINMENT UNIVERSE CSS
+   CO-WATCH CINEMA & OTT PLATFORM HUB CSS
    Strict 4-Color Palette: Pitch Black (#000000), Crisp White (#ffffff), 
    Electric Yellow (#FFE500), Crimson Red (#ff0033)
+   Zero AI Emojis - High Contrast, Authentic Netflix-Style Rows
    ========================================================================== */
 
 .cowatch-cinema-universe {
@@ -10,7 +11,8 @@
   color: #ffffff;
   font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   overflow-x: hidden;
-  padding-bottom: 90px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── 1. FLOATING PURE BLACK NAVBAR (1PX WHITE OUTLINE & LIGHT CURVE) ── */
@@ -328,128 +330,684 @@
   border-color: #ffffff;
 }
 
-/* ── 2. TOP-LEVEL ENTERTAINMENT PILLARS STRIP ── */
-.entertainment-pillars-section {
-  padding: 24px 24px 0 24px;
+/* ── 2. HERO ANNOUNCEMENT BANNER WITH YELLOW/BLACK PAPER BADGE ── */
+.cowatch-banner-wrapper {
   max-width: 1540px;
-  margin: 0 auto;
+  margin: 20px auto 0 auto;
+  padding: 0 24px;
 }
 
-.pillars-container {
+.cowatch-announcement-banner {
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.banner-text-content {
+  max-width: 820px;
+}
+
+.banner-sub-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FFE500;
+  letter-spacing: 0.12em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.banner-headline {
+  margin: 0 0 6px 0;
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.banner-description {
+  margin: 0;
+  font-size: 13px;
+  color: #aaaaaa;
+  line-height: 1.5;
+}
+
+/* ── YELLOW & BLACK PAPER / STICKER STYLE "CLICK HERE!" BADGE ── */
+.paper-style-click-badge {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-}
-
-.pillars-switch-bar {
-  display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 16px;
-  background: #080808;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 8px 12px;
-  border-radius: 50px;
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.pillar-switch-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: #ffffff;
-  padding: 10px 24px;
-  border-radius: 40px;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  background: #FFE500 !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+  padding: 12px 28px;
+  border-radius: 12px;
   cursor: pointer;
-  position: relative;
-  transition: all 0.25s ease;
-  white-space: nowrap;
-}
-
-.pillar-switch-btn:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.pillar-switch-btn.active {
-  background: #FFE500;
-  color: #000000;
-  border-color: #FFE500;
-  box-shadow: 0 4px 20px rgba(255, 229, 0, 0.35);
-}
-
-.pillar-btn-icon {
-  font-size: 18px;
-}
-
-.pillar-tagline-text {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: #aaaaaa;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin: 4px 0 0 0;
+  box-shadow: 4px 4px 0px #ffffff, 6px 6px 0px #ff0033;
+  transform: rotate(-1.5deg);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: center;
 }
 
-/* ── 3. OTT STREAMING PLATFORMS ROW ── */
-.ott-platforms-strip {
-  padding: 18px 24px;
-  max-width: 1540px;
-  margin: 0 auto;
+.paper-style-click-badge:hover {
+  transform: rotate(0deg) scale(1.05);
+  box-shadow: 6px 6px 0px #ffffff, 9px 9px 0px #ff0033;
 }
 
-.platforms-container {
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.platforms-container::-webkit-scrollbar {
-  display: none;
+.paper-style-click-badge.active-view {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 4px 4px 0px #FFE500, 6px 6px 0px #ff0033;
 }
 
-.platforms-pills-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 4px 2px;
+.paper-badge-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  background: #000000;
+  color: #FFE500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
 }
 
-.platform-pill-btn {
+.paper-badge-main-text {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #080808;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
 }
 
-.platform-pill-btn:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-  background: #141414;
-}
-
-.platform-pill-btn.active {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
-}
-
-.platform-pill-badge {
+.paper-badge-sub {
   font-family: 'Space Mono', monospace;
   font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-top: 3px;
+}
+
+/* ── 3. SEARCH BAR & LANGUAGE / GENRE FILTER SECTION ── */
+.search-filter-section {
+  max-width: 1540px;
+  margin: 20px auto 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.search-bar-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 20px;
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.search-bar-box:focus-within {
+  border-color: #FFE500;
+}
+
+.search-icon {
+  color: #FFE500;
+  flex-shrink: 0;
+}
+
+.cinema-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: 'Space Grotesk', sans-serif;
+  outline: none;
+}
+
+.btn-clear-search {
+  background: transparent;
+  border: none;
+  color: #888888;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.languages-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.languages-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── CUSTOM DIRECT URL STREAM BAR ── */
+.custom-url-stream-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #080808;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  padding: 10px 18px;
+  border-radius: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-url-stream-bar:focus-within {
+  border-color: #FFE500;
+  box-shadow: 0 0 20px rgba(255, 229, 0, 0.2);
+}
+
+.btn-stream-now-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFE500;
+  border: 1.5px solid #000000;
+  color: #000000;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+.btn-stream-now-action:hover {
+  background: #ffffff;
+}
+
+.canvas-sub-info {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.7);
+  font-weight: 700;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ── IN-PLAYER ORIGIN BLOCKED CARD (NBA.COM / ESPN X-FRAME-OPTIONS) ── */
+.in-player-origin-blocked-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #181818 0%, #050505 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+  z-index: 5;
+}
+
+.blocked-alert-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 0, 51, 0.15);
+  border: 1.5px solid #ff0033;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+
+.in-player-origin-blocked-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.in-player-origin-blocked-card p {
+  max-width: 620px;
+  margin: 0 0 24px 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #aaaaaa;
+}
+
+.in-player-origin-blocked-card code {
+  background: #111111;
+  color: #FFE500;
+  font-family: 'Space Mono', monospace;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.blocked-solution-deck {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  max-width: 680px;
+  width: 100%;
+}
+
+.solution-option-box {
+  background: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 18px;
+  text-align: left;
+}
+
+.solution-option-box.highlight-border {
+  border-color: #FFE500;
+  box-shadow: 0 0 20px rgba(255, 229, 0, 0.15);
+}
+
+.sol-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 900;
+  color: #FFE500;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.solution-option-box h4 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.solution-option-box p {
+  margin: 0 0 12px 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #888888;
+}
+
+.btn-launch-nba-direct {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFE500;
+  border: 1.5px solid #000000;
+  color: #000000;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+.btn-launch-nba-direct:hover {
+  background: #ffffff;
+}
+
+.portal-bridge-card {
+  max-width: 680px;
+  background: #000000;
+  border: 2px solid #FFE500;
+  border-radius: 24px;
+  padding: 36px 40px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(255, 229, 0, 0.25);
+}
+
+.portal-bridge-badge-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #141414;
+  border: 1px solid rgba(255, 229, 0, 0.4);
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.bridge-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 900;
+  color: #FFE500;
+  letter-spacing: 0.08em;
+}
+
+.bridge-title {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.bridge-desc {
+  margin: 0 0 22px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #aaaaaa;
+}
+
+.bridge-desc code {
+  color: #FFE500;
+  font-family: 'Space Mono', monospace;
+  background: #141414;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.bridge-sync-status-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.bridge-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meta-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: #888888;
+  letter-spacing: 0.06em;
+}
+
+.meta-val {
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.green-txt {
+  color: #22c55e;
+}
+
+.bridge-actions-deck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-launch-portal-game {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFE500;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #ffffff;
+  transition: all 0.2s ease;
+}
+
+.btn-launch-portal-game:hover {
+  background: #ffffff;
+}
+
+.btn-copy-bridge-invite {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #000000;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-copy-bridge-invite:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.bridge-footnote {
+  margin: 0;
+  font-size: 11px;
+  color: #777777;
+  line-height: 1.45;
+}
+
+/* ── 4. PUBLIC DOMAIN MASTERPIECES ON YELLOW CANVAS ── */
+.netflix-rows-section {
+  max-width: 1540px;
+  margin: 28px auto 44px auto;
+  padding: 36px 32px 44px 32px;
+  background: #FFE500 !important; /* Yellow Canvas */
+  color: #000000 !important;
+  border-radius: 30px; /* Big soft curves */
+  border: 2px solid #000000;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255, 229, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.yellow-canvas-header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.15);
+  padding-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.netflix-row-header-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000000 !important;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  font-family: 'Space Grotesk', 'Anton', sans-serif;
+}
+
+.canvas-count-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 900;
+  background: #000000;
+  color: #FFE500;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+}
+
+.public-domain-movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
+}
+
+.public-domain-movie-card {
+  position: relative;
+  cursor: pointer;
+  border-radius: 24px; /* Ovalish curved corners */
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.3s ease;
+  z-index: 1;
+}
+
+.public-domain-movie-card:hover {
+  transform: scale(1.04) translateY(-4px);
+  z-index: 20;
+}
+
+.pd-poster-frame {
+  position: relative;
+  width: 100%;
+  padding-top: 60%; /* 16:9 cinematic ratio */
+  border-radius: 24px; /* Ovalish curved corners */
+  overflow: hidden;
+  background: #000000;
+  border: 2.5px solid #000000;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.public-domain-movie-card:hover .pd-poster-frame {
+  border-color: #000000;
+  box-shadow: 6px 6px 0px #000000, 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+
+.pd-poster-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 22px;
+}
+
+.pd-poster-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 45%, rgba(0,0,0,0.85) 100%);
+  border-radius: 22px;
+}
+
+.pd-category-pill {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 900;
+  background: #ff0033;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+  z-index: 2;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.pd-year-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 900;
+  background: #000000;
+  color: #FFE500;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 3px 8px;
+  border-radius: 6px;
+  z-index: 2;
+}
+
+.pd-card-bottom-title {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  right: 14px;
+  z-index: 2;
+}
+
+.pd-movie-title-txt {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+}
+
+/* ── HOVER REVEAL OVERLAY WITH DESCRIPTION & WATCH NOW ── */
+.pd-hover-reveal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  border-radius: 22px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 5;
+}
+
+.public-domain-movie-card:hover .pd-hover-reveal-overlay {
+  opacity: 1;
+}
+
+.pd-hover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.pd-hover-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
   font-weight: 900;
   background: #ff0033;
   color: #ffffff;
@@ -458,19 +1016,1195 @@
   letter-spacing: 0.06em;
 }
 
-.platform-pill-btn.active .platform-pill-badge {
-  background: #000000;
+.pd-hover-cat {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 800;
   color: #FFE500;
 }
 
-.platform-pill-name {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.pd-hover-title {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
-/* ── 4. SYNCHRONIZED THEATER STAGE ── */
+.pd-hover-desc {
+  margin: 0 0 10px 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #cccccc;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.btn-pd-watch-now {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #FFE500;
+  border: 1.5px solid #000000;
+  color: #000000;
+  padding: 9px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+.btn-pd-watch-now:hover {
+  background: #ffffff;
+}
+
+/* ── 5. DEDICATED FULL-SCREEN THEATER ROOM VIEW (80% VIEWPORT COVERAGE) ── */
+.dedicated-theater-room-view {
+  width: 100%;
+  max-width: 1540px;
+  margin: 16px auto 44px auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.theater-room-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 18px;
+  padding: 16px 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.theater-header-left-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-back-to-catalog {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #000000;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back-to-catalog:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.theater-now-playing-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.live-sync-indicator {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 900;
+  color: #ff0033;
+  letter-spacing: 0.1em;
+}
+
+.theater-now-playing-name {
+  margin: 2px 0 0 0;
+  font-size: 20px;
+  font-weight: 900;
+  color: #FFE500;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.theater-category-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: #aaaaaa;
+}
+
+.theater-header-right-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stream-engine-switcher-cluster {
+  display: flex;
+  align-items: center;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.btn-engine-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #aaaaaa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-engine-toggle.active-engine {
+  background: #FFE500;
+  color: #000000;
+  box-shadow: 0 2px 8px rgba(255, 229, 0, 0.3);
+}
+
+.btn-theater-invite-squad {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFE500;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #ffffff;
+  transition: all 0.2s ease;
+}
+
+.btn-theater-invite-squad:hover {
+  background: #ffffff;
+}
+
+/* 80% Viewport Player Stage */
+.theater-eighty-percent-player-stage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #050505;
+  border: 2px solid #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 1);
+}
+
+.player-stage-inner-box {
+  position: relative;
+  width: 100%;
+  padding-top: 54%; /* Covering ~80% of viewport in 16:9 ratio */
+  background: #000000;
+}
+
+.fullscreen-archive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Floating Squad Cam Tiles */
+.theater-floating-squad-tiles {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.squad-floating-tile {
+  width: 120px;
+  height: 80px;
+  background: #111111;
+  border: 1.5px solid #FFE500;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.9);
+}
+
+.remote-tile {
+  border-color: #ff0033;
+}
+
+.floating-cam-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.host-avatar {
+  background: #FFE500;
+  color: #000000;
+}
+
+.guest-avatar {
+  background: #ff0033;
+  color: #ffffff;
+}
+
+.floating-cam-name {
+  font-size: 9.5px;
+  font-family: 'Space Mono', monospace;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+.floating-live-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+}
+
+/* Master Control Deck */
+.theater-master-control-deck {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #0d0d0d;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.2);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.control-deck-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-deck-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #181818;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-deck-toggle.active {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.volume-boost-cluster {
+  background: #141414;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  padding: 6px 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.boosted-volume {
+  color: #FFE500;
+}
+
+.boost-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.volume-slider-boost {
+  accent-color: #FFE500;
+  cursor: pointer;
+  width: 110px;
+}
+
+.super-boost-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 900;
+  background: #ff0033;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.quality-selector-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #181818;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #ffffff;
+}
+
+.quality-select-dropdown {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+
+.quality-select-dropdown option {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* ── SYNCHRONIZED CHAT SECTION (BELOW THE PLAYER) ── */
+.theater-bottom-synced-chat-section {
+  width: 100%;
+}
+
+.theater-synced-chat-card {
+  background: #080808;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.synced-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #111111;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.chat-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #FFE500;
+}
+
+.chat-header-title h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.chat-room-code-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  color: #aaaaaa;
+}
+
+.synced-chat-messages-container {
+  height: 180px;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #050505;
+}
+
+.synced-chat-single-bubble {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.chat-bubble-author {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.chat-bubble-author strong {
+  font-size: 11.5px;
+  color: #FFE500;
+}
+
+.chat-bubble-time {
+  font-size: 9.5px;
+  font-family: 'Space Mono', monospace;
+  color: #777777;
+}
+
+.chat-bubble-text {
+  margin: 0;
+  font-size: 12px;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.synced-chat-input-bar {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  background: #0d0d0d;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  gap: 12px;
+}
+
+.chat-typing-input {
+  flex: 1;
+  background: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #ffffff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  outline: none;
+}
+
+.chat-typing-input:focus {
+  border-color: #FFE500;
+}
+
+.btn-chat-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFE500;
+  border: 1.5px solid #000000;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-chat-send:hover {
+  background: #ffffff;
+}
+
+.no-movies-found-box {
+  text-align: center;
+  padding: 60px 20px;
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: #888888;
+}
+
+.no-movies-found-box h4 {
+  margin: 12px 0 6px 0;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.btn-reset-filters {
+  margin-top: 18px;
+  background: #FFE500;
+  color: #000000;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ── 5. FULL-PAGE OTT UNIVERSE (5 CARDS PER ROW, OVALISH / SOFT RECTANGULAR) ── */
+.ott-universe-full-page {
+  max-width: 1540px;
+  margin: 20px auto 40px auto;
+  padding: 0 24px;
+}
+
+.ott-universe-header {
+  margin-bottom: 28px;
+}
+
+.btn-return-cinema-hub {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #080808;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: all 0.2s ease;
+}
+
+.btn-return-cinema-hub:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.ott-sub-mono {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FFE500;
+  letter-spacing: 0.12em;
+  display: block;
+}
+
+.ott-page-main-title {
+  margin: 4px 0 6px 0;
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+/* Master DRM Category Switcher Tabs */
+.ott-drm-master-tabs {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.drm-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #080808;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.drm-tab-btn:hover {
+  border-color: #ffffff;
+  background: #141414;
+}
+
+.drm-tab-btn.active-red-tab {
+  background: #ff0033;
+  color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 4px 16px rgba(255, 0, 51, 0.4);
+}
+
+.drm-tab-btn.active-yellow-tab {
+  background: #FFE500;
+  color: #000000;
+  border-color: #000000;
+  box-shadow: 0 4px 16px rgba(255, 229, 0, 0.4);
+}
+
+/* ── DRM CATEGORY INTRO BANNERS ── */
+.drm-category-intro-banner {
+  background: #080808;
+  border-radius: 24px;
+  padding: 26px 30px;
+  margin-bottom: 28px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+}
+
+.red-border-banner {
+  border: 2px solid #ff0033;
+}
+
+.yellow-border-banner {
+  border: 2px solid #FFE500;
+}
+
+.intro-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.red-icon {
+  color: #ff0033;
+}
+
+.yellow-icon {
+  color: #FFE500;
+}
+
+.drm-intro-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  color: #ff0033;
+  letter-spacing: 0.1em;
+}
+
+.drm-intro-tag.yellow-txt {
+  color: #FFE500;
+}
+
+.drm-intro-heading {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.drm-intro-desc {
+  margin: 0 0 20px 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #aaaaaa;
+}
+
+/* 2-User Connection Step Grid */
+.drm-two-user-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.two-user-step-card {
+  background: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+
+.user-step-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 900;
+  color: #FFE500;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.two-user-step-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.two-user-step-card p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #888888;
+}
+
+/* Open Stream Quick Input Form */
+.category-open-stream-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 14px;
+  border-radius: 12px;
+}
+
+.open-stream-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12.5px;
+  outline: none;
+}
+
+.btn-open-stream-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFE500;
+  border: 1.5px solid #000000;
+  color: #000000;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+.btn-open-stream-submit:hover {
+  background: #ffffff;
+}
+
+/* OTT Detail Drawer - RED CANVAS */
+.ott-platform-detail-drawer {
+  background: #ff0033 !important; /* Red Canvas */
+  color: #ffffff !important;
+  border: 2.5px solid #ffffff;
+  border-radius: 28px; /* Ovalish curves */
+  padding: 32px;
+  margin-bottom: 34px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 45px rgba(255, 0, 51, 0.4);
+}
+
+.drawer-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 20px;
+  margin-bottom: 22px;
+}
+
+.drawer-title-col {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.drawer-logo-badge-wrap {
+  width: 58px;
+  height: 58px;
+  background: #000000;
+  border: 2px solid #ffffff;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  box-shadow: 2px 2px 0px #000000;
+}
+
+.drawer-header-logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.drawer-platform-name {
+  margin: 0 0 4px 0;
+  font-size: 26px;
+  font-weight: 900;
+  color: #FFE500 !important; /* Yellow title on Red Canvas */
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-family: 'Space Grotesk', 'Anton', sans-serif;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.drawer-drm-note {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #ffffff !important;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.btn-close-drawer {
+  background: #000000;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+.btn-close-drawer:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.drawer-tech-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #000000 !important;
+  border: 2px solid #ffffff;
+  padding: 18px 22px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.9);
+}
+
+.tech-info-icon {
+  color: #FFE500;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.drawer-tech-explanation strong {
+  font-size: 14px;
+  color: #FFE500;
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 800;
+}
+
+.drawer-tech-explanation p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #ffffff;
+}
+
+.drawer-steps-deck {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.drawer-step-box {
+  background: #000000 !important;
+  border: 2px solid #ffffff;
+  border-radius: 18px; /* Ovalish curves */
+  padding: 22px;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
+}
+
+.step-tag-pill {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  color: #FFE500 !important;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.drawer-step-box h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.drawer-step-box p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #cccccc;
+}
+
+.drawer-action-triggers {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-launch-ott-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFE500;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #000000;
+  transition: transform 0.2s ease;
+}
+
+.btn-launch-ott-tab:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+}
+
+.btn-copy-room-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #000000;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+.btn-copy-room-trigger:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.btn-copy-squad-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #000000;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+.btn-copy-squad-trigger:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* ── 5. FULL-PAGE OTT UNIVERSE (CLEAN, SPACIOUS & HIGH-CONTRAST) ── */
+.ott-universe-full-page {
+  max-width: 1540px;
+  margin: 20px auto 44px auto;
+  padding: 0 24px;
+}
+
+.ott-universe-clean-header {
+  margin-bottom: 30px;
+}
+
+.ott-header-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.btn-return-cinema-hub {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #000000;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+  padding: 9px 20px;
+  border-radius: 30px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-return-cinema-hub:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.ott-count-pill {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FFE500;
+  letter-spacing: 0.08em;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.ott-page-main-title {
+  margin: 0 0 6px 0;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-family: 'Space Grotesk', 'Anton', sans-serif;
+}
+
+.ott-page-subtitle {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: #888888;
+}
+
+/* Category Filter Tabs in OTT Universe */
+.ott-category-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.ott-category-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+.ott-cat-filter-btn {
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.ott-cat-filter-btn:hover {
+  border-color: #ffffff;
+  background: #141414;
+}
+
+.ott-cat-filter-btn.active {
+  background: #FFE500;
+  color: #000000;
+  border-color: #FFE500;
+}
+
+/* ── 5 PER ROW: PURE LOGO OVALISH CARDS (HIGH CONTRAST & READABLE) ── */
+.ott-platforms-five-col-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+}
+
+.ott-ovalish-card {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.ott-logo-matte-container {
+  width: 100%;
+  height: 112px;
+  background: radial-gradient(circle at center, #1e1e1e 0%, #0d0d0d 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 24px; /* Soft ovalish 65% roundness */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ott-ovalish-card:hover .ott-logo-matte-container,
+.ott-ovalish-card.active-ott-card .ott-logo-matte-container {
+  transform: translateY(-6px) scale(1.04);
+  border-color: #FFE500;
+  background: radial-gradient(circle at center, #262626 0%, #121212 100%);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.95), 0 0 24px rgba(255, 229, 0, 0.25);
+}
+
+.ott-exact-official-logo {
+  max-width: 100%;
+  max-height: 54px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.9));
+  transition: transform 0.25s ease;
+}
+
+.ott-ovalish-card:hover .ott-exact-official-logo {
+  transform: scale(1.08);
+}
+
+.ott-text-fallback-logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+/* ── 6. SYNCHRONIZED THEATER STAGE ── */
 .live-theater-stage-container {
   max-width: 1540px;
   margin: 20px auto;
@@ -479,7 +2213,7 @@
 
 .theater-inner-box {
   background: #050505;
-  border: 1px solid #ff0033;
+  border: 1px solid #ffffff;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95);
@@ -508,6 +2242,7 @@
   font-size: 18px;
   font-weight: 900;
   color: #FFE500;
+  text-transform: uppercase;
 }
 
 .theater-submeta {
@@ -518,25 +2253,20 @@
 
 .btn-close-theater {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   color: #ffffff;
   padding: 6px 14px;
   border-radius: 6px;
-  font-size: 11px;
   font-family: 'Space Mono', monospace;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
-}
-
-.btn-close-theater:hover {
-  background: #ff0033;
-  border-color: #ff0033;
 }
 
 .theater-screen-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 52%; /* 16:9 theater ratio */
+  padding-top: 52%;
   background: #000000;
 }
 
@@ -605,19 +2335,6 @@
   border-radius: 50%;
 }
 
-.floating-party-emoji {
-  position: absolute;
-  bottom: 30px;
-  font-size: 32px;
-  animation: floatUp 2s ease-out forwards;
-  pointer-events: none;
-}
-
-@keyframes floatUp {
-  0% { transform: translateY(0) scale(0.8); opacity: 1; }
-  100% { transform: translateY(-120px) scale(1.4); opacity: 0; }
-}
-
 .theater-bottom-deck {
   display: flex;
   align-items: center;
@@ -653,27 +2370,6 @@
   color: #22c55e;
 }
 
-.theater-reactions-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-reaction-tap {
-  background: #181818;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 16px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-
-.btn-reaction-tap:hover {
-  transform: scale(1.2);
-  border-color: #FFE500;
-}
-
 .btn-invite-squad-action {
   display: flex;
   align-items: center;
@@ -689,466 +2385,135 @@
   cursor: pointer;
 }
 
-/* ── 5. SPOTLIGHT HERO BANNER ── */
-.cowatch-hero-spotlight {
-  max-width: 1540px;
-  margin: 10px auto 28px auto;
-  padding: 0 24px;
+/* ── 7. LUXURY FOOTER ── */
+.cowatch-luxury-footer {
+  margin-top: auto;
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 32px 24px;
 }
 
-.hero-spotlight-card {
-  position: relative;
-  min-height: 440px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-}
-
-.hero-spotlight-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-size: cover;
-  background-position: center 25%;
-  z-index: 1;
-}
-
-.hero-spotlight-gradient-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(0deg, #000000 0%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.2) 100%),
-              linear-gradient(90deg, #000000 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
-  z-index: 2;
-}
-
-.hero-spotlight-content {
-  position: relative;
-  z-index: 3;
-  padding: 40px;
-  max-width: 780px;
-}
-
-.spotlight-top-tags {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.badge-featured {
-  background: #FFE500;
-  color: #000000;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 900;
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.08em;
-}
-
-.badge-platform {
-  background: #ff0033;
-  color: #ffffff;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 900;
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-
-.badge-rating {
-  background: #181818;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #ffffff;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 900;
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-
-.spotlight-title {
-  font-family: 'Space Grotesk', 'Anton', sans-serif;
-  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
-  font-weight: 900;
-  color: #ffffff;
-  margin: 0 0 12px 0;
-  line-height: 1.05;
-  text-transform: uppercase;
-}
-
-.spotlight-synopsis {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #cccccc;
-  margin: 0 0 18px 0;
-  max-width: 680px;
-}
-
-.spotlight-metadata-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  font-size: 12px;
-  color: #aaaaaa;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.spotlight-metadata-row strong {
-  color: #ffffff;
-}
-
-.spotlight-actions-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.btn-spotlight-watch-now {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #FFE500;
-  border: 2px solid #FFE500;
-  color: #000000;
-  padding: 12px 28px;
-  border-radius: 40px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-spotlight-watch-now:hover {
-  background: #ffffff;
-  border-color: #ffffff;
-  transform: translateY(-2px);
-}
-
-.btn-spotlight-copy-code {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0, 0, 0, 0.8);
-  border: 1px solid #ffffff;
-  color: #ffffff;
-  padding: 12px 24px;
-  border-radius: 40px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-spotlight-copy-code:hover {
-  background: #ffffff;
-  color: #000000;
-}
-
-/* ── 6. GIANT CINEMATIC CARDS GRID ── */
-.giant-cinema-cards-section {
+.footer-inner-wrapper {
   max-width: 1540px;
   margin: 0 auto;
-  padding: 0 24px;
-}
-
-.section-title-header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
-.section-tag-mono {
+.footer-left-col {
+  max-width: 480px;
+}
+
+.footer-brand-title {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+}
+
+.footer-brand-title span {
+  color: #FFE500;
+}
+
+.footer-brand-desc {
+  margin: 0;
+  font-size: 12px;
+  color: #888888;
+  line-height: 1.5;
+}
+
+.footer-center-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-webrtc-badge {
   font-family: 'Space Mono', monospace;
   font-size: 10px;
-  font-weight: 800;
-  color: #FFE500;
-  letter-spacing: 0.12em;
-  display: block;
-}
-
-.section-heading {
-  margin: 4px 0 0 0;
-  font-size: 22px;
   font-weight: 900;
-  color: #ffffff;
-  letter-spacing: -0.01em;
-}
-
-.count-pill {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 800;
-  background: #111111;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-
-.giant-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 28px;
-}
-
-.giant-movie-card {
-  background: #080808;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-}
-
-.giant-movie-card:hover {
-  transform: translateY(-8px);
-  border-color: #FFE500;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
-}
-
-.card-poster-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%; /* 16:9 ratio */
-  background: #111111;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.card-poster-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.giant-movie-card:hover .card-poster-img {
-  transform: scale(1.06);
-}
-
-.card-poster-vignette {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 40%, rgba(0,0,0,0.85) 100%);
-}
-
-.card-badge-container {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 2;
-}
-
-.platform-tag-pill {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  font-weight: 900;
-  background: #ff0033;
-  color: #ffffff;
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.06em;
-}
-
-.rating-tag-pill {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  font-weight: 900;
-  background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #FFE500;
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-
-.card-hover-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  z-index: 3;
-}
-
-.giant-movie-card:hover .card-hover-overlay {
-  opacity: 1;
-}
-
-.hover-play-circle {
-  width: 52px;
-  height: 52px;
-  background: #FFE500;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: scale(0.9);
-  transition: transform 0.2s ease;
-}
-
-.giant-movie-card:hover .hover-play-circle {
-  transform: scale(1);
-}
-
-.hover-cta-label {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 11px;
-  font-weight: 900;
-  color: #ffffff;
+  color: #22c55e;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  padding: 4px 10px;
+  border-radius: 4px;
 }
 
-.card-info-box {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+.footer-room-info {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #aaaaaa;
 }
 
-.card-title-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.card-title-text {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-}
-
-.card-title-text:hover {
+.footer-room-info strong {
   color: #FFE500;
 }
 
-.card-year-tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: #888888;
-  font-weight: 700;
-}
-
-.card-sub-info {
+.btn-footer-back-home {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: #aaaaaa;
-  margin-bottom: 12px;
-}
-
-.card-dot-sep {
-  color: #555555;
-}
-
-.card-synopsis-text {
-  font-size: 12px;
-  line-height: 1.5;
-  color: #999999;
-  margin: 0 0 14px 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card-cast-text {
-  font-size: 11px;
-  color: #777777;
-  margin-bottom: 18px;
-  margin-top: auto;
-}
-
-.card-cast-text strong {
-  color: #aaaaaa;
-}
-
-.btn-card-launch-party {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #FFE500;
-  border: 1px solid #FFE500;
-  color: #000000;
-  padding: 10px;
-  border-radius: 8px;
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 30px;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-card-launch-party:hover {
+.btn-footer-back-home:hover {
   background: #ffffff;
-  border-color: #ffffff;
   color: #000000;
 }
 
 /* ── RESPONSIVE MOBILE TWEAKS ── */
+@media (max-width: 1400px) {
+  .netflix-horizontal-cards-row {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .netflix-horizontal-cards-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .ott-platforms-five-col-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .cinema-top-header {
     width: calc(100% - 24px);
     padding: 0 14px;
     height: 76px;
   }
-  .cowatch-bold-yellow-title {
-    font-size: 1.8rem;
+  .cowatch-announcement-banner {
+    padding: 18px 16px;
   }
-  .giant-cards-grid {
-    grid-template-columns: 1fr;
+  .paper-style-click-badge {
+    width: 100%;
   }
-  .hero-spotlight-content {
-    padding: 24px 18px;
+  .netflix-horizontal-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .ott-platforms-five-col-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .footer-inner-wrapper {
+    flex-direction: column;
+    text-align: center;
   }
 }

@@ -8,6 +8,7 @@ import GameInfo from './GameInfo.jsx';
 import GameSocialRail from './GameSocialRail.jsx';
 import ChallengeModal from './ChallengeModal.jsx';
 import GameResultOverlay from './GameResultOverlay.jsx';
+import DraggableCameraOverlay from './DraggableCameraOverlay.jsx';
 import './GameShell.css';
 
 const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
@@ -28,7 +29,7 @@ function GameSocialRailContainer({
   onCountdownTrigger,
   onPeerScoreChange
 }) {
-  const webrtc = useWebRTC(roomId, username, SIGNALING_URL);
+  const webrtc = useWebRTC(roomId, username, SIGNALING_URL, { autoStartMedia: isChallengeMode });
 
   useEffect(() => {
     if (onPeerReadyChange) {
@@ -55,26 +56,41 @@ function GameSocialRailContainer({
   };
 
   return (
-    <GameSocialRail
-      roomId={roomId}
-      currentUsername={username}
-      localStream={webrtc.localStream}
-      remoteStreams={webrtc.remoteStreams}
-      micEnabled={webrtc.micEnabled}
-      cameraEnabled={webrtc.cameraEnabled}
-      isScreenSharing={webrtc.isScreenSharing}
-      connected={webrtc.connected}
-      chatMessages={webrtc.chatMessages}
-      onToggleMic={webrtc.toggleMic}
-      onToggleCamera={webrtc.toggleCamera}
-      onToggleScreenShare={webrtc.toggleScreenShare}
-      onSendMessage={webrtc.sendChatMessage}
-      onLeaveSession={onLeaveSession}
-      isChallengeMode={isChallengeMode}
-      isLocalReady={isLocalReady}
-      isPeerReady={webrtc.peerReady}
-      onToggleReady={handleToggleReady}
-    />
+    <>
+      <GameSocialRail
+        roomId={roomId}
+        currentUsername={username}
+        localStream={webrtc.localStream}
+        remoteStreams={webrtc.remoteStreams}
+        micEnabled={webrtc.micEnabled}
+        cameraEnabled={webrtc.cameraEnabled}
+        isScreenSharing={webrtc.isScreenSharing}
+        connected={webrtc.connected}
+        chatMessages={webrtc.chatMessages}
+        onToggleMic={webrtc.toggleMic}
+        onToggleCamera={webrtc.toggleCamera}
+        onToggleScreenShare={webrtc.toggleScreenShare}
+        onSendMessage={webrtc.sendChatMessage}
+        onLeaveSession={onLeaveSession}
+        isChallengeMode={isChallengeMode}
+        isLocalReady={isLocalReady}
+        isPeerReady={webrtc.peerReady}
+        onToggleReady={handleToggleReady}
+      />
+
+      {webrtc.cameraEnabled && (
+        <DraggableCameraOverlay
+          localStream={webrtc.localStream}
+          remoteStreams={webrtc.remoteStreams}
+          currentUsername={username}
+          micEnabled={webrtc.micEnabled}
+          cameraEnabled={webrtc.cameraEnabled}
+          onToggleMic={webrtc.toggleMic}
+          onToggleCamera={webrtc.toggleCamera}
+          onClose={webrtc.toggleCamera}
+        />
+      )}
+    </>
   );
 }
 
@@ -264,7 +280,7 @@ export default function GameShell({
         hasActiveSession={activeMode === 'CHALLENGE'}
       />
 
-      {/* ── Main Gameplay Body (Game Hero + Optional Social Rail) ── */}
+      {/* ── Main Gameplay Body (Game Hero + Right-Side Social Rail) ── */}
       <div className="game-shell-body">
         <div className="game-stage-column">
           {/* Centered Game Viewport (Dominant 65-80% area) */}
@@ -277,6 +293,8 @@ export default function GameShell({
             onBack={onClose}
             countdown={countdown}
             isFullscreen={isFullscreen}
+            onToggleFullscreen={handleToggleFullscreen}
+            onOpenChallenge={handleOpenChallenge}
             resultOverlay={
               resultData ? (
                 <GameResultOverlay
@@ -292,17 +310,14 @@ export default function GameShell({
               ) : null
             }
           />
-
-          {/* Minimal Info Tray (Below game, hidden in fullscreen) */}
-          {!isFullscreen && <GameInfo game={game} />}
         </div>
 
-        {/* ── Non-Overlapping Social Rail (Mounted ONLY in Challenge Mode) ── */}
-        {activeMode === 'CHALLENGE' && (
+        {/* ── Non-Overlapping Social Rail (Right-side chat & players) ── */}
+        {!isFullscreen && (
           <GameSocialRailContainer
             roomId={roomId}
             username={currentUsername}
-            isChallengeMode={true}
+            isChallengeMode={activeMode === 'CHALLENGE'}
             isLocalReady={isLocalReady}
             onToggleReady={setIsLocalReady}
             onLeaveSession={handleLeaveSession}

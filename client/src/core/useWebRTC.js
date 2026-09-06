@@ -9,11 +9,12 @@ const ICE_SERVERS = {
   ]
 };
 
-export function useWebRTC(roomId, username, signalingUrl) {
+export function useWebRTC(roomId, username, signalingUrl, options = { autoStartMedia: true }) {
+  const autoStart = options?.autoStartMedia !== false;
   const [localStream, setLocalStream] = useState(null);
   const [remoteStreams, setRemoteStreams] = useState({}); // id -> { stream, username, micEnabled, cameraEnabled }
-  const [micEnabled, setMicEnabled] = useState(true);
-  const [cameraEnabled, setCameraEnabled] = useState(true);
+  const [micEnabled, setMicEnabled] = useState(autoStart);
+  const [cameraEnabled, setCameraEnabled] = useState(autoStart);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [connected, setConnected] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
@@ -87,16 +88,18 @@ export function useWebRTC(roomId, username, signalingUrl) {
 
     async function initMediaAndSocket() {
       let stream = null;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      } catch (err) {
-        console.warn('Could not get video+audio, trying audio only...', err);
+      if (autoStart) {
         try {
-          stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-          setCameraEnabled(false);
-        } catch (audioErr) {
-          console.error('Could not get any media stream', audioErr);
-          setMediaError('Camera/Microphone access denied or unavailable.');
+          stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        } catch (err) {
+          console.warn('Could not get video+audio, trying audio only...', err);
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+            setCameraEnabled(false);
+          } catch (audioErr) {
+            console.error('Could not get any media stream', audioErr);
+            setMediaError('Camera/Microphone access denied or unavailable.');
+          }
         }
       }
 
@@ -122,8 +125,8 @@ export function useWebRTC(roomId, username, signalingUrl) {
         socket.emit('join-room', {
           roomId,
           username,
-          micEnabled: true,
-          cameraEnabled: stream?.getVideoTracks().length > 0
+          micEnabled: autoStart ? (stream?.getAudioTracks().length > 0) : false,
+          cameraEnabled: autoStart ? (stream?.getVideoTracks().length > 0) : false
         });
       });
 
@@ -255,8 +258,28 @@ export function useWebRTC(roomId, username, signalingUrl) {
   }, [roomId, username, signalingUrl, createPeerConnection]);
 
   // Toggle Microphone
-  const toggleMic = () => {
-    if (!localStreamRef.current) return;
+  const toggleMic = async () => {
+    if (!localStreamRef.current || localStreamRef.current.getAudioTracks().length === 0) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: cameraEnabled, audio: true });
+        localStreamRef.current = stream;
+        setLocalStream(stream);
+        setMicEnabled(true);
+        stream.getTracks().forEach((track) => {
+          Object.entries(peersRef.current).forEach(([remoteId, pc]) => {
+            const sender = pc.addTrack(track, stream);
+            if (!sendersRef.current[remoteId]) sendersRef.current[remoteId] = {};
+            if (track.kind === 'audio') sendersRef.current[remoteId].audioSender = sender;
+            if (track.kind === 'video') sendersRef.current[remoteId].videoSender = sender;
+          });
+        });
+        socketRef.current?.emit('toggle-media', { micEnabled: true, cameraEnabled });
+        return;
+      } catch (err) {
+        console.warn('Could not activate microphone on demand:', err);
+        return;
+      }
+    }
     const newMicState = !micEnabled;
     localStreamRef.current.getAudioTracks().forEach((track) => {
       track.enabled = newMicState;
@@ -266,8 +289,29 @@ export function useWebRTC(roomId, username, signalingUrl) {
   };
 
   // Toggle Camera
-  const toggleCamera = () => {
-    if (!localStreamRef.current) return;
+  const toggleCamera = async () => {
+    if (!localStreamRef.current || localStreamRef.current.getVideoTracks().length === 0) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localStreamRef.current = stream;
+        setLocalStream(stream);
+        setCameraEnabled(true);
+        setMicEnabled(true);
+        stream.getTracks().forEach((track) => {
+          Object.entries(peersRef.current).forEach(([remoteId, pc]) => {
+            const sender = pc.addTrack(track, stream);
+            if (!sendersRef.current[remoteId]) sendersRef.current[remoteId] = {};
+            if (track.kind === 'video') sendersRef.current[remoteId].videoSender = sender;
+            if (track.kind === 'audio') sendersRef.current[remoteId].audioSender = sender;
+          });
+        });
+        socketRef.current?.emit('toggle-media', { micEnabled: true, cameraEnabled: true });
+        return;
+      } catch (err) {
+        console.warn('Could not activate camera on demand:', err);
+        return;
+      }
+    }
     const newCameraState = !cameraEnabled;
     localStreamRef.current.getVideoTracks().forEach((track) => {
       track.enabled = newCameraState;

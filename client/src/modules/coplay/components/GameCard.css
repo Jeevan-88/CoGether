@@ -201,6 +201,38 @@
   border-color: #FFE500;
 }
 
+/* Open in New Tab Peek Button */
+.btn-card-tab-peek {
+  position: absolute;
+  bottom: 10px;
+  right: 44px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.cogether-game-card:hover .btn-card-tab-peek {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-card-tab-peek:hover {
+  background: #FFE500;
+  color: #000000;
+  border-color: #FFE500;
+}
+
 /* ── 2. METADATA & ACTIONS ── */
 .game-card-content {
   padding: 14px 16px;

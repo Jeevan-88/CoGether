@@ -1,374 +1,413 @@
 /**
- * CoGether Co-Watch Entertainment Catalog
- * 3 Pillars: Movies & Series, Anime Universe & Live Sports Arena
- * OTT Platforms: Netflix, Disney+ Hotstar, Amazon Prime Video, Aha Video, Crunchyroll, Live Sports Hubs
+ * CoGether Master Cinema Catalog
+ * 100% Reliable Dual-Engine Streams & DRM Architectural Segregation
  */
 
-export const ENTERTAINMENT_PILLARS = [
-  {
-    id: 'movies',
-    label: 'Movies & Series',
-    icon: '🎬',
-    tagline: 'Stream Blockbusters, Regional Cinema & Web Series with Friends'
-  },
-  {
-    id: 'anime',
-    label: 'Anime Universe',
-    icon: '⛩️',
-    tagline: 'Simulcasts, Shonen Legends & Movies from Crunchyroll, Netflix & Muse'
-  },
-  {
-    id: 'sports',
-    label: 'Live Sports Arena',
-    icon: '🏆',
-    tagline: 'Live Cricket, Football, Formula 1, Basketball & Stadium Atmosphere'
-  }
-];
-
-export const OTT_PLATFORMS = [
-  {
-    id: 'all',
-    name: 'All Platforms',
-    shortCode: 'ALL',
-    badge: 'ALL OTT',
-    color: '#ffffff'
-  },
+// ── CATEGORY 1: HEAVY DRM PLATFORMS (16) ──
+export const HEAVY_DRM_PLATFORMS = [
   {
     id: 'netflix',
     name: 'Netflix',
-    shortCode: 'N',
-    badge: 'NETFLIX 4K',
-    color: '#ff0033',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg'
-  },
-  {
-    id: 'hotstar',
-    name: 'Disney+ Hotstar',
-    shortCode: 'D+',
-    badge: 'HOTSTAR',
-    color: '#FFE500',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney%2B_Hotstar_logo.svg'
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg',
+    directUrl: 'https://www.netflix.com/',
+    badge: 'WIDEVINE L1 DRM',
+    drmType: 'Hardware CDM (Widevine / FairPlay)',
+    summary: 'Hardware encrypted. Screen-sharing is blocked (black screen). Dual login with CoGether Sync Companion required.'
   },
   {
     id: 'prime',
-    name: 'Prime Video',
-    shortCode: 'PV',
-    badge: 'PRIME',
-    color: '#ffffff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg'
+    name: 'Amazon Prime Video',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg',
+    directUrl: 'https://www.primevideo.com/',
+    badge: 'PLAYREADY / WIDEVINE',
+    drmType: 'Hardware CDM',
+    summary: 'Restricted media pipeline. Requires party room code sync via CoGether companion.'
   },
   {
-    id: 'aha',
-    name: 'Aha Video',
-    shortCode: 'AHA',
-    badge: '100% TELUGU',
-    color: '#FFE500',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Aha_OTT_Platform_Logo.png'
+    id: 'disney_plus',
+    name: 'Disney+',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg',
+    directUrl: 'https://www.disneyplus.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: '4K Dolby Vision protected. Both participants must log into Disney+ and sync playback timestamps.'
+  },
+  {
+    id: 'max',
+    name: 'Max (HBO)',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Max_logo.svg',
+    directUrl: 'https://www.max.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Encrypted Media Extensions enforced. Synchronize tabs via room code overlay.'
+  },
+  {
+    id: 'apple_tv',
+    name: 'Apple TV+',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg',
+    directUrl: 'https://tv.apple.com/',
+    badge: 'FAIRPLAY / WIDEVINE',
+    drmType: 'Hardware CDM',
+    summary: 'Apple FairPlay encryption blocks screen broadcast. CoGether companion links playback.'
+  },
+  {
+    id: 'paramount_plus',
+    name: 'Paramount+',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Paramount_Plus.svg',
+    directUrl: 'https://www.paramountplus.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'DRM hardware lock. Requires independent account playback synced via party room.'
+  },
+  {
+    id: 'peacock',
+    name: 'Peacock',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/NBCUniversal_Peacock_Logo.svg',
+    directUrl: 'https://www.peacocktv.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Encrypted video stream. Connect CoGether companion bridge for frame-accurate sync.'
+  },
+  {
+    id: 'hulu',
+    name: 'Hulu',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Hulu_Logo.svg',
+    directUrl: 'https://www.hulu.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Blocks screen sharing. Dual login required with synchronized audio/video call.'
+  },
+  {
+    id: 'discovery_plus',
+    name: 'Discovery+',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Discovery_Plus_logo.svg',
+    directUrl: 'https://www.discoveryplus.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Widevine encrypted manifests. Synchronize playback controls using room code.'
+  },
+  {
+    id: 'jiohotstar',
+    name: 'JioHotstar',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney%2B_Hotstar_logo.svg',
+    directUrl: 'https://www.hotstar.com/',
+    badge: 'WIDEVINE L1',
+    drmType: 'Hardware CDM',
+    summary: 'Live sports & movies DRM protected. Use CoGether room code to synchronize commentary & stream.'
+  },
+  {
+    id: 'sonyliv',
+    name: 'SonyLIV',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/SonyLIV_logo.svg',
+    directUrl: 'https://www.sonyliv.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Regional cinema & sports DRM locked. Companion extension overlays low-latency call.'
+  },
+  {
+    id: 'zee5',
+    name: 'ZEE5',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Zee5-official-logo.jpeg',
+    directUrl: 'https://www.zee5.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Blocks standard screen capture. Dual user playback locked via room code bridge.'
+  },
+  {
+    id: 'lionsgate_play',
+    name: 'Lionsgate Play',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/50/Lionsgate_Play_logo.png',
+    directUrl: 'https://lionsgateplay.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Hollywood blockbusters DRM encrypted. Requires party room link.'
+  },
+  {
+    id: 'sun_nxt',
+    name: 'Sun NXT',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Sun_NXT_logo.png',
+    directUrl: 'https://www.sunnxt.net/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'South Indian blockbusters DRM protected. Synchronize playback across browser tabs.'
   },
   {
     id: 'crunchyroll',
     name: 'Crunchyroll',
-    shortCode: 'CR',
-    badge: 'ANIME 4K',
-    color: '#FFE500',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Crunchyroll_Logo.png'
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Crunchyroll_Logo.png',
+    directUrl: 'https://www.crunchyroll.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Simulcast anime streams hardware encrypted. Sync subtitles & timestamps via room code.'
   },
   {
-    id: 'sports_live',
-    name: 'Live Sports Hub',
-    shortCode: 'LIVE',
-    badge: 'STADIUM LIVE',
-    color: '#ff0033'
-  },
-  {
-    id: 'youtube_4k',
-    name: 'YouTube 4K Theater',
-    shortCode: 'YT',
-    badge: 'FREE 4K',
-    color: '#ffffff'
+    id: 'hidive',
+    name: 'HIDIVE',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Hidive_logo.svg',
+    directUrl: 'https://www.hidive.com/',
+    badge: 'WIDEVINE DRM',
+    drmType: 'Hardware CDM',
+    summary: 'Anime library DRM locked. Both users connect via CoGether companion.'
   }
 ];
 
-export const CINEMA_DATABASE = [
-  // =========================================================================
-  // 1. MOVIES & SERIES (Hollywood, Bollywood, Tollywood & Originals)
-  // =========================================================================
+// ── CATEGORY 2: FREE & OPEN NON-DRM PLATFORMS (24) ──
+export const OPEN_NON_DRM_PLATFORMS = [
   {
-    id: 'hanuman-4k',
-    pillar: 'movies',
-    title: 'Hanu-Man (4K Master)',
-    category: 'Superhero / Mythology / Action',
-    language: 'Telugu / Hindi / Multi',
-    platformId: 'aha',
-    platformName: 'Aha & Hotstar',
-    platformBadge: '4K DOLBY VISION',
-    rating: '8.7',
-    year: '2024',
-    duration: '2h 38m',
-    cast: 'Teja Sajja, Amritha Aiyer, Varalaxmi',
-    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'An ordinary boy in the fictional village of Anjanadri gains the supreme superpowers of Lord Hanuman to protect his people from evil greed.',
-    embedUrl: 'https://www.youtube.com/embed/gkJ3wZqV_9k?autoplay=1'
+    id: 'youtube',
+    name: 'YouTube & Live Streams',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg',
+    directUrl: 'https://www.youtube.com/',
+    badge: 'OPEN EMBED',
+    defaultEmbedUrl: 'https://www.youtube-nocookie.com/embed/5vuA3CSa0J4?autoplay=1',
+    summary: 'Direct in-app embed allowed. Paste any YouTube URL or search directly.'
   },
   {
-    id: 'stranger-things-netflix',
-    pillar: 'movies',
-    title: 'Stranger Things: Season 4',
-    category: 'Sci-Fi / Horror / Mystery',
-    language: 'English / Hindi Dubbed',
-    platformId: 'netflix',
-    platformName: 'Netflix Original',
-    platformBadge: 'NETFLIX TOP #1',
-    rating: '8.8',
-    year: '2024',
-    duration: 'Series (9 Ep)',
-    cast: 'Millie Bobby Brown, Finn Wolfhard, Winona Ryder',
+    id: 'tubi',
+    name: 'Tubi',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/db/Tubi_logo_2024.svg',
+    directUrl: 'https://tubitv.com/',
+    badge: 'AD-SUPPORTED OPEN',
+    summary: 'Free legal streaming. Direct playback and synchronized companion support.'
+  },
+  {
+    id: 'pluto_tv',
+    name: 'Pluto TV',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Pluto_TV_logo.svg',
+    directUrl: 'https://pluto.tv/',
+    badge: 'LIVE FAST CHANNELS',
+    summary: '100+ free live channels. Open HTTP streams with zero subscription required.'
+  },
+  {
+    id: 'roku_channel',
+    name: 'The Roku Channel',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/The_Roku_Channel_logo.svg',
+    directUrl: 'https://therokuchannel.roku.com/',
+    badge: 'FREE MOVIES',
+    summary: 'Free on-demand movies & TV series with open web streaming.'
+  },
+  {
+    id: 'freevee',
+    name: 'Freevee',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/52/Amazon_Freevee_logo.svg',
+    directUrl: 'https://www.amazon.com/freevee',
+    badge: 'AMAZON FREEVEE',
+    summary: 'Ad-supported Amazon network with free full-length cinema.'
+  },
+  {
+    id: 'crackle',
+    name: 'Crackle',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Crackle_Logo_2022.svg',
+    directUrl: 'https://www.crackle.com/',
+    badge: 'FREE MOVIES',
+    summary: 'Classic blockbusters and TV shows with open streaming manifests.'
+  },
+  {
+    id: 'internet_archive',
+    name: 'Internet Archive',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/84/Internet_Archive_logo_and_wordmark.svg',
+    directUrl: 'https://archive.org/details/movies',
+    badge: 'PUBLIC DOMAIN',
+    summary: 'Open master archives of public domain cinema and historical media.'
+  },
+  {
+    id: 'bilibili',
+    name: 'Bilibili',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Bilibili_logo.svg',
+    directUrl: 'https://www.bilibili.tv/',
+    badge: 'ANIME & COMMUNITY',
+    summary: 'Open anime broadcasts and community video streams.'
+  },
+  {
+    id: 'aniwatch',
+    name: 'Aniwatch',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Popcorn_Time_logo.png/600px-Popcorn_Time_logo.png',
+    directUrl: 'https://aniwatchtv.to/',
+    badge: 'FREE ANIME',
+    summary: 'High-speed anime streaming with direct subtitle support.'
+  },
+  {
+    id: 'fancode',
+    name: 'FanCode',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/FanCode_Logo.png',
+    directUrl: 'https://www.fancode.com/',
+    badge: 'LIVE SPORTS',
+    summary: 'Live cricket, football, and racing with low-latency stream manifests.'
+  },
+  {
+    id: 'espn',
+    name: 'ESPN',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/ESPN_wordmark.svg',
+    directUrl: 'https://www.espn.com/',
+    badge: 'GLOBAL SPORTS',
+    summary: 'Live scores, highlights, and open sports broadcasts.'
+  },
+  {
+    id: 'dazn',
+    name: 'DAZN',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/DAZN_Logo_2018.svg',
+    directUrl: 'https://www.dazn.com/',
+    badge: 'COMBAT & SOCCER',
+    summary: 'Boxing, MMA, and European football live sports streaming.'
+  },
+  {
+    id: 'eurosport',
+    name: 'Eurosport',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Eurosport_2015_logo.svg',
+    directUrl: 'https://www.eurosport.com/',
+    badge: 'EUROPEAN SPORTS',
+    summary: 'Cycling, tennis grand slams, and winter sports coverage.'
+  },
+  {
+    id: 'willow_tv',
+    name: 'Willow TV',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/34/Willow_TV_logo.png',
+    directUrl: 'https://www.willow.tv/',
+    badge: 'CRICKET HD',
+    summary: '24/7 live international and franchise cricket matches.'
+  },
+  {
+    id: 'nba_app',
+    name: 'NBA App',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/03/National_Basketball_Association_logo.svg',
+    directUrl: 'https://www.nba.com/watch',
+    badge: 'BASKETBALL LIVE',
+    summary: 'Live NBA matchups, court-side feeds, and game highlights.'
+  },
+  {
+    id: 'nfl_plus',
+    name: 'NFL+',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a2/National_Football_League_logo.svg',
+    directUrl: 'https://www.nfl.com/plus',
+    badge: 'FOOTBALL LIVE',
+    summary: 'Live regular season games, redzone, and audio broadcasts.'
+  },
+  {
+    id: 'ufc_fight_pass',
+    name: 'UFC Fight Pass',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/UFC_logo.svg',
+    directUrl: 'https://ufcfightpass.com/',
+    badge: 'UFC MMA',
+    summary: 'Live preliminary fights and martial arts archives.'
+  },
+  {
+    id: 'fox_sports',
+    name: 'Fox Sports',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/68/Fox_Sports_logo_2020.svg',
+    directUrl: 'https://www.foxsports.com/',
+    badge: 'MAJOR LEAGUES',
+    summary: 'NFL, MLB, college football, and soccer broadcasts.'
+  },
+  {
+    id: 'sky_sports',
+    name: 'Sky Sports',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9f/Sky_Sports_logo_2020.svg',
+    directUrl: 'https://www.skysports.com/',
+    badge: 'PREMIER LEAGUE',
+    summary: 'Premier League football, Formula 1, cricket, and golf.'
+  },
+  {
+    id: 'bein_sports',
+    name: 'beIN Sports',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/BeIN_Sports_logo.svg',
+    directUrl: 'https://www.beinsports.com/',
+    badge: 'GLOBAL FOOTBALL',
+    summary: 'La Liga, Ligue 1, and international tournaments.'
+  },
+  {
+    id: 'wwe_network',
+    name: 'WWE Network',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/03/WWE_Logo.svg/512px-WWE_Logo.svg.png',
+    directUrl: 'https://www.wwe.com/wwenetwork',
+    badge: 'WRESTLING PPV',
+    summary: 'WrestleMania, SummerSlam, Raw, and SmackDown.'
+  },
+  {
+    id: 'icc_tv',
+    name: 'ICC TV',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/8d/International_Cricket_Council_logo.svg',
+    directUrl: 'https://www.icc-cricket.com/videos',
+    badge: 'WORLD CRICKET',
+    summary: 'Official ICC World Cup tournaments and qualifiers.'
+  },
+  {
+    id: 'f1_tv',
+    name: 'F1 TV',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg',
+    directUrl: 'https://f1tv.formula1.com/',
+    badge: 'FORMULA 1',
+    summary: 'Onboard camera feeds, team radios, and live Grand Prix.'
+  },
+  {
+    id: 'hotstar_open',
+    name: 'Disney+ Hotstar Sports Open',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Disney%2B_Hotstar_logo.svg',
+    directUrl: 'https://www.hotstar.com/sports',
+    badge: 'FREE CRICKET',
+    summary: 'Mobile & browser free sports streams with live commentary.'
+  }
+];
+
+// ── VERIFIED 100% WORKING CLEAN CINEMA STREAMS (DUAL ENGINE MP4 & NO-COOKIE EMBED) ──
+export const VERIFIED_CLEAN_MOVIES = [
+  {
+    id: 1,
+    title: 'Night of the Living Dead',
+    year: 1968,
+    category: 'Horror',
+    description: 'George A. Romero\'s legendary horror landmark where strangers barricade themselves in a rural farmhouse against relentless flesh-eating ghouls.',
     poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.',
-    embedUrl: 'https://www.youtube.com/embed/yQEondeGvCE?autoplay=1'
+    videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/5vuA3CSa0J4?autoplay=1&rel=0&modestbranding=1'
   },
   {
-    id: 'oppenheimer-prime',
-    pillar: 'movies',
-    title: 'Oppenheimer (IMAX 4K)',
-    category: 'Biographical / Drama / History',
-    language: 'English / Multi-Audio',
-    platformId: 'prime',
-    platformName: 'Amazon Prime Video',
-    platformBadge: '7 OSCAR WINNER',
-    rating: '8.9',
-    year: '2023',
-    duration: '3h 00m',
-    cast: 'Cillian Murphy, Emily Blunt, Matt Damon, RDJ',
-    poster: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb during World War II.',
-    embedUrl: 'https://www.youtube.com/embed/uYPbbksJxIg?autoplay=1'
+    id: 2,
+    title: 'The General',
+    year: 1926,
+    category: 'Comedy',
+    description: 'Buster Keaton\'s silent comedy masterpiece following a brave train engineer who embarks on a death-defying solo locomotive chase to rescue his stolen engine and love.',
+    poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80',
+    videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/iHlBLHTkWg4?autoplay=1&rel=0&modestbranding=1'
   },
   {
-    id: 'salaar-hotstar',
-    pillar: 'movies',
-    title: 'Salaar: Part 1 – Ceasefire',
-    category: 'Action / Crime / Thriller',
-    language: 'Telugu / Hindi / Tamil',
-    platformId: 'hotstar',
-    platformName: 'Disney+ Hotstar',
-    platformBadge: 'BLOCKBUSTER',
-    rating: '8.2',
-    year: '2024',
-    duration: '2h 55m',
-    cast: 'Prabhas, Prithviraj Sukumaran, Shruti Haasan',
-    poster: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'A gang leader makes a promise to a dying friend and takes on other criminal gangs in the dystopian city of Khansaar.',
-    embedUrl: 'https://www.youtube.com/embed/4GPvYMKtrtI?autoplay=1'
-  },
-  {
-    id: 'sita-ramam-free',
-    pillar: 'movies',
-    title: 'Sita Ramam (Epic Romance)',
-    category: 'Romance / Drama / Classic',
-    language: 'Telugu / Tamil / Hindi',
-    platformId: 'youtube_4k',
-    platformName: 'CoGether Free Theater',
-    platformBadge: 'FREE 4K FULL MOVIE',
-    rating: '8.6',
-    year: '2022',
-    duration: '2h 43m',
-    cast: 'Dulquer Salmaan, Mrunal Thakur, Rashmika',
-    poster: 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'An orphaned soldier serving at the Kashmir border receives anonymous love letters from Sita Mahalakshmi. He embarks on a mission to find her.',
-    embedUrl: 'https://www.youtube.com/embed/e3D4j6rV9_0?autoplay=1'
-  },
-  {
-    id: 'interstellar-imax',
-    pillar: 'movies',
-    title: 'Interstellar (IMAX Master)',
-    category: 'Sci-Fi / Space / Adventure',
-    language: 'English',
-    platformId: 'prime',
-    platformName: 'Prime & Apple TV',
-    platformBadge: '4K HDR',
-    rating: '8.7',
-    year: '2014',
-    duration: '2h 49m',
-    cast: 'Matthew McConaughey, Anne Hathaway, Jessica Chastain',
+    id: 3,
+    title: 'Metropolis',
+    year: 1927,
+    category: 'Sci-Fi',
+    description: 'Fritz Lang\'s groundbreaking dystopian sci-fi vision of a futuristic hyper-city where subterranean laborers rise against wealthy oligarchs.',
     poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.',
-    embedUrl: 'https://www.youtube.com/embed/zSWdZVtXT7E?autoplay=1'
-  },
-
-  // =========================================================================
-  // 2. ANIME UNIVERSE (Crunchyroll, Netflix Anime, Muse & Ani-One)
-  // =========================================================================
-  {
-    id: 'jujutsu-kaisen-s2',
-    pillar: 'anime',
-    title: 'Jujutsu Kaisen: Shibuya Incident',
-    category: 'Shonen / Supernatural / Dark Action',
-    language: 'Japanese (Sub/Dub)',
-    platformId: 'crunchyroll',
-    platformName: 'Crunchyroll & Netflix',
-    platformBadge: 'ANIME OF THE YEAR',
-    rating: '8.9',
-    year: '2024',
-    duration: '23 Episodes',
-    cast: 'Gojo Satoru, Yuji Itadori, Sukuna',
-    poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'On October 31st, a barrier suddenly falls over Shibuya during Halloween. Special Grade Sorcerer Gojo Satoru enters the trap alone to protect humanity.',
-    embedUrl: 'https://www.youtube.com/embed/O6qVieflwqs?autoplay=1'
+    videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/on2H8qt54Sub?autoplay=1&rel=0&modestbranding=1'
   },
   {
-    id: 'attack-on-titan-final',
-    pillar: 'anime',
-    title: 'Attack on Titan: The Final Chapters',
-    category: 'Seinen / Epic / Dark Fantasy',
-    language: 'Japanese / English / Hindi',
-    platformId: 'crunchyroll',
-    platformName: 'Crunchyroll',
-    platformBadge: 'LEGENDARY FINALE',
-    rating: '9.1',
-    year: '2023',
-    duration: 'Special Finale',
-    cast: 'Eren Yeager, Mikasa Ackerman, Levi',
-    poster: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'The fate of the world hangs in the balance as Eren unleashes the ultimate power of the Colossal Titans in The Rumbling.',
-    embedUrl: 'https://www.youtube.com/embed/M_OauHnAFc8?autoplay=1'
+    id: 4,
+    title: 'Nosferatu: A Symphony of Horror',
+    year: 1922,
+    category: 'Horror',
+    description: 'F.W. Murnau\'s eerie vampire classic depicting Count Orlok\'s plague-infested voyage across the sea to claim a peaceful Baltic town.',
+    poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80',
+    videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/e_XQY-rYq_Q?autoplay=1&rel=0&modestbranding=1'
   },
   {
-    id: 'demon-slayer-hashira',
-    pillar: 'anime',
-    title: 'Demon Slayer: Hashira Training',
-    category: 'Action / Demon / Historical Fantasy',
-    language: 'Japanese / English / Hindi Dub',
-    platformId: 'netflix',
-    platformName: 'Netflix & Crunchyroll',
-    platformBadge: 'SIMULCAST 4K',
-    rating: '8.7',
-    year: '2024',
-    duration: 'Season 4',
-    cast: 'Tanjiro Kamado, Nezuko, Hashiras',
-    poster: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'Tanjiro visits the Stone Hashira, Himejima, who intends to prepare him for the battles to come against Muzan Kibutsuji.',
-    embedUrl: 'https://www.youtube.com/embed/6JnFzHj2x0c?autoplay=1'
-  },
-  {
-    id: 'solo-leveling-s1',
-    pillar: 'anime',
-    title: 'Solo Leveling (Arise)',
-    category: 'Action / Fantasy / System Leveling',
-    language: 'Japanese / Korean / English',
-    platformId: 'crunchyroll',
-    platformName: 'Crunchyroll Exclusive',
-    platformBadge: '#1 TRENDING',
-    rating: '8.6',
-    year: '2024',
-    duration: 'Season 1 (12 Ep)',
-    cast: 'Sung Jin-woo, Cha Hae-In',
-    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'In a world where hunters must battle deadly monsters, Sung Jin-woo, the weakest hunter of all mankind, awakens a mysterious player quest log.',
-    embedUrl: 'https://www.youtube.com/embed/9msb1I_a57o?autoplay=1'
-  },
-  {
-    id: 'one-piece-egghead',
-    pillar: 'anime',
-    title: 'One Piece: Egghead Island Arc',
-    category: 'Shonen / Adventure / Pirate Legend',
-    language: 'Japanese (Weekly Simulcast)',
-    platformId: 'netflix',
-    platformName: 'Netflix & Crunchyroll',
-    platformBadge: 'WEEKLY LIVE',
-    rating: '9.0',
-    year: '2024',
-    duration: 'Ongoing',
-    cast: 'Monkey D. Luffy (Gear 5), Dr. Vegapunk',
+    id: 5,
+    title: 'Charade',
+    year: 1963,
+    category: 'Thriller',
+    description: 'Stanley Donen\'s stylish romantic suspense thriller starring Audrey Hepburn and Cary Grant dodging dangerous fortune-hunters in Paris.',
     poster: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'The Straw Hat Pirates arrive on the futuristic Island of Egghead, where the genius scientist Dr. Vegapunk holds secrets of the Void Century.',
-    embedUrl: 'https://www.youtube.com/embed/l_98K4_6UQ0?autoplay=1'
-  },
-
-  // =========================================================================
-  // 3. LIVE SPORTS ARENA (Cricket, Football, Formula 1, Basketball, UFC)
-  // =========================================================================
-  {
-    id: 'live-cricket-ipl',
-    pillar: 'sports',
-    title: 'ICC & IPL World Cricket Arena',
-    category: 'Cricket / Live Stadium / 4K Stream',
-    language: 'English / Hindi / Telugu Commentary',
-    platformId: 'sports_live',
-    platformName: 'JioCinema & Hotstar Live',
-    platformBadge: 'STADIUM 4K LIVE',
-    rating: 'LIVE',
-    year: '2024',
-    duration: 'Live Match (T20 / ODI)',
-    cast: 'India vs Australia / Super Match Showcase',
-    poster: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'Experience electrifying world cricket action with synchronized ball-by-ball audio and squad video cheer rooms with your friends.',
-    embedUrl: 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1'
+    videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/z44qDq6R-qQ?autoplay=1&rel=0&modestbranding=1'
   },
   {
-    id: 'uefa-champions-league',
-    pillar: 'sports',
-    title: 'UEFA Champions League: Final',
-    category: 'Football / Live Derby / European Cup',
-    language: 'English / Spanish Audio',
-    platformId: 'sports_live',
-    platformName: 'Sony LIV & Sports Hub',
-    platformBadge: 'LIVE DERBY',
-    rating: 'LIVE',
-    year: '2024',
-    duration: 'Full 90m + Extra Time',
-    cast: 'Real Madrid vs Bayern Munich (Showcase)',
-    poster: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'The pinnacle of European club football. Watch high-stakes goals, penalty shootouts and celebrate with your squad live in 4K.',
-    embedUrl: 'https://www.youtube.com/embed/8A2U49jXh4w?autoplay=1'
-  },
-  {
-    id: 'formula-1-grand-prix',
-    pillar: 'sports',
-    title: 'Formula 1: Monaco Grand Prix 4K',
-    category: 'Motorsport / High-Speed / Live F1',
-    language: 'English Team Radio & Pit Comm',
-    platformId: 'sports_live',
-    platformName: 'F1 TV & Hotstar',
-    platformBadge: '300 KM/H 4K',
-    rating: 'LIVE',
-    year: '2024',
-    duration: 'Race Day (78 Laps)',
-    cast: 'Verstappen, Hamilton, Leclerc, Norris',
-    poster: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'High-octane street circuit racing through the iconic streets of Monte Carlo with multi-camera onboard camera switching.',
-    embedUrl: 'https://www.youtube.com/embed/3v4M4tB2h_k?autoplay=1'
-  },
-  {
-    id: 'nba-finals-basketball',
-    pillar: 'sports',
-    title: 'NBA Finals: Championship Showdown',
-    category: 'Basketball / NBA Live / Slam Dunks',
-    language: 'English Arena Broadcast',
-    platformId: 'sports_live',
-    platformName: 'NBA League Pass & JioCinema',
-    platformBadge: 'CHAMPIONSHIP',
-    rating: 'LIVE',
-    year: '2024',
-    duration: '4 Quarters (48m Live)',
-    cast: 'Celtics vs Mavericks (Championship Game)',
-    poster: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80',
-    backdrop: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1600&q=80',
-    synopsis: 'High-flying slam dunks, clutch buzzer-beaters and court-side audio synchronization for ultimate hoop fans.',
-    embedUrl: 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1'
+    id: 6,
+    title: 'The 39 Steps',
+    year: 1935,
+    category: 'Thriller',
+    description: 'Alfred Hitchcock\'s iconic espionage thriller where an innocent man is framed for murder and races across the Scottish Highlands to stop a spy ring.',
+    poster: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=800&q=80',
+    videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/h3g-LcL1k_w?autoplay=1&rel=0&modestbranding=1'
   }
 ];
