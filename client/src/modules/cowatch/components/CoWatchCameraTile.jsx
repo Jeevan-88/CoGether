@@ -58,19 +58,14 @@ export default function CoWatchCameraTile({
         />
       ) : (
         <div className="cowatch-avatar-fallback">
-          <div className="cowatch-avatar-badge">
+          <div className="zoom-avatar-circle">
             <span className="avatar-initials">{initials}</span>
           </div>
           <span className="avatar-subtext">{label}</span>
         </div>
       )}
 
-      {/* Speaking Glow Ripple */}
-      {isSpeaking && (
-        <div className="speaking-indicator-ring" />
-      )}
-
-      {/* Top Hover Action Bar */}
+      {/* Top-Right Hover Action Bar */}
       <div className="cowatch-tile-hover-bar">
         {onTogglePin && (
           <button
@@ -100,22 +95,19 @@ export default function CoWatchCameraTile({
         )}
       </div>
 
-      {/* Bottom Info Bar: Unobtrusive Corner Badge */}
-      <div className="cowatch-tile-bottom-bar">
-        <div className="tile-identity-tag">
-          <span className="tile-user-name">
-            {label} {isLocal && <span className="you-pill">YOU</span>}
+      {/* Zoom-Style Bottom-Left Nameplate */}
+      <div className="zoom-tile-nameplate">
+        <span className={`zoom-mic-status ${micEnabled ? 'mic-on' : 'mic-muted'}`} title={micEnabled ? 'Mic active' : 'Muted'}>
+          {micEnabled ? <Mic size={10} /> : <MicOff size={10} />}
+        </span>
+        <span className="zoom-user-name">
+          {label} {isLocal && <span className="zoom-you-tag">You</span>}
+        </span>
+        {isSpeaking && (
+          <span className="zoom-speaking-indicator" title="Speaking">
+            <Volume2 size={10} />
           </span>
-          {isSpeaking && (
-            <span className="speaking-wave-badge" title="Speaking">
-              <Volume2 size={11} className="speaking-icon" />
-            </span>
-          )}
-        </div>
-
-        <div className={`tile-mic-indicator ${micEnabled ? 'mic-on' : 'mic-muted'}`} title={micEnabled ? 'Mic Active' : 'Muted'}>
-          {micEnabled ? <Mic size={11} /> : <MicOff size={11} />}
-        </div>
+        )}
       </div>
     </div>
   );

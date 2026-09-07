@@ -1,82 +1,80 @@
-/* ── COGETHER CO-WATCH CAMERA TILE ── */
+/* ══════════════════════════════════════════════════════════════════════
+   COWATCHCAMERATILE.CSS
+   Zoom-Style Plain Rectangular Camera Tile with Crisp Borders & Nameplate
+   ══════════════════════════════════════════════════════════════════════ */
 
 .cowatch-camera-tile {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  border-radius: 10px;
-  background: #14141d;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  aspect-ratio: 16 / 9;
+  border-radius: 4px; /* Crisp, plain rectangle like Zoom */
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
   user-select: none;
 }
 
 .cowatch-camera-tile:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
-/* Active Speaker State */
+/* Zoom Active Speaker Outline (Perimeter stroke, NO scale explosion) */
 .cowatch-camera-tile.is-speaking {
-  border-color: #FFE500;
-  box-shadow: 0 0 0 2px #FFE500, 0 6px 22px rgba(255, 229, 0, 0.35);
-  transform: scale(1.04);
-  z-index: 2;
-}
-
-.cowatch-camera-tile.is-local.is-speaking {
-  transform: scale(1.04);
+  border-color: #FFE500 !important;
+  box-shadow: 0 0 0 2px #FFE500, 0 4px 20px rgba(255, 229, 0, 0.35) !important;
+  z-index: 3;
 }
 
 /* Pinned Tile State */
 .cowatch-camera-tile.is-pinned {
-  border-color: rgba(255, 229, 0, 0.6);
-  box-shadow: 0 0 0 1.5px rgba(255, 229, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.7);
+  border-color: #FFE500;
+  box-shadow: 0 0 0 1.5px rgba(255, 229, 0, 0.6);
 }
 
-/* Video Element */
+/* Video Feed */
 .cowatch-tile-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  background: #000000;
 }
 
 .cowatch-camera-tile.is-local .cowatch-tile-video {
   transform: scaleX(-1);
 }
 
-/* Avatar Fallback (When Camera Off) */
+/* Fallback Avatar (Camera Disabled) */
 .cowatch-avatar-fallback {
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, #1e1e2c 0%, #111118 100%);
+  background: #111116;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
 }
 
-.cowatch-avatar-badge {
+.zoom-avatar-circle {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2a2a3c 0%, #161622 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: #232330;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .avatar-initials {
-  font-family: 'Barlow', 'Outfit', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-weight: 700;
   font-size: 15px;
   color: #FFE500;
@@ -84,27 +82,28 @@
 }
 
 .avatar-subtext {
+  font-family: 'Barlow', sans-serif;
   font-size: 11px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
   max-width: 85%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Top Hover Bar */
+/* Top-Right Hover Action Bar */
 .cowatch-tile-hover-bar {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 5px;
+  right: 5px;
   display: flex;
   align-items: center;
   gap: 4px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.18s ease;
-  z-index: 5;
+  transition: opacity 0.15s ease;
+  z-index: 10;
 }
 
 .cowatch-camera-tile:hover .cowatch-tile-hover-bar {
@@ -113,11 +112,11 @@
 }
 
 .btn-tile-action {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  background: rgba(16, 16, 24, 0.82);
-  backdrop-filter: blur(8px);
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  background: rgba(14, 14, 18, 0.85);
+  backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #cfd0d8;
   display: flex;
@@ -129,62 +128,68 @@
 
 .btn-tile-action:hover {
   background: #FFE500;
-  color: #0e0e13;
+  color: #000000;
   border-color: #FFE500;
 }
 
 .btn-tile-action.active {
   background: #FFE500;
-  color: #0e0e13;
+  color: #000000;
 }
 
-/* Bottom Identity & Mic Bar */
-.cowatch-tile-bottom-bar {
+/* Zoom-Style Bottom-Left Nameplate */
+.zoom-tile-nameplate {
   position: absolute;
-  bottom: 6px;
-  left: 6px;
-  right: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  pointer-events: none;
-  z-index: 4;
-}
-
-.tile-identity-tag {
-  display: flex;
+  bottom: 5px;
+  left: 5px;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(14, 14, 20, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 3px 7px;
-  border-radius: 6px;
-  max-width: 80%;
+  padding: 2px 6px;
+  border-radius: 3px; /* Zoom plain rectangular nameplate */
+  max-width: 85%;
+  pointer-events: none;
+  z-index: 8;
 }
 
-.tile-user-name {
+.zoom-mic-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-mic-status.mic-on {
+  color: #48bb78; /* Clean Zoom green */
+}
+
+.zoom-mic-status.mic-muted {
+  color: #f56565; /* Clean Zoom red */
+}
+
+.zoom-user-name {
   font-family: 'Barlow', sans-serif;
   font-size: 11px;
   font-weight: 600;
-  color: #e6e6ed;
+  color: #f0f0f5;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.you-pill {
+.zoom-you-tag {
   font-size: 9px;
   font-weight: 700;
-  color: #0e0e13;
+  color: #000000;
   background: #FFE500;
-  padding: 1px 4px;
-  border-radius: 3px;
-  margin-left: 3px;
+  padding: 0 4px;
+  border-radius: 2px;
+  margin-left: 2px;
 }
 
-.speaking-wave-badge {
+.zoom-speaking-indicator {
   display: flex;
   align-items: center;
   color: #FFE500;
@@ -192,28 +197,6 @@
 }
 
 @keyframes pulse-speaker {
-  0%, 100% { opacity: 0.7; transform: scale(0.95); }
-  50% { opacity: 1; transform: scale(1.15); }
-}
-
-.tile-mic-indicator {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(8px);
-}
-
-.tile-mic-indicator.mic-on {
-  background: rgba(14, 14, 20, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #68d391;
-}
-
-.tile-mic-indicator.mic-muted {
-  background: rgba(229, 62, 62, 0.85);
-  border: 1px solid rgba(255, 100, 100, 0.3);
-  color: #ffffff;
+  0%, 100% { opacity: 0.6; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.1); }
 }

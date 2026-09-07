@@ -183,6 +183,14 @@ export default function CoWatchPartyRoom({
             onTogglePin={handleTogglePin}
             isCinemaMode={isCinemaMode}
             roomCode={roomId}
+            localStream={localStream}
+            remoteStreams={remoteStreams}
+            currentUsername={username}
+            micEnabled={micEnabled}
+            cameraEnabled={cameraEnabled}
+            onToggleMic={toggleMic}
+            onToggleCamera={toggleCamera}
+            onCloseOverlay={() => setLayoutMode('RAIL')}
           />
 
           {/* BOTTOM FLOATING CONTROL DECK */}

@@ -23,14 +23,15 @@ export default function CoWatchControlDeck({
   const nextLayout = () => {
     if (layoutMode === 'RAIL') return 'TRAY';
     if (layoutMode === 'TRAY') return 'OVERLAY';
+    if (layoutMode === 'OVERLAY') return 'FOCUS';
     return 'RAIL';
   };
 
   const getLayoutLabel = () => {
     if (layoutMode === 'RAIL') return 'SIDE RAIL';
     if (layoutMode === 'TRAY') return 'BOTTOM TRAY';
-    if (layoutMode === 'OVERLAY') return 'CORNER OVERLAY';
-    return 'FOCUS';
+    if (layoutMode === 'OVERLAY') return 'FLOATING OVERLAY';
+    return 'FOCUS VIDEO';
   };
 
   return (

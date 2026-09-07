@@ -1,0 +1,372 @@
+/* ══════════════════════════════════════════════════════════════════════
+   COWATCHCAMERAOVERLAY.CSS
+   Co-Watch Multi-Camera Floating Overlay (Side-by-Side & Split Modes)
+   ══════════════════════════════════════════════════════════════════════ */
+
+.cowatch-camera-overlay-root {
+  position: fixed;
+  background: #0c0c12;
+  border: 1.5px solid rgba(255, 229, 0, 0.45);
+  border-radius: 6px; /* Clean plain rectangular frame */
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), 0 0 24px rgba(255, 229, 0, 0.2);
+  z-index: 99999 !important; /* Always visible over cinema stage & fullscreen */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.cowatch-camera-overlay-root.is-dragging {
+  cursor: grabbing;
+  border-color: #FFE500;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.95), 0 0 35px rgba(255, 229, 0, 0.35);
+}
+
+.cowatch-camera-overlay-root.is-resizing {
+  cursor: se-resize;
+  border-color: #FFE500;
+}
+
+.cowatch-camera-overlay-root.is-minimized {
+  width: 260px !important;
+  height: auto !important;
+}
+
+/* ── Anti-Collision Drag Handle ── */
+.cowatch-overlay-drag-handle {
+  height: 36px;
+  background: #14141d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: grab;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.cowatch-camera-overlay-root.is-dragging .cowatch-overlay-drag-handle {
+  cursor: grabbing;
+}
+
+.handle-left-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.drag-grip-icon {
+  color: #FFE500;
+  flex-shrink: 0;
+}
+
+.handle-badge-title {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+
+/* ── Mode Switcher: Side-by-Side vs Split ── */
+.overlay-layout-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.btn-layout-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.btn-layout-tab:hover {
+  color: #ffffff;
+}
+
+.btn-layout-tab.active {
+  background: #FFE500;
+  color: #000000;
+  font-weight: 700;
+}
+
+/* ── Right Actions: Size Presets & Controls ── */
+.handle-right-block {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.size-presets-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  padding: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.btn-preset-size {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-preset-size:hover {
+  color: #ffffff;
+}
+
+.btn-preset-size.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFE500;
+  font-weight: 700;
+}
+
+.btn-overlay-ctrl {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-overlay-ctrl:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.btn-close:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+}
+
+/* ── Side-by-Side Body Grid ── */
+.cowatch-overlay-body-container {
+  padding: 6px;
+  background: #08080c;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+
+.cowatch-side-by-side-grid {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  gap: 6px;
+}
+
+.cowatch-side-by-side-grid.count-1 {
+  grid-template-columns: 1fr;
+}
+
+.cowatch-side-by-side-grid.count-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.cowatch-side-by-side-grid.count-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.overlay-rect-slot {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-rect-slot .cowatch-camera-tile {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border: none;
+}
+
+/* ── Interactive Corner Drag-to-Resize Handle ── */
+.overlay-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  cursor: se-resize;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 2px;
+  z-index: 50;
+}
+
+.resize-corner-lines {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #FFE500;
+  border-bottom: 2px solid #FFE500;
+  border-bottom-right-radius: 2px;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.overlay-resize-handle:hover .resize-corner-lines {
+  opacity: 1;
+}
+
+/* ── SEPARATE (SPLIT) MODE: Floating Individual Tiles ── */
+.cowatch-separate-overlay-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99999;
+}
+
+.cowatch-separate-mode-pill {
+  position: fixed;
+  background: rgba(12, 12, 18, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid #FFE500;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(255, 229, 0, 0.2);
+}
+
+.split-mode-label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #FFE500;
+  letter-spacing: 0.8px;
+}
+
+.btn-regroup-cams {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #1e1e28;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-regroup-cams:hover {
+  background: #FFE500;
+  color: #000000;
+  border-color: #FFE500;
+}
+
+.btn-close-split {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.btn-close-split:hover {
+  color: #ef4444;
+}
+
+/* Individual Floating Card in Split Mode */
+.cowatch-floating-split-tile {
+  position: fixed;
+  width: 200px;
+  background: #0e0e14;
+  border: 1.5px solid rgba(255, 229, 0, 0.45);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 16px rgba(255, 229, 0, 0.2);
+  pointer-events: auto;
+  cursor: grab;
+  transition: border-color 0.18s ease;
+}
+
+.cowatch-floating-split-tile.is-dragging {
+  cursor: grabbing;
+  border-color: #FFE500;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 229, 0, 0.4);
+}
+
+.split-tile-drag-header {
+  height: 22px;
+  background: #161622;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.split-drag-grip {
+  color: #FFE500;
+}
+
+.split-tile-video-container {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: #000000;
+}
+
+.split-tile-video-container .cowatch-camera-tile {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+}

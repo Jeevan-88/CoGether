@@ -4,6 +4,7 @@ import {
   RotateCcw, Sparkles, Film, Globe, ShieldAlert, ExternalLink
 } from 'lucide-react';
 import CoWatchCameraTile from './CoWatchCameraTile.jsx';
+import CoWatchCameraOverlay from './CoWatchCameraOverlay.jsx';
 import './CoWatchVideoStage.css';
 
 export default function CoWatchVideoStage({
@@ -17,7 +18,15 @@ export default function CoWatchVideoStage({
   pinnedParticipantId,
   onTogglePin,
   isCinemaMode = false,
-  roomCode
+  roomCode,
+  localStream,
+  remoteStreams = {},
+  currentUsername = 'You',
+  micEnabled = true,
+  cameraEnabled = true,
+  onToggleMic,
+  onToggleCamera,
+  onCloseOverlay
 }) {
   const stageRef = useRef(null);
   const videoRef = useRef(null);
@@ -275,23 +284,18 @@ export default function CoWatchVideoStage({
           </div>
         )}
 
-        {/* Floating Camera Overlays (when layoutMode === 'OVERLAY' or in Fullscreen) */}
-        {(layoutMode === 'OVERLAY' || isFullscreen) && overlayParticipants.length > 0 && (
-          <div className="video-corner-cam-overlays fade-in">
-            {overlayParticipants.slice(0, 3).map((p) => (
-              <div key={p.id} className="corner-cam-slot">
-                <CoWatchCameraTile
-                  stream={p.stream}
-                  label={p.username}
-                  isLocal={p.isLocal}
-                  micEnabled={p.micEnabled}
-                  cameraEnabled={p.cameraEnabled}
-                  isPinned={pinnedParticipantId === p.id}
-                  onTogglePin={() => onTogglePin?.(p.id)}
-                />
-              </div>
-            ))}
-          </div>
+        {/* Floating Multi-Camera Overlay (Side-by-side grouped or separate split cards) */}
+        {(layoutMode === 'OVERLAY' || isFullscreen) && (cameraEnabled || Object.keys(remoteStreams).length > 0) && (
+          <CoWatchCameraOverlay
+            localStream={localStream}
+            remoteStreams={remoteStreams}
+            currentUsername={currentUsername}
+            micEnabled={micEnabled}
+            cameraEnabled={cameraEnabled}
+            onToggleMic={onToggleMic}
+            onToggleCamera={onToggleCamera}
+            onClose={onCloseOverlay}
+          />
         )}
 
         {/* Safe-Area Floating Reactions Layer (along right edge, never over center/subtitles) */}
