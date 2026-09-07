@@ -1,0 +1,87 @@
+/* ── COGETHER CO-WATCH SOCIAL RAIL ── */
+
+.cowatch-social-rail-aside {
+  width: 310px;
+  height: 100%;
+  min-height: 0;
+  background: #0d0d14;
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Header */
+.rail-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+
+.header-meta-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.header-icon {
+  color: #FFE500;
+}
+
+/* Cameras Section (Upper) */
+.rail-cameras-section {
+  max-height: 48%;
+  display: flex;
+  flex-direction: column;
+  min-height: 130px;
+}
+
+.rail-camera-tiles-stack {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.rail-camera-tiles-stack::-webkit-scrollbar {
+  width: 4px;
+}
+
+.rail-camera-tiles-stack::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+}
+
+.rail-tile-slot {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Chat Section (Lower) */
+.rail-chat-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1024px) {
+  .cowatch-social-rail-aside {
+    width: 270px;
+    padding: 8px;
+  }
+}

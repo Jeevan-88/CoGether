@@ -25,6 +25,9 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
   const [peerBoards, setPeerBoards] = useState({}); // peerId -> { score, grid, over, won, username }
   const [peerEliminated, setPeerEliminated] = useState({}); // peerId -> { score, username }
   const [peerWon, setPeerWon] = useState(null); // { peerId, username, score }
+  const [videoSyncPayload, setVideoSyncPayload] = useState(null);
+  const [incomingReaction, setIncomingReaction] = useState(null);
+  const [systemToast, setSystemToast] = useState(null);
 
   const socketRef = useRef(null);
   const peersRef = useRef({}); // id -> RTCPeerConnection
@@ -149,18 +152,6 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
         }
       });
 
-      // Someone new joined after us
-      socket.on('user-joined', ({ id, username: newUsername, micEnabled: newMic, cameraEnabled: newCam }) => {
-        setRemoteStreams((prev) => ({
-          ...prev,
-          [id]: {
-            stream: null,
-            username: newUsername,
-            micEnabled: newMic,
-            cameraEnabled: newCam
-          }
-        }));
-      });
 
       // Handle incoming offer from a peer
       socket.on('offer', async ({ from, offer, username: peerUsername }) => {
@@ -253,14 +244,51 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
         setPeerWon(payload);
       });
 
+      // Co-Watch Synchronized Video Stream Sync
+      socket.on('video-sync', (payload) => {
+        setVideoSyncPayload(payload);
+      });
+
+      // Co-Watch Real-Time Floating Reactions
+      socket.on('video-reaction', (payload) => {
+        setIncomingReaction(payload);
+      });
+
+      // Someone new joined after us
+      socket.on('user-joined', ({ id, username: newUsername, micEnabled: newMic, cameraEnabled: newCam }) => {
+        setRemoteStreams((prev) => ({
+          ...prev,
+          [id]: {
+            stream: null,
+            username: newUsername,
+            micEnabled: newMic,
+            cameraEnabled: newCam
+          }
+        }));
+        setSystemToast({
+          id: Math.random().toString(36).substring(2, 9),
+          text: `${newUsername || 'A friend'} joined the watch party`,
+          type: 'join',
+          time: Date.now()
+        });
+      });
+
       // User Left
       socket.on('user-left', (id) => {
+        const leavingPeer = remoteStreams[id] || (peersRef.current[id] ? { username: 'A friend' } : null);
         if (peersRef.current[id]) {
           peersRef.current[id].close();
           delete peersRef.current[id];
         }
         delete sendersRef.current[id];
         setRemoteStreams((prev) => {
+          const leavingName = prev[id]?.username || 'A friend';
+          setSystemToast({
+            id: Math.random().toString(36).substring(2, 9),
+            text: `${leavingName} left the watch party`,
+            type: 'leave',
+            time: Date.now()
+          });
           const updated = { ...prev };
           delete updated[id];
           return updated;
@@ -424,6 +452,16 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
     socketRef.current?.emit('challenge-player-won', { score });
   };
 
+  // Co-Watch Synchronized Playback Actions
+  const sendVideoSync = (actionPayload) => {
+    socketRef.current?.emit('video-sync', actionPayload);
+  };
+
+  // Co-Watch Quick Floating Reactions
+  const sendVideoReaction = (emoji) => {
+    socketRef.current?.emit('video-reaction', { emoji });
+  };
+
   return {
     localStream,
     remoteStreams,
@@ -439,6 +477,9 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
     peerBoards,
     peerEliminated,
     peerWon,
+    videoSyncPayload,
+    incomingReaction,
+    systemToast,
     toggleMic,
     toggleCamera,
     toggleScreenShare,
@@ -449,6 +490,8 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
     sendChallengeBoardSync,
     sendPlayerEliminated,
     sendPlayerWon,
+    sendVideoSync,
+    sendVideoReaction,
     socket: socketRef.current
   };
 }

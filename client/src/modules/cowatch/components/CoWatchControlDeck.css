@@ -1,0 +1,126 @@
+/* ── COGETHER CO-WATCH CONTROL DECK ── */
+
+.cowatch-control-deck-dock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  background: rgba(14, 14, 22, 0.92);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.06);
+  z-index: 100;
+  max-width: 100%;
+}
+
+.deck-buttons-cluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.deck-btn {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 19px;
+  background: #1a1a26;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #d1d1dc;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.deck-btn:hover {
+  background: #242436;
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  transform: translateY(-1.5px);
+}
+
+.deck-btn:active {
+  transform: translateY(0);
+}
+
+.deck-btn-label {
+  display: inline-block;
+}
+
+@media (max-width: 680px) {
+  .deck-btn {
+    padding: 0 10px;
+    height: 36px;
+  }
+  .deck-btn-label {
+    display: none;
+  }
+}
+
+/* Specific Button States */
+.deck-btn.is-active-audio {
+  background: rgba(104, 211, 145, 0.12);
+  border-color: rgba(104, 211, 145, 0.35);
+  color: #68d391;
+}
+
+.deck-btn.is-muted {
+  background: rgba(229, 62, 62, 0.16);
+  border-color: rgba(229, 62, 62, 0.4);
+  color: #fc8181;
+}
+
+.deck-btn.is-active-cam {
+  background: rgba(255, 229, 0, 0.1);
+  border-color: rgba(255, 229, 0, 0.35);
+  color: #FFE500;
+}
+
+.deck-btn.is-cam-off {
+  background: rgba(229, 62, 62, 0.16);
+  border-color: rgba(229, 62, 62, 0.4);
+  color: #fc8181;
+}
+
+.deck-btn.is-highlighted {
+  background: rgba(255, 229, 0, 0.18);
+  border-color: #FFE500;
+  color: #FFE500;
+}
+
+.deck-btn.is-cinema-active {
+  background: #FFE500;
+  border-color: #FFE500;
+  color: #0e0e13;
+  box-shadow: 0 0 16px rgba(255, 229, 0, 0.4);
+}
+
+.deck-btn.btn-deck-leave {
+  background: rgba(229, 62, 62, 0.2);
+  border-color: rgba(229, 62, 62, 0.45);
+  color: #ff7878;
+}
+
+.deck-btn.btn-deck-leave:hover {
+  background: #e53e3e;
+  border-color: #e53e3e;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(229, 62, 62, 0.5);
+}
+
+.deck-divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 2px;
+}

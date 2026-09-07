@@ -13,11 +13,13 @@ import {
   OPEN_NON_DRM_PLATFORMS,
   VERIFIED_CLEAN_MOVIES
 } from './cinemaCatalog.js';
+import CoWatchPartyRoom from './CoWatchPartyRoom.jsx';
 import './CoWatchCinemaHub.css';
 
-export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
+export default function CoWatchCinemaHub({ onBackToHome, initialUser, initialRoomId, initialUsername }) {
   // Page Modes: 'cinema_hub' | 'theater_room' | 'ott_universe'
-  const [viewMode, setViewMode] = useState('cinema_hub');
+  const [viewMode, setViewMode] = useState(() => initialRoomId ? 'theater_room' : 'cinema_hub');
+  const currentUsername = initialUsername || initialUser?.name || localStorage.getItem('sp_username') || 'Guest_' + Math.floor(100 + Math.random() * 900);
   
   // DRM Categorization Tab: 'heavy_drm' (Category 1) | 'open_stream' (Category 2)
   const [activeDrmTab, setActiveDrmTab] = useState('heavy_drm');
@@ -25,7 +27,7 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
 
   // Active Theater Movie & Stream Engine ('direct_mp4' or 'web_embed')
   const [activeMovie, setActiveMovie] = useState(VERIFIED_CLEAN_MOVIES[0]);
-  const [streamEngine, setStreamEngine] = useState('web_embed'); // 'web_embed' | 'direct_mp4'
+  const [streamEngine, setStreamEngine] = useState(() => VERIFIED_CLEAN_MOVIES[0]?.videoSrc ? 'direct_mp4' : 'web_embed');
   const [customStreamUrl, setCustomStreamUrl] = useState('');
   
   // Advanced Theater Controls
@@ -46,7 +48,7 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
   const [isCopied, setIsCopied] = useState(false);
   const [isRoomCopied, setIsRoomCopied] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [roomCode] = useState(() => 'CW-' + Math.floor(100000 + Math.random() * 900000));
+  const [roomCode] = useState(() => initialRoomId || ('CW-' + Math.floor(100000 + Math.random() * 900000)));
   
   const profileMenuRef = useRef(null);
   const videoRef = useRef(null);
@@ -77,9 +79,8 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
 
   const handleLaunchMovie = (movie) => {
     setActiveMovie(movie);
-    setStreamEngine('web_embed');
+    setStreamEngine(movie.videoSrc ? 'direct_mp4' : 'web_embed');
     setViewMode('theater_room');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   /**
@@ -193,6 +194,23 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
     setChatMessages(prev => [...prev, newMsg]);
     setInputChat('');
   };
+
+  // ── DEDICATED 100DVH CO-WATCH PARTY ROOM SURFACE ──
+  if (viewMode === 'theater_room' && activeMovie) {
+    return (
+      <CoWatchPartyRoom
+        movie={activeMovie}
+        streamEngine={streamEngine}
+        roomId={roomCode}
+        username={currentUsername}
+        onBack={() => setViewMode('cinema_hub')}
+        onLeave={() => {
+          setViewMode('cinema_hub');
+          onBackToHome?.();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="cowatch-cinema-universe fade-in">
@@ -399,230 +417,6 @@ export default function CoWatchCinemaHub({ onBackToHome, initialUser }) {
         </main>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW MODE 2: DEDICATED FULL-SCREEN THEATER ROOM (80% VIEWPORT COVERAGE)
-          ══════════════════════════════════════════════════════════════════════ */}
-      {viewMode === 'theater_room' && activeMovie && (
-        <main className="dedicated-theater-room-view fade-in">
-          {/* Header Bar */}
-          <div className="theater-room-header-bar">
-            <div className="theater-header-left-meta">
-              <button className="btn-back-to-catalog" onClick={() => setViewMode('cinema_hub')}>
-                <ArrowLeft size={16} /> <span>← BACK TO CINEMA CATALOG</span>
-              </button>
-              <div className="theater-now-playing-titles">
-                <span className="live-sync-indicator">● LIVE SYNCHRONIZED MASTER THEATER</span>
-                <h2 className="theater-now-playing-name">{activeMovie.title} {activeMovie.year ? `(${activeMovie.year})` : ''}</h2>
-                <span className="theater-category-meta">{activeMovie.category} • Direct In-App Feed</span>
-              </div>
-            </div>
-
-            {/* Stream Engine Switcher & Squad Sharing */}
-            <div className="theater-header-right-meta">
-              <div className="stream-engine-switcher-cluster">
-                {activeMovie.embedUrl && (
-                  <button 
-                    className={`btn-engine-toggle ${streamEngine === 'web_embed' ? 'active-engine' : ''}`}
-                    onClick={() => setStreamEngine('web_embed')}
-                  >
-                    <Globe size={13} />
-                    <span>HD STREAM</span>
-                  </button>
-                )}
-                {activeMovie.videoSrc && (
-                  <button 
-                    className={`btn-engine-toggle ${streamEngine === 'direct_mp4' ? 'active-engine' : ''}`}
-                    onClick={() => setStreamEngine('direct_mp4')}
-                  >
-                    <Film size={13} />
-                    <span>DIRECT MP4</span>
-                  </button>
-                )}
-              </div>
-
-              <button className="btn-theater-invite-squad" onClick={handleCopyPartyLink}>
-                {isCopied ? <Check size={15} /> : <Share2 size={15} />}
-                <span>{isCopied ? 'SQUAD LINK COPIED!' : 'INVITE FRIENDS TO CALL'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* ── 80% VIEWPORT DIRECT VIDEO PLAYER ── */}
-          <div className="theater-eighty-percent-player-stage">
-            <div className="player-stage-inner-box">
-              {/* DIRECT MP4 VIDEO PLAYER */}
-              {streamEngine === 'direct_mp4' && activeMovie.videoSrc ? (
-                <video
-                  ref={videoRef}
-                  src={activeMovie.videoSrc}
-                  controls
-                  autoPlay
-                  playsInline
-                  className="plain-html5-video-player"
-                />
-              ) : activeMovie.embedUrl?.includes('nba.com') || activeMovie.embedUrl?.includes('espn.com') ? (
-                /* SMART IN-PLAYER NBA / SPORTS ORIGIN EXPLANATION */
-                <div className="in-player-origin-blocked-card fade-in">
-                  <div className="blocked-alert-pill">
-                    <ShieldAlert size={18} className="red-icon" />
-                    <span>BROWSER X-FRAME-OPTIONS SECURITY NOTICE</span>
-                  </div>
-                  <h3>Why NBA.com Says "Refused to Connect"</h3>
-                  <p>
-                    <strong>NBA.com</strong> protects their website by sending <code>X-Frame-Options: SAMEORIGIN</code> to browsers.
-                    Chrome and Edge will block any web app from loading the full NBA website homepage inside an embedded frame.
-                  </p>
-
-                  <div className="blocked-solution-deck">
-                    <div className="solution-option-box">
-                      <span className="sol-num">OPTION 1 (DIRECT VIDEO)</span>
-                      <h4>Paste Direct Stream or Video Link</h4>
-                      <p>Paste an open video URL (.mp4, .m3u8, YouTube match stream, Twitch feed) to play 100% directly inside this player.</p>
-                    </div>
-
-                    <div className="solution-option-box highlight-border">
-                      <span className="sol-num">OPTION 2 (SQUAD SYNC)</span>
-                      <h4>Sync via CoGether Room ({roomCode})</h4>
-                      <p>Both users open the NBA match tab while keeping CoGether's floating squad webcam and live voice chat connected!</p>
-                      <a 
-                        href={activeMovie.embedUrl} 
-                        target="_blank" 
-                        rel="noreferrer" 
-                        className="btn-launch-nba-direct"
-                      >
-                        <span>OPEN NBA GAME LINK</span>
-                        <ExternalLink size={14} />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* DIRECT EMBED / IN-APP VIDEO STREAM */
-                <iframe
-                  src={activeMovie.embedUrl}
-                  title={activeMovie.title}
-                  className="fullscreen-archive-iframe"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-                  allowFullScreen
-                />
-              )}
-
-              {/* Floating Squad Cam Tiles */}
-              <div className="theater-floating-squad-tiles">
-                <div className="squad-floating-tile">
-                  <div className="floating-cam-avatar host-avatar">
-                    <User size={20} />
-                  </div>
-                  <span className="floating-cam-name">You (Host)</span>
-                  <span className="floating-live-dot" />
-                </div>
-                <div className="squad-floating-tile remote-tile">
-                  <div className="floating-cam-avatar guest-avatar">
-                    <User size={20} />
-                  </div>
-                  <span className="floating-cam-name">Squad Member #1</span>
-                  <span className="floating-live-dot" />
-                </div>
-              </div>
-            </div>
-
-            {/* ── ADVANCED MASTER CONTROL DECK ── */}
-            <div className="theater-master-control-deck">
-              {/* Squad Hardware Toggles */}
-              <div className="control-deck-group">
-                <button className={`btn-deck-toggle ${isMicOn ? 'active' : ''}`} onClick={() => setIsMicOn(!isMicOn)}>
-                  <Mic size={16} /> <span>{isMicOn ? 'MIC ON' : 'MUTED'}</span>
-                </button>
-                <button className={`btn-deck-toggle ${isCamOn ? 'active' : ''}`} onClick={() => setIsCamOn(!isCamOn)}>
-                  <Camera size={16} /> <span>{isCamOn ? 'CAM ON' : 'CAM OFF'}</span>
-                </button>
-              </div>
-
-              {/* 200% Super Volume Boost */}
-              <div className="control-deck-group volume-boost-cluster">
-                <Volume2 size={18} className={volumeBoost > 100 ? 'boosted-volume' : ''} />
-                <span className="boost-label">VOLUME: {volumeBoost}%</span>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="200" 
-                  value={volumeBoost}
-                  onChange={(e) => setVolumeBoost(Number(e.target.value))}
-                  className="volume-slider-boost"
-                />
-                {volumeBoost > 100 && (
-                  <span className="super-boost-badge">200% SUPER BOOST</span>
-                )}
-              </div>
-
-              {/* Subtitles & Stream Quality */}
-              <div className="control-deck-group">
-                <button 
-                  className={`btn-deck-toggle ${isSubtitlesOn ? 'active' : ''}`} 
-                  onClick={() => setIsSubtitlesOn(!isSubtitlesOn)}
-                >
-                  <Subtitles size={16} /> <span>{isSubtitlesOn ? 'SUBTITLES: ON' : 'SUBTITLES: OFF'}</span>
-                </button>
-
-                <div className="quality-selector-box">
-                  <Settings size={15} />
-                  <select 
-                    value={selectedQuality} 
-                    onChange={(e) => setSelectedQuality(e.target.value)}
-                    className="quality-select-dropdown"
-                  >
-                    <option value="1080p HD">1080p Full HD</option>
-                    <option value="720p HD">720p HD</option>
-                    <option value="480p">480p SD</option>
-                    <option value="Auto">Auto Quality</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ── SYNCHRONIZED CHAT SECTION (BELOW THE PLAYER) ── */}
-          <div className="theater-bottom-synced-chat-section">
-            <div className="theater-synced-chat-card">
-              <div className="synced-chat-header">
-                <div className="chat-header-title">
-                  <MessageSquare size={16} />
-                  <h4>SQUAD LIVE CHAT • {activeMovie.title}</h4>
-                </div>
-                <span className="chat-room-code-tag">ROOM: {roomCode}</span>
-              </div>
-
-              {/* Message List */}
-              <div className="synced-chat-messages-container">
-                {chatMessages.map(msg => (
-                  <div key={msg.id} className="synced-chat-single-bubble">
-                    <div className="chat-bubble-author">
-                      <strong>{msg.sender}</strong>
-                      <span className="chat-bubble-time">{msg.time}</span>
-                    </div>
-                    <p className="chat-bubble-text">{msg.text}</p>
-                  </div>
-                ))}
-                <div ref={chatEndRef} />
-              </div>
-
-              {/* Message Input Bar */}
-              <form onSubmit={handleSendChatMessage} className="synced-chat-input-bar">
-                <input 
-                  type="text" 
-                  placeholder={`Chat with squad during ${activeMovie.title}...`} 
-                  value={inputChat}
-                  onChange={(e) => setInputChat(e.target.value)}
-                  className="chat-typing-input"
-                />
-                <button type="submit" className="btn-chat-send">
-                  <Send size={15} /> <span>SEND</span>
-                </button>
-              </form>
-            </div>
-          </div>
-        </main>
-      )}
 
       {/* ══════════════════════════════════════════════════════════════════════
           VIEW MODE 3: FULL-PAGE OTT UNIVERSE (CATEGORY 1 DRM vs CATEGORY 2 OPEN)

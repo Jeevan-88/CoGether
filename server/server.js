@@ -162,6 +162,29 @@ io.on('connection', (socket) => {
     io.to(socket.roomId).emit('chat-message', messagePayload);
   });
 
+  // Co-Watch Synchronized Video Stream Control
+  socket.on('video-sync', (payload) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('video-sync', {
+      ...payload,
+      senderId: socket.id,
+      senderName: socket.username || 'Guest',
+      timestamp: Date.now()
+    });
+  });
+
+  // Co-Watch Real-Time Floating Reactions
+  socket.on('video-reaction', (payload) => {
+    if (!socket.roomId) return;
+    io.to(socket.roomId).emit('video-reaction', {
+      ...payload,
+      id: Math.random().toString(36).substring(2, 9),
+      senderId: socket.id,
+      senderName: socket.username || 'Guest',
+      timestamp: Date.now()
+    });
+  });
+
   // CoGether Challenge Mode Synchronization
   socket.on('challenge-ready', ({ ready }) => {
     if (!socket.roomId) return;

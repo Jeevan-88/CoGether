@@ -77,6 +77,8 @@ export default function App() {
         <CoWatchCinemaHub
           onBackToHome={handleLeaveRoom}
           initialUser={user}
+          initialRoomId={activeRoom.roomId}
+          initialUsername={activeRoom.username}
         />
       );
     }
