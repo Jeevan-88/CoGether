@@ -492,6 +492,7 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
     sendPlayerWon,
     sendVideoSync,
     sendVideoReaction,
-    socket: socketRef.current
+    socket: socketRef.current,
+    socketRef
   };
 }

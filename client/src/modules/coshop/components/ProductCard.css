@@ -1,0 +1,298 @@
+/* ══════════════════════════════════════════════════════════════════════
+   PRODUCTCARD.CSS
+   High-Polish CoShop Product Card with CoGether Brand Accents
+   ══════════════════════════════════════════════════════════════════════ */
+
+.coshop-product-card {
+  background: #111118;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.22s ease;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+.coshop-product-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 229, 0, 0.4);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 16px rgba(255, 229, 0, 0.12);
+}
+
+/* Image Frame */
+.product-image-frame {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  background: #09090d;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.coshop-product-card:hover .product-card-img {
+  transform: scale(1.05);
+}
+
+/* Discount Pill */
+.product-discount-pill {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #22c55e;
+  color: #000000;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+
+/* Retailer Identity Tag */
+.product-retailer-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(14, 14, 20, 0.88);
+  backdrop-filter: blur(8px);
+  color: #e2e8f0;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  z-index: 2;
+}
+
+.product-retailer-tag.retailer-amazon {
+  border-color: rgba(255, 153, 0, 0.4);
+  color: #ffb74d;
+}
+
+.product-retailer-tag.retailer-myntra {
+  border-color: rgba(255, 63, 108, 0.4);
+  color: #ff6584;
+}
+
+.product-retailer-tag.retailer-flipkart {
+  border-color: rgba(40, 116, 240, 0.4);
+  color: #60a5fa;
+}
+
+.product-retailer-tag.retailer-ajio {
+  border-color: rgba(147, 197, 253, 0.3);
+  color: #cbd5e1;
+}
+
+/* Wishlist Action */
+.btn-wishlist-action {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(14, 14, 20, 0.75);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  z-index: 2;
+}
+
+.btn-wishlist-action:hover {
+  background: rgba(255, 63, 108, 0.2);
+  border-color: #FF3F6C;
+  transform: scale(1.1);
+}
+
+.btn-wishlist-action.active {
+  background: rgba(255, 63, 108, 0.25);
+  border-color: #FF3F6C;
+}
+
+/* Room Mode: Send to Friend */
+.btn-send-friend-action {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(255, 229, 0, 0.9);
+  color: #000000;
+  border: none;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.15s ease;
+  z-index: 2;
+}
+
+.btn-send-friend-action:hover {
+  background: #ffffff;
+  transform: scale(1.05);
+}
+
+/* Body Info */
+.product-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.product-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.product-brand-name {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #FFE500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.product-rating-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.review-count {
+  font-size: 9px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.product-title {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+  line-height: 1.35;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 35px;
+}
+
+/* Comparison Pill */
+.product-comparison-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 229, 0, 0.1);
+  border: 1px solid rgba(255, 229, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #FFE500;
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.compare-icon {
+  color: #FFE500;
+}
+
+.product-single-store-note {
+  font-size: 9px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Price & Action Row */
+.product-price-action-row {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.price-block {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.currency-symbol {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFE500;
+}
+
+.current-price {
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.original-price {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  color: #64748b;
+  text-decoration: line-through;
+}
+
+.btn-view-deal {
+  background: #1e1e28;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.15s ease;
+}
+
+.btn-view-deal:hover {
+  background: #FFE500;
+  color: #000000;
+  border-color: #FFE500;
+}

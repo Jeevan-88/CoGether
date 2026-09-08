@@ -86,8 +86,8 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
             Co-Play
           </button>
           <button
-            className={`nav-menu-btn ${activeTab === 'shop' ? 'active' : ''}`}
-            onClick={() => onTabChange('watch')}
+            className={`nav-menu-btn ${activeTab === 'shop' || activeTab === 'coshop' ? 'active' : ''}`}
+            onClick={() => onTabChange('coshop')}
           >
             Co-Shop
           </button>

@@ -78,8 +78,73 @@ app.get('/api/games', async (req, res) => {
   });
 });
 
+// CoShop Massive Product Discovery & Social Shopping Engine
+const SearchIndex = require('./coshop/engine/searchIndex');
+const AIShoppingAssistant = require('./coshop/engine/aiShoppingAssistant');
+
+const coshopIndex = new SearchIndex();
+const coshopAI = new AIShoppingAssistant(coshopIndex);
+
+// CoShop: Search & Filter Catalog
+app.get('/api/coshop/products', (req, res) => {
+  try {
+    const results = coshopIndex.search(req.query);
+    res.json(results);
+  } catch (err) {
+    console.error('CoShop search error:', err);
+    res.status(500).json({ error: 'Search index query failure' });
+  }
+});
+
+// CoShop: Get Product Detail with Multi-Store Offers
+app.get('/api/coshop/products/:id', (req, res) => {
+  const product = coshopIndex.getProductById(req.params.id);
+  if (!product) {
+    return res.status(404).json({ error: 'Product not found in CoShop catalog' });
+  }
+  res.json(product);
+});
+
+// CoShop: Dynamic Facets / Filters
+app.get('/api/coshop/filters', (req, res) => {
+  const allResults = coshopIndex.search({ limit: 1000 });
+  res.json(allResults.facets);
+});
+
+// CoShop: AI Shopping Assistant Advisor
+app.post('/api/coshop/ai-assistant', async (req, res) => {
+  try {
+    const { prompt, context } = req.body;
+    const advice = await coshopAI.advise(prompt, context);
+    res.json(advice);
+  } catch (err) {
+    console.error('CoShop AI error:', err);
+    res.status(500).json({ error: 'AI Assistant processing error' });
+  }
+});
+
+// CoShop: Curated Feeds (Trending, Best Value, Deals)
+app.get('/api/coshop/recommendations', (req, res) => {
+  const trending = coshopIndex.search({ sort: 'relevance', limit: 4 });
+  const bestValue = coshopIndex.search({ sort: 'best_value', limit: 4 });
+  const deals = coshopIndex.search({ minPrice: 500, maxPrice: 5000, sort: 'price_asc', limit: 4 });
+
+  res.json({
+    trending: trending.products,
+    bestValue: bestValue.products,
+    deals: deals.products
+  });
+});
+
+// CoShop: Affiliate Click Tracker & Redirect Helper
+app.post('/api/coshop/click', (req, res) => {
+  const { productId, retailerId, targetUrl } = req.body;
+  console.log(`[CoShop Analytics] Affiliate Click: product=${productId}, retailer=${retailerId}, time=${new Date().toISOString()}`);
+  res.json({ status: 'ok', destinationUrl: targetUrl });
+});
+
 // Health check
-app.get('/health', (_req, res) => res.json({ status: 'ok', cachedGames: gamesCache.length, timestamp: new Date().toISOString() }));
+app.get('/health', (_req, res) => res.json({ status: 'ok', cachedGames: gamesCache.length, coshopIndexed: coshopIndex.indexedProducts.length, timestamp: new Date().toISOString() }));
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -237,6 +302,53 @@ io.on('connection', (socket) => {
       peerId: socket.id,
       username: socket.username,
       score
+    });
+  });
+
+  // ── CoShop Real-Time Shared Shopping Room Events ──
+  socket.on('coshop-share-product', ({ product }) => {
+    if (!socket.roomId || !product) return;
+    socket.to(socket.roomId).emit('coshop-product-shared', {
+      product,
+      senderName: socket.username || 'Friend',
+      senderId: socket.id,
+      timestamp: Date.now()
+    });
+  });
+
+  socket.on('coshop-reaction', ({ productId, emoji }) => {
+    if (!socket.roomId) return;
+    io.to(socket.roomId).emit('coshop-reaction-received', {
+      id: Math.random().toString(36).substr(2, 9),
+      productId,
+      emoji,
+      senderName: socket.username || 'Friend',
+      senderId: socket.id,
+      timestamp: Date.now()
+    });
+  });
+
+  socket.on('coshop-wishlist-sync', ({ wishlist }) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('coshop-wishlist-updated', {
+      wishlist,
+      senderName: socket.username || 'Friend'
+    });
+  });
+
+  socket.on('coshop-cart-sync', ({ cart }) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('coshop-cart-updated', {
+      cart,
+      senderName: socket.username || 'Friend'
+    });
+  });
+
+  socket.on('coshop-budget-sync', ({ budget }) => {
+    if (!socket.roomId) return;
+    socket.to(socket.roomId).emit('coshop-budget-updated', {
+      budget,
+      senderName: socket.username || 'Friend'
     });
   });
 

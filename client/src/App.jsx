@@ -5,6 +5,7 @@ import VideoRoom from './modules/videoroom/VideoRoom.jsx';
 import WatchPartyRoom from './modules/cowatch/WatchPartyRoom.jsx';
 import CoWatchCinemaHub from './modules/cowatch/CoWatchCinemaHub.jsx';
 import CoPlayGamesHub from './modules/coplay/CoPlayGamesHub.jsx';
+import CoShopHub from './modules/coshop/CoShopHub.jsx';
 import MergedCameraView from './modules/costudy/MergedCameraView.jsx';
 import AuthModal from './modules/auth/AuthModal.jsx';
 import PricingModal from './modules/pricing/PricingModal.jsx';
@@ -56,6 +57,8 @@ export default function App() {
       setActiveTab('gamesHub');
     } else if (modeParam === 'watch' || modeParam === 'cinema') {
       setActiveTab('cinemaHub');
+    } else if (modeParam === 'shop' || modeParam === 'coshop') {
+      setActiveTab('coshop');
     }
   }, []);
 
@@ -72,6 +75,17 @@ export default function App() {
   };
 
   if (activeRoom) {
+    if (activeRoom.mode === 'shop' || activeRoom.mode === 'coshop') {
+      return (
+        <CoShopHub
+          onBackToHome={handleLeaveRoom}
+          initialUser={user}
+          initialRoomId={activeRoom.roomId}
+          initialUsername={activeRoom.username}
+        />
+      );
+    }
+
     if (activeRoom.mode === 'watch' || activeRoom.mode === 'cinema') {
       return (
         <CoWatchCinemaHub
@@ -111,6 +125,16 @@ export default function App() {
     );
   }
 
+  // ── CO-SHOP MASSIVE SOCIAL SHOPPING HUB ──
+  if (activeTab === 'coshop' || activeTab === 'shop') {
+    return (
+      <CoShopHub
+        onBackToHome={() => setActiveTab('home')}
+        initialUser={user}
+      />
+    );
+  }
+
   // ── CO-WATCH OTT & CINEMA STREAMING HUB ──
   if (activeTab === 'cinemaHub') {
     return (
@@ -138,6 +162,7 @@ export default function App() {
         onTabChange={(tab) => {
           if (tab === 'watch' || tab === 'cowatch') setActiveTab('cinemaHub');
           else if (tab === 'games' || tab === 'coplay') setActiveTab('gamesHub');
+          else if (tab === 'shop' || tab === 'coshop') setActiveTab('coshop');
           else if (tab === 'telepresence') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'merged');
           else setActiveTab(tab);
         }}
