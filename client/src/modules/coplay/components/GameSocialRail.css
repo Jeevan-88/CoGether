@@ -94,6 +94,128 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+.live-status-dot.dot-connected {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.live-status-dot.dot-connecting {
+  background: #f59e0b;
+  box-shadow: 0 0 6px #f59e0b;
+  animation: pulse-dot 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ── Sub-bar: Room Code & WebRTC State ── */
+.rail-room-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: #09090d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 8px;
+}
+
+.rail-room-code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 2px 8px;
+  color: #e2e8f0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rail-room-code-badge:hover {
+  background: rgba(255, 229, 0, 0.1);
+  border-color: #FFE500;
+  color: #FFE500;
+}
+
+.rail-room-code-badge .room-label {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.rail-room-code-badge .copy-icon {
+  color: #94a3b8;
+}
+
+.rail-room-code-badge .copy-icon.copied {
+  color: #10b981;
+}
+
+.rail-webrtc-state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.rail-webrtc-state-pill .state-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.rail-webrtc-state-pill.state-connected {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.rail-webrtc-state-pill.state-connected .state-dot {
+  background: #10b981;
+  box-shadow: 0 0 5px #10b981;
+}
+
+.rail-webrtc-state-pill.state-connecting {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.rail-webrtc-state-pill.state-connecting .state-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 5px #f59e0b;
+  animation: pulse-dot 1.5s infinite ease-in-out;
+}
+
+.rail-webrtc-state-pill.state-new {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+.rail-webrtc-state-pill.state-new .state-dot {
+  background: #94a3b8;
+}
+
+.rail-webrtc-state-pill.state-disconnected,
+.rail-webrtc-state-pill.state-failed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.rail-webrtc-state-pill.state-disconnected .state-dot,
+.rail-webrtc-state-pill.state-failed .state-dot {
+  background: #ef4444;
+  box-shadow: 0 0 5px #ef4444;
+}
+
 /* ── Fixed Body (Zero Page Scroll) ── */
 .rail-scrollable-body {
   flex: 1;

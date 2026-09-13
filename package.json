@@ -8,7 +8,11 @@
   "scripts": {
     "dev": "npm --prefix client run dev",
     "build": "npm --prefix client run build",
-    "preview": "npm --prefix client run preview"
+    "preview": "npm --prefix client run preview",
+    "test": "node test/platform_foundation.test.js && node test/phase2a_coplay_twodevice.test.js && node test/phase2b_webrtc_security.test.js",
+    "test:phase1": "node test/platform_foundation.test.js",
+    "test:phase2a": "node test/phase2a_coplay_twodevice.test.js",
+    "test:phase2b": "node test/phase2b_webrtc_security.test.js"
   },
   "dependencies": {
     "lucide-react": "^0.380.0",

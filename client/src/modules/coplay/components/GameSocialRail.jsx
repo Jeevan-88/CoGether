@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Mic, MicOff, Video, VideoOff, Monitor, MessageSquare, 
-  Users, Send, Smile, LogOut, Swords, CheckCircle2, ChevronRight, ChevronDown, Zap 
+  Users, Send, Smile, LogOut, Swords, CheckCircle2, ChevronRight, ChevronDown, Zap,
+  Copy, Check
 } from 'lucide-react';
 import VideoTile from '../../videoroom/VideoTile.jsx';
 import './GameSocialRail.css';
@@ -27,6 +28,8 @@ export default function GameSocialRail({
   cameraEnabled = true,
   isScreenSharing = false,
   connected = false,
+  connectionState = 'NEW',
+  peerConnectionStates = {},
   chatMessages = [],
   onToggleMic,
   onToggleCamera,
@@ -42,7 +45,16 @@ export default function GameSocialRail({
   const [chatInput, setChatInput] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [copied, setCopied] = useState(false);
   const chatMessagesEndRef = useRef(null);
+
+  const handleCopyRoomCode = () => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(roomId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const remotePeerIds = Object.keys(remoteStreams);
   const totalCount = 1 + remotePeerIds.length;
@@ -70,7 +82,7 @@ export default function GameSocialRail({
       {/* ── Top Rail Status Header ── */}
       <div className="rail-top-header">
         <div className="rail-room-info">
-          <div className="live-status-dot" title={connected ? 'Connected' : 'Connecting'} />
+          <div className={`live-status-dot ${connected ? 'dot-connected' : 'dot-connecting'}`} title={connected ? 'Connected' : 'Connecting'} />
           <span className="rail-room-title">Party Room</span>
           <span className="rail-count-pill" title={`${totalCount} in room`}>
             <Users size={12} />
@@ -87,6 +99,26 @@ export default function GameSocialRail({
           {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
         </button>
       </div>
+
+      {/* ── Sub-header: 1-Click Room Code & Granular WebRTC State ── */}
+      {!isCollapsed && (
+        <div className="rail-room-meta-bar">
+          <button
+            type="button"
+            className="rail-room-code-badge"
+            onClick={handleCopyRoomCode}
+            title="Click to copy Room Code to invite friend or test second device"
+          >
+            <span className="room-label">ROOM:</span>
+            <span className="room-code">{roomId}</span>
+            {copied ? <Check size={12} className="copy-icon copied" /> : <Copy size={12} className="copy-icon" />}
+          </button>
+          <div className={`rail-webrtc-state-pill state-${(connectionState || 'NEW').toLowerCase()}`} title={`WebRTC Peer State: ${connectionState}`}>
+            <span className="state-dot" />
+            <span className="state-label">{connectionState}</span>
+          </div>
+        </div>
+      )}
 
       {!isCollapsed && (
         <div className="rail-scrollable-body">

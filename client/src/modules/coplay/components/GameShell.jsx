@@ -7,9 +7,10 @@ import GameViewport from './GameViewport.jsx';
 import GameSocialRail from './GameSocialRail.jsx';
 import ChallengeModal from './ChallengeModal.jsx';
 import DraggableCameraOverlay from './DraggableCameraOverlay.jsx';
+import { getSignalingUrl } from '../../../core/signalingConfig.js';
 import './GameShell.css';
 
-const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
+const SIGNALING_URL = getSignalingUrl();
 
 /**
  * GameShell
@@ -351,6 +352,8 @@ export default function GameShell({
             cameraEnabled={webrtc.cameraEnabled}
             isScreenSharing={webrtc.isScreenSharing}
             connected={webrtc.connected}
+            connectionState={webrtc.connectionState}
+            peerConnectionStates={webrtc.peerConnectionStates}
             chatMessages={webrtc.chatMessages}
             onToggleMic={webrtc.toggleMic}
             onToggleCamera={webrtc.toggleCamera}

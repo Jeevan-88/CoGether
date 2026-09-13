@@ -1,0 +1,20 @@
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+# Copy server package definitions
+COPY server/package*.json ./server/
+
+# Install server dependencies
+RUN cd server && npm ci --only=production
+
+# Copy application packages and server code
+COPY packages ./packages
+COPY server ./server
+
+EXPOSE 3001
+
+ENV NODE_ENV=production
+ENV PORT=3001
+
+CMD ["node", "server/server.js"]

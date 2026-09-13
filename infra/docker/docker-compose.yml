@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # ── PostgreSQL 16 Database ──────────────────────────────────────────────────
+  cogether-db:
+    image: postgres:16-alpine
+    container_name: cogether_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cogether_user
+      POSTGRES_PASSWORD: cogether_secret_dev_pass
+      POSTGRES_DB: cogether_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - cogether_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cogether_user -d cogether_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cogether-network
+
+  # ── Redis 7 Ephemeral State & Pub/Sub ───────────────────────────────────────
+  cogether-redis:
+    image: redis:7-alpine
+    container_name: cogether_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6380:6379"
+    volumes:
+      - cogether_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cogether-network
+
+  # ── CoGether Stateless Node.js API & Signaling Server ───────────────────────
+  cogether-server:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.server
+    container_name: cogether_api_server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://cogether_user:cogether_secret_dev_pass@cogether-db:5432/cogether_db
+      REDIS_URL: redis://cogether-redis:6379
+      JWT_SECRET: dev-secret-key-32bytes-minimum-length-cogether!
+      CORS_ORIGIN: "*"
+    ports:
+      - "3001:3001"
+    depends_on:
+      cogether-db:
+        condition: service_healthy
+      cogether-redis:
+        condition: service_healthy
+    networks:
+      - cogether-network
+
+volumes:
+  cogether_pgdata:
+    driver: local
+  cogether_redisdata:
+    driver: local
+
+networks:
+  cogether-network:
+    driver: bridge
