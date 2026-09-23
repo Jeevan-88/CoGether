@@ -1,19 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Swords, Trophy, Clock, Skull, Zap, RotateCw, ArrowLeft, Crown } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  Swords, Trophy, Clock, Skull, Zap, RotateCw, ArrowLeft, Crown, 
+  Wifi, Activity, ShieldCheck 
+} from 'lucide-react';
 import CoGetherButton from './CoGetherButton.jsx';
 import './GameSplitArena.css';
 
 /**
- * 2048 Board Renderer for opponent split screen
+ * Generic Opponent Live Duel Stage
+ * Dynamically displays real-time score telemetry, delta comparison,
+ * status banners, and optional grid data for any CoPlay game.
  */
-function Opponent2048Board({ grid = [], score = 0, isEliminated = false, isWinner = false }) {
-  // 4x4 fallback empty grid
-  const cells = grid && grid.length === 4 ? grid : [
-    [null, null, null, null],
-    [null, null, null, null],
-    [null, null, null, null],
-    [null, null, null, null]
-  ];
+function GenericOpponentStage({
+  game,
+  opponent,
+  localScore = 0,
+  isEliminated = false,
+  isWinner = false
+}) {
+  const oppScore = opponent.score || 0;
+  const scoreDiff = oppScore - localScore;
+
+  // Optional 2048 grid rendering if game provides serialized cell matrix
+  const hasValidGrid = opponent.grid && Array.isArray(opponent.grid) && opponent.grid.length === 4;
 
   const getTileColor = (val) => {
     if (!val) return { bg: 'rgba(238, 228, 218, 0.35)', color: 'transparent' };
@@ -34,40 +43,88 @@ function Opponent2048Board({ grid = [], score = 0, isEliminated = false, isWinne
   };
 
   return (
-    <div className="opponent-game-stage">
-      <div className="opponent-grid-2048">
-        {cells.map((col, x) => (
-          <div key={x} className="grid-col-2048">
-            {col.map((cell, y) => {
-              const val = cell?.value || cell;
-              const { bg, color } = getTileColor(val);
-              return (
-                <div
-                  key={`${x}-${y}`}
-                  className={`tile-cell-2048 ${val ? 'has-value' : 'empty'}`}
-                  style={{ backgroundColor: bg, color }}
-                >
-                  {val ? <span>{val}</span> : null}
-                </div>
-              );
-            })}
-          </div>
-        ))}
+    <div className="generic-opponent-stage">
+      {/* ── Top Telemetry Strip ── */}
+      <div className="opponent-telemetry-header">
+        <div className="telemetry-conn-pill">
+          <span className="live-pulse-dot" />
+          <Wifi size={12} />
+          <span>REAL-TIME P2P SYNC</span>
+        </div>
+        <div className="telemetry-game-name">
+          <span>{game?.title || 'Arcade Duel'}</span>
+        </div>
       </div>
 
-      {isEliminated && (
-        <div className="opponent-eliminated-scrim fade-in">
-          <Skull size={40} className="scrim-skull" />
-          <span className="scrim-title">ELIMINATED</span>
-          <span className="scrim-score">FINAL: {score}</span>
+      {/* ── Main Score Comparison Hub ── */}
+      <div className="opponent-score-hero">
+        <span className="score-hero-label">LIVE TELEMETRY SCORE</span>
+        <div className="score-hero-digits">
+          <Zap size={22} className="score-bolt-icon" />
+          <span className="score-number">{oppScore.toLocaleString()}</span>
+        </div>
+
+        {/* Delta relative to local player */}
+        <div className="score-delta-badge-row">
+          {scoreDiff > 0 ? (
+            <span className="delta-pill delta-ahead">+{scoreDiff.toLocaleString()} AHEAD OF YOU</span>
+          ) : scoreDiff < 0 ? (
+            <span className="delta-pill delta-behind">-{Math.abs(scoreDiff).toLocaleString()} BEHIND YOU</span>
+          ) : (
+            <span className="delta-pill delta-tied">TIED WITH YOU</span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Visualization: Mini Grid or Telemetry Pulse Wave ── */}
+      {hasValidGrid ? (
+        <div className="opponent-mini-grid-wrap">
+          <div className="opponent-grid-2048">
+            {opponent.grid.map((col, x) => (
+              <div key={x} className="grid-col-2048">
+                {col.map((cell, y) => {
+                  const val = cell?.value || cell;
+                  const { bg, color } = getTileColor(val);
+                  return (
+                    <div
+                      key={`${x}-${y}`}
+                      className={`tile-cell-2048 ${val ? 'has-value' : 'empty'}`}
+                      style={{ backgroundColor: bg, color }}
+                    >
+                      {val ? <span>{val}</span> : null}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="opponent-telemetry-radar-stage">
+          <div className="radar-pulse-ring ring-1" />
+          <div className="radar-pulse-ring ring-2" />
+          <div className="radar-center-icon">
+            <Activity size={36} className="radar-activity-icon" />
+            <span className="radar-label">ACTIVE STREAM</span>
+          </div>
         </div>
       )}
 
+      {/* ── Elimination Overlay ── */}
+      {isEliminated && (
+        <div className="opponent-eliminated-scrim fade-in">
+          <Skull size={44} className="scrim-skull" />
+          <span className="scrim-title">ELIMINATED</span>
+          <span className="scrim-score">FINAL SCORE: {oppScore}</span>
+        </div>
+      )}
+
+      {/* ── Winner Overlay ── */}
       {isWinner && (
         <div className="opponent-winner-scrim fade-in">
-          <Crown size={42} className="scrim-crown" />
+          <Crown size={48} className="scrim-crown" />
           <span className="scrim-title-win">WINNER!</span>
-          <span className="scrim-score">FINAL: {score}</span>
+          <span className="scrim-score">FINAL SCORE: {oppScore}</span>
         </div>
       )}
     </div>
@@ -109,7 +166,7 @@ export default function GameSplitArena({
     return () => clearInterval(interval);
   }, [matchOver]);
 
-  // Determine Win/Loss outcomes
+  // Determine Win/Loss outcomes based on objective win, elimination, and relative scores
   useEffect(() => {
     if (matchOver) return;
 
@@ -127,17 +184,17 @@ export default function GameSplitArena({
       return;
     }
 
-    // Rule 2: If local player loses, and opponents exist
+    // Rule 2: If local player is eliminated, check if all or single surviving opponent
     if (localOver && opponents.length > 0) {
-      // Find surviving opponents
       const survivingOpponents = opponents.filter((opp) => !opp.over);
       if (survivingOpponents.length === 1) {
-        // Last player standing wins!
         setMatchOver(true);
         setWinnerName(survivingOpponents[0].username || 'Opponent');
       } else if (survivingOpponents.length === 0) {
-        // All eliminated, highest score wins
-        const all = [{ name: currentUsername, score: localScore }, ...opponents.map((o) => ({ name: o.username, score: o.score || 0 }))];
+        const all = [
+          { name: currentUsername, score: localScore },
+          ...opponents.map((o) => ({ name: o.username, score: o.score || 0 }))
+        ];
         all.sort((a, b) => b.score - a.score);
         setMatchOver(true);
         setWinnerName(all[0].name);
@@ -145,7 +202,7 @@ export default function GameSplitArena({
       return;
     }
 
-    // Rule 3: If all opponents lost, local player is last standing and wins!
+    // Rule 3: If all opponents lost, local player wins
     if (opponents.length > 0 && opponents.every((opp) => opp.over) && !localOver) {
       setMatchOver(true);
       setWinnerName(currentUsername);
@@ -160,14 +217,15 @@ export default function GameSplitArena({
       {/* ── Global Match Status Banner ── */}
       <div className="arena-top-ticker">
         <div className="ticker-badge">
-          <Swords size={13} />
-          <span>SPLIT-SCREEN DUEL ARENA</span>
+          <Swords size={14} className="ticker-sword" />
+          <span>DUEL ARENA: {game?.title?.toUpperCase() || 'ARCADE'}</span>
         </div>
         <div className="ticker-timer">
           <Clock size={13} />
           <span>MATCH TIME: {formatTime(elapsedSeconds)}</span>
         </div>
         <div className="ticker-players">
+          <span className="live-dot" />
           <span>{totalPanes} PLAYERS LIVE</span>
         </div>
       </div>
@@ -183,11 +241,11 @@ export default function GameSplitArena({
               <span className="player-name-text">{currentUsername} (You)</span>
             </div>
             <div className="player-score-box">
-              <span className="score-label">SCORE</span>
-              <span className="score-value">{localScore}</span>
+              <span className="score-label">YOUR SCORE</span>
+              <span className="score-value">{localScore.toLocaleString()}</span>
             </div>
             <div className={`pane-status-pill ${localOver ? 'status-lost' : isLocalWinner && matchOver ? 'status-won' : 'status-live'}`}>
-              {localOver ? 'OUT' : isLocalWinner && matchOver ? 'WINNER' : 'PLAYING'}
+              {localOver ? 'ELIMINATED' : isLocalWinner && matchOver ? 'VICTORY' : 'PLAYING'}
             </div>
           </div>
 
@@ -213,7 +271,7 @@ export default function GameSplitArena({
           </div>
         </div>
 
-        {/* PANE 2 & 3: OPPONENT PLAYERS */}
+        {/* PANE 2 & 3: OPPONENTS */}
         {opponents.map((opp, idx) => {
           const isOppWinner = winnerName === opp.username;
           return (
@@ -228,19 +286,20 @@ export default function GameSplitArena({
                   <span className="player-name-text">{opp.username || `Player ${idx + 2}`}</span>
                 </div>
                 <div className="player-score-box">
-                  <span className="score-label">SCORE</span>
-                  <span className="score-value">{opp.score || 0}</span>
+                  <span className="score-label">OPPONENT SCORE</span>
+                  <span className="score-value">{(opp.score || 0).toLocaleString()}</span>
                 </div>
                 <div className={`pane-status-pill ${opp.over ? 'status-lost' : isOppWinner && matchOver ? 'status-won' : 'status-live'}`}>
-                  {opp.over ? 'OUT' : isOppWinner && matchOver ? 'WINNER' : 'PLAYING'}
+                  {opp.over ? 'ELIMINATED' : isOppWinner && matchOver ? 'VICTOR' : 'PLAYING'}
                 </div>
               </div>
 
-              {/* Opponent Live Board View */}
+              {/* Generic Opponent Stage */}
               <div className="pane-game-body">
-                <Opponent2048Board
-                  grid={opp.grid}
-                  score={opp.score || 0}
+                <GenericOpponentStage
+                  game={game}
+                  opponent={opp}
+                  localScore={localScore}
                   isEliminated={Boolean(opp.over)}
                   isWinner={isOppWinner && matchOver}
                 />

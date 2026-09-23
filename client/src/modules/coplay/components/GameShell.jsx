@@ -198,6 +198,7 @@ export default function GameShell({
 
       if (activeMode === 'CHALLENGE') {
         webrtc.sendChallengeBoardSync({ score, over, won, grid });
+        webrtc.sendChallengeScore(score, Boolean(over || won));
         if (over) webrtc.sendPlayerEliminated(score);
         if (won) webrtc.sendPlayerWon(score);
       }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './core/AuthContext.jsx';
 import Navbar from './components/common/Navbar.jsx';
 import LandingPage from './modules/landing/LandingPage.jsx';
 import VideoRoom from './modules/videoroom/VideoRoom.jsx';
@@ -6,15 +7,21 @@ import WatchPartyRoom from './modules/cowatch/WatchPartyRoom.jsx';
 import CoWatchCinemaHub from './modules/cowatch/CoWatchCinemaHub.jsx';
 import CoPlayGamesHub from './modules/coplay/CoPlayGamesHub.jsx';
 import CoShopHub from './modules/coshop/CoShopHub.jsx';
+import CoStudyWorld from './modules/costudy/CoStudyWorld.jsx';
 import MergedCameraView from './modules/costudy/MergedCameraView.jsx';
 import AuthModal from './modules/auth/AuthModal.jsx';
+import ProfileModal from './modules/auth/ProfileModal.jsx';
+import InviteLandingView from './modules/invites/InviteLandingView.jsx';
 import PricingModal from './modules/pricing/PricingModal.jsx';
 
-export default function App() {
+function MainApp() {
+  const { user, profile, preferences, isAuthenticated, restoreSession } = useAuth();
+
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub'
-  const [user, setUser] = useState(null);
   const [activeRoom, setActiveRoom] = useState(null);
+  const [activeInviteToken, setActiveInviteToken] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
   const [isCoshopActive, setIsCoshopActive] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -41,16 +48,36 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const pathname = window.location.pathname;
+
+    // Handle Google OAuth callback token
+    const tokenParam = params.get('token');
+    if (tokenParam) {
+      localStorage.setItem('cogether_access_token', tokenParam);
+      restoreSession();
+      // Clean query params
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+
+    // Handle invite token in pathname (/invite/<token>) or query (?invite=<token>)
+    if (pathname.includes('/invite/')) {
+      const token = pathname.split('/invite/')[1]?.split('/')[0]?.split('?')[0];
+      if (token) setActiveInviteToken(token);
+    } else if (params.get('invite')) {
+      setActiveInviteToken(params.get('invite'));
+    }
+
     const roomParam = params.get('room');
     const modeParam = params.get('mode');
     const gameParam = params.get('game');
     const challengeParam = params.get('challenge');
 
     if (roomParam) {
-      const storedName = localStorage.getItem('sp_username') || 'Guest_' + Math.floor(100 + Math.random() * 900);
+      const canonicalName = profile?.displayName || profile?.username || 'Member';
       setActiveRoom({
         roomId: roomParam,
-        username: storedName,
+        username: canonicalName,
         mode: modeParam || 'video'
       });
     } else if (modeParam === 'coplay' || modeParam === 'games' || gameParam || challengeParam) {
@@ -59,13 +86,16 @@ export default function App() {
       setActiveTab('cinemaHub');
     } else if (modeParam === 'shop' || modeParam === 'coshop') {
       setActiveTab('coshop');
+    } else if (modeParam === 'study' || modeParam === 'costudy') {
+      setActiveTab('studyHub');
     }
-  }, []);
+  }, [profile, restoreSession]);
 
   const handleStartRoom = (roomId, username, mode) => {
+    const canonicalName = username || profile?.displayName || profile?.username || 'Member';
     const newUrl = `${window.location.pathname}?room=${roomId}&mode=${mode}`;
     window.history.pushState({ path: newUrl }, '', newUrl);
-    setActiveRoom({ roomId, username, mode });
+    setActiveRoom({ roomId, username: canonicalName, mode });
   };
 
   const handleLeaveRoom = () => {
@@ -74,6 +104,25 @@ export default function App() {
     setActiveTab('home');
   };
 
+  // ── INVITE LANDING SCREEN ──
+  if (activeInviteToken) {
+    return (
+      <InviteLandingView
+        token={activeInviteToken}
+        onJoinRoom={({ roomId, resourceType }) => {
+          setActiveInviteToken(null);
+          const mode = resourceType === 'watch' ? 'watch' : 'games';
+          handleStartRoom(roomId, profile?.displayName || profile?.username || 'Guest', mode);
+        }}
+        onCancel={() => {
+          setActiveInviteToken(null);
+          window.history.pushState({}, document.title, '/');
+        }}
+      />
+    );
+  }
+
+  // ── ACTIVE ROOMS ──
   if (activeRoom) {
     if (activeRoom.mode === 'shop' || activeRoom.mode === 'coshop') {
       return (
@@ -145,13 +194,20 @@ export default function App() {
     );
   }
 
-  // ── CO-PLAY 100+ GAMES ARCADE HUB ──
+  // ── CO-PLAY VERIFIED GAMES ARCADE HUB ──
   if (activeTab === 'gamesHub') {
     return (
       <CoPlayGamesHub
         onBackToHome={() => setActiveTab('home')}
         initialUser={user}
       />
+    );
+  }
+
+  // ── CO-STUDY 2D LEARNING CITY & GAMIFIED CSE WORLD ──
+  if (activeTab === 'studyHub' || activeTab === 'costudy' || activeTab === 'study') {
+    return (
+      <CoStudyWorld />
     );
   }
 
@@ -163,11 +219,14 @@ export default function App() {
           if (tab === 'watch' || tab === 'cowatch') setActiveTab('cinemaHub');
           else if (tab === 'games' || tab === 'coplay') setActiveTab('gamesHub');
           else if (tab === 'shop' || tab === 'coshop') setActiveTab('coshop');
-          else if (tab === 'telepresence') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), user?.name || 'User', 'merged');
+          else if (tab === 'study' || tab === 'costudy') setActiveTab('studyHub');
+          else if (tab === 'telepresence') handleStartRoom('room-' + Math.floor(1000 + Math.random() * 9000), profile?.displayName || profile?.username || 'User', 'merged');
           else setActiveTab(tab);
         }}
         user={user}
+        profile={profile}
         onOpenAuth={() => setShowAuth(true)}
+        onOpenProfile={() => setShowProfile(true)}
         onOpenPricing={() => setShowPricing(true)}
         isScrolled={scrollProgress > 0.3}
         scrollProgress={scrollProgress}
@@ -186,18 +245,32 @@ export default function App() {
       {showAuth && (
         <AuthModal
           onClose={() => setShowAuth(false)}
-          onLoginSuccess={(loggedInUser) => setUser(loggedInUser)}
+          onLoginSuccess={() => {
+            setShowAuth(false);
+          }}
+        />
+      )}
+
+      {showProfile && (
+        <ProfileModal
+          onClose={() => setShowProfile(false)}
         />
       )}
 
       {showPricing && (
         <PricingModal
           onClose={() => setShowPricing(false)}
-          onSuccess={() => {
-            if (user) setUser({ ...user, plan: 'premium' });
-          }}
+          onSuccess={() => {}}
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
   );
 }

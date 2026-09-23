@@ -1,17 +1,25 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
   Gamepad2, Search, Play, Users, Flame, Star, Trophy, ArrowLeft, 
   X, Maximize, Minimize, Share2, Copy, Check, Heart, User, 
-  LogIn, Sparkles, Zap, Car, Crosshair, Brain, Swords, Bell, ShoppingBag
+  LogIn, Sparkles, Zap, Car, Crosshair, Brain, Swords, Bell, ShoppingBag, ShieldCheck
 } from 'lucide-react';
 import { AUTHORIZED_GAMES_DATABASE, GAME_CATEGORIES } from './authorizedGamesCatalog.js';
 import { GameMode, LicenseStatus, DistributionStatus } from './gameSchema.js';
 import GameCard from './components/GameCard.jsx';
 import GameDetailsModal from './components/GameDetailsModal.jsx';
 import GamePlayer from './components/GamePlayer.jsx';
+import LeaderboardModal from './components/LeaderboardModal.jsx';
+import AuthModal from '../auth/AuthModal.jsx';
+import ProfileModal from '../auth/ProfileModal.jsx';
+import { useAuth } from '../../core/AuthContext.jsx';
+import { API_URL } from '../../config/api.js';
 import './CoPlayGamesHub.css';
 
+const API_BASE = API_URL;
+
 export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initialUser }) {
+  const { user, profile, isAuthenticated, accessToken } = useAuth();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarHovered, setSidebarHovered] = useState(false);
@@ -21,49 +29,92 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
   const [activePlayGame, setActivePlayGame] = useState(null);
   const [activePlayMode, setActivePlayMode] = useState('SINGLE_PLAYER');
   const [activePlayRoomId, setActivePlayRoomId] = useState(null);
+  const [leaderboardGame, setLeaderboardGame] = useState(null);
 
-  const [favorites, setFavorites] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('cogether_fav_games')) || [];
-    } catch {
-      return [];
-    }
-  });
-
-  // User Profile & Progress State (Persisted in localStorage)
-  const [currentUser, setCurrentUser] = useState(() => {
-    if (initialUser) return initialUser;
-    try {
-      const stored = localStorage.getItem('cogether_player_profile');
-      return stored ? JSON.parse(stored) : {
-        name: localStorage.getItem('sp_username') || 'ArcadePlayer_88',
-        level: 4,
-        xp: 1450,
-        avatar: '🎮',
-        isLoggedIn: true
-      };
-    } catch {
-      return { name: 'Player_1', level: 1, xp: 100, avatar: '🕹️', isLoggedIn: false };
-    }
-  });
-
+  // Authentication & Profile Modals
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
-  const [authForm, setAuthForm] = useState({ username: '', email: '', password: '', avatar: '⚡' });
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
-  // Save favorites to localStorage
-  useEffect(() => {
-    localStorage.setItem('cogether_fav_games', JSON.stringify(favorites));
-  }, [favorites]);
+  // Authoritative games catalog from PostgreSQL backend
+  const [gamesCatalog, setGamesCatalog] = useState(AUTHORIZED_GAMES_DATABASE);
+  const [loadingGames, setLoadingGames] = useState(true);
 
-  // Save profile progress
+  // PostgreSQL-backed user favorites
+  const [favorites, setFavorites] = useState([]);
+
+  // Fetch games from PostgreSQL backend
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('cogether_player_profile', JSON.stringify(currentUser));
-      localStorage.setItem('sp_username', currentUser.name);
+    let isMounted = true;
+    fetch(`${API_BASE}/api/games?verifiedOnly=true&limit=100`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (isMounted && data?.games && Array.isArray(data.games) && data.games.length > 0) {
+          const mapped = data.games.map((g) => ({
+            id: g.id,
+            title: g.title,
+            description: g.description,
+            category: g.category,
+            thumbnail: g.thumbnail || g.thumb || `/games/thumbnails/${g.id}.svg`,
+            provider: g.provider || 'CoGether Open Source',
+            gameMode: g.gameMode || 'SINGLE_PLAYER',
+            launchType: g.launchType || 'LOCAL_SOURCE',
+            launchUrl: g.launchUrl || g.url || `/games/${g.id}/index.html`,
+            embedUrl: g.launchUrl || g.url || `/games/${g.id}/index.html`,
+            sourceRepository: g.sourceRepository || '',
+            sourceLicense: g.licenseType || 'MIT',
+            licenseStatus: g.licenseStatus || 'LICENSE_VERIFIED',
+            distributionStatus: g.distributionStatus || 'AVAILABLE',
+            controls: typeof g.controls === 'string' ? JSON.parse(g.controls) : (g.controls || {}),
+            orientation: g.orientation || 'any',
+            maxPlayers: g.maxPlayers || 1,
+            challengeSupported: g.challengeSupported ?? g.supportsChallenge ?? true,
+            cameraSupported: true,
+            fullscreenSupported: true
+          }));
+          setGamesCatalog(mapped);
+        }
+      })
+      .catch((err) => {
+        console.warn('Using authorized local games fallback:', err.message);
+      })
+      .finally(() => {
+        if (isMounted) setLoadingGames(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Fetch PostgreSQL favorites when user is authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !accessToken) {
+      setFavorites([]);
+      return;
     }
-  }, [currentUser]);
+
+    let isMounted = true;
+    fetch(`${API_BASE}/api/v1/coplay/favorites`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data?.favorites && Array.isArray(data.favorites)) {
+          setFavorites(data.favorites.map((f) => f.game_id));
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to fetch player favorites:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, accessToken]);
 
   // Read URL query parameters for direct game or challenge link sharing
   useEffect(() => {
@@ -73,30 +124,32 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
     const roomId = params.get('room');
 
     if (challengeId) {
-      const match = AUTHORIZED_GAMES_DATABASE.find(g => g.id === challengeId);
+      const match = gamesCatalog.find((g) => g.id === challengeId);
       if (match) {
         setActivePlayGame(match);
         setActivePlayMode('CHALLENGE');
         setActivePlayRoomId(roomId || ('duel-' + Math.floor(1000 + Math.random() * 9000)));
       }
     } else if (gameId) {
-      const match = AUTHORIZED_GAMES_DATABASE.find(g => g.id === gameId);
+      const match = gamesCatalog.find((g) => g.id === gameId);
       if (match) {
         setActivePlayGame(match);
         setActivePlayMode('SINGLE_PLAYER');
         setActivePlayRoomId(null);
       }
     }
-  }, []);
+  }, [gamesCatalog]);
 
   // Filter Games by Category & Search Query
   const filteredGames = useMemo(() => {
-    return AUTHORIZED_GAMES_DATABASE.filter((game) => {
+    return gamesCatalog.filter((game) => {
       let matchesCat = true;
       if (activeCategory === 'all') {
         matchesCat = true;
+      } else if (activeCategory === 'favorites') {
+        matchesCat = favorites.includes(game.id);
       } else if (activeCategory === 'popular') {
-        matchesCat = ['2048', 'hextris', 'block-puzzle', 'retro-pong-2p'].includes(game.id);
+        matchesCat = ['2048', 'hextris', 'block-puzzle', 'clumsy-bird'].includes(game.id);
       } else if (activeCategory === 'local_coop') {
         matchesCat = game.gameMode === GameMode.LOCAL_COOP;
       } else if (activeCategory === 'multiplayer') {
@@ -109,11 +162,11 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
       const matchesSearch = !q || 
         game.title.toLowerCase().includes(q) ||
         game.description.toLowerCase().includes(q) ||
-        game.category.toLowerCase().includes(q);
+        (game.category && game.category.toLowerCase().includes(q));
 
       return matchesCat && matchesSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [gamesCatalog, activeCategory, searchQuery, favorites]);
 
   const renderCatIcon = (iconName, size = 18) => {
     switch (iconName) {
@@ -124,15 +177,45 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
       case 'Zap': return <Zap size={size} />;
       case 'Users': return <Users size={size} />;
       case 'Trophy': return <Trophy size={size} />;
+      case 'Heart': return <Heart size={size} />;
       default: return <Gamepad2 size={size} />;
     }
   };
 
-  const toggleFavorite = (gameId, e) => {
-    e.stopPropagation();
-    setFavorites((prev) => 
-      prev.includes(gameId) ? prev.filter((id) => id !== gameId) : [...prev, gameId]
-    );
+  // Real user display values
+  const displayName = profile?.displayName || profile?.username || (user?.email ? user.email.split('@')[0] : 'Arcade Player');
+  const avatar = profile?.avatarUrl || '🎮';
+
+  // Toggle favorite with real PostgreSQL endpoint
+  const toggleFavorite = async (gameId, e) => {
+    if (e) e.stopPropagation();
+
+    if (!isAuthenticated || !accessToken) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    const isFav = favorites.includes(gameId);
+    // Optimistic UI update
+    setFavorites((prev) => (isFav ? prev.filter((id) => id !== gameId) : [...prev, gameId]));
+
+    try {
+      const method = isFav ? 'DELETE' : 'POST';
+      const res = await fetch(`${API_BASE}/api/v1/coplay/favorites/${encodeURIComponent(gameId)}`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!res.ok) {
+        // Rollback on server error
+        setFavorites((prev) => (isFav ? [...prev, gameId] : prev.filter((id) => id !== gameId)));
+      }
+    } catch (err) {
+      // Rollback on network error
+      setFavorites((prev) => (isFav ? [...prev, gameId] : prev.filter((id) => id !== gameId)));
+    }
   };
 
   // Launch handlers
@@ -144,12 +227,14 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
     setActivePlayMode('SINGLE_PLAYER');
     setActivePlayRoomId(null);
     setActivePlayGame(game);
-    // Award +50 XP for playing games
-    setCurrentUser((prev) => ({
-      ...prev,
-      xp: (prev.xp || 0) + 50,
-      level: Math.floor(((prev.xp || 0) + 50) / 400) + 1
-    }));
+  };
+
+  const copyToClipboardSafely = (text) => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+    } catch (e) {}
   };
 
   const handleChallengeGame = (game) => {
@@ -159,7 +244,7 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
     }
     const challengeRoomId = 'duel-' + Math.floor(1000 + Math.random() * 9000);
     const link = `${window.location.origin}?room=${challengeRoomId}&mode=coplay&challenge=${game.id}`;
-    navigator.clipboard.writeText(link);
+    copyToClipboardSafely(link);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2500);
     setActivePlayMode('CHALLENGE');
@@ -174,45 +259,31 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
     }
     const squadRoomId = 'squad-' + Math.floor(1000 + Math.random() * 9000);
     const link = `${window.location.origin}?room=${squadRoomId}&mode=coplay&game=${game.id}`;
-    navigator.clipboard.writeText(link);
+    copyToClipboardSafely(link);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2500);
     setActivePlayGame(game);
   };
 
-  const handleAuthSubmit = (e) => {
-    e.preventDefault();
-    const finalUser = {
-      name: authForm.username || 'ProGamer_' + Math.floor(100 + Math.random() * 900),
-      email: authForm.email,
-      level: 1,
-      xp: 250,
-      avatar: authForm.avatar || '🔥',
-      isLoggedIn: true
-    };
-    setCurrentUser(finalUser);
-    setShowAuthModal(false);
-  };
-
   const handleShareSquadRoom = () => {
     const roomCode = 'squad-' + Math.floor(1000 + Math.random() * 9000);
     const link = `${window.location.origin}?room=${roomCode}&mode=coplay`;
-    navigator.clipboard.writeText(link);
+    copyToClipboardSafely(link);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2500);
   };
 
   // Featured Spotlight Game (Playable verified hit)
-  const spotlightGame = AUTHORIZED_GAMES_DATABASE.find(g => g.id === '2048-classic') || AUTHORIZED_GAMES_DATABASE[0];
+  const spotlightGame = gamesCatalog.find((g) => g.id === '2048') || gamesCatalog[0];
 
-  // When a game is launched, render the dedicated GamePlayer exclusively (no yellow catalog background)
+  // When a game is launched, render the dedicated GamePlayer
   if (activePlayGame) {
     return (
       <GamePlayer
         game={activePlayGame}
         initialMode={activePlayMode}
         initialRoomId={activePlayRoomId}
-        currentUsername={currentUser?.name}
+        currentUsername={displayName}
         onClose={() => {
           setActivePlayGame(null);
           setActivePlayMode('SINGLE_PLAYER');
@@ -252,25 +323,36 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
           )}
         </div>
 
-        {/* RIGHT ACTIONS: XP, NOTIFICATION, AVATAR, SQUAD LAUNCH */}
+        {/* RIGHT ACTIONS: ARCADE STATUS, AVATAR/SIGN-IN, SQUAD LAUNCH */}
         <div className="coplay-header-right">
-          <div className="header-xp-pill" title="Arcade XP Level">
-            <Zap size={14} className="xp-icon" />
-            <span>{currentUser?.xp || 1450} XP</span>
+          <div className="header-xp-pill" title="Verified Open-Source Arcade">
+            <ShieldCheck size={14} className="xp-icon" />
+            <span>Verified Arcade</span>
           </div>
 
-          <button className="header-icon-btn" title="Notifications">
-            <Bell size={18} />
-            <span className="notif-badge-dot" />
-          </button>
-
-          <div 
-            className="header-avatar-circle" 
-            onClick={() => setShowAuthModal(true)} 
-            title={`${currentUser?.name} (LVL ${currentUser?.level || 1})`}
-          >
-            <span>{currentUser?.avatar || '🎮'}</span>
-          </div>
+          {isAuthenticated ? (
+            <div 
+              className="header-avatar-circle" 
+              onClick={() => setShowProfileModal(true)} 
+              title={`${displayName} (Manage Profile)`}
+            >
+              {avatar.startsWith('http') || avatar.startsWith('data:') ? (
+                <img src={avatar} alt="" className="hub-avatar-img" />
+              ) : (
+                <span>{avatar}</span>
+              )}
+            </div>
+          ) : (
+            <button 
+              type="button" 
+              className="btn-hub-signin" 
+              onClick={() => setShowAuthModal(true)}
+              title="Sign in with Email or Google"
+            >
+              <LogIn size={15} />
+              <span>SIGN IN</span>
+            </button>
+          )}
 
           <button className="btn-squad-party-launch" onClick={handleShareSquadRoom}>
             <Users size={15} /> 
@@ -303,6 +385,18 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
               </button>
             );
           })}
+          {isAuthenticated && (
+            <button
+              className={`sidebar-cat-btn ${activeCategory === 'favorites' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('favorites')}
+              title="My Favorites"
+            >
+              <div className="cat-icon-wrap">
+                <Heart size={18} />
+              </div>
+              <span className="cat-label-text">Favorites ({favorites.length})</span>
+            </button>
+          )}
         </div>
       </aside>
 
@@ -335,6 +429,14 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
                     <Swords size={16} /> CHALLENGE FRIEND
                   </button>
                 )}
+                <button 
+                  type="button" 
+                  className="btn-spotlight-squad" 
+                  onClick={() => setLeaderboardGame(spotlightGame)}
+                  title="View Top Scores"
+                >
+                  <Trophy size={16} /> LEADERBOARD
+                </button>
               </div>
             </div>
             <div className="spotlight-banner-right">
@@ -353,9 +455,15 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
           <div className="grid-header-row">
             <div>
               <h3 className="section-heading">
-                {activeCategory === 'all' ? 'ALL GAMES' : activeCategory === 'popular' ? 'POPULAR GAMES' : `${activeCategory.replace('_', ' ').toUpperCase()} GAMES`}
+                {activeCategory === 'all' 
+                  ? 'VERIFIED OPEN-SOURCE GAMES' 
+                  : activeCategory === 'popular' 
+                  ? 'POPULAR GAMES' 
+                  : activeCategory === 'favorites' 
+                  ? 'MY FAVORITE GAMES' 
+                  : `${activeCategory.replace('_', ' ').toUpperCase()} GAMES`}
               </h3>
-              <span className="section-subtext">Instant browser play • Duo camera overlay ready • Real-time challenge</span>
+              <span className="section-subtext">Verified open-source browser play • Duo camera overlay • Real-time leaderboard</span>
             </div>
             <span className="games-counter-badge">{filteredGames.length} GAMES</span>
           </div>
@@ -388,6 +496,7 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
                   onViewDetails={(g) => setDetailsGame(g)}
                   isFavorite={favorites.includes(game.id)}
                   onToggleFavorite={toggleFavorite}
+                  onViewLeaderboard={(g) => setLeaderboardGame(g)}
                 />
               ))}
             </div>
@@ -395,7 +504,7 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
         </main>
       </div>
 
-      {/* ── 5. GAME DETAILS MODAL ── */}
+      {/* ── 4. GAME DETAILS MODAL ── */}
       {detailsGame && (
         <GameDetailsModal
           game={detailsGame}
@@ -403,87 +512,34 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
           onPlay={handlePlayGame}
           onChallenge={handleChallengeGame}
           onSquad={handleSquadGame}
+          onViewLeaderboard={(g) => {
+            setDetailsGame(null);
+            setLeaderboardGame(g);
+          }}
         />
       )}
 
+      {/* ── 5. LEADERBOARD MODAL ── */}
+      {leaderboardGame && (
+        <LeaderboardModal
+          game={leaderboardGame}
+          onClose={() => setLeaderboardGame(null)}
+        />
+      )}
 
-      {/* ── 7. LOGIN & CLOUD PROGRESS MODAL ── */}
+      {/* ── 6. REAL AUTH MODAL ── */}
       {showAuthModal && (
-        <div className="arcade-auth-overlay fade-in">
-          <div className="arcade-auth-card">
-            <button className="modal-close-btn" onClick={() => setShowAuthModal(false)}>
-              <X size={18} />
-            </button>
-            <div className="auth-header">
-              <span className="auth-badge">CO-PLAY PROFILE</span>
-              <h2>{authMode === 'login' ? 'LOGIN TO SAVE PROGRESS' : 'CREATE FREE ARCADE ACCOUNT'}</h2>
-              <p>Save your high scores, unlock gamer avatars, and invite friends to private squad lobbies.</p>
-            </div>
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onLoginSuccess={() => setShowAuthModal(false)}
+        />
+      )}
 
-            <form onSubmit={handleAuthSubmit} className="arcade-auth-form">
-              <div className="avatar-selection-row">
-                <label>Choose Your Gamer Avatar:</label>
-                <div className="avatar-options">
-                  {['🎮', '⚡', '🔥', '👑', '🚀', '👾', '🕹️', '🏆'].map((av) => (
-                    <button
-                      type="button"
-                      key={av}
-                      className={`av-btn ${authForm.avatar === av ? 'active' : ''}`}
-                      onClick={() => setAuthForm({ ...authForm, avatar: av })}
-                    >
-                      {av}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Gamer Tag / Username:</label>
-                <input
-                  type="text"
-                  placeholder="e.g. ShadowRacer_99"
-                  value={authForm.username}
-                  onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Email Address:</label>
-                <input
-                  type="email"
-                  placeholder="gamer@gmail.com"
-                  value={authForm.email}
-                  onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Password:</label>
-                <input
-                  type="password"
-                  placeholder="••••••••••••"
-                  value={authForm.password}
-                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-                  required
-                />
-              </div>
-
-              <button type="submit" className="btn-auth-submit">
-                {authMode === 'login' ? 'LOGIN & SYNC CLOUD PROGRESS →' : 'SIGN UP & CLAIM 250 XP →'}
-              </button>
-            </form>
-
-            <div className="auth-switcher-row">
-              {authMode === 'login' ? (
-                <p>Don't have an arcade profile? <span onClick={() => setAuthMode('signup')}>Sign up for free</span></p>
-              ) : (
-                <p>Already have an account? <span onClick={() => setAuthMode('login')}>Log in here</span></p>
-              )}
-            </div>
-          </div>
-        </div>
+      {/* ── 7. REAL PROFILE MODAL ── */}
+      {showProfileModal && (
+        <ProfileModal
+          onClose={() => setShowProfileModal(false)}
+        />
       )}
     </div>
   );

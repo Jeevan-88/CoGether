@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Users, Heart, ShieldAlert, ShieldCheck, Swords, Info, Gamepad2, User, ExternalLink } from 'lucide-react';
+import { Play, Users, Heart, ShieldAlert, ShieldCheck, Swords, Info, Gamepad2, User, ExternalLink, Trophy } from 'lucide-react';
 import { GameMode, LicenseStatus, DistributionStatus } from '../gameSchema.js';
 import './GameCard.css';
 
@@ -10,7 +10,8 @@ export default function GameCard({
   onSquad,
   onViewDetails,
   isFavorite,
-  onToggleFavorite
+  onToggleFavorite,
+  onViewLeaderboard
 }) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -99,6 +100,22 @@ export default function GameCard({
         >
           <ExternalLink size={13} />
         </button>
+
+        {/* Leaderboard button on hover */}
+        {onViewLeaderboard && (
+          <button 
+            type="button" 
+            className="btn-card-leaderboard-peek"
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewLeaderboard(game);
+            }}
+            title="View Leaderboard"
+            aria-label="View Leaderboard"
+          >
+            <Trophy size={13} />
+          </button>
+        )}
 
         {/* Info button on hover */}
         <button 

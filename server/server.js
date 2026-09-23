@@ -6,17 +6,52 @@ const { Server } = require('socket.io');
 // Foundational Platform Packages
 const { getConfig, getSanitizedConfig } = require('../packages/config');
 const { logger, correlationMiddleware, metrics } = require('../packages/observability');
-const { authenticateToken, requireEntitlement, createGuestSession, verifyToken } = require('../packages/auth');
+const { 
+  authenticateToken, requireEntitlement, createGuestSession, verifyToken, signToken,
+  validateAndRotateSession, revokeSession, revokeAllUserSessions, getGoogleAuthUrl, exchangeCodeForTokens
+} = require('../packages/auth');
 const { db } = require('../packages/database');
 const { redis } = require('../packages/redis');
 const { validateGuestSessionInput } = require('../packages/contracts');
 const { gameRepository } = require('../services/coplay/gameRepository');
 const { gameSessionManager, SessionState } = require('../services/coplay/gameSessionManager');
+const { favoriteService } = require('../services/coplay/favoriteService');
+const { leaderboardService } = require('../services/coplay/leaderboardService');
 const { getIceConfiguration } = require('../packages/webrtc');
+const { userService, profileService, inviteService } = require('../services/identity');
+const cowatchContentRepo = require('../services/cowatch/contentRepository');
+const cowatchRoomService = require('../services/cowatch/roomService');
+const { cityRepository } = require('../services/costudy/cityRepository');
+const { learningRepository } = require('../services/costudy/learningRepository');
+const { submissionService } = require('../services/costudy/submissionService');
+const { interviewService } = require('../services/costudy/interviewService');
+
+const path = require('path');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use('/uploads', express.static(path.join(__dirname, '../client/public/uploads')));
+
+// Lightweight cookie parsing middleware
+app.use((req, res, next) => {
+  req.cookies = {};
+  const cookieHeader = req.headers.cookie;
+  if (cookieHeader) {
+    cookieHeader.split(';').forEach((part) => {
+      const [key, val] = part.trim().split('=');
+      if (key && val) {
+        try {
+          req.cookies[key] = decodeURIComponent(val);
+        } catch (e) {
+          req.cookies[key] = val;
+        }
+      }
+    });
+  }
+  next();
+});
+
 app.use(correlationMiddleware);
 
 
@@ -29,10 +64,529 @@ gameRepository.syncCatalogFromFeed().catch((err) => {
 app.get('/api/games', async (req, res) => {
   try {
     const result = await gameRepository.getGames(req.query);
-    res.json(result);
+    res.json({ success: true, ...result });
   } catch (err) {
     logger.error('Failed to query games repository', { error: err });
-    res.status(500).json({ error: 'Failed to retrieve games catalog' });
+    res.status(500).json({ success: false, error: 'Failed to retrieve games catalog' });
+  }
+});
+
+// Single Game API Endpoint
+app.get('/api/games/:id', async (req, res) => {
+  try {
+    const game = await gameRepository.getGameById(req.params.id);
+    if (!game) {
+      return res.status(404).json({ success: false, error: 'GAME_NOT_FOUND', message: 'Game not found' });
+    }
+    res.json({ success: true, game });
+  } catch (err) {
+    logger.error('Failed to get game by id', { error: err });
+    res.status(500).json({ success: false, error: 'Failed to retrieve game details' });
+  }
+});
+
+// CoPlay Leaderboards API (Aggregated from coplay.scores and identity.profiles)
+app.get('/api/v1/coplay/leaderboards/:gameId', async (req, res) => {
+  const { gameId } = req.params;
+  const { period = 'all_time', limit = 50 } = req.query;
+  try {
+    const result = await leaderboardService.getLeaderboard(gameId, { period, limit });
+    res.json({ success: true, ...result });
+  } catch (err) {
+    if (err.message && err.message.includes('GAME_NOT_FOUND')) {
+      return res.status(404).json({ error: { code: 'GAME_NOT_FOUND', message: err.message } });
+    }
+    if (err.message && err.message.includes('INVALID_GAME_ID')) {
+      return res.status(400).json({ error: { code: 'INVALID_GAME_ID', message: err.message } });
+    }
+    logger.error('Failed to get leaderboard', { error: err.message });
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to retrieve leaderboard' } });
+  }
+});
+
+// CoPlay Player Favorites APIs
+app.get('/api/v1/coplay/favorites', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+  }
+  try {
+    const result = await favoriteService.getFavorites(userId);
+    res.json({ success: true, ...result });
+  } catch (err) {
+    logger.error('Failed to get favorites', { error: err.message });
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to retrieve favorites' } });
+  }
+});
+
+app.post('/api/v1/coplay/favorites/:gameId', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+  }
+  const { gameId } = req.params;
+  try {
+    const result = await favoriteService.addFavorite(userId, gameId);
+    res.json({ success: true, ...result });
+  } catch (err) {
+    if (err.message && err.message.includes('GAME_NOT_FOUND')) {
+      return res.status(404).json({ error: { code: 'GAME_NOT_FOUND', message: err.message } });
+    }
+    if (err.message && err.message.includes('INVALID_GAME_ID')) {
+      return res.status(400).json({ error: { code: 'INVALID_GAME_ID', message: err.message } });
+    }
+    logger.error('Failed to add favorite', { error: err.message });
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to add favorite' } });
+  }
+});
+
+app.delete('/api/v1/coplay/favorites/:gameId', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+  }
+  const { gameId } = req.params;
+  try {
+    const result = await favoriteService.removeFavorite(userId, gameId);
+    res.json({ success: true, ...result });
+  } catch (err) {
+    if (err.message && err.message.includes('INVALID_GAME_ID')) {
+      return res.status(400).json({ error: { code: 'INVALID_GAME_ID', message: err.message } });
+    }
+    logger.error('Failed to remove favorite', { error: err.message });
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to remove favorite' } });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════
+// CO-WATCH REST APIS (PHASE 3.0)
+// ══════════════════════════════════════════════════════════════════════
+
+// 1. Content Catalog Query
+app.get('/api/v1/cowatch/content', async (req, res) => {
+  try {
+    const { contentType, providerId, genre, verifiedOnly, search, featured, trending, limit, offset } = req.query;
+    const result = await cowatchContentRepo.getAllContent({
+      contentType,
+      providerId,
+      genre,
+      verifiedOnly: verifiedOnly === 'true' || verifiedOnly === true,
+      search,
+      featured: featured !== undefined ? featured === 'true' : undefined,
+      trending: trending !== undefined ? trending === 'true' : undefined,
+      limit: limit ? parseInt(limit, 10) : 50,
+      offset: offset ? parseInt(offset, 10) : 0
+    });
+    res.json({ success: true, ...result });
+  } catch (err) {
+    logger.error('Failed to retrieve CoWatch content', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve content catalog' });
+  }
+});
+
+// 2. Single Content Details
+app.get('/api/v1/cowatch/content/:id', async (req, res) => {
+  try {
+    const content = await cowatchContentRepo.getContentById(req.params.id);
+    if (!content) {
+      return res.status(404).json({ success: false, error: 'CONTENT_NOT_FOUND', message: 'Media content not found' });
+    }
+    res.json({ success: true, content });
+  } catch (err) {
+    logger.error('Failed to get CoWatch content by id', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve content details' });
+  }
+});
+
+// 3. Providers Registry
+app.get('/api/v1/cowatch/providers', async (req, res) => {
+  try {
+    const providers = await cowatchContentRepo.getAllProviders();
+    res.json({ success: true, providers });
+  } catch (err) {
+    logger.error('Failed to get CoWatch providers', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve providers' });
+  }
+});
+
+app.get('/api/v1/cowatch/providers/:id', async (req, res) => {
+  try {
+    const provider = await cowatchContentRepo.getProviderById(req.params.id);
+    if (!provider) {
+      return res.status(404).json({ success: false, error: 'PROVIDER_NOT_FOUND' });
+    }
+    res.json({ success: true, provider });
+  } catch (err) {
+    logger.error('Failed to get provider by id', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve provider' });
+  }
+});
+
+// 4. Watch Rooms APIs
+app.post('/api/v1/cowatch/rooms', async (req, res) => {
+  try {
+    const { contentId, title, controlPolicy, playbackMode } = req.body;
+    let hostUserId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        hostUserId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+
+    const room = await cowatchRoomService.createWatchRoom({
+      hostUserId,
+      contentId,
+      title,
+      controlPolicy: controlPolicy || 'HOST_ONLY',
+      playbackMode: playbackMode || 'NATIVE_PLAYER'
+    });
+
+    res.status(201).json({ success: true, room });
+  } catch (err) {
+    logger.error('Failed to create watch room', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to create watch room' });
+  }
+});
+
+app.get('/api/v1/cowatch/rooms/:code', async (req, res) => {
+  try {
+    const room = await cowatchRoomService.getWatchRoomByCode(req.params.code);
+    if (!room) {
+      return res.status(404).json({ success: false, error: 'ROOM_NOT_FOUND', message: 'Watch room not found' });
+    }
+    res.json({ success: true, room });
+  } catch (err) {
+    logger.error('Failed to get watch room', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve watch room' });
+  }
+});
+
+app.post('/api/v1/cowatch/rooms/:code/join', async (req, res) => {
+  try {
+    const { username, role } = req.body;
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        userId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+
+    const room = await cowatchRoomService.joinWatchRoom({
+      roomCode: req.params.code,
+      userId,
+      username,
+      role: role || 'MEMBER'
+    });
+    res.json({ success: true, room });
+  } catch (err) {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/v1/cowatch/rooms/:code/leave', async (req, res) => {
+  try {
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        userId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+    await cowatchRoomService.leaveWatchRoom({ roomCode: req.params.code, userId });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5. Watch History APIs
+app.get('/api/v1/cowatch/history', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED' } });
+  }
+  try {
+    const history = await cowatchRoomService.getWatchHistory(userId);
+    res.json({ success: true, history });
+  } catch (err) {
+    logger.error('Failed to get watch history', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve watch history' });
+  }
+});
+
+app.post('/api/v1/cowatch/history', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED' } });
+  }
+  try {
+    const { contentId, positionSeconds, durationSeconds, completed } = req.body;
+    const entry = await cowatchRoomService.recordWatchHistory({
+      userId,
+      contentId,
+      positionSeconds,
+      durationSeconds,
+      completed
+    });
+    res.json({ success: true, entry });
+  } catch (err) {
+    logger.error('Failed to record watch history', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to record watch history' });
+  }
+});
+
+// 6. Favorites APIs
+app.get('/api/v1/cowatch/favorites', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED' } });
+  }
+  try {
+    const favorites = await cowatchRoomService.getFavorites(userId);
+    res.json({ success: true, favorites });
+  } catch (err) {
+    logger.error('Failed to get CoWatch favorites', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve favorites' });
+  }
+});
+
+app.post('/api/v1/cowatch/favorites/:contentId', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED' } });
+  }
+  try {
+    const favorite = await cowatchRoomService.addFavorite({ userId, contentId: req.params.contentId });
+    res.json({ success: true, favorite });
+  } catch (err) {
+    logger.error('Failed to add favorite', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to add favorite' });
+  }
+});
+
+app.delete('/api/v1/cowatch/favorites/:contentId', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED' } });
+  }
+  try {
+    await cowatchRoomService.removeFavorite({ userId, contentId: req.params.contentId });
+    res.json({ success: true });
+  } catch (err) {
+    logger.error('Failed to remove favorite', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to remove favorite' });
+  }
+});
+// ── CO-STUDY 2D LEARNING CITY & GAMIFIED CSE KNOWLEDGE WORLD ──
+
+// 1. Get 15 Knowledge Districts
+app.get('/api/v1/costudy/districts', async (req, res) => {
+  try {
+    const districts = await cityRepository.getDistricts();
+    res.json({ success: true, districts });
+  } catch (err) {
+    logger.error('Failed to get districts:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve districts' });
+  }
+});
+
+// 2. Get Buildings (all or by district)
+app.get('/api/v1/costudy/buildings', async (req, res) => {
+  try {
+    const buildings = await cityRepository.getBuildings(req.query.districtId);
+    res.json({ success: true, buildings });
+  } catch (err) {
+    logger.error('Failed to get buildings:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve buildings' });
+  }
+});
+
+// 3. Get Building by ID / Slug
+app.get('/api/v1/costudy/buildings/:id', async (req, res) => {
+  try {
+    const building = await cityRepository.getBuildingById(req.params.id);
+    if (!building) {
+      return res.status(404).json({ success: false, error: 'Building not found' });
+    }
+    res.json({ success: true, building });
+  } catch (err) {
+    logger.error('Failed to get building:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve building' });
+  }
+});
+
+// 4. Get Academic Campus Curriculum (Semesters 1-8)
+app.get('/api/v1/costudy/curriculum', async (req, res) => {
+  try {
+    const degree = req.query.degree || 'B.Tech CSE';
+    const curriculum = await cityRepository.getCurriculum(degree);
+    res.json({ success: true, ...curriculum });
+  } catch (err) {
+    logger.error('Failed to get curriculum:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve curriculum' });
+  }
+});
+
+// 5. Get Subject Campus Roadmap & Nodes
+app.get('/api/v1/costudy/subjects/:slug/roadmap', async (req, res) => {
+  try {
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        userId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+    const roadmap = await learningRepository.getSubjectRoadmap(req.params.slug, userId);
+    if (!roadmap) {
+      return res.status(404).json({ success: false, error: 'Subject not found' });
+    }
+    res.json({ success: true, ...roadmap });
+  } catch (err) {
+    logger.error('Failed to get subject roadmap:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve roadmap' });
+  }
+});
+
+// 6. Get Node Details, Lesson, and Problems
+app.get('/api/v1/costudy/nodes/:id', async (req, res) => {
+  try {
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        userId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+    const details = await learningRepository.getNodeDetails(req.params.id, userId);
+    if (!details) {
+      return res.status(404).json({ success: false, error: 'Node not found' });
+    }
+    res.json({ success: true, ...details });
+  } catch (err) {
+    logger.error('Failed to get node details:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve node details' });
+  }
+});
+
+// 7. Submit Code Problem Solution for Evaluation
+app.post('/api/v1/costudy/problems/:id/submit', async (req, res) => {
+  try {
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        userId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+    const { code } = req.body;
+    if (!code) {
+      return res.status(400).json({ success: false, error: 'Code submission cannot be empty' });
+    }
+    const result = await submissionService.evaluateSubmission({
+      userId,
+      problemId: req.params.id,
+      code
+    });
+    res.json({ success: true, ...result });
+  } catch (err) {
+    logger.error('Problem submission error:', { error: err.message });
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({ success: false, error: err.message });
+  }
+});
+
+// 8. Get Adaptive Viva Questions for Lesson
+app.get('/api/v1/costudy/interview/:lessonId', async (req, res) => {
+  try {
+    const questions = await interviewService.getQuestionsForLesson(req.params.lessonId);
+    res.json({ success: true, questions });
+  } catch (err) {
+    logger.error('Failed to get interview questions:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve interview questions' });
+  }
+});
+
+// 9. Evaluate Student AI Viva Answers
+app.post('/api/v1/costudy/interview/evaluate', async (req, res) => {
+  try {
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        userId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+    const { subjectId, lessonId, answers } = req.body;
+    if (!lessonId || !Array.isArray(answers)) {
+      return res.status(400).json({ success: false, error: 'Invalid interview submission payload' });
+    }
+    const evaluation = await interviewService.evaluateInterview({
+      userId,
+      subjectId,
+      lessonId,
+      answers
+    });
+    res.json({ success: true, ...evaluation });
+  } catch (err) {
+    logger.error('Interview evaluation error:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to evaluate interview' });
+  }
+});
+
+// 10. Record Node Progress / Completion
+app.post('/api/v1/costudy/nodes/:id/complete', async (req, res) => {
+  try {
+    let userId = 'anonymous';
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        if (decoded?.id || decoded?.sub) userId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+    const { status = 'COMPLETED', score = 100, masteryPct = 100 } = req.body;
+    const record = await learningRepository.recordNodeProgress(userId, req.params.id, {
+      status,
+      score,
+      masteryPct
+    });
+    res.json({ success: true, progress: record });
+  } catch (err) {
+    logger.error('Failed to record node completion:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to record progress' });
+  }
+});
+
+// 11. Get Total User City Progress & Unlocks
+app.get('/api/v1/costudy/progress', async (req, res) => {
+  try {
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        userId = decoded?.id || decoded?.sub;
+      } catch (e) {}
+    }
+    if (!userId) {
+      return res.json({ success: true, completedNodes: [], unlocks: [], totalScore: 0 });
+    }
+    const progress = await learningRepository.getUserCityProgress(userId);
+    res.json({ success: true, ...progress });
+  } catch (err) {
+    logger.error('Failed to get user city progress:', { error: err.message });
+    res.status(500).json({ success: false, error: 'Failed to retrieve progress' });
   }
 });
 
@@ -181,15 +735,339 @@ app.post('/api/v1/auth/session', (req, res) => {
   res.json({ valid: true, claims: result.claims });
 });
 
-// Get current user profile and entitlements
-app.get('/api/v1/auth/me', authenticateToken, (req, res) => {
-  if (!req.user) {
+// Request email OTP (passwordless signup or login)
+app.post('/api/v1/auth/email/request-otp', async (req, res) => {
+  try {
+    const { email, purpose } = req.body || {};
+    const result = await userService.requestEmailOtp(email, purpose);
+    if (!result.success) {
+      const status = result.error === 'RESEND_TOO_FREQUENT' ? 429 : 400;
+      return res.status(status).json(result);
+    }
+    metrics.incrementCounter('cogether_auth_otp_requested_total', 1);
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('Failed to process OTP request', { error: err.message });
+    res.status(500).json({ success: false, error: 'OTP_REQUEST_FAILED', message: err.message });
+  }
+});
+
+// Verify email OTP and establish authenticated session
+app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
+  try {
+    const { email, otp, username, displayName, avatarUrl, preferences } = req.body || {};
+    const metadata = {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection?.remoteAddress
+    };
+
+    const result = await userService.verifyEmailOtp(
+      email,
+      otp,
+      { username, displayName, avatarUrl, preferences },
+      metadata
+    );
+
+    if (!result.success) {
+      const status = result.error === 'MAX_ATTEMPTS_EXCEEDED' ? 429 : 400;
+      return res.status(status).json(result);
+    }
+
+    metrics.incrementCounter('cogether_auth_otp_verified_total', 1);
+
+    // Set secure HTTP-only refresh cookie
+    res.cookie('cogether_refresh', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('Failed to verify OTP', { error: err.message });
+    res.status(500).json({ success: false, error: 'OTP_VERIFICATION_FAILED', message: err.message });
+  }
+});
+
+// Refresh access token via session rotation
+app.post('/api/v1/auth/refresh', async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.cogether_refresh || req.body?.refreshToken;
+    if (!refreshToken) {
+      return res.status(400).json({ success: false, error: 'REFRESH_TOKEN_REQUIRED' });
+    }
+
+    const metadata = {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection?.remoteAddress
+    };
+
+    const rotation = await validateAndRotateSession(refreshToken, metadata);
+    if (!rotation.valid) {
+      return res.status(401).json({ success: false, error: rotation.error });
+    }
+
+    const me = await userService.getMeContext(rotation.userId);
+    if (!me) {
+      return res.status(404).json({ success: false, error: 'USER_NOT_FOUND' });
+    }
+
+    const accessToken = signToken({
+      sub: me.id,
+      email: me.primaryEmail,
+      username: me.profile?.username || 'user',
+      displayName: me.profile?.displayName || me.profile?.username || 'User',
+      tier: me.entitlement?.tier || 'free'
+    });
+
+    res.cookie('cogether_refresh', rotation.newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).json({
+      success: true,
+      accessToken,
+      refreshToken: rotation.newRefreshToken,
+      user: { id: me.id, email: me.primaryEmail },
+      profile: me.profile,
+      preferences: me.preferences
+    });
+  } catch (err) {
+    logger.error('Session refresh failure', { error: err.message });
+    res.status(500).json({ success: false, error: 'REFRESH_FAILED', message: err.message });
+  }
+});
+
+// Revoke session and logout
+app.post('/api/v1/auth/logout', async (req, res) => {
+  const refreshToken = req.cookies?.cogether_refresh || req.body?.refreshToken;
+  const authHeader = req.headers['authorization'];
+  if (refreshToken) {
+    await revokeSession(refreshToken).catch(() => {});
+  }
+  if (authHeader?.startsWith('Bearer ')) {
+    const decoded = verifyToken(authHeader.split(' ')[1]);
+    if (decoded?.valid && decoded?.claims?.sub) {
+      await revokeAllUserSessions(decoded.claims.sub).catch(() => {});
+    }
+  }
+  res.clearCookie('cogether_refresh');
+  res.status(200).json({ success: true, message: 'Logged out successfully' });
+});
+
+// Google OAuth initiation
+app.get('/api/v1/auth/google', (req, res) => {
+  const authUrlData = getGoogleAuthUrl();
+  if (!authUrlData.configured) {
+    return res.status(503).json({
+      error: 'GOOGLE_OAUTH_NOT_CONFIGURED',
+      message: authUrlData.error
+    });
+  }
+  res.redirect(authUrlData.url);
+});
+
+// Google OAuth callback
+app.get('/api/v1/auth/google/callback', async (req, res) => {
+  const { code, state, error } = req.query;
+  if (error) {
+    return res.status(400).json({ error: 'GOOGLE_AUTH_FAILED', details: error });
+  }
+  if (!code) {
+    return res.status(400).json({ error: 'CODE_REQUIRED' });
+  }
+
+  const exchange = await exchangeCodeForTokens(code);
+  if (!exchange.success) {
+    return res.status(400).json({ error: 'TOKEN_EXCHANGE_FAILED', details: exchange.error });
+  }
+
+  const result = await userService.authenticateGoogle(exchange.tokens.id_token, {
+    userAgent: req.headers['user-agent'],
+    ipAddress: req.ip
+  });
+
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
+
+  res.cookie('cogether_refresh', result.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+
+  const config = getConfig();
+  const clientUrl = config.auth.clientUrl || 'http://localhost:5173';
+  res.redirect(`${clientUrl}?auth=success&token=${encodeURIComponent(result.accessToken)}`);
+});
+
+// Verify Google ID token directly (client SPA or test harness)
+app.post('/api/v1/auth/google/verify-token', async (req, res) => {
+  try {
+    const { idToken } = req.body || {};
+    const metadata = {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection?.remoteAddress
+    };
+
+    const result = await userService.authenticateGoogle(idToken, metadata);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.cookie('cogether_refresh', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'GOOGLE_AUTH_FAILED', message: err.message });
+  }
+});
+
+// Authenticated current user context
+app.get('/api/v1/me', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
     return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Not authenticated', requestId: req.id } });
   }
+
+  const activeSession = await db.query(
+    'SELECT id FROM identity.sessions WHERE user_id = $1 AND revoked_at IS NULL AND expires_at > NOW() LIMIT 1',
+    [userId]
+  );
+  if (activeSession.rows.length === 0) {
+    return res.status(401).json({ error: { code: 'SESSION_REVOKED', message: 'Session has been revoked. Please log in again.' } });
+  }
+
+  const me = await userService.getMeContext(userId);
+  if (!me) {
+    return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User profile not found in database', requestId: req.id } });
+  }
+
+  res.json({ success: true, ...me });
+});
+
+// Platform Foundation compatibility endpoint
+app.get('/api/v1/auth/me', authenticateToken, (req, res) => {
   res.json({
     user: req.user,
-    claims: req.claims
+    claims: req.user
   });
+});
+
+// Update profile details (username, display name, avatar, bio)
+app.patch('/api/v1/me/profile', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Not authenticated', requestId: req.id } });
+  }
+
+  try {
+    const profile = await profileService.updateProfile(userId, req.body || {});
+    res.json({ success: true, profile });
+  } catch (err) {
+    const status = err.message === 'USERNAME_ALREADY_TAKEN' ? 409 : 400;
+    res.status(status).json({ success: false, error: err.message });
+  }
+});
+
+// Upload and update avatar image
+app.post('/api/v1/me/avatar', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Not authenticated', requestId: req.id } });
+  }
+
+  const { image, mimeType } = req.body || {};
+  if (!image) {
+    return res.status(400).json({ success: false, error: 'IMAGE_REQUIRED', message: 'Image payload is required' });
+  }
+
+  try {
+    const { storageService } = require('../services/storage/storageService');
+    const upload = await storageService.uploadAvatar(userId, image, mimeType);
+    if (!upload.success) {
+      return res.status(400).json(upload);
+    }
+
+    const updated = await profileService.updateProfile(userId, { avatarUrl: upload.url });
+    res.status(200).json({ success: true, avatarUrl: upload.url, profile: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'AVATAR_UPLOAD_FAILED', message: err.message });
+  }
+});
+
+// Update user preferences (interests, timezone, language)
+app.patch('/api/v1/me/preferences', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Not authenticated', requestId: req.id } });
+  }
+
+  try {
+    const preferences = await profileService.updatePreferences(userId, req.body || {});
+    res.json({ success: true, preferences });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// Create secure opaque invite token
+app.post('/api/v1/invites', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Not authenticated', requestId: req.id } });
+  }
+
+  try {
+    const invite = await inviteService.createInvite(userId, req.body || {});
+    res.status(201).json({ success: true, invite, ...invite });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// Public invite preview (resolves real inviter profile from PostgreSQL)
+app.get('/api/v1/invites/:token', async (req, res) => {
+  try {
+    const preview = await inviteService.getInvitePreview(req.params.token);
+    if (!preview.valid) {
+      const status = preview.error === 'INVITE_NOT_FOUND' ? 404 : 410;
+      return res.status(status).json(preview);
+    }
+    res.status(200).json({ success: true, invite: preview, ...preview });
+  } catch (err) {
+    res.status(500).json({ valid: false, error: 'INVITE_QUERY_FAILED', message: err.message });
+  }
+});
+
+// Redeem invite token and join destination
+app.post('/api/v1/invites/:token/redeem', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Not authenticated', requestId: req.id } });
+  }
+
+  try {
+    const result = await inviteService.redeemInvite(req.params.token, userId);
+    if (!result.success) {
+      const status = result.error === 'INVITE_NOT_FOUND' ? 404 : 400;
+      return res.status(status).json(result);
+    }
+    res.status(200).json({ redeemed: true, ...result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'REDEMPTION_FAILED', message: err.message });
+  }
 });
 
 // Dynamic WebRTC ICE/TURN Configuration Endpoint
@@ -261,7 +1139,8 @@ io.use((socket, next) => {
 
   socket.user = result.claims;
   socket.userId = result.claims.sub;
-  socket.username = result.claims.displayName || result.claims.username || 'Guest';
+  socket.username = result.claims.username || result.claims.displayName || 'Guest';
+  socket.displayName = result.claims.displayName || result.claims.username || 'Guest';
   next();
 });
 
@@ -287,10 +1166,12 @@ io.on('connection', (socket) => {
     const cleanRoomId = roomId.trim();
     socket.join(cleanRoomId);
     socket.roomId = cleanRoomId;
-    if (socket.user && (socket.user.displayName || socket.user.username)) {
-      socket.username = socket.user.displayName || socket.user.username;
+    if (socket.user && (socket.user.username || socket.user.displayName)) {
+      socket.username = socket.user.username || socket.user.displayName;
+      socket.displayName = socket.user.displayName || socket.user.username;
     } else if (username) {
       socket.username = username;
+      socket.displayName = username;
     }
 
     if (!rooms.has(cleanRoomId)) {
@@ -402,7 +1283,7 @@ io.on('connection', (socket) => {
     io.to(socket.roomId).emit('chat-message', messagePayload);
   });
 
-  // Co-Watch Synchronized Video Stream Control
+  // Co-Watch Synchronized Video Stream Control (Legacy Bridge)
   socket.on('video-sync', (payload) => {
     if (!socket.roomId) return;
     socket.to(socket.roomId).emit('video-sync', {
@@ -413,7 +1294,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Co-Watch Real-Time Floating Reactions
+  // Co-Watch Real-Time Floating Reactions (Legacy Bridge)
   socket.on('video-reaction', (payload) => {
     if (!socket.roomId) return;
     io.to(socket.roomId).emit('video-reaction', {
@@ -422,6 +1303,176 @@ io.on('connection', (socket) => {
       senderId: socket.id,
       senderName: socket.username || 'Guest',
       timestamp: Date.now()
+    });
+  });
+
+  // ── CO-WATCH AUTHORITATIVE SYNCHRONIZED STREAMING ENGINE (PHASE 3.0) ──
+  socket.on('cowatch:join', async ({ roomCode, username, role }) => {
+    if (!roomCode) return;
+    socket.cowatchRoom = roomCode;
+    socket.join(`cowatch:${roomCode}`);
+
+    try {
+      const room = await cowatchRoomService.getWatchRoomByCode(roomCode);
+      if (room) {
+        socket.emit('cowatch:room-state', {
+          roomCode,
+          contentId: room.content_id,
+          playbackState: room.playback_state,
+          currentPosition: room.current_time_seconds,
+          playbackRate: room.playback_rate,
+          serverTimeMs: Date.now(),
+          sequenceNumber: room.sequence_number,
+          controlPolicy: room.control_policy,
+          isLocked: room.is_locked,
+          hostUserId: room.host_user_id
+        });
+      }
+    } catch (err) {
+      logger.warn('Failed to load cowatch room state on join', { error: err.message });
+    }
+
+    io.to(`cowatch:${roomCode}`).emit('cowatch:peer-joined', {
+      peerId: socket.id,
+      userId: socket.userId || socket.id,
+      username: username || socket.username || 'Viewer',
+      role: role || 'MEMBER',
+      timestamp: Date.now()
+    });
+  });
+
+  socket.on('cowatch:leave', ({ roomCode }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code) return;
+    socket.leave(`cowatch:${code}`);
+    io.to(`cowatch:${code}`).emit('cowatch:peer-left', {
+      peerId: socket.id,
+      userId: socket.userId || socket.id,
+      timestamp: Date.now()
+    });
+  });
+
+  socket.on('cowatch:sync-check', ({ roomCode, clientSendTime }) => {
+    const code = roomCode || socket.cowatchRoom;
+    socket.emit('cowatch:sync-ack', {
+      roomCode: code,
+      clientSendTime,
+      serverTimeMs: Date.now()
+    });
+  });
+
+  socket.on('cowatch:play', async ({ roomCode, position, sequenceNumber }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code) return;
+    const now = Date.now();
+    try {
+      await cowatchRoomService.updatePlaybackState({
+        roomCode: code,
+        userId: socket.userId,
+        playbackState: 'PLAYING',
+        position,
+        sequenceNumber
+      });
+    } catch (e) {}
+
+    io.to(`cowatch:${code}`).emit('cowatch:playback-update', {
+      action: 'PLAY',
+      playbackState: 'PLAYING',
+      position,
+      serverTimeMs: now,
+      sequenceNumber: sequenceNumber || Date.now(),
+      triggeredBy: socket.username || 'Host'
+    });
+  });
+
+  socket.on('cowatch:pause', async ({ roomCode, position, sequenceNumber }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code) return;
+    const now = Date.now();
+    try {
+      await cowatchRoomService.updatePlaybackState({
+        roomCode: code,
+        userId: socket.userId,
+        playbackState: 'PAUSED',
+        position,
+        sequenceNumber
+      });
+    } catch (e) {}
+
+    io.to(`cowatch:${code}`).emit('cowatch:playback-update', {
+      action: 'PAUSE',
+      playbackState: 'PAUSED',
+      position,
+      serverTimeMs: now,
+      sequenceNumber: sequenceNumber || Date.now(),
+      triggeredBy: socket.username || 'Host'
+    });
+  });
+
+  socket.on('cowatch:seek', async ({ roomCode, position, sequenceNumber }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code) return;
+    const now = Date.now();
+    try {
+      await cowatchRoomService.updatePlaybackState({
+        roomCode: code,
+        userId: socket.userId,
+        position,
+        sequenceNumber
+      });
+    } catch (e) {}
+
+    io.to(`cowatch:${code}`).emit('cowatch:playback-update', {
+      action: 'SEEK',
+      position,
+      serverTimeMs: now,
+      sequenceNumber: sequenceNumber || Date.now(),
+      triggeredBy: socket.username || 'Host'
+    });
+  });
+
+  socket.on('cowatch:rate-change', async ({ roomCode, playbackRate }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code) return;
+    io.to(`cowatch:${code}`).emit('cowatch:playback-update', {
+      action: 'RATE_CHANGE',
+      playbackRate,
+      serverTimeMs: Date.now(),
+      triggeredBy: socket.username || 'Host'
+    });
+  });
+
+  socket.on('cowatch:chat', ({ roomCode, text }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code || !text || !text.trim()) return;
+    socket.to(`cowatch:${code}`).emit('cowatch:chat-message', {
+      id: Math.random().toString(36).substring(2, 9),
+      senderId: socket.userId || socket.id,
+      senderName: socket.username || 'Friend',
+      text: text.trim(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+  });
+
+  socket.on('cowatch:reaction', ({ roomCode, emoji }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code || !emoji) return;
+    io.to(`cowatch:${code}`).emit('cowatch:floating-reaction', {
+      id: Math.random().toString(36).substring(2, 9),
+      senderId: socket.userId || socket.id,
+      senderName: socket.username || 'Friend',
+      emoji,
+      timestamp: Date.now()
+    });
+  });
+
+  socket.on('cowatch:screen-share-state', ({ roomCode, isSharing }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code) return;
+    socket.to(`cowatch:${code}`).emit('cowatch:screen-share-change', {
+      isSharing,
+      sharerId: socket.userId || socket.id,
+      sharerName: socket.username || 'Friend'
     });
   });
 
@@ -503,18 +1554,18 @@ io.on('connection', (socket) => {
           metadata
         );
         io.to(socket.roomId).emit('challenge-session-sync', updated);
+
+        socket.to(socket.roomId).emit('challenge-peer-score', {
+          peerId: socket.id,
+          userId: socket.userId || socket.id,
+          username: socket.username,
+          score: updated.scores[socket.userId || socket.id] ?? score,
+          finalResult
+        });
       }
     } catch (err) {
-      logger.warn('Error in challenge-score', { error: err.message });
+      logger.warn('Error in challenge-score rejected invalid submission', { error: err.message });
     }
-
-    socket.to(socket.roomId).emit('challenge-peer-score', {
-      peerId: socket.id,
-      userId: socket.userId || socket.id,
-      username: socket.username,
-      score,
-      finalResult
-    });
   });
 
   socket.on('challenge-board-sync', (payload) => {

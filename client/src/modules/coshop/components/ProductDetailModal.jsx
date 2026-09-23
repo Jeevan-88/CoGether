@@ -3,6 +3,7 @@ import {
   X, Star, Heart, ExternalLink, ShieldCheck, Truck, RotateCcw, 
   Sparkles, Check, Share2, ShoppingBag, Info
 } from 'lucide-react';
+import { API_URL } from '../../../config/api.js';
 import './ProductDetailModal.css';
 
 export default function ProductDetailModal({
@@ -44,7 +45,7 @@ export default function ProductDetailModal({
 
   const handleBuyClick = (offer) => {
     // Log affiliate click on backend
-    fetch('http://localhost:3001/api/coshop/click', {
+    fetch(`${API_URL}/api/coshop/click`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

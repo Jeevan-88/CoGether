@@ -55,6 +55,8 @@ function authenticateToken(req, res, next) {
 
   req.user = {
     id: result.claims.sub,
+    sub: result.claims.sub,
+    username: result.claims.username,
     displayName: result.claims.displayName,
     isGuest: Boolean(result.claims.isGuest),
     tier: result.claims.tier || PlanTiers.FREE

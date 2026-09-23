@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   X, Play, Users, Swords, Gamepad2, ShieldCheck, 
   ShieldAlert, Sparkles, Monitor, RotateCcw, AlertTriangle, 
-  CheckCircle, ArrowRight, ExternalLink 
+  CheckCircle, ArrowRight, ExternalLink, Trophy 
 } from 'lucide-react';
 import { GameMode, LicenseStatus, DistributionStatus } from '../gameSchema.js';
 import CoGetherButton from './CoGetherButton.jsx';
@@ -13,7 +13,8 @@ export default function GameDetailsModal({
   onClose,
   onPlay,
   onChallenge,
-  onSquad
+  onSquad,
+  onViewLeaderboard
 }) {
   if (!game) return null;
 
@@ -187,6 +188,18 @@ export default function GameDetailsModal({
                   icon={Swords}
                 >
                   CHALLENGE A FRIEND
+                </CoGetherButton>
+              )}
+              {onViewLeaderboard && (
+                <CoGetherButton
+                  variant="secondary"
+                  onClick={() => {
+                    onClose();
+                    onViewLeaderboard(game);
+                  }}
+                  icon={Trophy}
+                >
+                  LEADERBOARD
                 </CoGetherButton>
               )}
               <CoGetherButton

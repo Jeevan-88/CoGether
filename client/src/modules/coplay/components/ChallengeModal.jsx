@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Copy, Check, Swords, X, Users, Share2, Sparkles } from 'lucide-react';
 import CoGetherButton from './CoGetherButton.jsx';
+import { API_URL } from '../../../config/api.js';
 import './ChallengeModal.css';
 
 /**
@@ -21,8 +22,34 @@ export default function ChallengeModal({
 }) {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [inviteLink, setInviteLink] = useState(
+    `${window.location.origin}?room=${roomId}&mode=coplay&challenge=${game?.id || '2048'}`
+  );
 
-  const inviteLink = `${window.location.origin}?room=${roomId}&mode=coplay&challenge=${game?.id || '2048'}`;
+  useEffect(() => {
+    async function initOpaqueInvite() {
+      const token = localStorage.getItem('cogether_access_token');
+      if (!token) return;
+      try {
+        const apiBase = API_URL;
+        const res = await fetch(`${apiBase}/api/v1/invites`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ resourceType: 'room', resourceId: roomId })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.token) {
+            setInviteLink(`${window.location.origin}/invite/${data.token}`);
+          }
+        }
+      } catch (e) {}
+    }
+    initOpaqueInvite();
+  }, [roomId]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(inviteLink);

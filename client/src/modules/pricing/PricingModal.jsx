@@ -28,7 +28,7 @@ export default function PricingModal({ onClose, onSuccess }) {
           <div className="pricing-summary-view">
             <div className="badge-glow">[ ALL-ACCESS KEYPASS ]</div>
             <h2>CoGether Master Keypass</h2>
-            <p className="modal-sub">Unlock unlimited 4K synced cinema, 100+ arcade multiplayer games, and private split-screen study desks.</p>
+            <p className="modal-sub">Unlock unlimited 4K synced cinema, verified arcade multiplayer games, and private split-screen study desks.</p>
 
             <div className="price-box">
               <span className="price-currency">₹</span>
@@ -38,7 +38,7 @@ export default function PricingModal({ onClose, onSuccess }) {
 
             <ul className="modal-feature-list">
               <li><CheckCircle2 size={16} /> Unlimited 4K Synced Watch Parties (Cinema & Series)</li>
-              <li><CheckCircle2 size={16} /> 100+ Multiplayer & Solo Arcade Games Hub</li>
+              <li><CheckCircle2 size={16} /> Verified Open-Source & Solo Arcade Games Hub</li>
               <li><CheckCircle2 size={16} /> Private 2-Way Live Study Desks with Lo-Fi Audio</li>
               <li><CheckCircle2 size={16} /> Zero Ads, Low-Latency WebRTC & Squad Room Sync</li>
             </ul>
@@ -92,7 +92,7 @@ export default function PricingModal({ onClose, onSuccess }) {
               <CheckCircle2 size={40} />
             </div>
             <h2>Keypass Activated!</h2>
-            <p>Your CoGether Master Keypass is now live. Enjoy unlimited 4K synced cinema, 100+ arcade games, and private desks.</p>
+            <p>Your CoGether Master Keypass is now live. Enjoy unlimited 4K synced cinema, verified arcade games, and private desks.</p>
 
             <button className="btn-continue" onClick={onClose}>
               Enter CoGether Hub <Sparkles size={16} />

@@ -1,0 +1,1277 @@
+/* CoStudy World — 2D Learning City & Gamified CSE Knowledge Map */
+/* Neo-Brutalist / Editorial Poster Design System */
+
+:root {
+  --cs-bg-cream: #FAF7EE;
+  --cs-bg-cream-dark: #F2EEDF;
+  --cs-black: #0B0B0B;
+  --cs-black-soft: #1E1E1E;
+  --cs-acid-lime: #CCFF00;
+  --cs-hot-pink: #FF3366;
+  --cs-electric-cyan: #00E5FF;
+  --cs-warning-yellow: #FFD600;
+  --cs-purple-accent: #B388FF;
+  --cs-white: #FFFFFF;
+  --cs-gray-light: #ECE7DA;
+  --cs-gray-muted: #8E8A80;
+  
+  --cs-border-thick: 2.5px solid #0B0B0B;
+  --cs-border-thin: 1.5px solid #0B0B0B;
+  --cs-shadow-hard: 5px 5px 0px #0B0B0B;
+  --cs-shadow-hard-sm: 3px 3px 0px #0B0B0B;
+  --cs-shadow-hard-lg: 8px 8px 0px #0B0B0B;
+  --cs-shadow-hover: 2px 2px 0px #0B0B0B;
+  
+  --cs-font-display: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cs-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.costudy-root {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--cs-bg-cream);
+  color: var(--cs-black);
+  font-family: var(--cs-font-display);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+/* Background grid pattern */
+.costudy-root::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle, #D8D2C2 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TOP HUD BAR
+   ───────────────────────────────────────────────────────────── */
+.cs-hud {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background: var(--cs-white);
+  border-bottom: var(--cs-border-thick);
+  box-shadow: 0 4px 0px rgba(11, 11, 11, 0.08);
+  gap: 16px;
+  flex-wrap: nowrap;
+}
+
+.cs-hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cs-brand-badge {
+  background: var(--cs-black);
+  color: var(--cs-acid-lime);
+  font-weight: 900;
+  font-size: 1.15rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  border: var(--cs-border-thin);
+  box-shadow: var(--cs-shadow-hard-sm);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.cs-brand-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: var(--cs-hot-pink);
+  color: var(--cs-white);
+  padding: 2px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.8px;
+  border: 1.5px solid var(--cs-black);
+}
+
+.cs-hud-center {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  max-width: 600px;
+}
+
+.cs-mission-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cs-bg-cream-dark);
+  border: var(--cs-border-thin);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--cs-shadow-hard-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.cs-mission-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cs-acid-lime);
+  border: 1.5px solid var(--cs-black);
+  box-shadow: 0 0 8px var(--cs-acid-lime);
+  animation: cs-pulse 1.8s infinite;
+}
+
+@keyframes cs-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+.cs-search-input-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.cs-search-input {
+  width: 100%;
+  background: var(--cs-white);
+  border: var(--cs-border-thin);
+  padding: 6px 12px 6px 32px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 6px;
+  outline: none;
+  box-shadow: inset 2px 2px 0px rgba(11, 11, 11, 0.05);
+}
+
+.cs-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: var(--cs-gray-muted);
+}
+
+.cs-hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cs-stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cs-bg-cream);
+  border: var(--cs-border-thin);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  box-shadow: var(--cs-shadow-hard-sm);
+}
+
+.cs-btn-academic {
+  background: var(--cs-electric-cyan);
+  color: var(--cs-black);
+  border: var(--cs-border-thin);
+  font-weight: 800;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: 6px;
+  box-shadow: var(--cs-shadow-hard-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.cs-btn-academic:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--cs-shadow-hard);
+}
+
+.cs-btn-studyroom {
+  background: var(--cs-acid-lime);
+  color: var(--cs-black);
+  border: var(--cs-border-thin);
+  font-weight: 900;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: 6px;
+  box-shadow: var(--cs-shadow-hard-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.cs-btn-studyroom:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--cs-shadow-hard);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   VIEW CONTAINER & BREADCRUMB
+   ───────────────────────────────────────────────────────────── */
+.cs-body-area {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 65px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.cs-subnav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  background: var(--cs-bg-cream-dark);
+  border-bottom: var(--cs-border-thin);
+  z-index: 10;
+}
+
+.cs-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.cs-crumb-link {
+  cursor: pointer;
+  color: var(--cs-black);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cs-crumb-link:hover {
+  color: var(--cs-hot-pink);
+}
+
+.cs-crumb-separator {
+  color: var(--cs-gray-muted);
+}
+
+.cs-crumb-active {
+  background: var(--cs-black);
+  color: var(--cs-white);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2D LEARNING CITY CANVAS & MAP
+   ───────────────────────────────────────────────────────────── */
+.cs-map-viewport {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #EFEAD9;
+  cursor: grab;
+}
+
+.cs-map-viewport:active {
+  cursor: grabbing;
+}
+
+.cs-city-world-canvas {
+  position: absolute;
+  width: 3200px;
+  height: 2400px;
+  background: #ECE7D5;
+  transform-origin: 0 0;
+  transition: transform 0.08s ease-out;
+  box-shadow: inset 0 0 100px rgba(11, 11, 11, 0.08);
+}
+
+/* Road Grid in Canvas */
+.cs-road-network {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cs-road-h {
+  position: absolute;
+  height: 48px;
+  background: #383838;
+  border-top: 3px solid var(--cs-black);
+  border-bottom: 3px solid var(--cs-black);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.cs-road-v {
+  position: absolute;
+  width: 48px;
+  background: #383838;
+  border-left: 3px solid var(--cs-black);
+  border-right: 3px solid var(--cs-black);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.cs-road-dash-h {
+  height: 4px;
+  width: 30px;
+  background: #FFD600;
+}
+
+.cs-road-dash-v {
+  width: 4px;
+  height: 30px;
+  background: #FFD600;
+}
+
+/* District Zones */
+.cs-district-zone {
+  position: absolute;
+  border: var(--cs-border-thick);
+  border-radius: 12px;
+  background: var(--cs-white);
+  box-shadow: var(--cs-shadow-hard);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cs-district-zone:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cs-shadow-hard-lg);
+}
+
+.cs-district-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: var(--cs-border-thin);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.cs-district-badge {
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1.5px solid var(--cs-black);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cs-district-name {
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cs-district-buildings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* Building Card (2.5D Isometric style) */
+.cs-building-card {
+  background: var(--cs-bg-cream);
+  border: var(--cs-border-thick);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  box-shadow: var(--cs-shadow-hard-sm);
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 110px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cs-building-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--cs-shadow-hard);
+  background: var(--cs-white);
+}
+
+.cs-building-card.active-target {
+  border-color: var(--cs-black);
+  background: #FFFDE7;
+  outline: 3px solid var(--cs-acid-lime);
+}
+
+.cs-building-card.locked {
+  opacity: 0.65;
+  background: #E8E5DD;
+  cursor: not-allowed;
+}
+
+.cs-bld-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cs-bld-icon {
+  font-size: 1.4rem;
+  background: var(--cs-white);
+  border: 1.5px solid var(--cs-black);
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 2px 2px 0 var(--cs-black);
+}
+
+.cs-bld-status-badge {
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--cs-black);
+}
+
+.cs-bld-title {
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.cs-bld-meta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-bld-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #DDD;
+  border: 1px solid var(--cs-black);
+  border-radius: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.cs-bld-bar-fill {
+  height: 100%;
+  background: var(--cs-acid-lime);
+}
+
+/* Map Controls Floating Overlay */
+.cs-map-controls {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 15;
+}
+
+.cs-map-btn {
+  width: 44px;
+  height: 44px;
+  background: var(--cs-white);
+  border: var(--cs-border-thick);
+  box-shadow: var(--cs-shadow-hard-sm);
+  font-weight: 900;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.cs-map-btn:hover {
+  background: var(--cs-acid-lime);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--cs-shadow-hard);
+}
+
+/* Quick District Jump Pills */
+.cs-district-dock {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: var(--cs-border-thick);
+  box-shadow: var(--cs-shadow-hard);
+  padding: 8px 14px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 75vw;
+  overflow-x: auto;
+  z-index: 15;
+}
+
+.cs-dock-pill {
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--cs-black);
+  background: var(--cs-bg-cream);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-dock-pill:hover,
+.cs-dock-pill.active {
+  background: var(--cs-black);
+  color: var(--cs-white);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BUILDING INTERIOR & CAMPUS ROADMAP VIEW
+   ───────────────────────────────────────────────────────────── */
+.cs-interior-view {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 32px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  background: var(--cs-bg-cream);
+}
+
+.cs-interior-hero {
+  background: var(--cs-white);
+  border: var(--cs-border-thick);
+  border-radius: 12px;
+  box-shadow: var(--cs-shadow-hard);
+  padding: 28px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cs-interior-hero::after {
+  content: "LOCATION MAP";
+  position: absolute;
+  right: 20px;
+  bottom: 10px;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: rgba(11, 11, 11, 0.04);
+  letter-spacing: 2px;
+  pointer-events: none;
+}
+
+.cs-interior-info h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin: 0 0 8px 0;
+}
+
+.cs-interior-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cs-interior-quest-box {
+  background: #FFFDE7;
+  border: var(--cs-border-thin);
+  border-radius: 8px;
+  padding: 16px 20px;
+  max-width: 380px;
+  box-shadow: var(--cs-shadow-hard-sm);
+}
+
+.cs-quest-tag {
+  font-size: 0.68rem;
+  font-weight: 900;
+  background: var(--cs-hot-pink);
+  color: var(--cs-white);
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.cs-quest-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.cs-quest-brief {
+  font-size: 0.8rem;
+  color: #444;
+  line-height: 1.3;
+}
+
+/* Roadmap Node Track */
+.cs-roadmap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cs-roadmap-header {
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cs-nodes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.cs-node-card {
+  background: var(--cs-white);
+  border: var(--cs-border-thick);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: var(--cs-shadow-hard);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  position: relative;
+}
+
+.cs-node-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--cs-shadow-hard-lg);
+  border-color: var(--cs-black);
+}
+
+.cs-node-card.completed {
+  background: #F4FFDF;
+}
+
+.cs-node-num-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--cs-black);
+  color: var(--cs-white);
+  font-weight: 900;
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
+.cs-node-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-node-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.cs-node-desc {
+  font-size: 0.82rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+.cs-node-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: var(--cs-border-thin);
+  padding-top: 10px;
+}
+
+.cs-node-action-btn {
+  background: var(--cs-acid-lime);
+  color: var(--cs-black);
+  border: 1.5px solid var(--cs-black);
+  font-weight: 900;
+  font-size: 0.82rem;
+  padding: 5px 12px;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 var(--cs-black);
+  cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10-STEP LESSON LOOP WORKSPACE
+   ───────────────────────────────────────────────────────────── */
+.cs-lesson-stage {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--cs-bg-cream);
+  overflow: hidden;
+}
+
+/* 10-Step Progress Stepper Ribbon */
+.cs-stepper-ribbon {
+  display: flex;
+  align-items: center;
+  background: var(--cs-white);
+  border-bottom: var(--cs-border-thick);
+  padding: 6px 20px;
+  gap: 8px;
+  overflow-x: auto;
+  box-shadow: 0 3px 0 rgba(11, 11, 11, 0.05);
+  z-index: 10;
+}
+
+.cs-step-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.78rem;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1.5px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.cs-step-tab:hover {
+  background: var(--cs-bg-cream-dark);
+}
+
+.cs-step-tab.active {
+  background: var(--cs-black);
+  color: var(--cs-white);
+  border: 1.5px solid var(--cs-black);
+  box-shadow: 2px 2px 0 rgba(11, 11, 11, 0.3);
+}
+
+.cs-step-tab.done {
+  color: var(--cs-black);
+  background: #EAF8D0;
+  border: 1.5px solid var(--cs-black);
+}
+
+.cs-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 0.68rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cs-step-tab.active .cs-step-number {
+  background: var(--cs-acid-lime);
+  color: var(--cs-black);
+}
+
+/* Lesson Stage Content View */
+.cs-stage-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.cs-stage-split-left {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cs-stage-split-right {
+  flex: 1.1;
+  border-left: var(--cs-border-thick);
+  background: var(--cs-white);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Editorial Article Layout */
+.cs-lesson-article {
+  background: var(--cs-white);
+  border: var(--cs-border-thick);
+  border-radius: 12px;
+  box-shadow: var(--cs-shadow-hard);
+  padding: 32px 36px;
+}
+
+.cs-lesson-article h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0 0 12px 0;
+}
+
+.cs-lesson-takeaway-card {
+  background: var(--cs-bg-cream);
+  border-left: 6px solid var(--cs-acid-lime);
+  border-top: var(--cs-border-thin);
+  border-right: var(--cs-border-thin);
+  border-bottom: var(--cs-border-thin);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 20px 0;
+  box-shadow: var(--cs-shadow-hard-sm);
+}
+
+.cs-lesson-takeaway-card h3 {
+  font-size: 0.95rem;
+  font-weight: 900;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cs-code-snippet {
+  background: #181818;
+  color: #E6E6E6;
+  font-family: var(--cs-font-mono);
+  font-size: 0.85rem;
+  padding: 16px;
+  border-radius: 8px;
+  border: var(--cs-border-thin);
+  box-shadow: var(--cs-shadow-hard-sm);
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CODE SANDBOX & DOM RUNNER
+   ───────────────────────────────────────────────────────────── */
+.cs-sandbox-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--cs-white);
+}
+
+.cs-sandbox-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--cs-bg-cream-dark);
+  border-bottom: var(--cs-border-thin);
+  padding: 8px 16px;
+}
+
+.cs-sandbox-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cs-sandbox-tab {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border: 1.5px solid var(--cs-black);
+  border-radius: 4px;
+  background: var(--cs-white);
+  cursor: pointer;
+}
+
+.cs-sandbox-tab.active {
+  background: var(--cs-black);
+  color: var(--cs-white);
+}
+
+.cs-sandbox-run-btn {
+  background: var(--cs-acid-lime);
+  color: var(--cs-black);
+  font-weight: 900;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  border: 1.5px solid var(--cs-black);
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 var(--cs-black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.cs-sandbox-run-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--cs-black);
+}
+
+.cs-sandbox-editor-split {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 45px);
+}
+
+.cs-code-editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-code-textarea {
+  flex: 1;
+  width: 100%;
+  padding: 16px;
+  background: #1A1A1A;
+  color: #F1F1F1;
+  font-family: var(--cs-font-mono);
+  font-size: 0.88rem;
+  border: none;
+  resize: none;
+  outline: none;
+  line-height: 1.5;
+}
+
+.cs-preview-frame-area {
+  flex: 1;
+  border-top: var(--cs-border-thick);
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.cs-preview-header {
+  background: #EFEFEF;
+  border-bottom: 1px solid #CCC;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-preview-iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CODING PROBLEMS LIST & TEST RESULTS
+   ───────────────────────────────────────────────────────────── */
+.cs-problems-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-prob-card {
+  background: var(--cs-white);
+  border: var(--cs-border-thick);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: var(--cs-shadow-hard-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-prob-card.active {
+  border-color: var(--cs-black);
+  box-shadow: var(--cs-shadow-hard);
+  background: #FDFFF5;
+}
+
+.cs-prob-card.passed {
+  border-left: 6px solid #4CAF50;
+}
+
+.cs-prob-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cs-prob-title {
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+.cs-test-case-item {
+  background: #F9F9F9;
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-test-pass {
+  color: #2E7D32;
+  font-weight: 800;
+}
+
+.cs-test-fail {
+  color: #C62828;
+  font-weight: 800;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   AI INTERVIEW VIVA MODAL
+   ───────────────────────────────────────────────────────────── */
+.cs-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(11, 11, 11, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.cs-modal-content {
+  background: var(--cs-bg-cream);
+  border: var(--cs-border-thick);
+  border-radius: 12px;
+  box-shadow: var(--cs-shadow-hard-lg);
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-modal-header {
+  background: var(--cs-white);
+  border-bottom: var(--cs-border-thick);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-modal-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.cs-modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.cs-modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cs-interview-question-box {
+  background: var(--cs-white);
+  border: var(--cs-border-thin);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: var(--cs-shadow-hard-sm);
+}
+
+.cs-viva-prompt {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.cs-viva-textarea {
+  width: 100%;
+  border: var(--cs-border-thin);
+  border-radius: 6px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  min-height: 90px;
+}
+
+.cs-viva-submit-btn {
+  background: var(--cs-hot-pink);
+  color: var(--cs-white);
+  font-weight: 900;
+  font-size: 0.9rem;
+  padding: 10px 20px;
+  border: var(--cs-border-thin);
+  border-radius: 8px;
+  box-shadow: var(--cs-shadow-hard-sm);
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.cs-viva-submit-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--cs-shadow-hard);
+}
+
+.cs-viva-result-box {
+  background: var(--cs-white);
+  border: var(--cs-border-thick);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--cs-shadow-hard);
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ACADEMIC SEMESTER CAMPUS MODAL (B.Tech CSE 1-8)
+   ───────────────────────────────────────────────────────────── */
+.cs-semester-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.cs-semester-card {
+  background: var(--cs-white);
+  border: var(--cs-border-thick);
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: var(--cs-shadow-hard-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-semester-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--cs-shadow-hard);
+}
+
+.cs-sem-year-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  background: var(--cs-acid-lime);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--cs-black);
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.cs-sem-title {
+  font-size: 1rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.cs-sem-subjects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cs-sem-subj-item {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 6px;
+  background: var(--cs-bg-cream);
+  border: 1px solid var(--cs-black);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE DESIGN
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .cs-hud {
+    padding: 8px 14px;
+    flex-wrap: wrap;
+  }
+  .cs-hud-center {
+    order: 3;
+    max-width: 100%;
+    width: 100%;
+  }
+  .cs-stage-body {
+    flex-direction: column;
+  }
+  .cs-stage-split-right {
+    border-left: none;
+    border-top: var(--cs-border-thick);
+    height: 50vh;
+  }
+  .cs-semester-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -17,6 +17,18 @@ game.GameOverScreen = me.ScreenObject.extend({
             me.save.topSteps = game.data.steps;
             game.data.newHiScore = true;
         }
+
+        try {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'COPLAY_GAME_SYNC',
+                    gameId: 'clumsy-bird',
+                    score: game.data.steps || 0,
+                    over: true,
+                    won: false
+                }, '*');
+            }
+        } catch (e) {}
         me.input.bindKey(me.input.KEY.ENTER, "enter", true);
         me.input.bindKey(me.input.KEY.SPACE, "enter", false)
         me.input.bindPointer(me.input.pointer.LEFT, me.input.KEY.ENTER);

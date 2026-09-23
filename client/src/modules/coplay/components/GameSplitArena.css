@@ -210,32 +210,203 @@
   display: block;
 }
 
-/* ── Opponent 2048 Board Renderer ── */
-.opponent-game-stage {
+/* ── Generic Opponent Duel Stage ── */
+.generic-opponent-stage {
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
+  background: #09090d;
+  position: relative;
+  overflow: hidden;
+}
+
+.opponent-telemetry-header {
+  height: 36px;
+  background: #111117;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+
+.telemetry-conn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  color: #10b981;
+  font-weight: 700;
+}
+
+.live-pulse-dot,
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse 1.5s infinite;
+  display: inline-block;
+}
+
+.telemetry-game-name {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.opponent-score-hero {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #faf8ef;
+  background: radial-gradient(circle at center, rgba(255, 229, 0, 0.08) 0%, transparent 70%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.score-hero-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.score-hero-digits {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-bolt-icon {
+  color: #FFE500;
+  animation: pulse 1.2s infinite;
+}
+
+.score-hero-digits .score-number {
+  font-family: 'Space Mono', monospace;
+  font-size: 42px;
+  font-weight: 700;
+  color: #FFE500;
+  text-shadow: 0 0 20px rgba(255, 229, 0, 0.4);
+}
+
+.score-delta-badge-row {
+  margin-top: 10px;
+}
+
+.delta-pill {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 12px;
+  letter-spacing: 0.8px;
+  display: inline-block;
+}
+
+.delta-ahead {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #f87171;
+}
+
+.delta-behind {
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #34d399;
+}
+
+.delta-tied {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+}
+
+/* Radar Pulse / Telemetry Stage */
+.opponent-telemetry-radar-stage {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
 }
 
+.radar-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 229, 0, 0.2);
+  animation: radarPing 3s infinite cubic-bezier(0, 0.2, 0.8, 1);
+}
+
+.radar-pulse-ring.ring-1 {
+  width: 140px;
+  height: 140px;
+}
+
+.radar-pulse-ring.ring-2 {
+  width: 220px;
+  height: 220px;
+  animation-delay: 1.2s;
+}
+
+@keyframes radarPing {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.radar-center-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+}
+
+.radar-activity-icon {
+  color: #FFE500;
+  animation: pulse 1.8s infinite;
+}
+
+.radar-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #94a3b8;
+}
+
+.opponent-mini-grid-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
 .opponent-grid-2048 {
-  width: 280px;
-  height: 280px;
+  width: 240px;
+  height: 240px;
   background: #bbada0;
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   box-sizing: border-box;
 }
 
 .grid-col-2048 {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
 }
 
@@ -246,7 +417,7 @@
   align-items: center;
   justify-content: center;
   font-family: 'Barlow', sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   transition: transform 0.1s ease, background-color 0.1s ease;
   user-select: none;

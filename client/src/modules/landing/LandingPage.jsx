@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Tv, Gamepad2, Sparkles, Play, Lock, CheckCircle2, ArrowRight, Video, ShoppingBag, BookOpen, Star, Flame, Eye, RefreshCw, Volume2, VolumeX, MessageSquare, Mic, Camera, Layers, Users, Maximize2, Move, Box, ShoppingCart } from 'lucide-react';
+import { useAuth } from '../../core/AuthContext.jsx';
 import './LandingPage.css';
 
 const MOVIE_STREAMING_APPS = [
@@ -128,8 +129,9 @@ function AutomaticDiagonal3DRubiksCube() {
 }
 
 export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing, onOpenGamesHub, onOpenCinemaHub }) {
+  const { profile } = useAuth();
   const [roomCode, setRoomCode] = useState('');
-  const [username, setUsername] = useState(localStorage.getItem('sp_username') || '');
+  const [username, setUsername] = useState(profile?.displayName || profile?.username || '');
   const [isMuted, setIsMuted] = useState(true);
   const [camBoxSize, setCamBoxSize] = useState('md');
   const [tutorialStep, setTutorialStep] = useState(1);
@@ -363,8 +365,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   };
 
   const handleLaunch = (mode, customRoomId) => {
-    const finalName = username.trim() || 'User_' + Math.floor(1000 + Math.random() * 9000);
-    localStorage.setItem('sp_username', finalName);
+    const finalName = username.trim() || profile?.displayName || profile?.username || 'User_' + Math.floor(1000 + Math.random() * 9000);
     const finalRoom = customRoomId || roomCode.trim() || generateCode();
 
     if (mode === 'watch') {
@@ -822,7 +823,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 </div>
               </div>
 
-              {/* RIGHT HALF: 100+ ONLINE GAMES ARCADE HUB */}
+              {/* RIGHT HALF: VERIFIED ONLINE GAMES ARCADE HUB */}
               <div 
                 className="right-games-rubiks-hub" 
                 onClick={onOpenGamesHub || onStartGames}
@@ -831,7 +832,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                 <div className="vertical-filled-typography-column text-center-all">
                   <h3 className="hero-word-top text-center">P L A Y</h3>
                   <div className="giant-1000-cube-overlay-stack">
-                    <h2 className="hero-word-giant-1000-behind">100+</h2>
+                    <h2 className="hero-word-giant-1000-behind">ARCADE</h2>
                     <div className="embedded-diagonal-cube-box center-front-cube">
                       <AutomaticDiagonal3DRubiksCube />
                     </div>
@@ -858,7 +859,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       boxShadow: '4px 4px 0px #000000'
                     }}
                   >
-                    🎮 OPEN 100+ GAMES ARCADE →
+                    🎮 OPEN VERIFIED ARCADE →
                   </button>
                 </div>
               </div>

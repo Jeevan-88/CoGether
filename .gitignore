@@ -8,4 +8,6 @@ client/dist/
 !.env.example
 .playwright-mcp/
 coverage/
-
+.test_last_otp.json
+*.png
+scratch/

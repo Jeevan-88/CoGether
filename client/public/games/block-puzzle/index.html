@@ -236,11 +236,39 @@
     //-------------------------------------------------------------------------
 
     function play() { hide('start'); reset();          playing = true;  }
-    function lose() { show('start'); setVisualScore(); playing = false; }
+    function lose() { 
+      show('start'); 
+      setVisualScore(); 
+      playing = false; 
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            type: 'COPLAY_GAME_SYNC',
+            gameId: 'block-puzzle',
+            score: score || 0,
+            over: true,
+            won: false
+          }, '*');
+        }
+      } catch (e) {}
+    }
 
     function setVisualScore(n)      { vscore = n || score; invalidateScore(); }
     function setScore(n)            { score = n; setVisualScore(n);  }
-    function addScore(n)            { score = score + n;   }
+    function addScore(n)            { 
+      score = score + n;   
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            type: 'COPLAY_GAME_SYNC',
+            gameId: 'block-puzzle',
+            score: score,
+            over: false,
+            won: false
+          }, '*');
+        }
+      } catch (e) {}
+    }
     function clearScore()           { setScore(0); }
     function clearRows()            { setRows(0); }
     function setRows(n)             { rows = n; step = Math.max(speed.min, speed.start - (speed.decrement*rows)); invalidateRows(); }

@@ -1,5 +1,6 @@
 import React from 'react';
 import GameShell from './GameShell.jsx';
+import { useAuth } from '../../../core/AuthContext.jsx';
 
 /**
  * GamePlayer
@@ -13,7 +14,8 @@ export default function GamePlayer({
   initialRoomId = null,
   currentUsername = null
 }) {
-  const username = currentUsername || localStorage.getItem('sp_username') || 'ArcadePlayer';
+  const { profile } = useAuth();
+  const username = currentUsername || profile?.displayName || profile?.username || 'ArcadePlayer';
 
   return (
     <GameShell

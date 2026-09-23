@@ -1,628 +1,604 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../../core/AuthContext.jsx';
 import { 
-  Tv, Play, Users, ArrowLeft, ExternalLink, Film, 
-  Volume2, VolumeX, Flame, Star, Compass, Clapperboard, 
-  Mic, Camera, MessageSquare, Copy, Check, ShieldCheck,
-  User, ChevronDown, LogOut, Share2, Key, Link2, MonitorPlay, Radio, 
-  Layers, Info, Sparkles, HelpCircle, Download, CheckCircle2, ArrowRight,
-  Search, SlidersHorizontal, ChevronLeft, ChevronRight, Volume1, Maximize2,
-  Subtitles, Settings, Send, ShieldAlert, Lock, Globe, Video, RefreshCw, AlertCircle
+  Play, Users, Film, Search, Plus, Filter, 
+  ExternalLink, Sparkles, Shield, AlertCircle, RefreshCw,
+  Tv, Compass, LogOut, Check
 } from 'lucide-react';
-import { 
-  HEAVY_DRM_PLATFORMS,
-  OPEN_NON_DRM_PLATFORMS,
-  VERIFIED_CLEAN_MOVIES
-} from './cinemaCatalog.js';
+import CoWatchSidebar from './components/CoWatchSidebar.jsx';
+import CoWatchHeader from './components/CoWatchHeader.jsx';
+import HeroBillboard from './components/HeroBillboard.jsx';
+import ContentCard from './components/ContentCard.jsx';
+import ProviderCard from './components/ProviderCard.jsx';
+import CreateRoomModal from './components/CreateRoomModal.jsx';
 import CoWatchPartyRoom from './CoWatchPartyRoom.jsx';
-import './CoWatchCinemaHub.css';
+import AuthModal from '../auth/AuthModal.jsx';
+import ProfileModal from '../auth/ProfileModal.jsx';
+import { API_URL } from '../../config/api.js';
+import './CoWatchLayout.css';
 
-export default function CoWatchCinemaHub({ onBackToHome, initialUser, initialRoomId, initialUsername }) {
-  // Page Modes: 'cinema_hub' | 'theater_room' | 'ott_universe'
-  const [viewMode, setViewMode] = useState(() => initialRoomId ? 'theater_room' : 'cinema_hub');
-  const currentUsername = initialUsername || initialUser?.name || localStorage.getItem('sp_username') || 'Guest_' + Math.floor(100 + Math.random() * 900);
-  
-  // DRM Categorization Tab: 'heavy_drm' (Category 1) | 'open_stream' (Category 2)
-  const [activeDrmTab, setActiveDrmTab] = useState('heavy_drm');
-  const [selectedOttPlatform, setSelectedOttPlatform] = useState(null);
+const API_BASE = API_URL;
 
-  // Active Theater Movie & Stream Engine ('direct_mp4' or 'web_embed')
-  const [activeMovie, setActiveMovie] = useState(VERIFIED_CLEAN_MOVIES[0]);
-  const [streamEngine, setStreamEngine] = useState(() => VERIFIED_CLEAN_MOVIES[0]?.videoSrc ? 'direct_mp4' : 'web_embed');
-  const [customStreamUrl, setCustomStreamUrl] = useState('');
-  
-  // Advanced Theater Controls
-  const [volumeBoost, setVolumeBoost] = useState(100); // 0 to 200%
-  const [isSubtitlesOn, setIsSubtitlesOn] = useState(false);
-  const [selectedQuality, setSelectedQuality] = useState('1080p HD');
-  const [isMicOn, setIsMicOn] = useState(true);
-  const [isCamOn, setIsCamOn] = useState(true);
+export default function CoWatchCinemaHub({ onBackToHome }) {
+  const { user, profile, isAuthenticated, getAccessToken } = useAuth();
+  const currentUsername = profile?.displayName || profile?.username || user?.email?.split('@')[0] || 'Guest';
 
-  // Synchronized Chat
-  const [chatMessages, setChatMessages] = useState([
-    { id: 1, sender: 'CoGether System', text: 'Low-latency WebRTC sync channel established.', time: 'Now' },
-    { id: 2, sender: 'Party Host', text: 'Direct in-app player is active! Video is streaming.', time: 'Just now' }
-  ]);
-  const [inputChat, setInputChat] = useState('');
+  // 1. Navigation & Search State
+  const [activeNav, setActiveNav] = useState('HOME');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState('ALL');
 
-  // Profile & Room State
-  const [isCopied, setIsCopied] = useState(false);
-  const [isRoomCopied, setIsRoomCopied] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [roomCode] = useState(() => initialRoomId || ('CW-' + Math.floor(100000 + Math.random() * 900000)));
-  
-  const profileMenuRef = useRef(null);
-  const videoRef = useRef(null);
-  const chatEndRef = useRef(null);
+  // 2. Data State
+  const [catalog, setCatalog] = useState([]);
+  const [providers, setProviders] = useState([]);
+  const [favoritesList, setFavoritesList] = useState(new Set());
+  const [watchHistory, setWatchHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
-  // Close profile dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
-        setIsProfileOpen(false);
+  // 3. Active Watch Media / Room State
+  const [activeMedia, setActiveMedia] = useState(null);
+  const [activeRoomId, setActiveRoomId] = useState(null);
+  const [viewMode, setViewMode] = useState('HUB'); // 'HUB' | 'THEATER_ROOM'
+
+  // 4. Modals
+  const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [roomModalMode, setRoomModalMode] = useState('CREATE'); // 'CREATE' | 'JOIN' | 'IMPORT'
+  const [selectedContentForRoom, setSelectedContentForRoom] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // Fetch Catalog from PostgreSQL API
+  const fetchCatalog = async () => {
+    setIsLoading(true);
+    setFetchError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/cowatch/content?limit=100`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.contents)) {
+        setCatalog(data.contents);
+        if (!activeMedia && data.contents.length > 0) {
+          const featured = data.contents.find((c) => c.isFeatured) || data.contents[0];
+          setActiveMedia(featured);
+        }
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    } catch (err) {
+      console.error('Failed to load CoWatch catalog', err);
+      setFetchError('Unable to load verified cinema catalog.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch Providers
+  const fetchProviders = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/cowatch/providers`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.providers)) {
+          setProviders(data.providers);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load providers', err);
+    }
+  };
+
+  // Fetch Favorites if Authenticated
+  const fetchFavorites = async () => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/cowatch/favorites`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.favorites)) {
+          setFavoritesList(new Set(data.favorites.map((f) => f.id || f.content_id)));
+        }
+      }
+    } catch (e) {}
+  };
+
+  // Fetch Watch History if Authenticated
+  const fetchHistory = async () => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/cowatch/history`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.history)) {
+          setWatchHistory(data.history);
+        }
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    fetchCatalog();
+    fetchProviders();
   }, []);
 
-  // Auto-scroll chat
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
-
-  // Adjust video element volume if native video is playing
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.volume = Math.min(1.0, volumeBoost / 100);
+    if (isAuthenticated) {
+      fetchFavorites();
+      fetchHistory();
+    } else {
+      setFavoritesList(new Set());
+      setWatchHistory([]);
     }
-  }, [volumeBoost]);
+  }, [isAuthenticated]);
 
-  const handleLaunchMovie = (movie) => {
-    setActiveMovie(movie);
-    setStreamEngine(movie.videoSrc ? 'direct_mp4' : 'web_embed');
-    setViewMode('theater_room');
-  };
-
-  /**
-   * Direct In-App Video Stream Resolver
-   * Converts ANY input (NBA, YouTube, Twitch, MP4, HLS, or direct link) to play DIRECTLY inside player
-   */
-  const handleStreamCustomUrl = (e) => {
-    e?.preventDefault();
-    if (!customStreamUrl.trim()) return;
-    const url = customStreamUrl.trim();
-
-    // 1. YouTube & YouTube Live
-    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/|shorts\/))([\w-]{11})/);
-      const ytId = match ? match[1] : '';
-      const finalEmbed = ytId ? `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&enablejsapi=1` : url;
-      
-      setActiveMovie({
-        id: Date.now(),
-        title: 'YouTube Direct In-App Stream',
-        year: new Date().getFullYear(),
-        category: 'YouTube Live',
-        description: 'Direct in-app video stream with synchronized chat.',
-        poster: 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=800&q=80',
-        videoSrc: null,
-        embedUrl: finalEmbed
-      });
-      setStreamEngine('web_embed');
-      setViewMode('theater_room');
+  // Toggle Favorite
+  const handleToggleFavorite = async (contentId) => {
+    if (!isAuthenticated) {
+      setIsAuthModalOpen(true);
       return;
     }
+    const token = getAccessToken();
+    const isFav = favoritesList.has(contentId);
 
-    // 2. Twitch Stream
-    if (url.includes('twitch.tv')) {
-      const channelMatch = url.match(/twitch\.tv\/([\w]+)/);
-      const channel = channelMatch ? channelMatch[1] : '';
-      const finalEmbed = `https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}&autoplay=true`;
-      
-      setActiveMovie({
-        id: Date.now(),
-        title: `Twitch Live: ${channel}`,
-        year: new Date().getFullYear(),
-        category: 'Twitch Live',
-        description: `Direct Twitch in-app player for ${channel}.`,
-        poster: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-        videoSrc: null,
-        embedUrl: finalEmbed
-      });
-      setStreamEngine('web_embed');
-      setViewMode('theater_room');
-      return;
-    }
-
-    // 3. Direct Video Files (.mp4, .webm, .ogg, .m3u8)
-    if (url.match(/\.(mp4|webm|ogg|m3u8|mov)(\?.*)?$/i)) {
-      setActiveMovie({
-        id: Date.now(),
-        title: 'Direct Video Player',
-        year: new Date().getFullYear(),
-        category: 'Direct MP4 Stream',
-        description: 'Direct in-app video player.',
-        poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80',
-        videoSrc: url,
-        embedUrl: null
-      });
-      setStreamEngine('direct_mp4');
-      setViewMode('theater_room');
-      return;
-    }
-
-    // 4. Any other URL (NBA, sports, website stream) -> Play DIRECTLY inside player!
-    const normalizedUrl = url.startsWith('http') ? url : `https://${url}`;
-    setActiveMovie({
-      id: Date.now(),
-      title: 'Direct In-App Stream',
-      year: new Date().getFullYear(),
-      category: 'Direct Web Video',
-      description: 'Streaming directly in the CoGether master player.',
-      poster: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80',
-      videoSrc: null,
-      embedUrl: normalizedUrl
+    setFavoritesList((prev) => {
+      const next = new Set(prev);
+      if (isFav) next.delete(contentId);
+      else next.add(contentId);
+      return next;
     });
-    setStreamEngine('web_embed');
-    setViewMode('theater_room');
+
+    try {
+      const method = isFav ? 'DELETE' : 'POST';
+      await fetch(`${API_BASE}/api/v1/cowatch/favorites/${contentId}`, {
+        method,
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (err) {
+      console.error('Failed to toggle favorite', err);
+    }
   };
 
-  const handleCopyPartyLink = (e) => {
-    e?.stopPropagation();
-    const link = `${window.location.origin}?room=${roomCode}&mode=watch`;
-    navigator.clipboard.writeText(link);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2500);
+  // Launch Watch Party (Create Room)
+  const handleLaunchWatchParty = async (content) => {
+    try {
+      const token = getAccessToken();
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      const res = await fetch(`${API_BASE}/api/v1/cowatch/rooms`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          title: `${content.title} Watch Room`,
+          contentId: content.id,
+          playbackMode: content.playbackMode,
+          controlPolicy: 'HOST_ONLY'
+        })
+      });
+
+      const data = await res.json();
+      if (data.success && data.room) {
+        setActiveMedia(content);
+        setActiveRoomId(data.room.room_code || data.room.room_id);
+        setViewMode('THEATER_ROOM');
+      } else {
+        const fallbackCode = 'CW-' + Math.floor(100000 + Math.random() * 900000);
+        setActiveMedia(content);
+        setActiveRoomId(fallbackCode);
+        setViewMode('THEATER_ROOM');
+      }
+    } catch (err) {
+      const fallbackCode = 'CW-' + Math.floor(100000 + Math.random() * 900000);
+      setActiveMedia(content);
+      setActiveRoomId(fallbackCode);
+      setViewMode('THEATER_ROOM');
+    }
   };
 
-  const handleCopyRoomCode = (e) => {
-    e?.stopPropagation();
-    navigator.clipboard.writeText(roomCode);
-    setIsRoomCopied(true);
-    setTimeout(() => setIsRoomCopied(false), 2500);
+  // Watch Solo Action
+  const handleWatchSolo = (content) => {
+    if (content.playbackMode === 'EXTERNAL_PROVIDER') {
+      window.open(content.externalUrl || 'https://www.netflix.com', '_blank', 'noopener,noreferrer');
+    } else {
+      handleLaunchWatchParty(content);
+    }
   };
 
-  const handleSendChatMessage = (e) => {
-    e.preventDefault();
-    if (!inputChat.trim()) return;
-    const newMsg = {
-      id: Date.now(),
-      sender: initialUser?.name || 'You (Host)',
-      text: inputChat.trim(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  // Launch Provider Watch Party
+  const handleProviderWatchParty = (provider) => {
+    const matchingContent = catalog.find((c) => c.providerId === provider.id) || {
+      id: `provider-${provider.id}`,
+      title: `${provider.name} Watch Room`,
+      description: `Synchronized individual playback for ${provider.name}.`,
+      thumbnail: provider.logoUrl,
+      backdrop: provider.logoUrl,
+      contentType: 'SERIES',
+      genre: 'OTT Service',
+      providerId: provider.id,
+      providerName: provider.name,
+      sourceType: 'EXTERNAL_PROVIDER',
+      playbackMode: provider.embedSupported ? 'YOUTUBE_PLAYER' : 'EXTERNAL_PROVIDER',
+      licenseStatus: 'PROVIDER_AUTHORIZED',
+      externalUrl: provider.officialUrl
     };
-    setChatMessages(prev => [...prev, newMsg]);
-    setInputChat('');
+    handleLaunchWatchParty(matchingContent);
   };
 
-  // ── DEDICATED 100DVH CO-WATCH PARTY ROOM SURFACE ──
-  if (viewMode === 'theater_room' && activeMovie) {
+  // Join Room via Code
+  const handleJoinRoom = async (code) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/cowatch/rooms/${code}`);
+      const data = await res.json();
+      if (data.success && data.room) {
+        const matchingContent = catalog.find((c) => c.id === data.room.content_id) || {
+          id: data.room.content_id,
+          title: data.room.content_title || data.room.title || 'Watch Room Stream',
+          playbackMode: data.room.playback_mode || 'NATIVE_PLAYER',
+          videoStreamUrl: data.room.video_stream_url
+        };
+        setActiveMedia(matchingContent);
+        setActiveRoomId(code);
+        setIsRoomModalOpen(false);
+        setViewMode('THEATER_ROOM');
+      } else {
+        alert('Watch room not found. Please verify the room code.');
+      }
+    } catch (e) {
+      setActiveRoomId(code);
+      setIsRoomModalOpen(false);
+      setViewMode('THEATER_ROOM');
+    }
+  };
+
+  // Import Validated Stream
+  const handleImportStream = (importedItem) => {
+    setCatalog((prev) => [importedItem, ...prev]);
+    setActiveMedia(importedItem);
+    setIsRoomModalOpen(false);
+    handleLaunchWatchParty(importedItem);
+  };
+
+  // Categorized Content Filters
+  const filteredCatalog = useMemo(() => {
+    return catalog.filter((item) => {
+      // 1. Search Query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesTitle = item.title.toLowerCase().includes(q);
+        const matchesDesc = (item.description || '').toLowerCase().includes(q);
+        const matchesGenre = (item.genre || '').toLowerCase().includes(q);
+        const matchesProvider = (item.providerName || '').toLowerCase().includes(q);
+        if (!matchesTitle && !matchesDesc && !matchesGenre && !matchesProvider) return false;
+      }
+
+      // 2. Sidebar Navigation Filter
+      if (activeNav === 'MOVIES' && item.contentType !== 'MOVIE') return false;
+      if (activeNav === 'SERIES' && item.contentType !== 'SERIES') return false;
+      if (activeNav === 'ANIME' && item.contentType !== 'ANIME') return false;
+      if (activeNav === 'SPORTS' && item.contentType !== 'SPORTS_LIVE') return false;
+      if (activeNav === 'YOUTUBE' && item.sourceType !== 'YOUTUBE') return false;
+      if (activeNav === 'FREE' && (item.playbackMode !== 'NATIVE_PLAYER' || (item.sourceType !== 'PUBLIC_DOMAIN' && item.sourceType !== 'OPEN_LICENSE'))) return false;
+      if (activeNav === 'FAVORITES' && !favoritesList.has(item.id)) return false;
+
+      // 3. Category Filter Tabs (when on HOME / EXPLORE)
+      if (activeCategoryFilter !== 'ALL') {
+        if (activeCategoryFilter === 'MOVIES' && item.contentType !== 'MOVIE') return false;
+        if (activeCategoryFilter === 'SERIES' && item.contentType !== 'SERIES') return false;
+        if (activeCategoryFilter === 'ANIME' && item.contentType !== 'ANIME') return false;
+        if (activeCategoryFilter === 'SPORTS' && item.contentType !== 'SPORTS_LIVE') return false;
+        if (activeCategoryFilter === 'YOUTUBE' && item.sourceType !== 'YOUTUBE') return false;
+        if (activeCategoryFilter === 'FREE' && (item.playbackMode !== 'NATIVE_PLAYER' || (item.sourceType !== 'PUBLIC_DOMAIN' && item.sourceType !== 'OPEN_LICENSE'))) return false;
+      }
+
+      return true;
+    });
+  }, [catalog, searchQuery, activeNav, activeCategoryFilter, favoritesList]);
+
+  // Section 1: FREE TO WATCH (Strictly Native Player + Public Domain / Open License)
+  const freeToWatchItems = useMemo(() => {
+    return catalog.filter((c) => 
+      c.playbackMode === 'NATIVE_PLAYER' && 
+      (c.sourceType === 'PUBLIC_DOMAIN' || c.sourceType === 'OPEN_LICENSE') &&
+      c.availabilityStatus === 'AVAILABLE'
+    );
+  }, [catalog]);
+
+  // Section 2: External OTT Providers (Tiles)
+  const ottProviders = useMemo(() => {
+    return providers.filter((p) => p.id !== 'cogether_hosted' && p.id !== 'public_domain');
+  }, [providers]);
+
+  // Section 3: Official YouTube Streams
+  const youtubeStreams = useMemo(() => {
+    return catalog.filter((c) => c.sourceType === 'YOUTUBE');
+  }, [catalog]);
+
+  // Dedicated Views for specific categories
+  const categoryItems = useMemo(() => {
+    if (activeNav === 'MOVIES') return catalog.filter((c) => c.contentType === 'MOVIE');
+    if (activeNav === 'SERIES') return catalog.filter((c) => c.contentType === 'SERIES');
+    if (activeNav === 'ANIME') return catalog.filter((c) => c.contentType === 'ANIME');
+    if (activeNav === 'SPORTS') return catalog.filter((c) => c.contentType === 'SPORTS_LIVE');
+    if (activeNav === 'YOUTUBE') return catalog.filter((c) => c.sourceType === 'YOUTUBE');
+    if (activeNav === 'FREE') return freeToWatchItems;
+    if (activeNav === 'FAVORITES') return catalog.filter((c) => favoritesList.has(c.id));
+    return [];
+  }, [catalog, activeNav, freeToWatchItems, favoritesList]);
+
+  // Inside Watch Room Theater
+  if (viewMode === 'THEATER_ROOM' && activeRoomId) {
     return (
       <CoWatchPartyRoom
-        movie={activeMovie}
-        streamEngine={streamEngine}
-        roomId={roomCode}
+        content={activeMedia}
+        roomId={activeRoomId}
         username={currentUsername}
-        onBack={() => setViewMode('cinema_hub')}
+        onBack={() => setViewMode('HUB')}
         onLeave={() => {
-          setViewMode('cinema_hub');
-          onBackToHome?.();
+          setViewMode('HUB');
+          setActiveRoomId(null);
         }}
       />
     );
   }
 
   return (
-    <div className="cowatch-cinema-universe fade-in">
-      {/* ── 1. FLOATING PURE BLACK NAVBAR ── */}
-      <header className="cinema-top-header">
-        {/* LEFT: Profile Trigger */}
-        <div className="cinema-header-left">
-          <div className="profile-menu-wrapper" ref={profileMenuRef}>
-            <button 
-              className={`btn-profile-trigger ${isProfileOpen ? 'active' : ''}`}
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              title="Party Profile & Squad Link"
-            >
-              <div className="profile-avatar-square">
-                <User size={17} />
-              </div>
-              <span className="profile-user-name">{initialUser?.name || 'PARTY HOST'}</span>
-              <ChevronDown size={14} className={`profile-chevron ${isProfileOpen ? 'rotated' : ''}`} />
-            </button>
+    <div className="cowatch-app-shell">
+      {/* ── LEFT NAVIGATION SIDEBAR ── */}
+      <CoWatchSidebar
+        activeNav={activeNav}
+        onSelectNav={(id) => {
+          setActiveNav(id);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onBackToHome={onBackToHome}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
+      />
 
-            {/* Profile Dropdown Card */}
-            {isProfileOpen && (
-              <div className="profile-dropdown-card fade-in">
-                <div className="dropdown-user-header">
-                  <div className="dropdown-avatar-sq-lg">
-                    <User size={24} />
-                  </div>
-                  <div className="dropdown-user-details">
-                    <h4>{initialUser?.name || 'PARTY HOST'}</h4>
-                  </div>
-                </div>
+      {/* ── MAIN CONTENT VIEWPORT ── */}
+      <main className="cowatch-main-viewport">
+        {/* ── TOP SEARCH & ACTIONS HEADER ── */}
+        <CoWatchHeader
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onCreateRoom={() => {
+            setSelectedContentForRoom(activeMedia || catalog[0]);
+            setRoomModalMode('CREATE');
+            setIsRoomModalOpen(true);
+          }}
+          onJoinRoom={() => {
+            setRoomModalMode('JOIN');
+            setIsRoomModalOpen(true);
+          }}
+          onOpenImportModal={() => {
+            setRoomModalMode('IMPORT');
+            setIsRoomModalOpen(true);
+          }}
+          onOpenProfile={() => setIsProfileModalOpen(true)}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
+        />
 
-                <div className="dropdown-divider" />
+        {/* ── HERO BILLBOARD (ONLY IN HOME MODE) ── */}
+        {activeNav === 'HOME' && !searchQuery && activeMedia && (
+          <HeroBillboard
+            content={activeMedia}
+            onWatchNow={handleWatchSolo}
+            onWatchTogether={handleLaunchWatchParty}
+          />
+        )}
 
-                {/* Room Code Compartment */}
-                <div className="dropdown-section">
-                  <span className="dropdown-section-label">ROOM CODE</span>
-                  <div className="dropdown-copy-box" onClick={handleCopyRoomCode}>
-                    <span className="mono-code">{roomCode}</span>
-                    <button className="btn-inline-copy">
-                      {isRoomCopied ? <Check size={13} className="copied-yellow" /> : <Copy size={13} />}
-                      <span>{isRoomCopied ? 'COPIED' : 'COPY'}</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Squad Sync Link Compartment */}
-                <div className="dropdown-section">
-                  <span className="dropdown-section-label">SQUAD SYNC LINK</span>
-                  <div className="dropdown-copy-box" onClick={handleCopyPartyLink}>
-                    <span className="mono-link-preview">{`${window.location.origin}?room=${roomCode}&mode=watch`}</span>
-                    <button className="btn-inline-copy">
-                      {isCopied ? <Check size={13} className="copied-yellow" /> : <Copy size={13} />}
-                      <span>{isCopied ? 'COPIED' : 'COPY'}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="dropdown-divider" />
-
-                {/* Leave Action */}
-                <button className="dropdown-leave-btn" onClick={onBackToHome}>
-                  <LogOut size={14} /> <span>LEAVE PARTY & GO HOME</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CENTER: BOLD YELLOW CO-WATCH + ITALIC CURSIVE SUBTITLE */}
-        <div className="cinema-header-center">
-          <div className="cowatch-center-branding">
-            <h1 className="cowatch-bold-yellow-title">CO-WATCH</h1>
-            <span className="cowatch-cursive-subtitle">watch together</span>
-          </div>
-        </div>
-
-        {/* RIGHT: Quick Back to Home */}
-        <div className="cinema-header-right">
-          <button className="btn-cinema-back-subtle" onClick={onBackToHome}>
-            <ArrowLeft size={13} /> <span>BACK TO HOME</span>
-          </button>
-        </div>
-      </header>
-
-      {/* ── 2. HERO BANNER (ONLY ON CINEMA HUB VIEW) ── */}
-      {viewMode === 'cinema_hub' && (
-        <section className="cowatch-banner-wrapper">
-          <div className="cowatch-announcement-banner">
-            <div className="banner-text-content">
-              <span className="banner-sub-tag">[ STREAM CINEMA TOGETHER ]</span>
-              <h2 className="banner-headline">
-                Watch Shows, Anime, Series, Movies & Live Sports Together
-              </h2>
-              <p className="banner-description">
-                Direct in-app clean video streaming for open media, and synchronized companion setup for heavy DRM platforms.
-              </p>
-            </div>
-
-            {/* Paper-Style Badge Button to open OTT Category Universe */}
-            <div className="banner-action-side">
-              <button 
-                className="paper-style-click-badge"
-                onClick={() => {
-                  setViewMode('ott_universe');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+        {/* ── CATEGORY FILTER TABS (EDITORIAL UNDERLINE RAIL) ── */}
+        {(activeNav === 'HOME' || activeNav === 'EXPLORE') && (
+          <div className="cowatch-category-tabs-bar">
+            {[
+              { id: 'ALL', label: 'ALL' },
+              { id: 'FREE', label: 'FREE' },
+              { id: 'MOVIES', label: 'MOVIES' },
+              { id: 'SERIES', label: 'SERIES' },
+              { id: 'ANIME', label: 'ANIME' },
+              { id: 'SPORTS', label: 'SPORTS' },
+              { id: 'YOUTUBE', label: 'YOUTUBE' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                className={`cowatch-filter-tab ${activeCategoryFilter === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveCategoryFilter(tab.id)}
               >
-                <span className="paper-badge-tag">DRM & OPEN STREAM HUBS</span>
-                <div className="paper-badge-main-text">
-                  <strong>CLICK HERE!</strong>
-                  <ArrowRight size={16} />
-                </div>
-                <span className="paper-badge-sub">
-                  NETFLIX • PRIME • DISNEY+ • SPORTS
-                </span>
+                <span>{tab.label}</span>
+                {activeCategoryFilter === tab.id && <span className="cowatch-tab-indicator" />}
               </button>
-            </div>
+            ))}
           </div>
-        </section>
-      )}
+        )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW MODE 1: FREE CINEMA HUB & DIRECT CUSTOM STREAM BAR
-          ══════════════════════════════════════════════════════════════════════ */}
-      {viewMode === 'cinema_hub' && (
-        <main className="free-cinema-main-container fade-in">
-          {/* ── DIRECT URL STREAM INPUT BAR ── */}
-          <section className="search-filter-section">
-            <form onSubmit={handleStreamCustomUrl} className="custom-url-stream-bar">
-              <Video size={18} className="search-icon" />
-              <input 
-                type="text"
-                placeholder="Paste ANY video URL (NBA, YouTube, Twitch, MP4, Live stream) to play directly in-app..."
-                value={customStreamUrl}
-                onChange={(e) => setCustomStreamUrl(e.target.value)}
-                className="cinema-search-input"
-              />
-              <button type="submit" className="btn-stream-now-action">
-                <Play size={13} fill="#000000" />
-                <span>PLAY IN PLAYER</span>
-              </button>
-            </form>
-          </section>
-
-          {/* ── YELLOW CANVAS WITH VERIFIED CLEAN DIRECT MOVIES ── */}
-          <section className="netflix-rows-section">
-            <div className="yellow-canvas-header-meta">
-              <div>
-                <h3 className="netflix-row-header-title">Free to Watch Masterpieces on CoGether</h3>
-                <span className="canvas-sub-info">Direct plain video streaming • Zero ads, zero website chrome</span>
+        {/* ── CATALOG ROWS OR DEDICATED CATEGORY VIEW ── */}
+        {isLoading ? (
+          <div style={{ padding: '60px 36px', textAlign: 'center', color: 'var(--cw-text-secondary)' }}>
+            <RefreshCw size={24} className="spin-icon" style={{ margin: '0 auto 12px auto' }} />
+            <p style={{ fontWeight: 300 }}>Loading verified cinema catalog...</p>
+          </div>
+        ) : fetchError ? (
+          <div style={{ padding: '40px 36px', textAlign: 'center', color: '#ff8a90' }}>
+            <AlertCircle size={24} style={{ margin: '0 auto 12px auto' }} />
+            <p>{fetchError}</p>
+          </div>
+        ) : activeNav !== 'HOME' && activeNav !== 'EXPLORE' ? (
+          /* Dedicated Category Screen (Movies, Series, Anime, Sports, Free, Favorites) */
+          <section className="cowatch-catalog-section">
+            <div className="cowatch-rail-header">
+              <div className="cowatch-rail-title-group">
+                <div className="cowatch-rail-accent-bar" />
+                <h2 className="cowatch-rail-title">
+                  {activeNav === 'FREE' ? 'Free to Watch' : activeNav}
+                </h2>
               </div>
-              <span className="canvas-count-tag">{VERIFIED_CLEAN_MOVIES.length} MOVIES READY</span>
-            </div>
-
-            <div className="public-domain-movies-grid">
-              {VERIFIED_CLEAN_MOVIES.map(movie => (
-                <div 
-                  key={movie.id} 
-                  className="public-domain-movie-card"
-                  onClick={() => handleLaunchMovie(movie)}
-                >
-                  <div className="pd-poster-frame">
-                    <img 
-                      src={movie.poster} 
-                      alt={movie.title} 
-                      className="pd-poster-img"
-                      loading="lazy"
-                    />
-                    <div className="pd-poster-gradient" />
-
-                    {/* Top Badges */}
-                    <span className="pd-category-pill">{movie.category}</span>
-                    <span className="pd-year-pill">{movie.year}</span>
-
-                    {/* Title at bottom */}
-                    <div className="pd-card-bottom-title">
-                      <span className="pd-movie-title-txt">{movie.title}</span>
-                    </div>
-
-                    {/* Hover Reveal Overlay with Description & Watch Now */}
-                    <div className="pd-hover-reveal-overlay">
-                      <div className="pd-hover-header">
-                        <span className="pd-hover-badge">DIRECT STREAM READY</span>
-                        <span className="pd-hover-cat">{movie.category} • {movie.year}</span>
-                      </div>
-
-                      <h4 className="pd-hover-title">{movie.title}</h4>
-                      <p className="pd-hover-desc">{movie.description}</p>
-
-                      <button className="btn-pd-watch-now" onClick={(e) => {
-                        e.stopPropagation();
-                        handleLaunchMovie(movie);
-                      }}>
-                        <Play size={14} fill="#000000" />
-                        <span>WATCH NOW</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </main>
-      )}
-
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW MODE 3: FULL-PAGE OTT UNIVERSE (CATEGORY 1 DRM vs CATEGORY 2 OPEN)
-          ══════════════════════════════════════════════════════════════════════ */}
-      {viewMode === 'ott_universe' && (
-        <main className="ott-universe-full-page fade-in">
-          {/* Header */}
-          <div className="ott-universe-clean-header">
-            <div className="ott-header-top-row">
-              <button className="btn-return-cinema-hub" onClick={() => setViewMode('cinema_hub')}>
-                <ArrowLeft size={16} /> <span>← BACK TO FREE CINEMA</span>
-              </button>
-              <span className="ott-count-pill">
-                {activeDrmTab === 'heavy_drm' ? 'CATEGORY 1: 16 DRM SERVICES' : 'CATEGORY 2: 24 OPEN SERVICES'}
+              <span className="cowatch-rail-count-badge">
+                {categoryItems.length} TITLES
               </span>
             </div>
 
-            <h2 className="ott-page-main-title">Streaming Platforms & Connection Architecture</h2>
-            <p className="ott-page-subtitle">
-              Choose between Heavy DRM services (requires account sync) or Free Open streams (direct playback).
-            </p>
-
-            {/* Two Master Category Tabs */}
-            <div className="ott-drm-master-tabs">
-              <button 
-                className={`drm-tab-btn ${activeDrmTab === 'heavy_drm' ? 'active-red-tab' : ''}`}
-                onClick={() => {
-                  setActiveDrmTab('heavy_drm');
-                  setSelectedOttPlatform(null);
-                }}
-              >
-                <Lock size={15} />
-                <span>CATEGORY 1: HEAVY DRM PLATFORMS (16)</span>
-              </button>
-
-              <button 
-                className={`drm-tab-btn ${activeDrmTab === 'open_stream' ? 'active-yellow-tab' : ''}`}
-                onClick={() => {
-                  setActiveDrmTab('open_stream');
-                  setSelectedOttPlatform(null);
-                }}
-              >
-                <Globe size={15} />
-                <span>CATEGORY 2: FREE & OPEN STREAMING (24)</span>
-              </button>
-            </div>
-          </div>
-
-          {/* ── CATEGORY 1: HEAVY DRM PLATFORM GUIDE (RED CANVAS) ── */}
-          {activeDrmTab === 'heavy_drm' && (
-            <div className="drm-category-intro-banner red-border-banner fade-in">
-              <div className="intro-badge-row">
-                <ShieldAlert size={20} className="red-icon" />
-                <span className="drm-intro-tag">CATEGORY 1: HARDWARE DRM PROTECTED (WIDEVINE / FAIRPLAY / PLAYREADY)</span>
-              </div>
-              <h3 className="drm-intro-heading">How 2+ People Connect & Watch Together</h3>
-              <p className="drm-intro-desc">
-                These platforms utilize browser-level hardware encryption (Encrypted Media Extensions / CDMs).
-                Standard screen-sharing or simple iframes turn into a <strong>black screen</strong>.
+            {categoryItems.length === 0 ? (
+              <p style={{ color: 'var(--cw-text-muted)', fontWeight: 300, margin: '20px 0' }}>
+                No titles currently available in this collection.
               </p>
-
-              {/* Exact 3 Steps on how two people connect */}
-              <div className="drm-two-user-steps-grid">
-                <div className="two-user-step-card">
-                  <span className="user-step-num">STEP 1</span>
-                  <h4>Both Members Sign In</h4>
-                  <p>Both you and your friends open the official platform (e.g., Netflix) in separate browser tabs with your own active accounts.</p>
-                </div>
-                <div className="two-user-step-card">
-                  <span className="user-step-num">STEP 2</span>
-                  <h4>Connect Room Code ({roomCode})</h4>
-                  <p>Open the CoGether Companion extension in your tab and paste your active Room Code to link the squad together.</p>
-                </div>
-                <div className="two-user-step-card">
-                  <span className="user-step-num">STEP 3</span>
-                  <h4>Synchronized Playback & Call</h4>
-                  <p>Play, pause, and seek actions are instantly synchronized with a low-latency floating video call and squad voice chat.</p>
-                </div>
+            ) : (
+              <div className="cowatch-cards-grid">
+                {categoryItems.map((item) => (
+                  <ContentCard
+                    key={item.id}
+                    content={item}
+                    isFavorited={favoritesList.has(item.id)}
+                    onToggleFavorite={handleToggleFavorite}
+                    onWatchSolo={handleWatchSolo}
+                    onWatchParty={handleLaunchWatchParty}
+                  />
+                ))}
               </div>
-            </div>
-          )}
-
-          {/* ── CATEGORY 2: OPEN & FREE PLATFORM GUIDE (YELLOW CANVAS) ── */}
-          {activeDrmTab === 'open_stream' && (
-            <div className="drm-category-intro-banner yellow-border-banner fade-in">
-              <div className="intro-badge-row">
-                <Globe size={20} className="yellow-icon" />
-                <span className="drm-intro-tag yellow-txt">CATEGORY 2: OPEN VIDEO MANIFESTS & ZERO DRM</span>
-              </div>
-              <h3 className="drm-intro-heading">Direct In-App Playback & Embed Streaming</h3>
-              <p className="drm-intro-desc">
-                These platforms do not enforce hardware-locked encryption for web playback.
-                You can paste direct video links or launch synchronized in-app theater streams directly!
-              </p>
-
-              {/* Quick direct stream input */}
-              <form onSubmit={handleStreamCustomUrl} className="category-open-stream-form">
-                <input 
-                  type="text" 
-                  placeholder="Paste direct video URL (MP4 / YouTube / Live stream)..."
-                  value={customStreamUrl}
-                  onChange={(e) => setCustomStreamUrl(e.target.value)}
-                  className="open-stream-input"
-                />
-                <button type="submit" className="btn-open-stream-submit">
-                  <Play size={13} fill="#000000" /> <span>PLAY IN THEATER</span>
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* ── PLATFORM DETAIL DRAWER (WHEN CLICKED) ── */}
-          {selectedOttPlatform && (
-            <div className={`ott-platform-detail-drawer ${activeDrmTab === 'heavy_drm' ? 'red-canvas-drawer' : 'yellow-canvas-drawer'} fade-in`}>
-              <div className="drawer-header-row">
-                <div className="drawer-title-col">
-                  <div className="drawer-logo-badge-wrap">
-                    {selectedOttPlatform.logoUrl ? (
-                      <img src={selectedOttPlatform.logoUrl} alt={selectedOttPlatform.name} className="drawer-header-logo" />
-                    ) : null}
-                  </div>
+            )}
+          </section>
+        ) : (
+          /* Homepage / Explore View with Partitioned Sections */
+          <>
+            {/* SECTION 1: FREE TO WATCH (Strictly Verified Native Player Films) */}
+            {(activeCategoryFilter === 'ALL' || activeCategoryFilter === 'FREE') && freeToWatchItems.length > 0 && (
+              <section className="cowatch-catalog-section">
+                <div className="cowatch-rail-header">
                   <div>
-                    <h3 className="drawer-platform-name">{selectedOttPlatform.name} Connection Guide</h3>
-                    <span className="drawer-drm-note">{selectedOttPlatform.badge} • {selectedOttPlatform.summary}</span>
+                    <div className="cowatch-rail-title-group">
+                      <div className="cowatch-rail-accent-bar" />
+                      <h2 className="cowatch-rail-title">Free to Watch</h2>
+                    </div>
+                    <p className="cowatch-rail-subtitle">
+                      Verified public-domain and openly licensed films.
+                    </p>
                   </div>
+                  <span className="cowatch-rail-count-badge">
+                    {freeToWatchItems.length} TITLES
+                  </span>
                 </div>
-                <button className="btn-close-drawer" onClick={() => setSelectedOttPlatform(null)}>
-                  ✕ CLOSE
-                </button>
-              </div>
 
-              {/* Actions */}
-              <div className="drawer-action-triggers">
-                <a 
-                  href={selectedOttPlatform.directUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="btn-launch-ott-tab"
-                >
-                  <span>OPEN {selectedOttPlatform.name.toUpperCase()}</span>
-                  <ExternalLink size={15} />
-                </a>
-
-                <button className="btn-copy-room-trigger" onClick={handleCopyRoomCode}>
-                  <Key size={15} />
-                  <span>{isRoomCopied ? 'ROOM CODE COPIED!' : `COPY ROOM CODE (${roomCode})`}</span>
-                </button>
-
-                <button className="btn-copy-squad-trigger" onClick={handleCopyPartyLink}>
-                  <Share2 size={15} />
-                  <span>{isCopied ? 'INVITE LINK COPIED!' : 'SHARE SQUAD INVITE LINK'}</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ── 5 PER ROW: PURE LOGO OVALISH CARDS ── */}
-          <div className="ott-platforms-five-col-grid">
-            {(activeDrmTab === 'heavy_drm' ? HEAVY_DRM_PLATFORMS : OPEN_NON_DRM_PLATFORMS).map(platform => (
-              <div 
-                key={platform.id} 
-                className={`ott-ovalish-card ${selectedOttPlatform?.id === platform.id ? 'active-ott-card' : ''}`}
-                onClick={() => setSelectedOttPlatform(platform)}
-                title={`Click to view connection instructions for ${platform.name}`}
-              >
-                <div className="ott-logo-matte-container">
-                  {platform.logoUrl ? (
-                    <img 
-                      src={platform.logoUrl} 
-                      alt={`${platform.name} Logo`} 
-                      className="ott-exact-official-logo" 
-                      loading="lazy"
+                <div className="cowatch-cards-carousel">
+                  {freeToWatchItems.map((item) => (
+                    <ContentCard
+                      key={item.id}
+                      content={item}
+                      isFavorited={favoritesList.has(item.id)}
+                      onToggleFavorite={handleToggleFavorite}
+                      onWatchSolo={handleWatchSolo}
+                      onWatchParty={handleLaunchWatchParty}
                     />
-                  ) : (
-                    <span className="ott-text-fallback-logo">{platform.name}</span>
-                  )}
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        </main>
+              </section>
+            )}
+
+            {/* SECTION 2: WATCH ON YOUR SERVICES (Provider Tiles) */}
+            {(activeCategoryFilter === 'ALL') && ottProviders.length > 0 && !searchQuery && (
+              <section className="cowatch-catalog-section">
+                <div className="cowatch-rail-header">
+                  <div>
+                    <div className="cowatch-rail-title-group">
+                      <div className="cowatch-rail-accent-bar" style={{ background: 'var(--cw-gold-primary)' }} />
+                      <h2 className="cowatch-rail-title">Watch on Your Services</h2>
+                    </div>
+                    <p className="cowatch-rail-subtitle">
+                      Connect personal streaming accounts for synchronized group playback.
+                    </p>
+                  </div>
+                  <span className="cowatch-rail-count-badge">
+                    {ottProviders.length} SERVICES
+                  </span>
+                </div>
+
+                <div className="cowatch-providers-carousel">
+                  {ottProviders.map((prov) => (
+                    <ProviderCard
+                      key={prov.id}
+                      provider={prov}
+                      onOpenProvider={(p) => {
+                        if (p.officialUrl) window.open(p.officialUrl, '_blank', 'noopener,noreferrer');
+                      }}
+                      onWatchTogether={handleProviderWatchParty}
+                      onWatchInCoWatch={handleProviderWatchParty}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* SECTION 3: YOUTUBE (Official Player & Verified Channels) */}
+            {(activeCategoryFilter === 'ALL' || activeCategoryFilter === 'YOUTUBE') && youtubeStreams.length > 0 && (
+              <section className="cowatch-catalog-section">
+                <div className="cowatch-rail-header">
+                  <div>
+                    <div className="cowatch-rail-title-group">
+                      <div className="cowatch-rail-accent-bar" style={{ background: '#ff0000' }} />
+                      <h2 className="cowatch-rail-title">YouTube</h2>
+                    </div>
+                    <p className="cowatch-rail-subtitle">
+                      Official YouTube player synchronization and live public streams.
+                    </p>
+                  </div>
+                  <span className="cowatch-rail-count-badge">
+                    {youtubeStreams.length} STREAMS
+                  </span>
+                </div>
+
+                <div className="cowatch-cards-carousel">
+                  {youtubeStreams.map((item) => (
+                    <ContentCard
+                      key={item.id}
+                      content={item}
+                      isFavorited={favoritesList.has(item.id)}
+                      onToggleFavorite={handleToggleFavorite}
+                      onWatchSolo={handleWatchSolo}
+                      onWatchParty={handleLaunchWatchParty}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+          </>
+        )}
+      </main>
+
+      {/* ── CREATE / JOIN / IMPORT ROOM MODAL ── */}
+      <CreateRoomModal
+        isOpen={isRoomModalOpen}
+        mode={roomModalMode}
+        initialContent={selectedContentForRoom}
+        onClose={() => setIsRoomModalOpen(false)}
+        onSubmitCreate={(roomData) => {
+          setIsRoomModalOpen(false);
+          const target = selectedContentForRoom || catalog[0];
+          handleLaunchWatchParty(target);
+        }}
+        onSubmitJoin={handleJoinRoom}
+        onSubmitImport={handleImportStream}
+      />
+
+      {/* ── REAL AUTHENTICATION MODAL ── */}
+      {isAuthModalOpen && (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          onSuccess={() => {
+            setIsAuthModalOpen(false);
+            fetchFavorites();
+            fetchHistory();
+          }}
+        />
       )}
 
-      {/* ── 6. COGETHER LUXURY FOOTER ── */}
-      <footer className="cowatch-luxury-footer">
-        <div className="footer-inner-wrapper">
-          <div className="footer-left-col">
-            <h4 className="footer-brand-title">CO-WATCH <span>CINEMA</span></h4>
-            <p className="footer-brand-desc">
-              Direct Plain Video Streaming, DRM Extension Synchronization & Low-Latency WebRTC P2P Video Chat.
-            </p>
-          </div>
-
-          <div className="footer-center-col">
-            <span className="footer-webrtc-badge">● WEBRTC 2.0 P2P SYNC ACTIVE</span>
-            <span className="footer-room-info">Active Party Room: <strong>{roomCode}</strong></span>
-          </div>
-
-          <div className="footer-right-col">
-            <button className="btn-footer-back-home" onClick={onBackToHome}>
-              <span>BACK TO COGETHER HOME</span>
-              <ArrowLeft size={14} />
-            </button>
-          </div>
-        </div>
-      </footer>
+      {/* ── USER PROFILE MODAL ── */}
+      {isProfileModalOpen && (
+        <ProfileModal
+          onClose={() => setIsProfileModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

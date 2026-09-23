@@ -161,6 +161,8 @@ export class DirectEmbedAdapter extends GameProviderAdapter {
       iframe.src = this.game.launchUrl;
       iframe.title = this.game.title;
       iframe.className = 'game-embedded-viewport-frame';
+      // Strict sandbox for third-party external embeds: strictly omit 'allow-same-origin' to prevent token/cookie exfiltration
+      iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-pointer-lock');
       iframe.setAttribute('allow', 'autoplay; fullscreen; gamepad; accelerometer; gyroscope; keyboard-map');
       iframe.setAttribute('allowFullScreen', 'true');
       iframe.setAttribute('tabindex', '0');

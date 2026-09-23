@@ -9,6 +9,8 @@ import FilterSidebar from './components/FilterSidebar.jsx';
 import AIShoppingAssistantModal from './components/AIShoppingAssistantModal.jsx';
 import SharedCartDrawer from './components/SharedCartDrawer.jsx';
 import CoShopRoom from './components/CoShopRoom.jsx';
+import { useAuth } from '../../core/AuthContext.jsx';
+import { API_URL } from '../../config/api.js';
 import './CoShopHub.css';
 
 export default function CoShopHub({
@@ -17,10 +19,11 @@ export default function CoShopHub({
   initialUsername,
   onBackToHome
 }) {
+  const { profile } = useAuth();
   // Navigation & View Mode
   const [activeView, setActiveView] = useState(initialRoomId ? 'room' : 'discovery');
   const [activeRoomId, setActiveRoomId] = useState(initialRoomId || null);
-  const currentUsername = initialUsername || initialUser?.name || localStorage.getItem('sp_username') || 'Shopper_' + Math.floor(100 + Math.random() * 900);
+  const currentUsername = initialUsername || profile?.displayName || profile?.username || initialUser?.name || 'Shopper_' + Math.floor(100 + Math.random() * 900);
 
   // Search & Catalog State
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,7 +56,7 @@ export default function CoShopHub({
 
   // Fetch Curated Feeds on Mount
   useEffect(() => {
-    fetch('http://localhost:3001/api/coshop/recommendations')
+    fetch(`${API_URL}/api/coshop/recommendations`)
       .then((r) => r.json())
       .then((data) => setRecommendations(data))
       .catch((e) => console.error('Failed to fetch curated feeds:', e));
@@ -75,7 +78,7 @@ export default function CoShopHub({
     params.set('sort', sortBy);
     params.set('limit', '30');
 
-    fetch(`http://localhost:3001/api/coshop/products?${params.toString()}`)
+    fetch(`${API_URL}/api/coshop/products?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
         setProducts(data.products || []);

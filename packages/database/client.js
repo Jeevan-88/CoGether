@@ -41,10 +41,16 @@ class DatabaseClient {
           this.isConnected = false;
         });
       } catch (err) {
+        if (config.env === 'production' || process.env.NODE_ENV === 'production') {
+          throw new Error(`FATAL: PostgreSQL pool creation failed in production: ${err.message}`);
+        }
         logger.warn('PostgreSQL pool creation failed; enabling simulated store for local dev', { error: err });
         this.isSimulated = true;
       }
     } else {
+      if (config.env === 'production' || process.env.NODE_ENV === 'production') {
+        throw new Error('FATAL: PostgreSQL connection string is required in production environment.');
+      }
       this.isSimulated = true;
       logger.info('PostgreSQL driver or URL not active; operating in fallback dev simulation mode');
     }
@@ -65,12 +71,25 @@ class DatabaseClient {
     }
 
     // Fallback simulation mode
+    const config = getConfig();
+    if (config.env === 'production' || process.env.NODE_ENV === 'production') {
+      throw new Error('FATAL: Database queries cannot run in simulated fallback mode in production environment.');
+    }
     logger.debug('[Simulated DB] query execution', { text, params });
     return { rows: [], rowCount: 0 };
   }
 
   async checkHealth() {
+    const config = getConfig();
     if (this.isSimulated || !this.pool) {
+      if (config.env === 'production' || process.env.NODE_ENV === 'production') {
+        return {
+          connected: false,
+          mode: 'simulated_dev',
+          latencyMs: 0,
+          error: 'FATAL: Simulated database mode is prohibited in production environment.'
+        };
+      }
       return {
         connected: true,
         mode: 'simulated_dev',

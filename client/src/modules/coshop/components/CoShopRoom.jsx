@@ -9,6 +9,7 @@ import CoWatchCameraTile from '../../cowatch/components/CoWatchCameraTile.jsx';
 import ProductCard from './ProductCard.jsx';
 import ProductDetailModal from './ProductDetailModal.jsx';
 import SharedCartDrawer from './SharedCartDrawer.jsx';
+import { API_URL } from '../../../config/api.js';
 import './CoShopRoom.css';
 
 const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
@@ -53,7 +54,7 @@ export default function CoShopRoom({
 
   // Fetch initial catalog
   useEffect(() => {
-    fetch('http://localhost:3001/api/coshop/products?limit=24')
+    fetch(`${API_URL}/api/coshop/products?limit=24`)
       .then((r) => r.json())
       .then((d) => setProducts(d.products || []))
       .catch((e) => console.error('CoShop Room product fetch failed:', e));

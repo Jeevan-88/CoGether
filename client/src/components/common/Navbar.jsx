@@ -1,7 +1,7 @@
 import React from 'react';
 import './Navbar.css';
 
-export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpenPricing, isScrolled, scrollProgress = 0, hideNavbar = false }) {
+export default function Navbar({ activeTab, onTabChange, user, profile, onOpenAuth, onOpenProfile, onOpenPricing, isScrolled, scrollProgress = 0, hideNavbar = false }) {
   const winW = typeof window !== 'undefined' ? window.innerWidth : 1200;
   const winH = typeof window !== 'undefined' ? window.innerHeight : 800;
 
@@ -92,6 +92,12 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
             Co-Shop
           </button>
           <button
+            className={`nav-menu-btn ${activeTab === 'study' || activeTab === 'costudy' || activeTab === 'studyHub' ? 'active' : ''}`}
+            onClick={() => onTabChange('costudy')}
+          >
+            Co-Study
+          </button>
+          <button
             className={`nav-menu-btn ${activeTab === 'telepresence' ? 'active' : ''}`}
             onClick={() => onTabChange('telepresence')}
           >
@@ -99,12 +105,51 @@ export default function Navbar({ activeTab, onTabChange, user, onOpenAuth, onOpe
           </button>
         </nav>
 
-        {/* Right: oval white buttons */}
+        {/* Right: oval white buttons / profile avatar */}
         <div className="nav-right-actions">
-          {user ? (
-            <div className="user-nav-badge">
-              <span>{user.name}</span>
-            </div>
+          {profile || user ? (
+            <button
+              className="user-nav-badge"
+              onClick={onOpenProfile}
+              title="Click to view & edit Profile / Preferences"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 14px',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 229, 0, 0.3)',
+                borderRadius: '24px',
+                color: '#ffffff',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '13px'
+              }}
+            >
+              {profile?.avatarUrl || profile?.avatar_url ? (
+                <img
+                  src={profile.avatarUrl || profile.avatar_url}
+                  alt={profile.displayName || profile.display_name}
+                  style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div style={{
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '50%',
+                  background: '#FFE500',
+                  color: '#000',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: '800'
+                }}>
+                  {(profile?.displayName || profile?.display_name || profile?.username || user?.name || 'U')[0].toUpperCase()}
+                </div>
+              )}
+              <span>{profile?.displayName || profile?.display_name || profile?.username || user?.name || 'Member'}</span>
+            </button>
           ) : (
             <button className="btn-login-rect" onClick={onOpenAuth}>
               Log In

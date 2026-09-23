@@ -23,17 +23,17 @@
   border-color: rgba(255, 255, 255, 0.25);
 }
 
-/* Zoom Active Speaker Outline (Perimeter stroke, NO scale explosion) */
+/* Active Speaker Outline */
 .cowatch-camera-tile.is-speaking {
-  border-color: #FFE500 !important;
-  box-shadow: 0 0 0 2px #FFE500, 0 4px 20px rgba(255, 229, 0, 0.35) !important;
+  border-color: #d4af37 !important;
+  box-shadow: 0 0 0 2px #d4af37, 0 4px 16px rgba(212, 175, 55, 0.3) !important;
   z-index: 3;
 }
 
 /* Pinned Tile State */
 .cowatch-camera-tile.is-pinned {
-  border-color: #FFE500;
-  box-shadow: 0 0 0 1.5px rgba(255, 229, 0, 0.6);
+  border-color: #e50914;
+  box-shadow: 0 0 0 1.5px rgba(229, 9, 20, 0.6);
 }
 
 /* Video Feed */

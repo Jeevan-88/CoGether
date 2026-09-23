@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, Send, Bot, User, ArrowRight, Star } from 'lucide-react';
+import { API_URL } from '../../../config/api.js';
 import './AIShoppingAssistantModal.css';
 
 export default function AIShoppingAssistantModal({
@@ -50,7 +51,7 @@ export default function AIShoppingAssistantModal({
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:3001/api/coshop/ai-assistant', {
+      const res = await fetch(`${API_URL}/api/coshop/ai-assistant`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: textToSend })

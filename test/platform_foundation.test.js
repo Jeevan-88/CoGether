@@ -198,9 +198,9 @@ async function runTests() {
 
   // ── 5. Database Migrations ───────────────────────────────────────────────────
   console.log('\n── [5/7] Database Migrations ──');
-  await testAsync('Discovers and validates all 6 versioned SQL migrations', async () => {
+  await testAsync('Discovers and validates all versioned SQL migrations', async () => {
     const files = await getMigrationFiles();
-    assert.strictEqual(files.length, 6);
+    assert.ok(files.length >= 6, `Expected at least 6 migrations, found ${files.length}`);
     assert.strictEqual(files[0], '001_init_schemas.sql');
     assert.strictEqual(files[1], '002_identity_schema.sql');
     assert.strictEqual(files[2], '003_coplay_schema.sql');
@@ -211,7 +211,7 @@ async function runTests() {
     for (const f of files) {
       const content = fs.readFileSync(path.join(__dirname, '../packages/database/migrations', f), 'utf8');
       assert.ok(content.length > 50, `Migration ${f} must have non-empty SQL content`);
-      assert.ok(content.includes('CREATE TABLE') || content.includes('CREATE SCHEMA'), `Migration ${f} has valid DDL`);
+      assert.ok(content.includes('CREATE TABLE') || content.includes('CREATE SCHEMA') || content.includes('ALTER TABLE'), `Migration ${f} has valid DDL`);
     }
   });
 

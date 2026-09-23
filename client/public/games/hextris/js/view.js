@@ -159,6 +159,18 @@ function gameOverDisplay() {
 	$("#socialShare").fadeIn();
 	$("#restart").fadeIn();
     set_score_pos();
+
+	try {
+		if (window.parent && window.parent !== window) {
+			window.parent.postMessage({
+				type: 'COPLAY_GAME_SYNC',
+				gameId: 'hextris',
+				score: score || 0,
+				over: true,
+				won: false
+			}, '*');
+		}
+	} catch (e) {}
 }
 
 function updateHighScores (){

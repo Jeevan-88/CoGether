@@ -92,6 +92,17 @@ game.BirdEntity = me.Entity.extend({
             me.game.world.removeChildNow(obj);
             game.data.steps++;
             me.audio.play('hit');
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'COPLAY_GAME_SYNC',
+                        gameId: 'clumsy-bird',
+                        score: game.data.steps,
+                        over: false,
+                        won: false
+                    }, '*');
+                }
+            } catch (e) {}
         }
     },
 

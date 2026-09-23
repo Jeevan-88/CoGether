@@ -38,7 +38,35 @@ function loadConfig(env = process.env) {
     auth: {
       jwtSecret,
       jwtExpiresIn: env.JWT_EXPIRES_IN || '15m',
-      guestExpiresIn: env.GUEST_EXPIRES_IN || '24h'
+      jwtExpiresInSeconds: parseInt(env.JWT_EXPIRES_IN_SECONDS || '900', 10),
+      refreshTokenExpiresInSeconds: parseInt(env.REFRESH_TOKEN_EXPIRES_IN_SECONDS || '604800', 10),
+      guestExpiresIn: env.GUEST_EXPIRES_IN || '24h',
+      otpExpiresInSeconds: parseInt(env.OTP_EXPIRES_IN_SECONDS || '600', 10),
+      otpMaxAttempts: parseInt(env.OTP_MAX_ATTEMPTS || '5', 10),
+      otpResendIntervalSeconds: parseInt(env.OTP_RESEND_INTERVAL_SECONDS || '60', 10),
+      otpSalt: env.OTP_SALT || 'cogether-otp-salt-production-secure',
+      google: {
+        clientId: env.GOOGLE_CLIENT_ID || null,
+        clientSecret: env.GOOGLE_CLIENT_SECRET || null,
+        redirectUri: env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/v1/auth/google/callback'
+      },
+      email: {
+        provider: env.EMAIL_PROVIDER || 'console_test',
+        apiKey: env.RESEND_API_KEY || env.SENDGRID_API_KEY || null,
+        fromEmail: env.FROM_EMAIL || 'auth@cogether.app',
+        smtpHost: env.SMTP_HOST || null,
+        smtpPort: parseInt(env.SMTP_PORT || '587', 10),
+        smtpUser: env.SMTP_USER || null,
+        smtpPass: env.SMTP_PASS || null
+      },
+      clientUrl: env.CLIENT_URL || 'http://localhost:5173',
+      cookieSecret: env.COOKIE_SECRET || jwtSecret,
+      invites: {
+        defaultMaxUses: parseInt(env.INVITE_DEFAULT_MAX_USES || '10', 10),
+        defaultExpiresInHours: parseInt(env.INVITE_DEFAULT_EXPIRES_HOURS || '48', 10),
+        maxAllowedUses: parseInt(env.INVITE_MAX_ALLOWED_USES || '100', 10),
+        allowSelfRedemption: false
+      }
     },
     database: {
       url: databaseUrl,
@@ -49,6 +77,17 @@ function loadConfig(env = process.env) {
     redis: {
       url: redisUrl,
       enabled: env.REDIS_ENABLED !== 'false'
+    },
+    storage: {
+      provider: env.STORAGE_PROVIDER || (env.S3_BUCKET ? 's3' : 'local'),
+      s3: {
+        bucket: env.S3_BUCKET || null,
+        region: env.S3_REGION || 'us-east-1',
+        endpoint: env.S3_ENDPOINT || null,
+        accessKeyId: env.AWS_ACCESS_KEY_ID || null,
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY || null,
+        publicUrlBase: env.S3_PUBLIC_URL_BASE || null
+      }
     },
     observability: {
       serviceName: env.SERVICE_NAME || 'cogether-platform',
@@ -76,7 +115,25 @@ function getSanitizedConfig(cfg = getConfig()) {
     ...cfg,
     auth: {
       ...cfg.auth,
-      jwtSecret: '***REDACTED***'
+      jwtSecret: '***REDACTED***',
+      otpSalt: '***REDACTED***',
+      cookieSecret: '***REDACTED***',
+      google: {
+        ...cfg.auth.google,
+        clientSecret: cfg.auth.google.clientSecret ? '***REDACTED***' : null
+      },
+      email: {
+        ...cfg.auth.email,
+        apiKey: cfg.auth.email.apiKey ? '***REDACTED***' : null,
+        smtpPass: cfg.auth.email.smtpPass ? '***REDACTED***' : null
+      }
+    },
+    storage: {
+      ...cfg.storage,
+      s3: {
+        ...cfg.storage?.s3,
+        secretAccessKey: cfg.storage?.s3?.secretAccessKey ? '***REDACTED***' : null
+      }
     },
     database: {
       ...cfg.database,
