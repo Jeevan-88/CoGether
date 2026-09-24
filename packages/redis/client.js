@@ -25,10 +25,17 @@ class RedisClient {
 
   _init() {
     const config = getConfig();
+    const allowFallback = config.env === 'development' || config.isTest;
+
     if (!config.redis.enabled) {
-      this.isSimulated = true;
-      logger.info('Redis disabled by configuration; using in-memory state engine');
-      return;
+      if (allowFallback) {
+        this.isSimulated = true;
+        logger.info('Redis disabled by configuration; using in-memory state engine');
+        return;
+      }
+
+      logger.error('Redis is disabled in a non-development environment; refusing to start with simulated state');
+      process.exit(1);
     }
 
     let ioredis;
@@ -37,39 +44,87 @@ class RedisClient {
     } catch (e) {
       try {
         const path = require('path');
-        ioredis = require(require.resolve('ioredis', { paths: [path.join(__dirname, '../../server'), path.join(__dirname, '../..')] }));
+        ioredis = require(require.resolve('ioredis', {
+          paths: [path.join(__dirname, '../../server'), path.join(__dirname, '../..')]
+        }));
       } catch (e2) {}
     }
 
-    if (ioredis && config.redis.url) {
-      try {
-        this.client = new ioredis(config.redis.url, {
-          lazyConnect: true,
-          maxRetriesPerRequest: 1,
-          connectTimeout: 2000
-        });
-
-        this.client.on('connect', () => {
-          this.isConnected = true;
-          logger.info('Connected to Redis instance successfully');
-        });
-
-        this.client.on('error', (err) => {
-          logger.warn('Redis error; switching to resilient in-memory fallback', { error: err.message });
-          this.isConnected = false;
-          this.isSimulated = true;
-        });
-
-        this.client.connect().catch((err) => {
-          logger.info('Could not connect to Redis at ' + config.redis.url + '; using in-memory state engine');
-          this.isSimulated = true;
-        });
-      } catch (err) {
+    if (!ioredis || !config.redis.url) {
+      if (allowFallback) {
         this.isSimulated = true;
+        logger.info('Redis client or URL unavailable; using in-memory state engine');
+        return;
       }
-    } else {
-      this.isSimulated = true;
-      logger.info('Redis client not available; using in-memory state engine');
+
+      logger.error('Redis client or REDIS_URL is missing in a non-development environment');
+      process.exit(1);
+    }
+
+    try {
+      const Redis = ioredis;
+
+      this.client = new Redis(config.redis.url, {
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000
+      });
+
+      this.client.on('connect', () => {
+        this.isConnected = true;
+        this.isSimulated = false;
+        logger.info('Connected to Redis instance successfully');
+      });
+
+      this.client.on('error', (err) => {
+        this.isConnected = false;
+
+        if (allowFallback) {
+          this.isSimulated = true;
+          logger.warn('Redis error; switching to resilient in-memory fallback', {
+            error: err.message
+          });
+          return;
+        }
+
+        logger.error('Redis connection failed in non-development environment', {
+          error: err.message
+        });
+
+        process.exit(1);
+      });
+
+      this.client.connect().catch((err) => {
+        this.isConnected = false;
+
+        if (allowFallback) {
+          this.isSimulated = true;
+          logger.info('Could not connect to Redis; using in-memory state engine', {
+            error: err.message
+          });
+          return;
+        }
+
+        logger.error('Could not connect to required Redis/Valkey in non-development environment', {
+          error: err.message
+        });
+
+        process.exit(1);
+      });
+    } catch (err) {
+      if (allowFallback) {
+        this.isSimulated = true;
+        logger.warn('Redis initialization failed; using in-memory fallback', {
+          error: err.message
+        });
+        return;
+      }
+
+      logger.error('Redis initialization failed in non-development environment', {
+        error: err.message
+      });
+
+      process.exit(1);
     }
   }
 
