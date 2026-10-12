@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, User, Sparkles, Globe, Clock, Shield, LogOut, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../core/AuthContext.jsx';
-import './AuthModal.css';
+import './ProfileModal.css';
 
 export default function ProfileModal({ onClose }) {
   const { user, profile, preferences, entitlement, updateProfile, updatePreferences, uploadAvatar, logout } = useAuth();

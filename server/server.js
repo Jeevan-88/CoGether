@@ -29,7 +29,55 @@ const { interviewService } = require('../services/costudy/interviewService');
 const path = require('path');
 
 const app = express();
-app.use(cors({ origin: true, credentials: true }));
+
+// Dynamic CORS configuration allowing localhost, Vercel deployments, and production domains
+const allowedOriginRegexes = [
+  /^http:\/\/localhost:(?:3000|3001|5173|5174)$/,
+  /^http:\/\/127\.0\.0\.1:(?:3000|3001|5173|5174)$/,
+  /^https:\/\/[a-zA-Z0-9_-]+\.vercel\.app$/,
+  /^https:\/\/(?:[a-zA-Z0-9_-]+\.)?cogether\.tech$/
+];
+
+function isOriginAllowed(origin) {
+  if (!origin) return true; // Non-browser / server-to-server / curl
+  if (allowedOriginRegexes.some((re) => re.test(origin))) return true;
+  if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) return true;
+  if (process.env.CORS_ORIGIN) {
+    if (process.env.CORS_ORIGIN === '*' || origin === process.env.CORS_ORIGIN) return true;
+  }
+  return false;
+}
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      callback(null, origin || true);
+    } else {
+      callback(new Error(`Origin ${origin} not permitted by CORS`));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'X-Correlation-ID']
+}));
+
+// Centralized refresh token cookie configuration
+function getRefreshCookieOptions() {
+  const cfg = getConfig();
+  const isProdLike = process.env.NODE_ENV === 'production' || 
+                     process.env.NODE_ENV === 'staging' || 
+                     process.env.STAGING === 'true' || 
+                     cfg.isProd ||
+                     (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('rds.amazonaws.com'));
+  return {
+    httpOnly: true,
+    secure: isProdLike,
+    sameSite: isProdLike ? 'none' : 'lax',
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  };
+}
+
 app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '../client/public/uploads')));
 
@@ -735,13 +783,53 @@ app.post('/api/v1/auth/session', (req, res) => {
   res.json({ valid: true, claims: result.claims });
 });
 
+// Check username availability & validity
+app.get('/api/v1/auth/check-username', async (req, res) => {
+  try {
+    const rawUsername = req.query.username || '';
+    if (!rawUsername) {
+      return res.status(400).json({ success: false, available: false, error: 'USERNAME_REQUIRED', message: 'Username is required.' });
+    }
+
+    const validation = profileService.validateUsername(rawUsername);
+    if (!validation.valid) {
+      return res.status(200).json({
+        success: true,
+        available: false,
+        username: rawUsername,
+        error: validation.error,
+        message: validation.error === 'USERNAME_TOO_SHORT' ? 'Handle must be at least 3 characters.' :
+                 validation.error === 'USERNAME_TOO_LONG' ? 'Handle cannot exceed 30 characters.' :
+                 validation.error === 'USERNAME_INVALID_CHARS' ? 'Letters, numbers and underscores only.' :
+                 'Invalid handle.'
+      });
+    }
+
+    const isAvailable = await profileService.isUsernameAvailable(validation.normalized);
+    return res.status(200).json({
+      success: true,
+      available: isAvailable,
+      username: validation.cleanUsername,
+      message: isAvailable ? 'Handle is available.' : 'Handle is already taken.'
+    });
+  } catch (err) {
+    logger.error('Username check failure', { error: err.message });
+    res.status(500).json({ success: false, available: false, error: 'CHECK_FAILED', message: 'Unable to check availability.' });
+  }
+});
+
 // Request email OTP (passwordless signup or login)
 app.post('/api/v1/auth/email/request-otp', async (req, res) => {
   try {
     const { email, purpose } = req.body || {};
     const result = await userService.requestEmailOtp(email, purpose);
     if (!result.success) {
-      const status = result.error === 'RESEND_TOO_FREQUENT' ? 429 : 400;
+      let status = 400;
+      if (result.error === 'RESEND_TOO_FREQUENT') {
+        status = 429;
+      } else if (result.error === 'EMAIL_SERVICE_NOT_CONFIGURED' || result.error === 'EMAIL_DELIVERY_FAILED') {
+        status = 503;
+      }
       return res.status(status).json(result);
     }
     metrics.incrementCounter('cogether_auth_otp_requested_total', 1);
@@ -776,12 +864,7 @@ app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
     metrics.incrementCounter('cogether_auth_otp_verified_total', 1);
 
     // Set secure HTTP-only refresh cookie
-    res.cookie('cogether_refresh', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    });
+    res.cookie('cogether_refresh', result.refreshToken, getRefreshCookieOptions());
 
     res.status(200).json(result);
   } catch (err) {
@@ -821,12 +904,7 @@ app.post('/api/v1/auth/refresh', async (req, res) => {
       tier: me.entitlement?.tier || 'free'
     });
 
-    res.cookie('cogether_refresh', rotation.newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('cogether_refresh', rotation.newRefreshToken, getRefreshCookieOptions());
 
     res.status(200).json({
       success: true,
@@ -855,7 +933,13 @@ app.post('/api/v1/auth/logout', async (req, res) => {
       await revokeAllUserSessions(decoded.claims.sub).catch(() => {});
     }
   }
-  res.clearCookie('cogether_refresh');
+  const cookieOpts = getRefreshCookieOptions();
+  res.clearCookie('cogether_refresh', {
+    httpOnly: cookieOpts.httpOnly,
+    secure: cookieOpts.secure,
+    sameSite: cookieOpts.sameSite,
+    path: cookieOpts.path
+  });
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 });
 
@@ -895,12 +979,7 @@ app.get('/api/v1/auth/google/callback', async (req, res) => {
     return res.status(400).json(result);
   }
 
-  res.cookie('cogether_refresh', result.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+  res.cookie('cogether_refresh', result.refreshToken, getRefreshCookieOptions());
 
   const config = getConfig();
   const clientUrl = config.auth.clientUrl || 'http://localhost:5173';
@@ -921,12 +1000,7 @@ app.post('/api/v1/auth/google/verify-token', async (req, res) => {
       return res.status(400).json(result);
     }
 
-    res.cookie('cogether_refresh', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('cogether_refresh', result.refreshToken, getRefreshCookieOptions());
 
     res.status(200).json(result);
   } catch (err) {

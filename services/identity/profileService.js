@@ -88,7 +88,12 @@ class ProfileService {
       ]
     );
 
-    return res.rows[0];
+    const row = res.rows[0];
+    return {
+      ...row,
+      displayName: row.display_name,
+      avatarUrl: row.avatar_url
+    };
   }
 
   async getProfileByUserId(userId, client = db) {
@@ -98,7 +103,13 @@ class ProfileService {
        WHERE user_id = $1`,
       [userId]
     );
-    return res.rows[0] || null;
+    if (!res.rows[0]) return null;
+    const row = res.rows[0];
+    return {
+      ...row,
+      displayName: row.display_name,
+      avatarUrl: row.avatar_url
+    };
   }
 
   async getProfileByUsername(username, client = db) {
@@ -109,7 +120,13 @@ class ProfileService {
        WHERE username_normalized = $1`,
       [normalized]
     );
-    return res.rows[0] || null;
+    if (!res.rows[0]) return null;
+    const row = res.rows[0];
+    return {
+      ...row,
+      displayName: row.display_name,
+      avatarUrl: row.avatar_url
+    };
   }
 
   async updateProfile(userId, updates = {}, client = db) {
@@ -152,7 +169,12 @@ class ProfileService {
       [newUsername, newNormalized, displayName, avatarUrl, bio, userId]
     );
 
-    return res.rows[0];
+    const row = res.rows[0];
+    return {
+      ...row,
+      displayName: row.display_name,
+      avatarUrl: row.avatar_url
+    };
   }
 
   async createPreferences(userId, { primaryInterest = 'all', interests = [], timezone = 'UTC', language = 'en' } = {}, client = db) {

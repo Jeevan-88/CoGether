@@ -65,7 +65,20 @@ class UserService {
     );
 
     // 5. Deliver through email provider
-    await emailService.sendOtpEmail({ to: email, otp: rawOtp, purpose });
+    const sendResult = await emailService.sendOtpEmail({ to: email, otp: rawOtp, purpose });
+    if (!sendResult || !sendResult.success) {
+      // Clean up the un-sent OTP so no orphan/phantom passcode remains in database
+      await db.query(
+        `DELETE FROM identity.email_otps WHERE email_normalized = $1 AND otp_hash = $2`,
+        [email, otpHash]
+      ).catch(() => {});
+
+      return {
+        success: false,
+        error: sendResult?.error || 'EMAIL_DELIVERY_FAILED',
+        message: sendResult?.message || 'Failed to dispatch verification passcode email.'
+      };
+    }
 
     return {
       success: true,

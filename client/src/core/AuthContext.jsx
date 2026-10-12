@@ -18,6 +18,7 @@ export function AuthProvider({ children }) {
   const restoreSession = useCallback(async () => {
     setIsLoading(true);
     const storedToken = localStorage.getItem('cogether_access_token');
+    const storedRefreshToken = localStorage.getItem('cogether_refresh_token');
 
     if (storedToken) {
       try {
@@ -40,34 +41,36 @@ export function AuthProvider({ children }) {
       }
     }
 
-    // Attempt refresh token rotation via cookie
+    // Attempt refresh token rotation via cookie AND/OR stored refresh token body
     try {
       const refreshRes = await fetch(`${API_BASE}/api/v1/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        credentials: 'include',
+        body: JSON.stringify({ refreshToken: storedRefreshToken || undefined })
       });
 
       if (refreshRes.ok) {
         const refreshData = await refreshRes.json();
         localStorage.setItem('cogether_access_token', refreshData.accessToken);
+        if (refreshData.refreshToken) {
+          localStorage.setItem('cogether_refresh_token', refreshData.refreshToken);
+        }
         setAccessToken(refreshData.accessToken);
         setUser(refreshData.user);
         setProfile(refreshData.profile);
         setPreferences(refreshData.preferences);
         setEntitlement({ tier: 'free' });
-      } else {
+      } else if (refreshRes.status === 401 || refreshRes.status === 400 || refreshRes.status === 404) {
+        // Session invalid or expired on server
         localStorage.removeItem('cogether_access_token');
+        localStorage.removeItem('cogether_refresh_token');
         setAccessToken(null);
         setUser(null);
         setProfile(null);
       }
     } catch (err) {
-      // Offline or network error
-      localStorage.removeItem('cogether_access_token');
-      setAccessToken(null);
-      setUser(null);
-      setProfile(null);
+      console.warn('Session refresh network error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -154,6 +157,9 @@ export function AuthProvider({ children }) {
       }
 
       localStorage.setItem('cogether_access_token', data.accessToken);
+      if (data.refreshToken) {
+        localStorage.setItem('cogether_refresh_token', data.refreshToken);
+      }
       setAccessToken(data.accessToken);
       setUser(data.user);
       setProfile(data.profile);

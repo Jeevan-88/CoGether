@@ -93,17 +93,25 @@ class EmailService {
       }
     }
 
-    // In production, strictly fail closed if real delivery was not completed
-    if (config.env === 'production' || process.env.NODE_ENV === 'production') {
-      logger.error('Production email delivery failed: neither Resend nor SMTP succeeded', { to, purpose });
+    // In production or staging, strictly fail closed if real delivery was not completed
+    const isProdOrStaging = config.env === 'production' || 
+                            config.env === 'staging' || 
+                            process.env.NODE_ENV === 'production' || 
+                            process.env.NODE_ENV === 'staging' || 
+                            process.env.STAGING === 'true' || 
+                            config.isProd ||
+                            (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('rds.amazonaws.com'));
+
+    if (isProdOrStaging || (!config.isTest && provider !== 'console_test')) {
+      logger.error('Email delivery failed: neither Resend nor SMTP succeeded and environment requires real delivery', { to, purpose });
       return {
         success: false,
         error: 'EMAIL_SERVICE_NOT_CONFIGURED',
-        message: 'Transactional email delivery is not configured for production. Please configure RESEND_API_KEY or SMTP credentials.'
+        message: 'Transactional email delivery is not configured or failed to deliver. Please configure RESEND_API_KEY or SMTP credentials in the backend environment.'
       };
     }
 
-    // 3. Development / Test delivery tracking (active ONLY in development/test)
+    // 3. Development / Test delivery tracking (active ONLY in development/test with console_test provider)
     this.lastSentOtp = { to, otp, purpose, timestamp: new Date().toISOString() };
     try {
       const fs = require('fs');
@@ -138,7 +146,14 @@ class EmailService {
 
   getLastSentOtpForTest(email = null) {
     const config = getConfig();
-    if (config.env === 'production' || process.env.NODE_ENV === 'production') {
+    const isProdOrStaging = config.env === 'production' || 
+                            config.env === 'staging' || 
+                            process.env.NODE_ENV === 'production' || 
+                            process.env.NODE_ENV === 'staging' || 
+                            process.env.STAGING === 'true' || 
+                            config.isProd ||
+                            (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('rds.amazonaws.com'));
+    if (isProdOrStaging) {
       return null;
     }
     try {

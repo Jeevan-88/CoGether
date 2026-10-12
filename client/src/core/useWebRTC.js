@@ -184,8 +184,8 @@ export function useWebRTC(roomId, username, signalingUrl, options = { autoStartM
         setLocalStream(stream);
       }
 
-      // 3. Ensure Authenticated JWT Token Exists
-      let authToken = localStorage.getItem('cogether_jwt');
+      // 3. Ensure Authenticated JWT Token Exists (prefer verified member token)
+      let authToken = localStorage.getItem('cogether_access_token') || localStorage.getItem('cogether_jwt');
       if (!authToken) {
         try {
           const authRes = await fetch(`${signalingUrl}/api/v1/auth/guest`, {
