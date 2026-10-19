@@ -1,5 +1,6 @@
 /* ==========================================================================
-   COGETHER AUTHENTICATION — EXACT REFERENCE "BUILD YOUR FLOW" DESIGN
+   COGETHER AUTHENTICATION, AVATAR STUDIO, METALLIC SILVER CARD & Z-LAUNCH
+   Preserves Approved "Build Your Flow" Reference Layout & Peach Palette
    ========================================================================== */
 
 /* ── MODAL OVERLAY BACKDROP ── */
@@ -19,6 +20,16 @@
   animation: flowFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* PART 4: Unified Pitch-Black Reveal Environment */
+.flow-auth-overlay.is-cinematic-blackout {
+  background: #000000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  animation: blackoutFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @keyframes flowFadeIn {
   from {
     opacity: 0;
@@ -28,13 +39,24 @@
   }
 }
 
+@keyframes blackoutFadeIn {
+  from {
+    opacity: 0;
+    background: #000000;
+  }
+  to {
+    opacity: 1;
+    background: #000000;
+  }
+}
+
 /* ── MAIN CARD CONTAINER (Thick Black Outer Frame) ── */
 .flow-auth-card {
   position: relative;
   width: 100%;
   max-width: 960px;
   max-height: calc(100dvh - 32px);
-  height: min(640px, calc(100dvh - 32px));
+  height: min(650px, calc(100dvh - 32px));
   background: #000000;
   border: 14px solid #000000;
   border-radius: 38px;
@@ -88,7 +110,31 @@
   transform: rotate(90deg);
 }
 
-/* ── LEFT VISUAL PANEL (VIDEO PLAYER AGAINST PURE BLACK) ── */
+.flow-cinematic-close-btn {
+  position: fixed;
+  top: 22px;
+  right: 24px;
+  z-index: 1020;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.flow-cinematic-close-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+/* ── PART 1: LEFT VISUAL PANEL (COMPLETE UNCROPPED VIDEO AGAINST PURE BLACK) ── */
 .flow-auth-left-panel {
   position: relative;
   background: #000000;
@@ -97,7 +143,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
 }
 
@@ -105,7 +153,11 @@
   position: relative;
   width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
+  /* Right clearance ensures the center curved seam bridge never clips the video frame */
+  padding: 12px 34px 12px 12px;
+  box-sizing: border-box;
   background: #000000;
   display: flex;
   align-items: center;
@@ -115,11 +167,16 @@
 .flow-auth-video {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain !important;
+  object-position: center center !important;
   background: #000000;
   display: block;
+  margin: auto;
   border: none;
   outline: none;
+  flex-shrink: 1;
 }
 
 /* Bottom-left floating glass badge: "Stay focused. Grow every day." */
@@ -195,10 +252,11 @@
   position: relative;
   background: linear-gradient(135deg, #FDF4E7 0%, #F9E5D2 38%, #F3CBA5 78%, #E9B287 100%);
   border-radius: 24px;
-  padding: 28px 42px 24px;
+  padding: 22px 34px 20px;
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-width: 0;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
@@ -207,7 +265,6 @@
   overscroll-behavior: contain;
 }
 
-/* Custom discreet scrollbar for right form panel */
 .flow-auth-right-panel::-webkit-scrollbar {
   width: 5px;
 }
@@ -221,20 +278,68 @@
   border-radius: 10px;
 }
 
-.flow-auth-right-panel::-webkit-scrollbar-thumb:hover {
-  background: rgba(140, 100, 70, 0.55);
-}
-
-/* Top-Right Account Switch Row */
+/* Top Navigation & Progress Row */
 .flow-top-switch-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   font-size: 13px;
   color: #6f6052;
-  margin-bottom: 16px;
-  margin-right: 36px; /* Ensure ample clearance from close button */
+  margin-bottom: 12px;
+  margin-right: 36px;
+  min-height: 26px;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+.flow-mode-switch-text {
+  margin-left: auto;
+}
+
+.flow-back-step-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(180, 140, 110, 0.35);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2c241d;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s ease;
+}
+
+.flow-back-step-btn:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: #111111;
+}
+
+/* Minimal 6-Step Progress Bar */
+.flow-step-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 auto;
+}
+
+.flow-progress-pill {
+  width: 18px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(110, 86, 65, 0.22);
+  transition: all 0.25s ease;
+}
+
+.flow-progress-pill.done {
+  background: rgba(17, 17, 17, 0.55);
+}
+
+.flow-progress-pill.current {
+  width: 28px;
+  background: #111111;
 }
 
 .flow-switch-action {
@@ -256,35 +361,69 @@
   opacity: 0.75;
 }
 
-/* Form Centered Content Block (Self-centering with safe scrolling) */
+/* ── ANIMATED STEP CONTENT STAGE (280ms Horizontal Page Transitions) ── */
 .flow-form-content {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 380px;
-  margin: auto auto; /* Vertically centers when space allows; scrolls naturally from top when constrained */
+  max-width: 400px;
+  margin: auto auto;
   box-sizing: border-box;
+}
+
+.flow-step-transition-forward {
+  animation: flowSlideForward 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flow-step-transition-backward {
+  animation: flowSlideBackward 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes flowSlideForward {
+  0% {
+    opacity: 0;
+    transform: translateX(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes flowSlideBackward {
+  0% {
+    opacity: 0;
+    transform: translateX(-22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Heading & Subtitle */
 .flow-header-block {
-  margin-bottom: 22px;
+  margin-bottom: 18px;
   text-align: left;
 }
 
+.flow-header-block.flow-header-compact {
+  margin-bottom: 10px;
+}
+
 .flow-title {
-  font-size: 32px;
+  font-size: 29px;
   font-weight: 700;
   color: #141416;
   letter-spacing: -0.03em;
-  margin: 0 0 6px 0;
+  margin: 0 0 5px 0;
   line-height: 1.15;
 }
 
 .flow-subtitle {
-  font-size: 13.5px;
+  font-size: 13px;
   color: #76695e;
-  line-height: 1.45;
+  line-height: 1.42;
   margin: 0;
 }
 
@@ -297,8 +436,14 @@
 .flow-interactive-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 18px;
+  gap: 11px;
+  margin-bottom: 14px;
+}
+
+.flow-name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .flow-field-wrapper {
@@ -310,18 +455,18 @@
 
 .flow-field-icon {
   position: absolute;
-  left: 16px;
+  left: 15px;
   color: #87786b;
   pointer-events: none;
 }
 
 .flow-input-control {
   width: 100%;
-  height: 48px;
-  padding: 12px 16px 12px 46px;
+  height: 46px;
+  padding: 11px 14px 11px 43px;
   border-radius: 14px;
   border: 1px solid rgba(180, 140, 110, 0.38);
-  background: rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.32);
   color: #1a1a1a;
   font-size: 14px;
   font-family: inherit;
@@ -336,217 +481,1388 @@
 
 .flow-input-control:focus {
   border-color: #111111;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.56);
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+.flow-input-control.status-available {
+  border-color: #15803d;
+  background: rgba(240, 253, 244, 0.6);
+}
+
+.flow-input-control.status-taken,
+.flow-input-control.status-invalid {
+  border-color: #b91c1c;
+  background: rgba(254, 242, 242, 0.6);
+}
+
+/* Live Display-Name Preview Card (Step 3) */
+.flow-live-name-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px dashed rgba(140, 105, 80, 0.4);
+  font-size: 12.5px;
+}
+
+.flow-live-name-preview .preview-label {
+  color: #76695e;
+  font-weight: 500;
+}
+
+.flow-live-name-preview .preview-value {
+  color: #111111;
+  font-weight: 700;
+}
+
+/* Username Availability Feedback & Suggestions (Step 4) */
+.flow-username-feedback {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.35);
+  color: #5c4e43;
+}
+
+.flow-username-feedback.status-available {
+  background: rgba(22, 163, 74, 0.12);
+  color: #14532d;
+}
+
+.flow-username-feedback.status-taken,
+.flow-username-feedback.status-invalid {
+  background: rgba(220, 38, 38, 0.12);
+  color: #7f1d1d;
+}
+
+.flow-username-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.suggestions-label {
+  font-size: 11.5px;
+  color: #6f6052;
+  font-weight: 600;
+}
+
+.suggestions-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.suggestion-chip {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(140, 105, 80, 0.35);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #111111;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.suggestion-chip:hover {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
 }
 
 /* Primary Action Button (Pure Deep Black) */
 .flow-action-button {
   width: 100%;
-  height: 48px;
+  height: 46px;
   border-radius: 14px;
   background: #111111;
   color: #ffffff;
   border: none;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 4px;
-  box-sizing: border-box;
-}
-
-.flow-action-button:hover:not(:disabled) {
-  background: #222222;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.35);
-}
-
-.flow-action-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.flow-action-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-flex-inner {
+  font-family: inherit;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.flow-action-button:hover:not(:disabled) {
+  background: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.26);
+}
+
+.flow-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── AVATAR RENDERER & IDLE BREATHING ANIMATION ── */
+.cogether-avatar-stage {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.16),
+    0 10px 24px rgba(0, 0, 0, 0.22);
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.cogether-avatar-stage.is-animated .avatar-breathing-group {
+  transform-origin: 512px 760px;
+  animation: avatarGentleFloat 3.6s ease-in-out infinite;
+}
+
+@keyframes avatarGentleFloat {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.012);
+  }
+}
+
+.cogether-avatar-svg .avatar-layer {
+  transition: opacity 0.18s ease;
+}
+
+/* ── PART 3: STEP 5 AVATAR STUDIO & CURVED ARC SELECTION WHEEL ── */
+.cogether-avatar-studio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.studio-preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.studio-main-avatar-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studio-step-arrow-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(140, 105, 80, 0.35);
+  color: #1c1917;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  padding: 0;
+}
+
+.studio-step-arrow-btn:hover:not(:disabled) {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
+.studio-step-arrow-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Studio Quick Utility Toolbar (Randomize, Undo, Reset, Backdrop, Clear) */
+.studio-Utility-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.studio-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(140, 105, 80, 0.3);
+  color: #27221d;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.studio-tool-chip:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: #111111;
+}
+
+.studio-tool-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Horizontally Scrollable Category Bar (No Scrollbar) */
+.studio-category-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 3px 2px;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  overscroll-behavior-x: contain;
+}
+
+.studio-category-bar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.studio-category-tab {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(140, 105, 80, 0.25);
+  color: #5c4e43;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.studio-category-tab:hover {
+  background: rgba(255, 255, 255, 0.55);
+  color: #111111;
+}
+
+.studio-category-tab.active {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
+/* Curved Arc Selection Wheel Wrapper (Zero Visible Scrollbar) */
+.studio-arc-wheel-wrapper {
+  position: relative;
+  width: 100%;
+  padding: 2px 0 6px;
+}
+
+/* Subtle shallow semicircular dial arc under the wheel */
+.studio-arc-Dial-curve {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 2px;
+  height: 18px;
+  border-top: 1.5px solid rgba(135, 98, 72, 0.22);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.studio-carousel-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 8px 14px;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  cursor: grab;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000000 7%,
+    #000000 93%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000000 7%,
+    #000000 93%,
+    transparent 100%
+  );
+}
+
+.studio-carousel-container:active {
+  cursor: grabbing;
+}
+
+.studio-carousel-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.studio-thumbnail-track,
+.studio-arc-track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: min-content;
+  padding: 2px 18px;
+}
+
+.studio-thumb-card {
+  position: relative;
+  flex-shrink: 0;
+  width: 74px;
+  min-height: 78px;
+  padding: 7px 5px 5px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.44);
+  border: 1.5px solid rgba(160, 120, 90, 0.26);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  cursor: pointer;
+  overflow: hidden;
+  transform-origin: center bottom;
+  transform: translateY(var(--arc-offset-y, 0px)) scale(var(--arc-scale, 1)) rotateZ(var(--arc-rotate, 0deg));
+  opacity: var(--arc-opacity, 1);
+  transition:
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.24s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.24s ease;
+  font-family: inherit;
+}
+
+/* Restrained top specular reflection on wheel cards */
+.studio-thumb-reflection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 42%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  border-radius: 15px 15px 40% 40%;
+  pointer-events: none;
+  opacity: 0.45;
+  transition: opacity 0.2s ease;
+}
+
+.studio-thumb-card:hover {
+  background: rgba(255, 255, 255, 0.72);
+  opacity: 1;
+}
+
+.studio-thumb-card.selected {
+  border: 2px solid #111111;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 10px 22px -6px rgba(20, 15, 10, 0.24),
+    0 0 0 2px rgba(255, 255, 255, 0.65);
+  z-index: 3;
+}
+
+.studio-thumb-card.selected .studio-thumb-reflection {
+  opacity: 0.85;
+}
+
+.studio-thumb-visual {
+  position: relative;
+  z-index: 1;
+  width: 52px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.studio-thumb-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.studio-thumb-caption {
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  font-weight: 600;
+  color: #27221d;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 64px;
+}
+
+.skin-swatch-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.35);
+  margin-top: 4px;
+}
+
+.bg-swatch-preview {
+  width: 48px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  margin-top: 4px;
+}
+
+.studio-empty-category {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 76px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px dashed rgba(140, 105, 80, 0.4);
+  color: #6f6052;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Subcolor Swatch Bar (Hair / Clothing Tint) */
+.studio-subcolor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.subcolor-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #5c4e43;
+}
+
+.subcolor-swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.subcolor-swatches::-webkit-scrollbar {
+  display: none;
+}
+
+.subcolor-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.subcolor-dot.active {
+  border-color: #111111;
+  transform: scale(1.18);
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.2);
+}
+
+/* ── STEP 6: PROFILE REVIEW CARD ── */
+.flow-review-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.44);
+  border: 1px solid rgba(160, 120, 90, 0.35);
+  margin-bottom: 14px;
+}
+
+.flow-review-avatar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.flow-review-mini-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(17, 17, 17, 0.08);
+  border: 1px solid rgba(17, 17, 17, 0.15);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #111111;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.flow-review-mini-edit:hover {
+  background: #111111;
+  color: #ffffff;
+}
+
+.flow-review-info-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.review-field-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid rgba(140, 105, 80, 0.18);
+}
+
+.review-field-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.review-field-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.review-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #7c6b5d;
+}
+
+.review-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #141416;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-email-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.review-verified-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.14);
+  color: #15803d;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.review-step-jump-btn {
+  background: none;
+  border: 1px solid rgba(17, 17, 17, 0.22);
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #111111;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.review-step-jump-btn:hover {
+  background: #111111;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   PARTS 4, 5, 6 & 7: UNIFIED PITCH-BLACK STAGE, BRUSHED-SILVER METALLIC CARD,
+   FIERY Z-TRAJECTORY & CENTERED FOUR-SERVICE CHOOSER
+   ========================================================================== */
+
+.flow-cinematic-black-stage {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 1005;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, sans-serif;
+}
+
+.flow-z-trajectory-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.flow-cinematic-card-anchor {
+  position: relative;
+  z-index: 4;
+  width: min(440px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  perspective: 1400px;
+}
+
+.flow-member-card-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   width: 100%;
 }
 
-.btn-spinner {
-  animation: flowSpin 0.8s linear infinite;
+/* ── PART 5: BRUSHED-SILVER / SATIN-TITANIUM METALLIC MEMBER CARD ── */
+.cogether-titanium-card,
+.cogether-brushed-silver-card {
+  position: relative;
+  width: 100%;
+  border-radius: 24px;
+  padding: 20px 22px;
+  /* Realistic multi-stop brushed-silver / satin-aluminum base gradient */
+  background:
+    linear-gradient(
+      132deg,
+      #DDE2EA 0%,
+      #F6F8FB 22%,
+      #C4CBD6 46%,
+      #EDF0F5 70%,
+      #B5BDCB 88%,
+      #D9DFE8 100%
+    );
+  border: 1.5px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 28px 65px -12px rgba(0, 0, 0, 0.92),
+    0 4px 18px rgba(255, 255, 255, 0.08),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 3px rgba(30, 41, 59, 0.28);
+  color: #12161F;
+  overflow: hidden;
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+  transition: box-shadow 0.25s ease;
+}
+
+/* Fine horizontal brushed-metal micro-grain texture */
+.silver-brushed-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.24) 0px,
+      rgba(255, 255, 255, 0.24) 1px,
+      rgba(15, 23, 42, 0.045) 1px,
+      rgba(15, 23, 42, 0.045) 2px
+    );
+  mix-blend-mode: soft-light;
+}
+
+/* Diagonal anisotropic specular reflection across the metal plate */
+.silver-anisotropic-cone {
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  z-index: 1;
+  background: conic-gradient(
+    from 215deg at 50% 50%,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.55) 38deg,
+    rgba(30, 41, 59, 0.12) 82deg,
+    transparent 140deg,
+    rgba(255, 255, 255, 0.48) 218deg,
+    rgba(30, 41, 59, 0.1) 265deg,
+    transparent 360deg
+  );
+  opacity: 0.55;
+  mix-blend-mode: overlay;
+}
+
+/* Dynamic silver light sweep across the brushed surface */
+.silver-light-sweep {
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 68%;
+  height: 100%;
+  z-index: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 30%,
+    rgba(255, 255, 255, 0.78) 50%,
+    rgba(255, 255, 255, 0.15) 70%,
+    transparent 100%
+  );
+  transform: skewX(-22deg);
+  pointer-events: none;
+  animation: silverLightSweep 1.65s cubic-bezier(0.22, 1, 0.36, 1) 0.18s forwards;
+}
+
+@keyframes silverLightSweep {
+  0% {
+    left: -130%;
+  }
+  100% {
+    left: 165%;
+  }
+}
+
+/* Polished silver bevel along outer edges */
+.silver-bevel-border {
+  position: absolute;
+  inset: 2px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Red-orange rim illumination caught from the fiery Z trail during Scenes B/C/D */
+.silver-z-rim-heat {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: var(--edge-heat, 0);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 235, 165, 0.55) 0%,
+    rgba(255, 90, 28, 0.68) 55%,
+    rgba(225, 20, 45, 0.85) 100%
+  );
+  box-shadow:
+    0 0 36px rgba(255, 82, 28, 0.9),
+    inset 0 0 18px rgba(255, 220, 130, 0.85);
+  mix-blend-mode: screen;
+}
+
+.cogether-brushed-silver-card.is-z-heated {
+  border-color: #FFF4D6;
+  box-shadow:
+    0 0 42px rgba(255, 78, 22, 0.92),
+    0 0 84px rgba(220, 20, 45, 0.65);
+}
+
+/* Card Top Row: Red CoGether Logo & Engraved Member ID */
+.titanium-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  position: relative;
+  z-index: 4;
+}
+
+.titanium-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.titanium-brand-logo {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+  /* Preserve original red CoGether logo with crisp contrast against brushed silver */
+  filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.22));
+}
+
+.titanium-card-tag {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #C8102E;
+  background: rgba(200, 16, 46, 0.09);
+  border: 1px solid rgba(200, 16, 46, 0.28);
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.titanium-member-id {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #333C4D;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+/* Card Main Body: Machined Recessed Avatar + Engraved Identity Metadata */
+.titanium-card-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 4;
+  margin-bottom: 15px;
+}
+
+.titanium-avatar-frame,
+.silver-avatar-recess {
+  border-radius: 20px;
+  padding: 3.5px;
+  background: linear-gradient(145deg, #9AA3B2 0%, #F8FAFC 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(15, 23, 42, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
+}
+
+.titanium-identity-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.titanium-display-name {
+  font-size: 21px;
+  font-weight: 800;
+  color: #11151E;
+  margin: 0;
+  letter-spacing: -0.025em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.78);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titanium-username {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #364052;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.titanium-email-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0D5C3A;
+  background: rgba(16, 185, 129, 0.13);
+  border: 1px solid rgba(13, 92, 58, 0.22);
+  padding: 2px 8px;
+  border-radius: 999px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.titanium-email-status span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Card Bottom Metallic Micro-Bar (Engraved Serial, NO Rainbow Dot) */
+.titanium-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+  position: relative;
+  z-index: 4;
+}
+
+.titanium-footer-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: #465063;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.titanium-etched-serial {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #525D72;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* ── PART 7: THE FOUR-SERVICE CHOICE (CENTER OF PURE #000000 VIEWPORT) ── */
+.flow-service-chooser-center {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 24px 20px;
+  max-width: 980px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.flow-service-pills-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 16px;
+}
+
+@media (max-width: 820px) {
+  .flow-service-pills-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+.flow-service-oval-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 22px 12px 15px;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    #252834 0%,
+    #171922 55%,
+    #101117 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 16px 36px -6px rgba(0, 0, 0, 0.95),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.22),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.75);
+  color: #F8FAFC;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition:
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+  animation: servicePillEmerge 0.62s cubic-bezier(0.16, 1, 0.3, 1)
+    calc(var(--stagger-index, 0) * 90ms) both;
+}
+
+@keyframes servicePillEmerge {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.flow-service-oval-pill:hover,
+.flow-service-oval-pill:focus-visible {
+  transform: translateY(-2.5px) scale(1.025);
+  border-color: rgba(255, 255, 255, 0.65);
+  background: linear-gradient(
+    180deg,
+    #303444 0%,
+    #1D202B 55%,
+    #13151D 100%
+  );
+  box-shadow:
+    0 20px 42px -6px rgba(0, 0, 0, 0.98),
+    0 0 20px rgba(255, 255, 255, 0.14),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.38);
+  outline: none;
+}
+
+.flow-service-oval-pill:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.92),
+    inset 0 1.5px 2px rgba(0, 0, 0, 0.8);
+}
+
+.service-oval-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E2E6EE 0%, #B8C0CE 100%);
+  color: #11151E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.9),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.flow-service-oval-pill:hover .service-oval-icon {
+  background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.service-oval-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.service-oval-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.service-oval-tagline {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #94A3B8;
+  line-height: 1.2;
+}
+
+/* Subtle bottom micro-controls on the service chooser screen */
+.flow-service-footer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  animation: servicePillEmerge 0.62s cubic-bezier(0.16, 1, 0.3, 1) 520ms both;
+}
+
+.flow-service-micro-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.flow-service-micro-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* Utility pills when inspecting the Member Card on the pitch-black stage */
+.flow-cinematic-card-utilities {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cinematic-util-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #E2E8F0;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.cinematic-util-pill:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.cinematic-util-pill.is-primary-pill {
+  background: #E2E8F0;
+  color: #0F172A;
+  border-color: #FFFFFF;
+}
+
+.cinematic-util-pill.is-primary-pill:hover {
+  background: #FFFFFF;
+}
+
+/* ProfileModal Member Card Action Buttons */
+.flow-member-actions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flow-member-secondary-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.flow-secondary-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #F1F5F9;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.flow-secondary-chip-btn:hover:not(:disabled) {
+  background: #F8FAFC;
+  color: #0F172A;
+  border-color: #F8FAFC;
+}
+
+/* ── OTP INPUT & RESEND CONTROLS ── */
+.flow-otp-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.flow-otp-input {
+  width: 100%;
+  height: 54px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(160, 120, 90, 0.5);
+  background: rgba(255, 255, 255, 0.45);
+  color: #111111;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.45em;
+  text-align: center;
+  padding-left: 0.45em;
+  outline: none;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.flow-otp-input:focus {
+  border-color: #111111;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+.flow-resend-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.flow-resend-link {
+  background: none;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3d332a;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-family: inherit;
+}
+
+.flow-resend-link:disabled {
+  color: #8f8073;
+  cursor: default;
+}
+
+/* Divider & Social Grid */
+.flow-or-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 12px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(150, 115, 85, 0.24);
+}
+
+.divider-label {
+  font-size: 12px;
+  color: #8c7a6b;
+  font-weight: 500;
+}
+
+.flow-social-grid {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.flow-social-card {
+  flex: 1;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(180, 140, 110, 0.36);
+  background: rgba(255, 255, 255, 0.28);
+  color: #1e1b18;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+}
+
+/* Legal Text */
+.flow-legal-disclaimer {
+  font-size: 11px;
+  color: #7c6d60;
+  text-align: center;
+  margin: 4px 0 0 0;
+  line-height: 1.45;
+}
+
+.flow-legal-disclaimer a {
+  color: #141416;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Alerts */
+.flow-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.flow-alert-error {
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.28);
+  color: #7f1d1d;
+}
+
+.flow-alert-info {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  color: #065f46;
+}
+
+.spin-icon {
+  animation: flowSpin 1s linear infinite;
 }
 
 @keyframes flowSpin {
+  from {
+    transform: rotate(0deg);
+  }
   to {
     transform: rotate(360deg);
   }
 }
 
-/* OTP Verification Meta Links */
-.flow-otp-meta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  margin-top: 2px;
-  padding: 0 2px;
-}
-
-.flow-resend-link,
-.flow-change-email-link {
-  background: none;
-  border: none;
-  padding: 0;
-  color: #5a4c40;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color 0.2s ease;
-}
-
-.flow-resend-link:hover:not(:disabled),
-.flow-change-email-link:hover {
-  color: #111111;
-}
-
-.flow-resend-link:disabled {
-  color: #9c8e82;
-  cursor: not-allowed;
-  text-decoration: none;
-}
-
-/* Divider: "or continue with" */
-.flow-divider-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 4px 0 16px;
-}
-
-.divider-hairline {
-  flex: 1;
-  height: 1px;
-  background: rgba(160, 125, 95, 0.25);
-}
-
-.divider-caption {
-  font-size: 12px;
-  color: #8c7d70;
-  font-weight: 500;
-}
-
-/* Social Buttons Grid (Google, Apple, Telegram) */
-.flow-social-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.flow-social-card {
-  height: 42px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(180, 140, 110, 0.32);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #221d18;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0 8px;
-  box-sizing: border-box;
-}
-
-.flow-social-card:hover {
-  background: rgba(255, 255, 255, 0.42);
-  border-color: rgba(140, 100, 70, 0.45);
-  transform: translateY(-1px);
-}
-
-.flow-social-card:active {
-  transform: translateY(0);
-}
-
-.social-svg {
-  flex-shrink: 0;
-}
-
-/* Bottom Legal Disclaimer */
-.flow-legal-disclaimer {
-  font-size: 11px;
-  line-height: 1.5;
-  color: #76675a;
-  text-align: center;
-  margin: 0;
-}
-
-.flow-legal-disclaimer a {
-  color: #1a1a1a;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.flow-legal-disclaimer a:hover {
-  opacity: 0.8;
-}
-
-/* Inline Feedback Banners */
-.flow-alert-banner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  line-height: 1.4;
-  margin-bottom: 14px;
-  text-align: left;
-  animation: flowFadeIn 0.2s ease;
-}
-
-.alert-error {
-  background: rgba(220, 38, 38, 0.12);
-  border: 1px solid rgba(220, 38, 38, 0.35);
-  color: #991b1b;
-}
-
-.alert-info {
-  background: rgba(22, 101, 52, 0.12);
-  border: 1px solid rgba(22, 101, 52, 0.35);
-  color: #166534;
-}
-
-.alert-notice {
-  background: rgba(180, 83, 9, 0.12);
-  border: 1px solid rgba(180, 83, 9, 0.35);
-  color: #92400e;
-}
-
-/* ==========================================================================
-   RESPONSIVENESS (Desktop, Tablet, Mobile)
-   ========================================================================== */
-
-/* ── TABLET & SMALL LAPTOP (<= 860px) ── */
+/* ── TABLET & COMPACT VIEWPORTS (max-width: 860px) ── */
 @media (max-width: 860px) {
   .flow-auth-overlay {
-    padding: 12px 8px;
+    padding: 10px;
   }
 
   .flow-auth-card {
@@ -563,7 +1879,6 @@
     flex-direction: column;
   }
 
-  /* Close button on mobile positioned over black video */
   .flow-modal-close-btn {
     top: 14px;
     right: 14px;
@@ -572,48 +1887,45 @@
     color: #ffffff;
   }
 
-  .flow-modal-close-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    color: #ffffff;
-  }
-
-  /* Left video panel moves to top */
   .flow-auth-left-panel {
-    height: clamp(160px, 25dvh, 210px);
-    min-height: 150px;
-    max-height: 220px;
+    height: clamp(140px, 22dvh, 190px);
+    min-height: 130px;
+    max-height: 200px;
     flex-shrink: 0;
     border-radius: 20px 20px 10px 10px;
+  }
+
+  .flow-video-stage {
+    padding: 6px 12px;
   }
 
   .flow-center-seam-bridge {
     display: none;
   }
 
-  /* Right form panel moves to bottom */
   .flow-auth-right-panel {
     flex: 1;
     min-height: 0;
     overflow-y: visible;
     border-radius: 10px 10px 20px 20px;
-    padding: 24px 22px 22px;
+    padding: 20px 20px 18px;
   }
 
   .flow-top-switch-row {
     padding-right: 0;
     margin-right: 0;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
 
   .flow-title {
-    font-size: 28px;
+    font-size: 25px;
   }
 }
 
 /* ── MOBILE SCREENS (320px - 430px) ── */
 @media (max-width: 430px) {
   .flow-auth-overlay {
-    padding: 8px 6px;
+    padding: 6px;
   }
 
   .flow-auth-card {
@@ -624,95 +1936,90 @@
   }
 
   .flow-auth-left-panel {
-    height: clamp(140px, 22dvh, 180px);
-    min-height: 130px;
+    height: clamp(115px, 19dvh, 155px);
+    min-height: 110px;
     border-radius: 18px 18px 8px 8px;
   }
 
   .flow-video-leaf-badge {
-    bottom: 10px;
-    left: 10px;
-    padding: 6px 10px;
+    bottom: 8px;
+    left: 8px;
+    padding: 5px 9px;
     border-radius: 10px;
   }
 
-  .badge-main {
-    font-size: 11px;
-  }
-
-  .badge-sub {
-    font-size: 10px;
-  }
-
   .flow-auth-right-panel {
-    padding: 18px 14px 18px;
+    padding: 16px 14px 16px;
     border-radius: 8px 8px 18px 18px;
   }
 
-  .flow-top-switch-row {
-    font-size: 12px;
-    padding-right: 0;
-    margin-bottom: 12px;
+  .flow-name-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 
-  .flow-switch-action {
-    font-size: 12px;
+  .flow-review-card {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .flow-title {
-    font-size: 25px;
-  }
-
-  .flow-subtitle {
-    font-size: 12.5px;
-  }
-
-  .flow-interactive-form {
+  .titanium-card-body {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 10px;
-    margin-bottom: 14px;
   }
 
-  .flow-input-control {
-    height: 44px;
-    font-size: 13px;
-    padding: 10px 14px 10px 42px;
+  .flow-service-pills-row {
+    flex-direction: column;
+    width: 100%;
+    max-width: 260px;
   }
 
-  .flow-action-button {
-    height: 44px;
-    font-size: 13px;
-  }
-
-  .flow-social-grid {
-    gap: 6px;
-    margin-bottom: 16px;
-  }
-
-  .flow-social-card {
-    height: 38px;
-    font-size: 11px;
-    gap: 4px;
-  }
-
-  .flow-legal-disclaimer {
-    font-size: 10px;
+  .flow-service-oval-pill {
+    width: 100%;
+    justify-content: flex-start;
+    box-sizing: border-box;
   }
 }
 
 /* ── SMALL MOBILE (320px - 360px) ── */
 @media (max-width: 360px) {
   .flow-auth-left-panel {
-    height: 120px;
-    min-height: 110px;
+    height: 105px;
+    min-height: 100px;
   }
 
-  .flow-social-grid {
-    grid-template-columns: 1fr;
-    gap: 6px;
+  .flow-title {
+    font-size: 22px;
+  }
+}
+
+/* ── PRINT STYLESHEET FOR DIGITAL MEMBER CARD ── */
+@media print {
+  body * {
+    visibility: hidden !important;
   }
 
-  .flow-social-card {
-    height: 38px;
+  .printable-member-card,
+  .printable-member-card * {
+    visibility: visible !important;
+  }
+
+  .printable-member-card {
+    position: fixed !important;
+    left: 50% !important;
+    top: 40% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 440px !important;
+    max-width: 92vw !important;
+    background: linear-gradient(135deg, #E2E6EE 0%, #F7F9FC 50%, #C4CBD6 100%) !important;
+    color: #11151E !important;
+    border: 2px solid #94A3B8 !important;
+    border-radius: 22px !important;
+    padding: 24px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-shadow: none !important;
   }
 }
 
@@ -720,8 +2027,12 @@
 @media (prefers-reduced-motion: reduce) {
   .flow-auth-overlay,
   .flow-auth-card,
-  .flow-action-button,
-  .flow-social-card {
+  .flow-form-content,
+  .cogether-titanium-card,
+  .silver-light-sweep,
+  .flow-service-oval-pill,
+  .flow-service-footer-controls,
+  .cogether-avatar-stage.is-animated .avatar-breathing-group {
     animation: none !important;
     transition: none !important;
   }

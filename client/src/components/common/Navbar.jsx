@@ -1,4 +1,5 @@
 import React from 'react';
+import CogetherAvatarRenderer from '../../modules/auth/CogetherAvatarRenderer.jsx';
 import './Navbar.css';
 
 export default function Navbar({ activeTab, onTabChange, user, profile, onOpenAuth, onOpenProfile, onOpenPricing, isScrolled, scrollProgress = 0, hideNavbar = false }) {
@@ -97,12 +98,6 @@ export default function Navbar({ activeTab, onTabChange, user, profile, onOpenAu
           >
             Co-Study
           </button>
-          <button
-            className={`nav-menu-btn ${activeTab === 'telepresence' ? 'active' : ''}`}
-            onClick={() => onTabChange('telepresence')}
-          >
-            Duo Camera
-          </button>
         </nav>
 
         {/* Right: oval white buttons / profile avatar */}
@@ -126,7 +121,15 @@ export default function Navbar({ activeTab, onTabChange, user, profile, onOpenAu
                 fontSize: '13px'
               }}
             >
-              {profile?.avatarUrl || profile?.avatar_url ? (
+              {profile?.avatarConfig || profile?.avatar_config ? (
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <CogetherAvatarRenderer
+                    config={profile.avatarConfig || profile.avatar_config}
+                    size={24}
+                    animated={false}
+                  />
+                </div>
+              ) : profile?.avatarUrl || profile?.avatar_url ? (
                 <img
                   src={profile.avatarUrl || profile.avatar_url}
                   alt={profile.displayName || profile.display_name}

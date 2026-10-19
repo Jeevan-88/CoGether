@@ -28,7 +28,13 @@ export function AuthProvider({ children }) {
 
         if (res.ok) {
           const data = await res.json();
-          setUser({ id: data.id, email: data.primaryEmail, status: data.status });
+          setUser({
+            id: data.id,
+            email: data.primaryEmail,
+            status: data.status,
+            emailVerified: Boolean(data.emailVerified),
+            createdAt: data.createdAt || null
+          });
           setProfile(data.profile);
           setPreferences(data.preferences);
           setEntitlement(data.entitlement || { tier: 'free' });
@@ -174,14 +180,15 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Update Profile details (username, displayName, bio, avatar)
+  // Update Profile details (username, displayName, firstName, lastName, bio, avatarConfig)
   const updateProfile = async (updates) => {
-    if (!accessToken) return { success: false, error: 'UNAUTHORIZED' };
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { success: false, error: 'UNAUTHORIZED' };
     try {
       const res = await fetch(`${API_BASE}/api/v1/me/profile`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(updates)
@@ -199,14 +206,47 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Check username availability & get suggestions
+  const checkUsername = async (rawUsername, { suggest = false } = {}) => {
+    try {
+      const token = accessToken || localStorage.getItem('cogether_access_token');
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const params = new URLSearchParams({ username: rawUsername });
+      if (suggest) params.set('suggest', 'true');
+      const res = await fetch(`${API_BASE}/api/v1/auth/check-username?${params.toString()}`, {
+        headers
+      });
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      return { success: false, available: false, error: 'NETWORK_ERROR', message: 'Unable to check availability.' };
+    }
+  };
+
+  // Query configured social auth providers
+  const fetchAuthProviders = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/providers`);
+      if (!res.ok) return { google: false, apple: false, telegram: false };
+      const data = await res.json();
+      return data.providers || { google: false, apple: false, telegram: false };
+    } catch (_err) {
+      return { google: false, apple: false, telegram: false };
+    }
+  }, []);
+
   // Upload and persist avatar image
   const uploadAvatar = async (base64Image, mimeType = 'image/jpeg') => {
-    if (!accessToken) return { success: false, error: 'UNAUTHORIZED' };
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { success: false, error: 'UNAUTHORIZED' };
     try {
       const res = await fetch(`${API_BASE}/api/v1/me/avatar`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ image: base64Image, mimeType })
@@ -226,12 +266,13 @@ export function AuthProvider({ children }) {
 
   // Update Preferences (interests, timezone, language)
   const updatePreferences = async (updates) => {
-    if (!accessToken) return { success: false, error: 'UNAUTHORIZED' };
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { success: false, error: 'UNAUTHORIZED' };
     try {
       const res = await fetch(`${API_BASE}/api/v1/me/preferences`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(updates)
@@ -251,12 +292,13 @@ export function AuthProvider({ children }) {
 
   // Create an opaque invite link
   const createInvite = async ({ resourceType = 'platform', resourceId = null, maxUses = 10, expiresInDays = 7 } = {}) => {
-    if (!accessToken) return { success: false, error: 'UNAUTHORIZED' };
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { success: false, error: 'UNAUTHORIZED' };
     try {
       const res = await fetch(`${API_BASE}/api/v1/invites`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ resourceType, resourceId, maxUses, expiresInDays })
@@ -307,6 +349,8 @@ export function AuthProvider({ children }) {
     verifyOtp,
     loginWithGoogleToken,
     updateProfile,
+    checkUsername,
+    fetchAuthProviders,
     uploadAvatar,
     updatePreferences,
     createInvite,

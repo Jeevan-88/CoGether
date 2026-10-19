@@ -1,0 +1,2042 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-10-16T22:01:20.779Z",
+  "canvas": {
+    "width": 1024,
+    "height": 1024,
+    "viewBox": "0 0 1024 1024",
+    "headAnchor": {
+      "cx": 512,
+      "chinY": 630,
+      "width": 410
+    },
+    "eyesAnchor": {
+      "cx": 512,
+      "cy": 465,
+      "width": 250
+    },
+    "neckAnchor": {
+      "cx": 512,
+      "topY": 626
+    }
+  },
+  "defaults": {
+    "headId": "head-base-01",
+    "skinToneId": "skin-01-porcelain",
+    "eyesId": "eyes-05-sparkle-wide",
+    "hairId": "hair-01-short-messy",
+    "hairColorId": "hair-color-charcoal",
+    "clothingId": "clothing-01-chibi-crew-tee",
+    "clothingColorId": "cloth-color-crimson",
+    "eyewearId": null,
+    "accessoryIds": [],
+    "backgroundId": "bg-01-obsidian",
+    "effectsIds": []
+  },
+  "sourceSheets": [
+    {
+      "id": "base-character-chibi-neutral-01",
+      "originalFilename": "a-single-original-chibi-avatar-character-base--fro.svg",
+      "cleanFilename": "base-character-chibi-neutral-01.svg",
+      "url": "/assets/avatars/cogether/source-sheets/base-character-chibi-neutral-01.svg",
+      "title": "Chibi Base 01 — Classic Crew Tee (Porcelain Skin)",
+      "assetType": "base-character",
+      "isSourceSheet": true,
+      "bytes": 55580,
+      "sha256": "93536b1d0446d73b137470f75199c0f9b6abcc79fc2fe878e5a4b70576900b7d",
+      "dimensions": {
+        "width": 1024,
+        "height": 1024
+      }
+    },
+    {
+      "id": "base-character-chibi-warm-02",
+      "originalFilename": "a-single-original-chibi-avatar-character-base--fro (1).svg",
+      "cleanFilename": "base-character-chibi-warm-02.svg",
+      "url": "/assets/avatars/cogether/source-sheets/base-character-chibi-warm-02.svg",
+      "title": "Chibi Base 02 — Relaxed Crew Tee (Golden Peach Skin)",
+      "assetType": "base-character",
+      "isSourceSheet": true,
+      "bytes": 58717,
+      "sha256": "a643d3e276e3539d00bc4d189f719b665d37deaf77f23f0dd2c772396858f994",
+      "dimensions": {
+        "width": 1024,
+        "height": 1024
+      }
+    },
+    {
+      "id": "base-character-bust-clean-01",
+      "originalFilename": "a-single-original-front-facing-avatar-character-ba (1).svg",
+      "cleanFilename": "base-character-bust-clean-01.svg",
+      "url": "/assets/avatars/cogether/source-sheets/base-character-bust-clean-01.svg",
+      "title": "Front Bust Base 01 — Sleeveless Athletic Tank",
+      "assetType": "base-character",
+      "isSourceSheet": true,
+      "bytes": 78280,
+      "sha256": "8f7781f99621c598af61be16935126dabcfcf1e4b09ed81a0cfbfb3b221ad73d",
+      "dimensions": {
+        "width": 1024,
+        "height": 1024
+      }
+    },
+    {
+      "id": "base-character-bust-detailed-02",
+      "originalFilename": "a-single-original-front-facing-avatar-character-ba.svg",
+      "cleanFilename": "base-character-bust-detailed-02.svg",
+      "url": "/assets/avatars/cogether/source-sheets/base-character-bust-detailed-02.svg",
+      "title": "Front Bust Base 02 — Collarbone Sleeveless Tank",
+      "assetType": "base-character",
+      "isSourceSheet": true,
+      "bytes": 92407,
+      "sha256": "39da40e8fefd164abd9413fb1a0dc057d6cbcddb4a82b0e6e368f43c14f45835",
+      "dimensions": {
+        "width": 1024,
+        "height": 1024
+      }
+    },
+    {
+      "id": "head-skin-tone-sheet-01",
+      "originalFilename": "an-asset-production-sheet-of-exactly-30-blank-avat.svg",
+      "cleanFilename": "head-skin-tone-sheet-01.svg",
+      "url": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+      "title": "Blank Avatar Heads & Skin-Tone Production Sheet (25 Heads in 5x5 Grid)",
+      "assetType": "head-sheet",
+      "isSourceSheet": true,
+      "bytes": 102037,
+      "sha256": "0330625ade5a86dcbee952ab12e09c238fe025e17c524da6f31ead4c4b927901",
+      "dimensions": {
+        "width": 1152,
+        "height": 896
+      }
+    },
+    {
+      "id": "eyes-sheet-initial-01",
+      "originalFilename": "asset-sheet-of-exactly-6-separate-pairs-of-cartoon.svg",
+      "cleanFilename": "eyes-sheet-initial-01.svg",
+      "url": "/assets/avatars/cogether/source-sheets/eyes-sheet-initial-01.svg",
+      "title": "Cartoon/Anime Eye Pairs Production Sheet (6 Eye Pairs in 3x2 Grid)",
+      "assetType": "eyes-sheet",
+      "isSourceSheet": true,
+      "bytes": 81498,
+      "sha256": "1bed294158d366c5134441fd5a5b4a6b143218cdd53723eef896a3e55614ebf0",
+      "dimensions": {
+        "width": 1280,
+        "height": 832
+      }
+    },
+    {
+      "id": "hair-sheet-initial-01",
+      "originalFilename": "asset-sheet-of-exactly-6-separate-hairstyle-overla.svg",
+      "cleanFilename": "hair-sheet-initial-01.svg",
+      "url": "/assets/avatars/cogether/source-sheets/hair-sheet-initial-01.svg",
+      "title": "Hairstyle Overlays Production Sheet (6 Hairstyles in 3x2 Grid)",
+      "assetType": "hair-sheet",
+      "isSourceSheet": true,
+      "bytes": 68725,
+      "sha256": "1ca0a61815e56fb4a429067187c1411f1b8fcc1add6e4e37180ad7951376315d",
+      "dimensions": {
+        "width": 1280,
+        "height": 832
+      }
+    }
+  ],
+  "baseCharacters": [
+    {
+      "id": "base-character-chibi-01",
+      "category": "base",
+      "name": "Chibi Base 01 — Classic Crew Tee (Porcelain Skin)",
+      "filename": "base-character-chibi-01.svg",
+      "url": "/assets/avatars/cogether/base/base-character-chibi-01.svg",
+      "sourceSheet": "/assets/avatars/cogether/source-sheets/base-character-chibi-neutral-01.svg",
+      "assetType": "complete-base-character",
+      "isSourceSheet": false,
+      "viewBox": "0 0 1024 1024"
+    },
+    {
+      "id": "base-character-chibi-02",
+      "category": "base",
+      "name": "Chibi Base 02 — Relaxed Crew Tee (Golden Peach Skin)",
+      "filename": "base-character-chibi-02.svg",
+      "url": "/assets/avatars/cogether/base/base-character-chibi-02.svg",
+      "sourceSheet": "/assets/avatars/cogether/source-sheets/base-character-chibi-warm-02.svg",
+      "assetType": "complete-base-character",
+      "isSourceSheet": false,
+      "viewBox": "0 0 1024 1024"
+    },
+    {
+      "id": "base-character-bust-01",
+      "category": "base",
+      "name": "Front Bust Base 01 — Sleeveless Athletic Tank",
+      "filename": "base-character-bust-01.svg",
+      "url": "/assets/avatars/cogether/base/base-character-bust-01.svg",
+      "sourceSheet": "/assets/avatars/cogether/source-sheets/base-character-bust-clean-01.svg",
+      "assetType": "complete-base-character",
+      "isSourceSheet": false,
+      "viewBox": "0 0 1024 1024"
+    },
+    {
+      "id": "base-character-bust-02",
+      "category": "base",
+      "name": "Front Bust Base 02 — Collarbone Sleeveless Tank",
+      "filename": "base-character-bust-02.svg",
+      "url": "/assets/avatars/cogether/base/base-character-bust-02.svg",
+      "sourceSheet": "/assets/avatars/cogether/source-sheets/base-character-bust-detailed-02.svg",
+      "assetType": "complete-base-character",
+      "isSourceSheet": false,
+      "viewBox": "0 0 1024 1024"
+    }
+  ],
+  "categories": {
+    "heads": [
+      {
+        "id": "head-base-01",
+        "category": "heads",
+        "name": "Chibi Classic (Porcelain)",
+        "shapeGroup": "Chibi Classic",
+        "toneGroup": "Porcelain Cream",
+        "filename": "head-base-01-chibi-neutral.svg",
+        "url": "/assets/avatars/cogether/heads/head-base-01-chibi-neutral.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/base-character-chibi-neutral-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F4E8D3",
+        "shadowSkinFill": "#DAC9B1",
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Native 1024x1024 chibi head (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-base-02",
+        "category": "heads",
+        "name": "Chibi Rounded (Golden Peach)",
+        "shapeGroup": "Chibi Rounded",
+        "toneGroup": "Golden Peach",
+        "filename": "head-base-02-chibi-warm.svg",
+        "url": "/assets/avatars/cogether/heads/head-base-02-chibi-warm.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/base-character-chibi-warm-02.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#FEDF9B",
+        "shadowSkinFill": "#F4E8D3",
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Native 1024x1024 chibi head (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-01",
+        "category": "heads",
+        "name": "Soft Square · R1C1",
+        "shapeGroup": "Soft Square",
+        "toneGroup": "Porcelain Fair",
+        "gridPosition": {
+          "row": 1,
+          "col": 1
+        },
+        "filename": "head-01-r1c1.svg",
+        "url": "/assets/avatars/cogether/heads/head-01-r1c1.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#CCA57F"
+        ],
+        "pathCount": 9,
+        "sourceBBox": {
+          "x": 97,
+          "y": 116,
+          "width": 165,
+          "height": 117
+        },
+        "avatarTransform": {
+          "tx": -97.67,
+          "ty": -163.08,
+          "scale": 3.4008
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-02",
+        "category": "heads",
+        "name": "Rounded Classic · R1C2",
+        "shapeGroup": "Rounded Classic",
+        "toneGroup": "Porcelain Fair",
+        "gridPosition": {
+          "row": 1,
+          "col": 2
+        },
+        "filename": "head-02-r1c2.svg",
+        "url": "/assets/avatars/cogether/heads/head-02-r1c2.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#F2E1CD"
+        ],
+        "pathCount": 9,
+        "sourceBBox": {
+          "x": 306,
+          "y": 117,
+          "width": 151,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -805.7,
+          "ty": -173.3,
+          "scale": 3.4556
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-03",
+        "category": "heads",
+        "name": "Oval Contour · R1C3",
+        "shapeGroup": "Oval Contour",
+        "toneGroup": "Porcelain Fair",
+        "gridPosition": {
+          "row": 1,
+          "col": 3
+        },
+        "filename": "head-03-r1c3.svg",
+        "url": "/assets/avatars/cogether/heads/head-03-r1c3.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#CCA57F"
+        ],
+        "pathCount": 6,
+        "sourceBBox": {
+          "x": 502,
+          "y": 117,
+          "width": 150,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -1477.92,
+          "ty": -171.51,
+          "scale": 3.449
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-04",
+        "category": "heads",
+        "name": "Sculpted Jaw · R1C4",
+        "shapeGroup": "Sculpted Jaw",
+        "toneGroup": "Porcelain Fair",
+        "gridPosition": {
+          "row": 1,
+          "col": 4
+        },
+        "filename": "head-04-r1c4.svg",
+        "url": "/assets/avatars/cogether/heads/head-04-r1c4.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#CCA57F",
+        "shadowSkinFill": "#C69B75",
+        "fills": [
+          "#CCA57F",
+          "#C69B75"
+        ],
+        "pathCount": 6,
+        "sourceBBox": {
+          "x": 698,
+          "y": 117,
+          "width": 150,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -2169.49,
+          "ty": -173.82,
+          "scale": 3.4668
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-05",
+        "category": "heads",
+        "name": "Wide Chibi · R1C5",
+        "shapeGroup": "Wide Chibi",
+        "toneGroup": "Porcelain Fair",
+        "gridPosition": {
+          "row": 1,
+          "col": 5
+        },
+        "filename": "head-05-r1c5.svg",
+        "url": "/assets/avatars/cogether/heads/head-05-r1c5.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#F2E1CD"
+        ],
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 895,
+          "y": 117,
+          "width": 161,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -2856.66,
+          "ty": -173.39,
+          "scale": 3.4555
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-06",
+        "category": "heads",
+        "name": "Soft Square · R2C1",
+        "shapeGroup": "Soft Square",
+        "toneGroup": "Warm Ivory",
+        "gridPosition": {
+          "row": 2,
+          "col": 1
+        },
+        "filename": "head-06-r2c1.svg",
+        "url": "/assets/avatars/cogether/heads/head-06-r2c1.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#F2E1CD"
+        ],
+        "pathCount": 6,
+        "sourceBBox": {
+          "x": 97,
+          "y": 253,
+          "width": 164,
+          "height": 114
+        },
+        "avatarTransform": {
+          "tx": -111.34,
+          "ty": -647.04,
+          "scale": 3.4771
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-07",
+        "category": "heads",
+        "name": "Rounded Classic · R2C2",
+        "shapeGroup": "Rounded Classic",
+        "toneGroup": "Warm Ivory",
+        "gridPosition": {
+          "row": 2,
+          "col": 2
+        },
+        "filename": "head-07-r2c2.svg",
+        "url": "/assets/avatars/cogether/heads/head-07-r2c2.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#F2E1CD"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 306,
+          "y": 252,
+          "width": 151,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -806.33,
+          "ty": -639.99,
+          "scale": 3.4578
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-08",
+        "category": "heads",
+        "name": "Oval Contour · R2C3",
+        "shapeGroup": "Oval Contour",
+        "toneGroup": "Warm Ivory",
+        "gridPosition": {
+          "row": 2,
+          "col": 3
+        },
+        "filename": "head-08-r2c3.svg",
+        "url": "/assets/avatars/cogether/heads/head-08-r2c3.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#E2C6A5",
+        "shadowSkinFill": "#CCA57F",
+        "fills": [
+          "#E2C6A5",
+          "#CCA57F"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 501,
+          "y": 252,
+          "width": 151,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -1481.29,
+          "ty": -639.52,
+          "scale": 3.4564
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-09",
+        "category": "heads",
+        "name": "Sculpted Jaw · R2C4",
+        "shapeGroup": "Sculpted Jaw",
+        "toneGroup": "Warm Ivory",
+        "gridPosition": {
+          "row": 2,
+          "col": 4
+        },
+        "filename": "head-09-r2c4.svg",
+        "url": "/assets/avatars/cogether/heads/head-09-r2c4.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#CCA57F",
+        "shadowSkinFill": "#BB8F6A",
+        "fills": [
+          "#CCA57F",
+          "#BB8F6A",
+          "#C69B75"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 698,
+          "y": 252,
+          "width": 151,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -2170.05,
+          "ty": -643.21,
+          "scale": 3.4677
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-10",
+        "category": "heads",
+        "name": "Wide Chibi · R2C5",
+        "shapeGroup": "Wide Chibi",
+        "toneGroup": "Warm Ivory",
+        "gridPosition": {
+          "row": 2,
+          "col": 5
+        },
+        "filename": "head-10-r2c5.svg",
+        "url": "/assets/avatars/cogether/heads/head-10-r2c5.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#F2E1CD",
+          "#CCA57F"
+        ],
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 895,
+          "y": 252,
+          "width": 161,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -2847.54,
+          "ty": -635.74,
+          "scale": 3.4459
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-11",
+        "category": "heads",
+        "name": "Soft Square · R3C1",
+        "shapeGroup": "Soft Square",
+        "toneGroup": "Golden Sand",
+        "gridPosition": {
+          "row": 3,
+          "col": 1
+        },
+        "filename": "head-11-r3c1.svg",
+        "url": "/assets/avatars/cogether/heads/head-11-r3c1.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#E2C6A5",
+        "shadowSkinFill": "#F2E1CD",
+        "fills": [
+          "#E2C6A5",
+          "#F2E1CD"
+        ],
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 97,
+          "y": 389,
+          "width": 164,
+          "height": 114
+        },
+        "avatarTransform": {
+          "tx": -115.83,
+          "ty": -1127.01,
+          "scale": 3.4974
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-12",
+        "category": "heads",
+        "name": "Rounded Classic · R3C2",
+        "shapeGroup": "Rounded Classic",
+        "toneGroup": "Golden Sand",
+        "gridPosition": {
+          "row": 3,
+          "col": 2
+        },
+        "filename": "head-12-r3c2.svg",
+        "url": "/assets/avatars/cogether/heads/head-12-r3c2.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#F2E1CD"
+        ],
+        "pathCount": 8,
+        "sourceBBox": {
+          "x": 306,
+          "y": 388,
+          "width": 151,
+          "height": 114
+        },
+        "avatarTransform": {
+          "tx": -818.59,
+          "ty": -1122.18,
+          "scale": 3.4883
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-13",
+        "category": "heads",
+        "name": "Oval Contour · R3C3",
+        "shapeGroup": "Oval Contour",
+        "toneGroup": "Golden Sand",
+        "gridPosition": {
+          "row": 3,
+          "col": 3
+        },
+        "filename": "head-13-r3c3.svg",
+        "url": "/assets/avatars/cogether/heads/head-13-r3c3.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#E2C6A5",
+        "shadowSkinFill": "#CCA57F",
+        "fills": [
+          "#E2C6A5",
+          "#CCA57F"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 502,
+          "y": 387,
+          "width": 150,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -1484.9,
+          "ty": -1108.86,
+          "scale": 3.4614
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-14",
+        "category": "heads",
+        "name": "Sculpted Jaw · R3C4",
+        "shapeGroup": "Sculpted Jaw",
+        "toneGroup": "Golden Sand",
+        "gridPosition": {
+          "row": 3,
+          "col": 4
+        },
+        "filename": "head-14-r3c4.svg",
+        "url": "/assets/avatars/cogether/heads/head-14-r3c4.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#C69B75",
+        "shadowSkinFill": "#BB8F6A",
+        "fills": [
+          "#C69B75",
+          "#BB8F6A",
+          "#CCA57F"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 698,
+          "y": 388,
+          "width": 150,
+          "height": 114
+        },
+        "avatarTransform": {
+          "tx": -2177.56,
+          "ty": -1116.28,
+          "scale": 3.477
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-15",
+        "category": "heads",
+        "name": "Wide Chibi · R3C5",
+        "shapeGroup": "Wide Chibi",
+        "toneGroup": "Golden Sand",
+        "gridPosition": {
+          "row": 3,
+          "col": 5
+        },
+        "filename": "head-15-r3c5.svg",
+        "url": "/assets/avatars/cogether/heads/head-15-r3c5.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#F2E1CD",
+          "#CCA57F"
+        ],
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 895,
+          "y": 387,
+          "width": 161,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -2863.63,
+          "ty": -1108.94,
+          "scale": 3.4621
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-16",
+        "category": "heads",
+        "name": "Soft Square · R4C1",
+        "shapeGroup": "Soft Square",
+        "toneGroup": "Honey Tan",
+        "gridPosition": {
+          "row": 4,
+          "col": 1
+        },
+        "filename": "head-16-r4c1.svg",
+        "url": "/assets/avatars/cogether/heads/head-16-r4c1.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#E2C6A5",
+        "shadowSkinFill": "#CCA57F",
+        "fills": [
+          "#E2C6A5",
+          "#CCA57F"
+        ],
+        "pathCount": 10,
+        "sourceBBox": {
+          "x": 97,
+          "y": 525,
+          "width": 164,
+          "height": 114
+        },
+        "avatarTransform": {
+          "tx": -114.8,
+          "ty": -1604.81,
+          "scale": 3.4982
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-17",
+        "category": "heads",
+        "name": "Rounded Classic · R4C2",
+        "shapeGroup": "Rounded Classic",
+        "toneGroup": "Honey Tan",
+        "gridPosition": {
+          "row": 4,
+          "col": 2
+        },
+        "filename": "head-17-r4c2.svg",
+        "url": "/assets/avatars/cogether/heads/head-17-r4c2.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#CCA57F",
+          "#F2E1CD"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 306,
+          "y": 525,
+          "width": 152,
+          "height": 114
+        },
+        "avatarTransform": {
+          "tx": -818.52,
+          "ty": -1597.9,
+          "scale": 3.4876
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-18",
+        "category": "heads",
+        "name": "Oval Contour · R4C3",
+        "shapeGroup": "Oval Contour",
+        "toneGroup": "Honey Tan",
+        "gridPosition": {
+          "row": 4,
+          "col": 3
+        },
+        "filename": "head-18-r4c3.svg",
+        "url": "/assets/avatars/cogether/heads/head-18-r4c3.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#E2C6A5",
+        "shadowSkinFill": "#CCA57F",
+        "fills": [
+          "#E2C6A5",
+          "#CCA57F"
+        ],
+        "pathCount": 9,
+        "sourceBBox": {
+          "x": 502,
+          "y": 524,
+          "width": 150,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -1489.89,
+          "ty": -1587.55,
+          "scale": 3.4705
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-19",
+        "category": "heads",
+        "name": "Sculpted Jaw · R4C4",
+        "shapeGroup": "Sculpted Jaw",
+        "toneGroup": "Honey Tan",
+        "gridPosition": {
+          "row": 4,
+          "col": 4
+        },
+        "filename": "head-19-r4c4.svg",
+        "url": "/assets/avatars/cogether/heads/head-19-r4c4.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#BB8F6A",
+        "shadowSkinFill": "#A97D5D",
+        "fills": [
+          "#BB8F6A",
+          "#A97D5D",
+          "#C69B75",
+          "#CCA57F"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 698,
+          "y": 525,
+          "width": 151,
+          "height": 114
+        },
+        "avatarTransform": {
+          "tx": -2192.68,
+          "ty": -1603.79,
+          "scale": 3.4971
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-20",
+        "category": "heads",
+        "name": "Wide Chibi · R4C5",
+        "shapeGroup": "Wide Chibi",
+        "toneGroup": "Honey Tan",
+        "gridPosition": {
+          "row": 4,
+          "col": 5
+        },
+        "filename": "head-20-r4c5.svg",
+        "url": "/assets/avatars/cogether/heads/head-20-r4c5.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#F3E7D5",
+        "shadowSkinFill": "#E2C6A5",
+        "fills": [
+          "#F3E7D5",
+          "#E2C6A5",
+          "#F2E1CD"
+        ],
+        "pathCount": 9,
+        "sourceBBox": {
+          "x": 895,
+          "y": 525,
+          "width": 161,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -2875.09,
+          "ty": -1591.14,
+          "scale": 3.4738
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-21",
+        "category": "heads",
+        "name": "Soft Square · R5C1",
+        "shapeGroup": "Soft Square",
+        "toneGroup": "Rich Espresso",
+        "gridPosition": {
+          "row": 5,
+          "col": 1
+        },
+        "filename": "head-21-r5c1.svg",
+        "url": "/assets/avatars/cogether/heads/head-21-r5c1.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#9B6B53",
+        "shadowSkinFill": "#76493A",
+        "fills": [
+          "#9B6B53",
+          "#76493A",
+          "#A97D5D"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 97,
+          "y": 662,
+          "width": 164,
+          "height": 113
+        },
+        "avatarTransform": {
+          "tx": -116.24,
+          "ty": -2089.17,
+          "scale": 3.5073
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-22",
+        "category": "heads",
+        "name": "Rounded Classic · R5C2",
+        "shapeGroup": "Rounded Classic",
+        "toneGroup": "Rich Espresso",
+        "gridPosition": {
+          "row": 5,
+          "col": 2
+        },
+        "filename": "head-22-r5c2.svg",
+        "url": "/assets/avatars/cogether/heads/head-22-r5c2.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#9B6B53",
+        "shadowSkinFill": "#76493A",
+        "fills": [
+          "#9B6B53",
+          "#76493A",
+          "#A97D5D"
+        ],
+        "pathCount": 6,
+        "sourceBBox": {
+          "x": 305,
+          "y": 662,
+          "width": 152,
+          "height": 113
+        },
+        "avatarTransform": {
+          "tx": -828.01,
+          "ty": -2093.89,
+          "scale": 3.5154
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-23",
+        "category": "heads",
+        "name": "Oval Contour · R5C3",
+        "shapeGroup": "Oval Contour",
+        "toneGroup": "Rich Espresso",
+        "gridPosition": {
+          "row": 5,
+          "col": 3
+        },
+        "filename": "head-23-r5c3.svg",
+        "url": "/assets/avatars/cogether/heads/head-23-r5c3.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#9B6B53",
+        "shadowSkinFill": "#76493A",
+        "fills": [
+          "#9B6B53",
+          "#76493A"
+        ],
+        "pathCount": 7,
+        "sourceBBox": {
+          "x": 500,
+          "y": 661,
+          "width": 152,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -1488.3,
+          "ty": -2059.61,
+          "scale": 3.4694
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-24",
+        "category": "heads",
+        "name": "Sculpted Jaw · R5C4",
+        "shapeGroup": "Sculpted Jaw",
+        "toneGroup": "Rich Espresso",
+        "gridPosition": {
+          "row": 5,
+          "col": 4
+        },
+        "filename": "head-24-r5c4.svg",
+        "url": "/assets/avatars/cogether/heads/head-24-r5c4.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#76493A",
+        "shadowSkinFill": "#674033",
+        "fills": [
+          "#76493A",
+          "#674033"
+        ],
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 697,
+          "y": 661,
+          "width": 151,
+          "height": 113
+        },
+        "avatarTransform": {
+          "tx": -2205.7,
+          "ty": -2093.47,
+          "scale": 3.5157
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      },
+      {
+        "id": "head-25",
+        "category": "heads",
+        "name": "Wide Chibi · R5C5",
+        "shapeGroup": "Wide Chibi",
+        "toneGroup": "Rich Espresso",
+        "gridPosition": {
+          "row": 5,
+          "col": 5
+        },
+        "filename": "head-25-r5c5.svg",
+        "url": "/assets/avatars/cogether/heads/head-25-r5c5.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/head-skin-tone-sheet-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "primarySkinFill": "#76493A",
+        "shadowSkinFill": "#76493A",
+        "fills": [
+          "#76493A"
+        ],
+        "pathCount": 4,
+        "sourceBBox": {
+          "x": 894,
+          "y": 661,
+          "width": 161,
+          "height": 115
+        },
+        "avatarTransform": {
+          "tx": -2863.1,
+          "ty": -2056.69,
+          "scale": 3.4628
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "210 190 604 480",
+        "alignmentNotes": "Normalized to 1024x1024 head space (cx=512, chin y=630)",
+        "layerPosition": 5,
+        "compatible": true,
+        "compatibleBody": "chibi-01"
+      }
+    ],
+    "skin": [
+      {
+        "id": "skin-01-porcelain",
+        "name": "Porcelain Cream",
+        "primary": "#F4E8D3",
+        "shadow": "#DAC9B1",
+        "deepShadow": "#C7B299"
+      },
+      {
+        "id": "skin-02-ivory",
+        "name": "Warm Ivory",
+        "primary": "#F3E7D5",
+        "shadow": "#E2C6A5",
+        "deepShadow": "#CCA57F"
+      },
+      {
+        "id": "skin-03-peach",
+        "name": "Golden Peach",
+        "primary": "#FEDF9B",
+        "shadow": "#E6C27A",
+        "deepShadow": "#CCA57F"
+      },
+      {
+        "id": "skin-04-sand",
+        "name": "Warm Sand",
+        "primary": "#E2C6A5",
+        "shadow": "#CCA57F",
+        "deepShadow": "#B58B63"
+      },
+      {
+        "id": "skin-05-honey",
+        "name": "Honey Tan",
+        "primary": "#CCA57F",
+        "shadow": "#B58962",
+        "deepShadow": "#9B6B53"
+      },
+      {
+        "id": "skin-06-caramel",
+        "name": "Caramel Bronze",
+        "primary": "#C69B75",
+        "shadow": "#A97D5D",
+        "deepShadow": "#8F6344"
+      },
+      {
+        "id": "skin-07-amber",
+        "name": "Warm Amber",
+        "primary": "#BB8F6A",
+        "shadow": "#9B6B53",
+        "deepShadow": "#76493A"
+      },
+      {
+        "id": "skin-08-chestnut",
+        "name": "Chestnut Brown",
+        "primary": "#9B6B53",
+        "shadow": "#76493A",
+        "deepShadow": "#5E382B"
+      },
+      {
+        "id": "skin-09-espresso",
+        "name": "Deep Espresso",
+        "primary": "#76493A",
+        "shadow": "#5C372B",
+        "deepShadow": "#472920"
+      }
+    ],
+    "eyes": [
+      {
+        "id": "eyes-01-round-slate",
+        "category": "eyes",
+        "name": "Round Slate",
+        "description": "Classic round cartoon eyes with slate-blue iris",
+        "filename": "eyes-01-round-slate.svg",
+        "url": "/assets/avatars/cogether/eyes/eyes-01-round-slate.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/eyes-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "isClosedVariant": false,
+        "pathCount": 15,
+        "sourceBBox": {
+          "x": 160,
+          "y": 205,
+          "width": 259,
+          "height": 120
+        },
+        "avatarTransform": {
+          "tx": 233.21,
+          "ty": 210.07,
+          "scale": 0.9636
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "340 370 344 190",
+        "alignmentNotes": "Centered horizontally at x=512, eye-line y=465 on 1024x1024 canvas",
+        "layerPosition": 6,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "cy": 465
+        }
+      },
+      {
+        "id": "eyes-02-fierce-crimson",
+        "category": "eyes",
+        "name": "Fierce Crimson",
+        "description": "Sharp half-lidded crimson anime eyes",
+        "filename": "eyes-02-fierce-crimson.svg",
+        "url": "/assets/avatars/cogether/eyes/eyes-02-fierce-crimson.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/eyes-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "isClosedVariant": false,
+        "pathCount": 37,
+        "sourceBBox": {
+          "x": 498,
+          "y": 225,
+          "width": 292,
+          "height": 85
+        },
+        "avatarTransform": {
+          "tx": -39.67,
+          "ty": 235.68,
+          "scale": 0.857
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "340 370 344 190",
+        "alignmentNotes": "Centered horizontally at x=512, eye-line y=465 on 1024x1024 canvas",
+        "layerPosition": 6,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "cy": 465
+        }
+      },
+      {
+        "id": "eyes-03-relaxed-amber",
+        "category": "eyes",
+        "name": "Relaxed Amber",
+        "description": "Calm half-lidded warm brown eyes",
+        "filename": "eyes-03-relaxed-amber.svg",
+        "url": "/assets/avatars/cogether/eyes/eyes-03-relaxed-amber.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/eyes-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "isClosedVariant": false,
+        "pathCount": 20,
+        "sourceBBox": {
+          "x": 865,
+          "y": 232,
+          "width": 262,
+          "height": 76
+        },
+        "avatarTransform": {
+          "tx": -437.2,
+          "ty": 208.12,
+          "scale": 0.9529
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "340 370 344 190",
+        "alignmentNotes": "Centered horizontally at x=512, eye-line y=465 on 1024x1024 canvas",
+        "layerPosition": 6,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "cy": 465
+        }
+      },
+      {
+        "id": "eyes-04-closed-happy",
+        "category": "eyes",
+        "name": "Happy Arc",
+        "description": "Cheerful curved closed-eye arcs",
+        "filename": "eyes-04-closed-happy.svg",
+        "url": "/assets/avatars/cogether/eyes/eyes-04-closed-happy.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/eyes-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "isClosedVariant": true,
+        "pathCount": 2,
+        "sourceBBox": {
+          "x": 159,
+          "y": 525,
+          "width": 262,
+          "height": 68
+        },
+        "avatarTransform": {
+          "tx": 235.11,
+          "ty": -67.4,
+          "scale": 0.9527
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "340 370 344 190",
+        "alignmentNotes": "Centered horizontally at x=512, eye-line y=465 on 1024x1024 canvas",
+        "layerPosition": 6,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "cy": 465
+        }
+      },
+      {
+        "id": "eyes-05-sparkle-wide",
+        "category": "eyes",
+        "name": "Sparkle Wide",
+        "description": "Expressive wide anime eyes with bright catchlights",
+        "filename": "eyes-05-sparkle-wide.svg",
+        "url": "/assets/avatars/cogether/eyes/eyes-05-sparkle-wide.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/eyes-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "isClosedVariant": false,
+        "pathCount": 10,
+        "sourceBBox": {
+          "x": 490,
+          "y": 464,
+          "width": 306,
+          "height": 148
+        },
+        "avatarTransform": {
+          "tx": -12.84,
+          "ty": 25.76,
+          "scale": 0.8159
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "340 370 344 190",
+        "alignmentNotes": "Centered horizontally at x=512, eye-line y=465 on 1024x1024 canvas",
+        "layerPosition": 6,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "cy": 465
+        }
+      },
+      {
+        "id": "eyes-06-focused-dark",
+        "category": "eyes",
+        "name": "Focused Dark",
+        "description": "Crisp round eyes with deep brown pupils",
+        "filename": "eyes-06-focused-dark.svg",
+        "url": "/assets/avatars/cogether/eyes/eyes-06-focused-dark.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/eyes-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "isClosedVariant": false,
+        "pathCount": 10,
+        "sourceBBox": {
+          "x": 870,
+          "y": 496,
+          "width": 259,
+          "height": 119
+        },
+        "avatarTransform": {
+          "tx": -452.87,
+          "ty": -71.52,
+          "scale": 0.9649
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "340 370 344 190",
+        "alignmentNotes": "Centered horizontally at x=512, eye-line y=465 on 1024x1024 canvas",
+        "layerPosition": 6,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "cy": 465
+        }
+      }
+    ],
+    "hair": [
+      {
+        "id": "hair-01-short-messy",
+        "category": "hair",
+        "name": "Short Messy",
+        "description": "Tousled anime bangs with textured crown",
+        "filename": "hair-01-short-messy.svg",
+        "url": "/assets/avatars/cogether/hair/hair-01-short-messy.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/hair-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "defaultColors": {
+          "primary": "#5A5655",
+          "highlight": "#938E8D",
+          "outline": "#2B2B30"
+        },
+        "pathCount": 4,
+        "sourceBBox": {
+          "x": 195,
+          "y": 135,
+          "width": 229,
+          "height": 231
+        },
+        "avatarTransform": {
+          "tx": -287.6,
+          "ty": -284.03,
+          "scale": 2.5366
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "160 60 704 720",
+        "alignmentNotes": "Calibrated to 1024x1024 head crown (cx=512, chin y=630, head width=410)",
+        "layerPosition": 7,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "topY": 232
+        }
+      },
+      {
+        "id": "hair-02-side-undercut",
+        "category": "hair",
+        "name": "Side Undercut",
+        "description": "Asymmetric side sweep with shaved undercut detail",
+        "filename": "hair-02-side-undercut.svg",
+        "url": "/assets/avatars/cogether/hair/hair-02-side-undercut.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/hair-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "defaultColors": {
+          "primary": "#5A5655",
+          "highlight": "#938E8D",
+          "outline": "#2B2B30"
+        },
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 522,
+          "y": 136,
+          "width": 215,
+          "height": 229
+        },
+        "avatarTransform": {
+          "tx": -818.73,
+          "ty": -129.49,
+          "scale": 2.1084
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "160 60 704 720",
+        "alignmentNotes": "Calibrated to 1024x1024 head crown (cx=512, chin y=630, head width=410)",
+        "layerPosition": 7,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "topY": 232
+        }
+      },
+      {
+        "id": "hair-03-fluffy-cloud",
+        "category": "hair",
+        "name": "Fluffy Cloud",
+        "description": "Voluminous soft curly silhouette with glossy highlights",
+        "filename": "hair-03-fluffy-cloud.svg",
+        "url": "/assets/avatars/cogether/hair/hair-03-fluffy-cloud.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/hair-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "defaultColors": {
+          "primary": "#5A5655",
+          "highlight": "#938E8D",
+          "outline": "#2B2B30"
+        },
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 795,
+          "y": 113,
+          "width": 294,
+          "height": 252
+        },
+        "avatarTransform": {
+          "tx": -1889.8,
+          "ty": -283.68,
+          "scale": 2.5368
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "160 60 704 720",
+        "alignmentNotes": "Calibrated to 1024x1024 head crown (cx=512, chin y=630, head width=410)",
+        "layerPosition": 7,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "topY": 232
+        }
+      },
+      {
+        "id": "hair-04-long-hime",
+        "category": "hair",
+        "name": "Long Hime Cut",
+        "description": "Blunt straight fringe with long framing side locks",
+        "filename": "hair-04-long-hime.svg",
+        "url": "/assets/avatars/cogether/hair/hair-04-long-hime.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/hair-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "defaultColors": {
+          "primary": "#5A5655",
+          "highlight": "#938E8D",
+          "outline": "#2B2B30"
+        },
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 211,
+          "y": 436,
+          "width": 199,
+          "height": 284
+        },
+        "avatarTransform": {
+          "tx": -296.96,
+          "ty": -1050.45,
+          "scale": 2.6013
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "160 60 704 720",
+        "alignmentNotes": "Calibrated to 1024x1024 head crown (cx=512, chin y=630, head width=410)",
+        "layerPosition": 7,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "topY": 232
+        }
+      },
+      {
+        "id": "hair-05-top-bun",
+        "category": "hair",
+        "name": "Samurai Bun",
+        "description": "Center-parted curtains with high tied top knot",
+        "filename": "hair-05-top-bun.svg",
+        "url": "/assets/avatars/cogether/hair/hair-05-top-bun.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/hair-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "defaultColors": {
+          "primary": "#5A5655",
+          "highlight": "#938E8D",
+          "outline": "#2B2B30"
+        },
+        "pathCount": 8,
+        "sourceBBox": {
+          "x": 535,
+          "y": 422,
+          "width": 200,
+          "height": 279
+        },
+        "avatarTransform": {
+          "tx": -981.57,
+          "ty": -1020.65,
+          "scale": 2.3729
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "160 60 704 720",
+        "alignmentNotes": "Calibrated to 1024x1024 head crown (cx=512, chin y=630, head width=410)",
+        "layerPosition": 7,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "topY": 232
+        }
+      },
+      {
+        "id": "hair-06-spiky-anime",
+        "category": "hair",
+        "name": "Spiky Hero",
+        "description": "Dynamic multi-directional anime spikes",
+        "filename": "hair-06-spiky-anime.svg",
+        "url": "/assets/avatars/cogether/hair/hair-06-spiky-anime.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/hair-sheet-initial-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "defaultColors": {
+          "primary": "#5A5655",
+          "highlight": "#938E8D",
+          "outline": "#2B2B30"
+        },
+        "pathCount": 5,
+        "sourceBBox": {
+          "x": 797,
+          "y": 460,
+          "width": 291,
+          "height": 240
+        },
+        "avatarTransform": {
+          "tx": -1958.16,
+          "ty": -1193.12,
+          "scale": 2.6223
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "160 60 704 720",
+        "alignmentNotes": "Calibrated to 1024x1024 head crown (cx=512, chin y=630, head width=410)",
+        "layerPosition": 7,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "topY": 232
+        }
+      }
+    ],
+    "clothing": [
+      {
+        "id": "clothing-01-chibi-crew-tee",
+        "category": "clothing",
+        "name": "Classic Crew Tee",
+        "description": "Chibi crimson short-sleeve crew-neck t-shirt",
+        "filename": "clothing-01-chibi-crew-tee.svg",
+        "url": "/assets/avatars/cogether/clothing/clothing-01-chibi-crew-tee.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/base-character-chibi-neutral-01.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "defaultColors": {
+          "primary": "#B1232D",
+          "shadow": "#8E1B26"
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "220 590 584 360",
+        "alignmentNotes": "Aligned to neck anchor y=626, cx=512 on 1024x1024 canvas",
+        "layerPosition": 4,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "topY": 626
+        }
+      },
+      {
+        "id": "clothing-02-chibi-relaxed-tee",
+        "category": "clothing",
+        "name": "Relaxed Fit Tee",
+        "description": "Chibi relaxed-shoulder short-sleeve t-shirt",
+        "filename": "clothing-02-chibi-relaxed-tee.svg",
+        "url": "/assets/avatars/cogether/clothing/clothing-02-chibi-relaxed-tee.svg",
+        "sourceSheet": "/assets/avatars/cogether/source-sheets/base-character-chibi-warm-02.svg",
+        "assetType": "extracted-vector-layer",
+        "isSourceSheet": false,
+        "supportsRecolor": true,
+        "defaultColors": {
+          "primary": "#C2283C",
+          "shadow": "#8E1B26"
+        },
+        "viewBox": "0 0 1024 1024",
+        "thumbnailViewBox": "220 590 584 360",
+        "alignmentNotes": "Aligned to neck anchor y=626, cx=512 on 1024x1024 canvas",
+        "layerPosition": 4,
+        "compatible": true,
+        "anchor": {
+          "cx": 512,
+          "topY": 626
+        }
+      }
+    ],
+    "accessories": [],
+    "backgrounds": [],
+    "effects": [],
+    "eyewear": []
+  },
+  "palettes": {
+    "skinTones": [
+      {
+        "id": "skin-01-porcelain",
+        "name": "Porcelain Cream",
+        "primary": "#F4E8D3",
+        "shadow": "#DAC9B1",
+        "deepShadow": "#C7B299"
+      },
+      {
+        "id": "skin-02-ivory",
+        "name": "Warm Ivory",
+        "primary": "#F3E7D5",
+        "shadow": "#E2C6A5",
+        "deepShadow": "#CCA57F"
+      },
+      {
+        "id": "skin-03-peach",
+        "name": "Golden Peach",
+        "primary": "#FEDF9B",
+        "shadow": "#E6C27A",
+        "deepShadow": "#CCA57F"
+      },
+      {
+        "id": "skin-04-sand",
+        "name": "Warm Sand",
+        "primary": "#E2C6A5",
+        "shadow": "#CCA57F",
+        "deepShadow": "#B58B63"
+      },
+      {
+        "id": "skin-05-honey",
+        "name": "Honey Tan",
+        "primary": "#CCA57F",
+        "shadow": "#B58962",
+        "deepShadow": "#9B6B53"
+      },
+      {
+        "id": "skin-06-caramel",
+        "name": "Caramel Bronze",
+        "primary": "#C69B75",
+        "shadow": "#A97D5D",
+        "deepShadow": "#8F6344"
+      },
+      {
+        "id": "skin-07-amber",
+        "name": "Warm Amber",
+        "primary": "#BB8F6A",
+        "shadow": "#9B6B53",
+        "deepShadow": "#76493A"
+      },
+      {
+        "id": "skin-08-chestnut",
+        "name": "Chestnut Brown",
+        "primary": "#9B6B53",
+        "shadow": "#76493A",
+        "deepShadow": "#5E382B"
+      },
+      {
+        "id": "skin-09-espresso",
+        "name": "Deep Espresso",
+        "primary": "#76493A",
+        "shadow": "#5C372B",
+        "deepShadow": "#472920"
+      }
+    ],
+    "hairColors": [
+      {
+        "id": "hair-color-charcoal",
+        "name": "Charcoal Slate",
+        "primary": "#5A5655",
+        "highlight": "#938E8D"
+      },
+      {
+        "id": "hair-color-obsidian",
+        "name": "Midnight Obsidian",
+        "primary": "#232228",
+        "highlight": "#52505E"
+      },
+      {
+        "id": "hair-color-crimson",
+        "name": "CoGether Crimson",
+        "primary": "#9E1F32",
+        "highlight": "#D95367"
+      },
+      {
+        "id": "hair-color-auburn",
+        "name": "Warm Auburn",
+        "primary": "#6E3B2B",
+        "highlight": "#A6634E"
+      },
+      {
+        "id": "hair-color-blonde",
+        "name": "Honey Blonde",
+        "primary": "#C89D54",
+        "highlight": "#EBD09A"
+      },
+      {
+        "id": "hair-color-silver",
+        "name": "Silver Frost",
+        "primary": "#B8B5C0",
+        "highlight": "#E8E6EE"
+      },
+      {
+        "id": "hair-color-cobalt",
+        "name": "Cobalt Indigo",
+        "primary": "#2E4775",
+        "highlight": "#6384BD"
+      },
+      {
+        "id": "hair-color-jade",
+        "name": "Forest Jade",
+        "primary": "#2A5C4A",
+        "highlight": "#5B9681"
+      }
+    ],
+    "clothingColors": [
+      {
+        "id": "cloth-color-crimson",
+        "name": "CoGether Red",
+        "primary": "#B1232D",
+        "shadow": "#8E1B26"
+      },
+      {
+        "id": "cloth-color-onyx",
+        "name": "Onyx Black",
+        "primary": "#232329",
+        "shadow": "#141418"
+      },
+      {
+        "id": "cloth-color-navy",
+        "name": "Studio Navy",
+        "primary": "#263E63",
+        "shadow": "#192942"
+      },
+      {
+        "id": "cloth-color-emerald",
+        "name": "Emerald Pine",
+        "primary": "#265942",
+        "shadow": "#183B2B"
+      },
+      {
+        "id": "cloth-color-plum",
+        "name": "Royal Plum",
+        "primary": "#5C3768",
+        "shadow": "#3D2246"
+      },
+      {
+        "id": "cloth-color-ochre",
+        "name": "Warm Ochre",
+        "primary": "#C46D29",
+        "shadow": "#8F4B16"
+      },
+      {
+        "id": "cloth-color-slate",
+        "name": "Titanium Grey",
+        "primary": "#4D5159",
+        "shadow": "#34373D"
+      }
+    ],
+    "studioBackdrops": [
+      {
+        "id": "bg-01-obsidian",
+        "name": "Obsidian Studio",
+        "css": "radial-gradient(circle at 50% 38%, #2a2833 0%, #121116 100%)",
+        "accent": "#E11D48"
+      },
+      {
+        "id": "bg-02-crimson-glow",
+        "name": "CoGether Dusk",
+        "css": "radial-gradient(circle at 50% 35%, #4a1924 0%, #140d10 100%)",
+        "accent": "#F43F5E"
+      },
+      {
+        "id": "bg-03-warm-parchment",
+        "name": "Warm Peach Atelier",
+        "css": "radial-gradient(circle at 50% 38%, #f7e4cf 0%, #DFB591 100%)",
+        "accent": "#111111"
+      },
+      {
+        "id": "bg-04-midnight-indigo",
+        "name": "Midnight Horizon",
+        "css": "radial-gradient(circle at 50% 35%, #1e2d4a 0%, #0d121f 100%)",
+        "accent": "#60A5FA"
+      },
+      {
+        "id": "bg-05-emerald-zen",
+        "name": "Forest Canopy",
+        "css": "radial-gradient(circle at 50% 35%, #1d3b32 0%, #0c1714 100%)",
+        "accent": "#34D399"
+      }
+    ]
+  },
+  "layerOrder": [
+    "background",
+    "hairBack",
+    "baseBody",
+    "clothing",
+    "head",
+    "eyes",
+    "hairFront",
+    "eyewear",
+    "accessories",
+    "effects"
+  ],
+  "baseBody": {
+    "id": "base-body-chibi-01",
+    "name": "Chibi Base Body",
+    "url": "/assets/avatars/cogether/base/base-body.svg",
+    "viewBox": "0 0 1024 1024",
+    "compatible": true
+  }
+}

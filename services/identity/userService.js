@@ -223,8 +223,11 @@ class UserService {
           userId,
           {
             username: chosenUsername,
-            displayName: userDetails.displayName || chosenUsername,
+            displayName: userDetails.displayName || [userDetails.firstName, userDetails.lastName].filter(Boolean).join(' ').trim() || chosenUsername,
+            firstName: userDetails.firstName || null,
+            lastName: userDetails.lastName || null,
             avatarUrl: userDetails.avatarUrl || null,
+            avatarConfig: userDetails.avatarConfig || null,
             bio: userDetails.bio || null
           },
           client
@@ -268,7 +271,7 @@ class UserService {
       return {
         success: true,
         isNewUser,
-        user: { id: userId, email },
+        user: { id: userId, email, emailVerified: true },
         profile,
         preferences,
         accessToken,
@@ -424,7 +427,7 @@ class UserService {
 
     const userRes = await db.query(
       `SELECT u.id, u.status, u.created_at, u.last_login_at,
-              p.username, p.display_name, p.avatar_url, p.bio,
+              p.username, p.display_name, p.first_name, p.last_name, p.avatar_url, p.avatar_config, p.bio,
               pref.primary_interest, pref.interests, pref.timezone, pref.language,
               e.tier as entitlement_tier
        FROM identity.users u
@@ -446,19 +449,29 @@ class UserService {
       [userId]
     );
 
+    const primaryEmailRow = emailsRes.rows[0] || null;
+
     return {
       id: row.id,
       status: row.status,
       createdAt: row.created_at,
       lastLoginAt: row.last_login_at,
-      primaryEmail: emailsRes.rows[0]?.email_normalized || null,
+      primaryEmail: primaryEmailRow?.email_normalized || null,
+      emailVerified: Boolean(primaryEmailRow?.verified_at),
+      emailVerifiedAt: primaryEmailRow?.verified_at || null,
       emails: emailsRes.rows,
       profile: {
         username: row.username,
         displayName: row.display_name,
         display_name: row.display_name,
+        firstName: row.first_name || null,
+        first_name: row.first_name || null,
+        lastName: row.last_name || null,
+        last_name: row.last_name || null,
         avatarUrl: row.avatar_url,
         avatar_url: row.avatar_url,
+        avatarConfig: row.avatar_config || null,
+        avatar_config: row.avatar_config || null,
         bio: row.bio
       },
       preferences: {

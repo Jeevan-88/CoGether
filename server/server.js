@@ -783,12 +783,36 @@ app.post('/api/v1/auth/session', (req, res) => {
   res.json({ valid: true, claims: result.claims });
 });
 
-// Check username availability & validity
+// Query configured social authentication providers
+app.get('/api/v1/auth/providers', (_req, res) => {
+  const googleInfo = getGoogleAuthUrl();
+  res.status(200).json({
+    success: true,
+    providers: {
+      google: Boolean(googleInfo?.configured),
+      apple: Boolean(process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID),
+      telegram: Boolean(process.env.TELEGRAM_BOT_TOKEN)
+    }
+  });
+});
+
+// Check username availability & validity (with optional suggestions & current-user exclusion)
 app.get('/api/v1/auth/check-username', async (req, res) => {
   try {
-    const rawUsername = req.query.username || '';
+    const rawUsername = String(req.query.username || '').trim().replace(/^@+/, '');
     if (!rawUsername) {
       return res.status(400).json({ success: false, available: false, error: 'USERNAME_REQUIRED', message: 'Username is required.' });
+    }
+
+    let excludeUserId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(authHeader.split(' ')[1]);
+        if (decoded?.valid && decoded?.claims) {
+          excludeUserId = decoded.claims.sub || decoded.claims.id || null;
+        }
+      } catch (_e) {}
     }
 
     const validation = profileService.validateUsername(rawUsername);
@@ -798,19 +822,28 @@ app.get('/api/v1/auth/check-username', async (req, res) => {
         available: false,
         username: rawUsername,
         error: validation.error,
-        message: validation.error === 'USERNAME_TOO_SHORT' ? 'Handle must be at least 3 characters.' :
-                 validation.error === 'USERNAME_TOO_LONG' ? 'Handle cannot exceed 30 characters.' :
-                 validation.error === 'USERNAME_INVALID_CHARS' ? 'Letters, numbers and underscores only.' :
-                 'Invalid handle.'
+        message: validation.message || (
+          validation.error === 'USERNAME_TOO_SHORT' ? 'Handle must be at least 3 characters.' :
+          validation.error === 'USERNAME_TOO_LONG' ? 'Handle cannot exceed 30 characters.' :
+          validation.error === 'USERNAME_INVALID_CHARS' ? 'Letters, numbers and underscores only.' :
+          'Invalid handle.'
+        ),
+        suggestions: []
       });
     }
 
-    const isAvailable = await profileService.isUsernameAvailable(validation.normalized);
+    const isAvailable = await profileService.isUsernameAvailable(validation.normalized, excludeUserId);
+    const wantSuggestions = !isAvailable || req.query.suggest === 'true';
+    const suggestions = wantSuggestions
+      ? await profileService.generateUsernameSuggestions(validation.normalized, excludeUserId, 3)
+      : [];
+
     return res.status(200).json({
       success: true,
       available: isAvailable,
       username: validation.cleanUsername,
-      message: isAvailable ? 'Handle is available.' : 'Handle is already taken.'
+      message: isAvailable ? 'Handle is available.' : 'Handle is already taken.',
+      suggestions
     });
   } catch (err) {
     logger.error('Username check failure', { error: err.message });
@@ -843,7 +876,7 @@ app.post('/api/v1/auth/email/request-otp', async (req, res) => {
 // Verify email OTP and establish authenticated session
 app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
   try {
-    const { email, otp, username, displayName, avatarUrl, preferences } = req.body || {};
+    const { email, otp, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences } = req.body || {};
     const metadata = {
       userAgent: req.headers['user-agent'],
       ipAddress: req.ip || req.connection?.remoteAddress
@@ -852,7 +885,7 @@ app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
     const result = await userService.verifyEmailOtp(
       email,
       otp,
-      { username, displayName, avatarUrl, preferences },
+      { username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences },
       metadata
     );
 
@@ -910,7 +943,7 @@ app.post('/api/v1/auth/refresh', async (req, res) => {
       success: true,
       accessToken,
       refreshToken: rotation.newRefreshToken,
-      user: { id: me.id, email: me.primaryEmail },
+      user: { id: me.id, email: me.primaryEmail, emailVerified: me.emailVerified },
       profile: me.profile,
       preferences: me.preferences
     });
