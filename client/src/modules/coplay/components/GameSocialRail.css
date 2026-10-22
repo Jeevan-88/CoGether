@@ -228,135 +228,168 @@
   box-sizing: border-box;
 }
 
-/* ── Challenge Readiness Card ── */
-.rail-challenge-status-card {
-  background: #14141a;
-  border: 1px solid #FFE500;
-  border-radius: 8px;
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.challenge-card-header {
+/* ── Top Header Actions & Quick Nav ── */
+.rail-header-actions {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 10.5px;
-  font-weight: 900;
-  color: #FFE500;
-  letter-spacing: 0.05em;
 }
 
-.swords-icon {
-  color: #FFE500;
+.btn-rail-quick-invite,
+.btn-rail-quick-dm {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.challenge-players-ready-grid {
+.btn-rail-quick-invite:hover,
+.btn-rail-quick-dm:hover {
+  background: rgba(255, 229, 0, 0.12);
+  color: #FFE500;
+  border-color: rgba(255, 229, 0, 0.3);
+}
+
+.rail-collapse-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rail-collapse-toggle-btn:hover {
+  color: #FFE500;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Compact Ready Bar ── */
+.rail-compact-ready-bar {
+  background: #111117;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.ready-players-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
 
-.player-ready-pill {
+.ready-player-chip {
   display: flex;
-  flex-direction: column;
-  padding: 4px 6px;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
   border-radius: 6px;
-  background: #09090c;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  overflow: hidden;
 }
 
-.player-ready-pill.is-ready {
-  border-color: #10b981;
-  background: rgba(16, 185, 129, 0.08);
+.ready-player-chip.is-ready {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.1);
 }
 
-.player-ready-pill .player-name {
-  font-size: 10.5px;
-  font-weight: 700;
+.ready-player-chip .chip-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ready-player-chip .chip-name {
+  font-weight: 600;
   color: #ffffff;
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.player-ready-pill .ready-indicator {
-  font-family: 'Space Mono', monospace;
-  font-size: 8.5px;
-  font-weight: 800;
-  margin-top: 1px;
-  color: #94a3b8;
+.ready-player-chip .chip-status {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
 }
 
-.player-ready-pill.is-ready .ready-indicator {
+.ready-player-chip.is-ready .chip-status {
   color: #10b981;
 }
 
-.ready-btn-group {
+.ready-toggle-wrap {
   display: flex;
-  flex-direction: column;
   gap: 6px;
-  width: 100%;
 }
 
-.btn-practice-duel-trigger {
-  display: flex;
+.btn-compact-ready-toggle {
+  flex: 1;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  width: 100%;
   padding: 6px 10px;
-  background: #FFE500;
-  border: 1.5px solid #FFE500;
-  color: #000000;
-  border-radius: 6px;
-  font-family: 'Barlow', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  box-shadow: 0 4px 12px rgba(255, 229, 0, 0.25);
-}
-
-.btn-practice-duel-trigger:hover {
-  background: #ffffff;
-  border-color: #ffffff;
-  transform: translateY(-1px);
-}
-
-.btn-challenge-ready-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  padding: 6px 10px;
-  background: #1e1e26;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: #1e1e28;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 7px;
   color: #ffffff;
-  border-radius: 6px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 10.5px;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.15s ease;
 }
 
-.btn-challenge-ready-toggle:hover {
+.btn-compact-ready-toggle:hover {
   border-color: #FFE500;
   color: #FFE500;
 }
 
-.btn-challenge-ready-toggle.ready-active {
+.btn-compact-ready-toggle.ready-active {
   background: #10b981;
   border-color: #10b981;
   color: #000000;
-  font-weight: 900;
+}
+
+.btn-practice-duel-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: rgba(255, 229, 0, 0.12);
+  border: 1px solid rgba(255, 229, 0, 0.3);
+  border-radius: 7px;
+  color: #FFE500;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-practice-duel-trigger:hover {
+  background: #FFE500;
+  color: #000000;
 }
 
 /* ── Live Video Stream Grid (Cameras on Top) ── */

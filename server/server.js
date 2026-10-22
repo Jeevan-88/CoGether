@@ -25,6 +25,8 @@ const { cityRepository } = require('../services/costudy/cityRepository');
 const { learningRepository } = require('../services/costudy/learningRepository');
 const { submissionService } = require('../services/costudy/submissionService');
 const { interviewService } = require('../services/costudy/interviewService');
+const { friendService, messagingService } = require('../services/social');
+const { privateRoomService } = require('../services/coplay/privateRoomService');
 
 const path = require('path');
 
@@ -876,7 +878,7 @@ app.post('/api/v1/auth/email/request-otp', async (req, res) => {
 // Verify email OTP and establish authenticated session
 app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
   try {
-    const { email, otp, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences } = req.body || {};
+    const { email, otp, password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences } = req.body || {};
     const metadata = {
       userAgent: req.headers['user-agent'],
       ipAddress: req.ip || req.connection?.remoteAddress
@@ -885,7 +887,7 @@ app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
     const result = await userService.verifyEmailOtp(
       email,
       otp,
-      { username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences },
+      { password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences },
       metadata
     );
 
@@ -903,6 +905,198 @@ app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
   } catch (err) {
     logger.error('Failed to verify OTP', { error: err.message });
     res.status(500).json({ success: false, error: 'OTP_VERIFICATION_FAILED', message: err.message });
+  }
+});
+
+// Email & password authentication with OWASP Argon2id & progressive abuse defense
+app.post('/api/v1/auth/login', async (req, res) => {
+  try {
+    const rateLimit = await redis.consumeRateLimit(`auth:login:ip:${req.ip}`, 30, 60);
+    if (!rateLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many login attempts. Please slow down.'
+      });
+    }
+
+    const { email, password } = req.body || {};
+    const metadata = {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection?.remoteAddress
+    };
+
+    const result = await userService.authenticateWithPassword({ email, password, metadata });
+
+    if (!result.success) {
+      const status = result.error === 'ACCOUNT_TEMPORARILY_LOCKED' ? 429 : 401;
+      return res.status(status).json(result);
+    }
+
+    metrics.incrementCounter('cogether_auth_login_total', 1);
+
+    if (result.mfaRequired) {
+      return res.status(200).json(result);
+    }
+
+    res.cookie('cogether_refresh', result.refreshToken, getRefreshCookieOptions());
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('Password login failed', { error: err.message });
+    res.status(500).json({ success: false, error: 'LOGIN_FAILED', message: 'Internal server error during login' });
+  }
+});
+
+// Request password reset passcode (enumeration-safe)
+app.post('/api/v1/auth/password/forgot', async (req, res) => {
+  try {
+    const rateLimit = await redis.consumeRateLimit(`auth:forgot:ip:${req.ip}`, 10, 60);
+    if (!rateLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many reset requests. Please wait a moment.'
+      });
+    }
+
+    const { email } = req.body || {};
+    const result = await userService.requestPasswordReset(email);
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('Forgot password failed', { error: err.message });
+    res.status(500).json({ success: false, error: 'FORGOT_PASSWORD_FAILED', message: 'Unable to process reset request.' });
+  }
+});
+
+// Reset password with verified OTP
+app.post('/api/v1/auth/password/reset', async (req, res) => {
+  try {
+    const rateLimit = await redis.consumeRateLimit(`auth:reset:ip:${req.ip}`, 10, 60);
+    if (!rateLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many reset attempts. Please wait.'
+      });
+    }
+
+    const { email, otp, newPassword } = req.body || {};
+    const result = await userService.resetPasswordWithOtp(email, otp, newPassword);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('Password reset failed', { error: err.message });
+    res.status(500).json({ success: false, error: 'PASSWORD_RESET_FAILED', message: err.message });
+  }
+});
+
+// Set or update password for authenticated user
+app.post('/api/v1/auth/password/set', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?.sub;
+    const { newPassword, currentPassword } = req.body || {};
+    const result = await userService.setPassword(userId, newPassword, currentPassword);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('Set password error', { error: err.message });
+    res.status(500).json({ success: false, error: 'SET_PASSWORD_FAILED', message: err.message });
+  }
+});
+
+// Query MFA status for authenticated user
+app.get('/api/v1/auth/mfa/status', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?.sub;
+    const status = await userService.getMfaStatus(userId);
+    res.status(200).json({ success: true, ...status });
+  } catch (err) {
+    logger.error('MFA status query failed', { error: err.message });
+    res.status(500).json({ success: false, error: 'MFA_STATUS_FAILED', message: err.message });
+  }
+});
+
+// Enroll MFA for authenticated user (returns secret, QR code data URL, recovery codes)
+app.post('/api/v1/auth/mfa/enroll', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?.sub;
+    const result = await userService.enrollMfa(userId);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('MFA enrollment error', { error: err.message });
+    res.status(500).json({ success: false, error: 'MFA_ENROLL_FAILED', message: err.message });
+  }
+});
+
+// Confirm MFA enrollment with TOTP passcode
+app.post('/api/v1/auth/mfa/confirm', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?.sub;
+    const { code } = req.body || {};
+    const result = await userService.confirmMfa(userId, code);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('MFA confirmation error', { error: err.message });
+    res.status(500).json({ success: false, error: 'MFA_CONFIRM_FAILED', message: err.message });
+  }
+});
+
+// Verify MFA login challenge (via TOTP code or single-use recovery code)
+app.post('/api/v1/auth/mfa/verify', async (req, res) => {
+  try {
+    const { mfaTicket, code, recoveryCode } = req.body || {};
+    const metadata = {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection?.remoteAddress
+    };
+
+    const result = await userService.verifyMfaLogin(mfaTicket, { code, recoveryCode, metadata });
+
+    if (!result.success) {
+      return res.status(401).json(result);
+    }
+
+    res.cookie('cogether_refresh', result.refreshToken, getRefreshCookieOptions());
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('MFA challenge verification error', { error: err.message });
+    res.status(500).json({ success: false, error: 'MFA_VERIFY_FAILED', message: err.message });
+  }
+});
+
+// Disable MFA for authenticated user
+app.post('/api/v1/auth/mfa/disable', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?.sub;
+    const { password, code } = req.body || {};
+    const result = await userService.disableMfa(userId, password || code);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('MFA disable error', { error: err.message });
+    res.status(500).json({ success: false, error: 'MFA_DISABLE_FAILED', message: err.message });
   }
 });
 
@@ -1223,6 +1417,440 @@ app.post('/api/v1/telemetry/webrtc', (req, res) => {
   res.status(200).json({ received: true, status: 'recorded', event: eventType });
 });
 
+// ==========================================
+// CoGether Social, Friends & Presence Routes
+// ==========================================
+
+// Query friends list with real-time online presence status
+app.get('/api/v1/social/friends', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const friends = await friendService.getFriends(userId);
+    const enriched = friends.map(f => ({
+      ...f,
+      online: onlineUsers.has(f.id) && onlineUsers.get(f.id).size > 0
+    }));
+    res.json({ success: true, friends: enriched });
+  } catch (err) {
+    logger.error('Failed to get friends', { error: err.message, userId });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Query pending friend requests (both incoming and outgoing)
+app.get('/api/v1/social/friends/requests', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const requests = await friendService.getPendingRequests(userId);
+    res.json({ success: true, ...requests });
+  } catch (err) {
+    logger.error('Failed to get friend requests', { error: err.message, userId });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Search users by @username or display name
+app.get('/api/v1/social/users/search', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  const q = req.query.q || '';
+  try {
+    const users = await friendService.searchUsers(q, userId);
+    const enriched = users.map(u => ({
+      ...u,
+      online: onlineUsers.has(u.id) && onlineUsers.get(u.id).size > 0
+    }));
+    res.json({ success: true, users: enriched });
+  } catch (err) {
+    logger.error('Failed to search users', { error: err.message });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Send a friend request
+app.post('/api/v1/social/friends/request', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { target } = req.body || {};
+
+  try {
+    const result = await friendService.sendFriendRequest(userId, target);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    // Realtime notification to recipient
+    if (result.recipientId) {
+      io.to(`user:${result.recipientId}`).emit('social:friend_request_received', {
+        requester: {
+          id: userId,
+          username: req.user?.username || req.user?.displayName,
+          displayName: req.user?.displayName || req.user?.username,
+          avatarUrl: req.user?.avatarUrl
+        },
+        friendshipId: result.friendship?.id
+      });
+    }
+    res.status(201).json(result);
+  } catch (err) {
+    logger.error('Failed to send friend request', { error: err.message, userId });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Respond to a friend request (accept or reject)
+app.post('/api/v1/social/friends/respond', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { requesterId, action } = req.body || {};
+
+  try {
+    const result = await friendService.respondToFriendRequest(userId, requesterId, action);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    // Realtime notification on accept
+    if (action === 'accept') {
+      io.to(`user:${requesterId}`).emit('social:friend_request_accepted', {
+        friend: {
+          id: userId,
+          username: req.user?.username || req.user?.displayName,
+          displayName: req.user?.displayName || req.user?.username,
+          avatarUrl: req.user?.avatarUrl
+        }
+      });
+    }
+    res.json(result);
+  } catch (err) {
+    logger.error('Failed to respond to friend request', { error: err.message, userId });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Cancel an outgoing friend request
+app.post('/api/v1/social/friends/cancel', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { recipientId } = req.body || {};
+
+  try {
+    const result = await friendService.cancelFriendRequest(userId, recipientId);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    io.to(`user:${recipientId}`).emit('social:friend_request_cancelled', { requesterId: userId });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Remove a friend
+app.delete('/api/v1/social/friends/:friendUserId', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const result = await friendService.removeFriend(userId, req.params.friendUserId);
+    if (result.success) {
+      io.to(`user:${req.params.friendUserId}`).emit('social:friend_removed', { userId });
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Block / unblock user
+app.post('/api/v1/social/users/block', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { targetUserId } = req.body || {};
+  try {
+    const result = await friendService.blockUser(userId, targetUserId);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/v1/social/users/unblock', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { targetUserId } = req.body || {};
+  try {
+    const result = await friendService.unblockUser(userId, targetUserId);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Batch presence query
+app.get('/api/v1/social/presence', authenticateToken, (req, res) => {
+  const userIds = req.query.userIds ? req.query.userIds.split(',') : [];
+  const presence = {};
+  for (const id of userIds) {
+    presence[id] = onlineUsers.has(id) && onlineUsers.get(id).size > 0;
+  }
+  res.json({ success: true, presence });
+});
+
+// ==========================================
+// CoPlay Private Rooms & Game Invitations
+// ==========================================
+
+// Create a private game room with cryptographic code
+app.post('/api/v1/coplay/rooms/private', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { gameId, options } = req.body || {};
+
+  try {
+    const room = await privateRoomService.createPrivateRoom(userId, gameId, options);
+    res.status(201).json({ success: true, room });
+  } catch (err) {
+    logger.error('Failed to create private room', { error: err.message });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get room by code or UUID
+app.get('/api/v1/coplay/rooms/:codeOrId', async (req, res) => {
+  try {
+    const room = await privateRoomService.getRoomByCodeOrId(req.params.codeOrId);
+    if (!room) {
+      return res.status(404).json({ success: false, error: 'ROOM_NOT_FOUND', message: 'Room not found or expired.' });
+    }
+    res.json({ success: true, room });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Send a game invitation to a friend
+app.post('/api/v1/coplay/rooms/invite', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { inviteeId, roomId, gameId } = req.body || {};
+
+  try {
+    const result = await privateRoomService.createGameInvitation(userId, inviteeId, roomId, gameId);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    // Realtime notification to invitee
+    io.to(`user:${inviteeId}`).emit('coplay:invite_received', {
+      invitation: result.invitation,
+      room: result.room,
+      inviter: {
+        id: userId,
+        username: req.user?.username || req.user?.displayName,
+        displayName: req.user?.displayName || req.user?.username,
+        avatarUrl: req.user?.avatarUrl
+      }
+    });
+    res.status(201).json(result);
+  } catch (err) {
+    logger.error('Failed to create game invitation', { error: err.message });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Preview game invitation details
+app.get('/api/v1/coplay/invitations/:token', async (req, res) => {
+  try {
+    const result = await privateRoomService.getInvitationDetails(req.params.token);
+    if (!result.success) {
+      const status = result.error === 'INVITATION_NOT_FOUND' ? 404 : 410;
+      return res.status(status).json(result);
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Accept a game invitation
+app.post('/api/v1/coplay/invitations/:token/accept', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const result = await privateRoomService.acceptInvitation(req.params.token, userId);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    // Realtime notification to inviter that the friend accepted
+    if (result.invitation?.inviter_user_id) {
+      io.to(`user:${result.invitation.inviter_user_id}`).emit('coplay:invite_accepted', {
+        invitation: result.invitation,
+        room: result.room,
+        acceptedBy: {
+          id: userId,
+          username: req.user?.username || req.user?.displayName,
+          displayName: req.user?.displayName || req.user?.username
+        }
+      });
+    }
+    res.json(result);
+  } catch (err) {
+    logger.error('Failed to accept game invitation', { error: err.message });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Reject a game invitation
+app.post('/api/v1/coplay/invitations/:token/reject', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const result = await privateRoomService.rejectInvitation(req.params.token, userId);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    if (result.invitation?.inviter_user_id) {
+      io.to(`user:${result.invitation.inviter_user_id}`).emit('coplay:invite_rejected', {
+        invitationId: result.invitation.id,
+        rejectedBy: userId
+      });
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Cancel a game invitation
+app.post('/api/v1/coplay/invitations/:id/cancel', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const result = await privateRoomService.cancelInvitation(req.params.id, userId);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// E2EE Direct Messaging & Key Directory
+// ==========================================
+
+// Register client ECDH P-256 public key (JWK)
+app.post('/api/v1/social/keys', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { keyId, publicKeyJwk } = req.body || {};
+
+  try {
+    const result = await messagingService.registerUserKey(userId, keyId, publicKeyJwk);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (err) {
+    logger.error('Failed to register user public key', { error: err.message });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Retrieve friend's public key (JWK)
+app.get('/api/v1/social/keys/:targetUserId', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const result = await messagingService.getUserPublicKey(req.params.targetUserId);
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Store & route end-to-end encrypted direct message (ciphertext + IV only)
+app.post('/api/v1/social/messages', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  const { recipientId, ciphertext, iv, senderKeyId, recipientKeyId } = req.body || {};
+
+  try {
+    const result = await messagingService.sendDirectMessage(userId, recipientId, {
+      ciphertext,
+      iv,
+      senderKeyId,
+      recipientKeyId
+    });
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    // Realtime Socket.IO delivery to recipient
+    io.to(`user:${recipientId}`).emit('social:dm_received', {
+      message: result.message
+    });
+    // Also notify sender for cross-tab / device synchronization
+    io.to(`user:${userId}`).emit('social:dm_sent', {
+      message: result.message
+    });
+
+    res.status(201).json(result);
+  } catch (err) {
+    logger.error('Failed to send encrypted message', { error: err.message });
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Fetch direct message conversation history
+app.get('/api/v1/social/messages/:friendUserId', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const result = await messagingService.getConversation(userId, req.params.friendUserId, req.query);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Mark direct messages as read
+app.post('/api/v1/social/messages/:friendUserId/read', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const result = await messagingService.markMessagesRead(userId, req.params.friendUserId);
+    if (result.success && result.markedCount > 0) {
+      io.to(`user:${req.params.friendUserId}`).emit('social:dm_read', {
+        readerId: userId,
+        readAt: new Date().toISOString()
+      });
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get unread counts summary across all conversations
+app.get('/api/v1/social/messages/unread/summary', authenticateToken, async (req, res) => {
+  const userId = req.user?.id || req.user?.sub;
+  if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
+
+  try {
+    const result = await messagingService.getUnreadSummary(userId);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] }
@@ -1252,9 +1880,34 @@ io.use((socket, next) => {
 });
 
 const rooms = new Map();
+const onlineUsers = new Map(); // userId -> Set of socketIds
 
 io.on('connection', (socket) => {
   metrics.incrementCounter('cogether_socket_connect_total', 1);
+
+  // Authenticated user presence and personal room registration
+  if (socket.userId) {
+    socket.join(`user:${socket.userId}`);
+    if (!onlineUsers.has(socket.userId)) {
+      onlineUsers.set(socket.userId, new Set());
+    }
+    onlineUsers.get(socket.userId).add(socket.id);
+
+    // Notify connected friends or global listeners of online presence
+    io.emit('social:user_presence', {
+      userId: socket.userId,
+      online: true,
+      timestamp: Date.now()
+    });
+  }
+
+  socket.on('dm:typing', ({ recipientId, isTyping }) => {
+    if (!socket.userId || !recipientId) return;
+    io.to(`user:${recipientId}`).emit('social:dm_typing', {
+      senderId: socket.userId,
+      isTyping: !!isTyping
+    });
+  });
 
   function isPeerInRoom(targetSocketId) {
     if (!socket.roomId || !rooms.has(socket.roomId)) return false;
@@ -1765,6 +2418,19 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     metrics.incrementCounter('cogether_socket_disconnect_total', 1);
+
+    if (socket.userId && onlineUsers.has(socket.userId)) {
+      const userSockets = onlineUsers.get(socket.userId);
+      userSockets.delete(socket.id);
+      if (userSockets.size === 0) {
+        onlineUsers.delete(socket.userId);
+        io.emit('social:user_presence', {
+          userId: socket.userId,
+          online: false,
+          timestamp: Date.now()
+        });
+      }
+    }
     if (socket.roomId) {
       metrics.incrementCounter('cogether_room_leave_total', 1, { roomId: socket.roomId });
     }

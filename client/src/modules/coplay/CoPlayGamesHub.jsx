@@ -14,11 +14,16 @@ import AuthModal from '../auth/AuthModal.jsx';
 import ProfileModal from '../auth/ProfileModal.jsx';
 import { useAuth } from '../../core/AuthContext.jsx';
 import { API_URL } from '../../config/api.js';
+import { useSocial } from '../../core/SocialContext.jsx';
+import CogetherAvatarRenderer from '../auth/CogetherAvatarRenderer.jsx';
+import PlayWithFriendModal from './components/PlayWithFriendModal.jsx';
+import FriendsModal from '../social/FriendsModal.jsx';
+import AppNavShell from '../../components/common/AppNavShell.jsx';
 import './CoPlayGamesHub.css';
 
 const API_BASE = API_URL;
 
-export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initialUser }) {
+export default function CoPlayGamesHub({ onBackToHome, onSelectService, onLaunchSquadRoom, initialUser }) {
   const { user, profile, isAuthenticated, accessToken } = useAuth();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,6 +39,8 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
   // Authentication & Profile Modals
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showPlayWithFriendModal, setShowPlayWithFriendModal] = useState(false);
+  const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary, pendingRequests } = useSocial();
   const [copiedCode, setCopiedCode] = useState(false);
 
   // Authoritative games catalog from PostgreSQL backend
@@ -297,69 +304,61 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
   return (
     <div className="coplay-yellow-canvas-wrapper fade-in">
       {/* ── 1. TOP NAVIGATION HEADER (PLAYHOP STYLE) ── */}
-      <header className="coplay-header-bar">
-        <div className="coplay-header-left">
-          <button className="btn-back-home" onClick={onBackToHome} title="Back to Home">
-            <ArrowLeft size={16} />
-          </button>
-          <div className="coplay-logo-brand" onClick={onBackToHome}>
-            <span className="arcade-title">CO-PLAY</span>
+      <AppNavShell
+        activeService="coplay"
+        onSelectService={(service) => {
+          if (onSelectService) onSelectService(service);
+          else if (service === 'cowatch') onBackToHome('watch');
+          else if (service === 'coshop') onBackToHome('shop');
+          else if (service === 'costudy') onBackToHome('study');
+        }}
+        onBackToHome={onBackToHome}
+        user={user}
+        profile={profile}
+        onOpenProfile={() => setShowProfileModal(true)}
+        onOpenSocial={() => setIsSocialModalOpen(true)}
+        onOpenAuth={() => setShowAuthModal(true)}
+        unreadCount={unreadSummary.totalUnread}
+        pendingCount={pendingRequests.incoming.length}
+        centerContent={
+          <div className="coplay-search-box">
+            <Search size={15} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Find game or genre..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button className="clear-search-btn" onClick={() => setSearchQuery('')} aria-label="Clear search">
+                <X size={14} />
+              </button>
+            )}
           </div>
-        </div>
-
-        {/* CENTER SEARCH PILL */}
-        <div className="coplay-search-box">
-          <Search size={16} className="search-icon" />
-          <input
-            type="text"
-            placeholder="Find game or genre..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="clear-search-btn" onClick={() => setSearchQuery('')} aria-label="Clear search">
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        {/* RIGHT ACTIONS: ARCADE STATUS, AVATAR/SIGN-IN, SQUAD LAUNCH */}
-        <div className="coplay-header-right">
-          <div className="header-xp-pill" title="Verified Open-Source Arcade">
-            <ShieldCheck size={14} className="xp-icon" />
-            <span>Verified Arcade</span>
-          </div>
-
-          {isAuthenticated ? (
-            <div 
-              className="header-avatar-circle" 
-              onClick={() => setShowProfileModal(true)} 
-              title={`${displayName} (Manage Profile)`}
+        }
+        rightActions={
+          <>
+            <button
+              type="button"
+              className="btn-hub-play-friend"
+              onClick={() => setShowPlayWithFriendModal(true)}
+              title="Play with a Friend in a private room"
             >
-              {avatar.startsWith('http') || avatar.startsWith('data:') ? (
-                <img src={avatar} alt="" className="hub-avatar-img" />
-              ) : (
-                <span>{avatar}</span>
-              )}
-            </div>
-          ) : (
-            <button 
-              type="button" 
-              className="btn-hub-signin" 
-              onClick={() => setShowAuthModal(true)}
-              title="Sign in with Email or Google"
-            >
-              <LogIn size={15} />
-              <span>SIGN IN</span>
+              <Swords size={15} />
+              <span>Play with Friend</span>
             </button>
-          )}
-
-          <button className="btn-squad-party-launch" onClick={handleShareSquadRoom}>
-            <Users size={15} /> 
-            <span>{copiedCode ? 'LINK COPIED!' : 'CREATE SQUAD ROOM'}</span>
-          </button>
-        </div>
-      </header>
+            <button
+              type="button"
+              className="btn-squad-party-launch"
+              onClick={handleShareSquadRoom}
+              title="Create squad room"
+            >
+              <Users size={15} />
+              <span>{copiedCode ? 'COPIED!' : 'SQUAD'}</span>
+            </button>
+          </>
+        }
+      />
 
       {/* ── 2. EXPANDABLE LEFT SIDEBAR DRAWER (PLAYHOP STYLE) ── */}
       <aside 
@@ -369,6 +368,25 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
         aria-label="Game categories drawer"
       >
         <div className="sidebar-track">
+          {isAuthenticated && (
+            <button
+              type="button"
+              className="sidebar-cat-btn sidebar-friends-btn"
+              onClick={() => setIsSocialModalOpen(true)}
+              title="Friends & Messages"
+            >
+              <div className="cat-icon-wrap" style={{ color: '#FFE500' }}>
+                <Users size={18} />
+              </div>
+              <span className="cat-label-text" style={{ fontWeight: 700, color: '#ffffff' }}>
+                Friends
+              </span>
+              {unreadSummary.totalUnread > 0 && (
+                <span className="sidebar-badge-count">{unreadSummary.totalUnread}</span>
+              )}
+            </button>
+          )}
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '4px 6px' }} />
           {GAME_CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat.id;
             return (
@@ -541,6 +559,23 @@ export default function CoPlayGamesHub({ onBackToHome, onLaunchSquadRoom, initia
           onClose={() => setShowProfileModal(false)}
         />
       )}
+
+      {/* ── 8. PLAY WITH FRIEND MODAL ── */}
+      {showPlayWithFriendModal && (
+        <PlayWithFriendModal
+          game={gamesCatalog[0]}
+          onClose={() => setShowPlayWithFriendModal(false)}
+          onJoinRoom={(newRoomCode) => {
+            setShowPlayWithFriendModal(false);
+            setActivePlayGame(gamesCatalog[0]);
+            setActivePlayMode('CHALLENGE');
+            setActivePlayRoomId(newRoomCode);
+          }}
+        />
+      )}
+
+
+
     </div>
   );
 }

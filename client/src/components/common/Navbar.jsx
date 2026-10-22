@@ -1,8 +1,21 @@
 import React from 'react';
+import { Users } from 'lucide-react';
 import CogetherAvatarRenderer from '../../modules/auth/CogetherAvatarRenderer.jsx';
 import './Navbar.css';
 
-export default function Navbar({ activeTab, onTabChange, user, profile, onOpenAuth, onOpenProfile, onOpenPricing, isScrolled, scrollProgress = 0, hideNavbar = false }) {
+export default function Navbar({
+  activeTab,
+  onTabChange,
+  user,
+  profile,
+  onOpenAuth,
+  onOpenProfile,
+  onOpenSocial,
+  unreadCount = 0,
+  isScrolled,
+  scrollProgress = 0,
+  hideNavbar = false
+}) {
   const winW = typeof window !== 'undefined' ? window.innerWidth : 1200;
   const winH = typeof window !== 'undefined' ? window.innerHeight : 800;
 
@@ -42,6 +55,18 @@ export default function Navbar({ activeTab, onTabChange, user, profile, onOpenAu
   const posX = currentCenterX - (currentW / 2);
   const posY = currentCenterY - (currentH / 2);
 
+  const isAuthenticated = Boolean(user || profile);
+  const displayName =
+    profile?.displayName ||
+    profile?.display_name ||
+    [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') ||
+    profile?.username ||
+    user?.email?.split('@')[0] ||
+    'Member';
+
+  const avatar = profile?.avatarUrl || profile?.avatar_url || user?.avatarUrl || '';
+  const avatarConfig = profile?.avatarConfig || profile?.avatar_config;
+
   return (
     <header className={`cogether-navbar ${isScrolled ? 'scrolled-header-active' : ''} ${hideNavbar ? 'navbar-transparent-coshop' : ''}`}>
       {/* SINGLE CONTINUOUS 8K 3D LOGO: Flies up to top-left navbar header during Phase 1 */}
@@ -69,8 +94,31 @@ export default function Navbar({ activeTab, onTabChange, user, profile, onOpenAu
       />
 
       <div className="navbar-container">
-        {/* Reserved header logo spacer */}
-        <div className="navbar-brand-logo" onClick={() => onTabChange('home')} />
+        {/* Upper-Left: Brand logo spacer & conditional authenticated profile control */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div className="navbar-brand-logo" onClick={() => onTabChange('home')} />
+          {isAuthenticated && (
+            <button
+              type="button"
+              className="user-nav-badge-upper-left hub-upper-left-profile-btn"
+              onClick={onOpenProfile}
+              title={`${displayName} — Manage Profile & Avatar`}
+            >
+              {avatarConfig ? (
+                <div className="hub-btn-avatar-wrap">
+                  <CogetherAvatarRenderer config={avatarConfig} size={22} animated={false} />
+                </div>
+              ) : avatar && (avatar.startsWith('http') || avatar.startsWith('data:')) ? (
+                <img src={avatar} alt="" className="hub-btn-avatar-img" />
+              ) : (
+                <span className="hub-btn-avatar-initial">
+                  {(displayName || 'U')[0].toUpperCase()}
+                </span>
+              )}
+              <span className="hub-btn-username">{displayName}</span>
+            </button>
+          )}
+        </div>
 
         {/* Pixar-style nav links: uppercase, spaced, pure white */}
         <nav className="nav-menu-links">
@@ -100,61 +148,37 @@ export default function Navbar({ activeTab, onTabChange, user, profile, onOpenAu
           </button>
         </nav>
 
-        {/* Right: oval white buttons / profile avatar */}
+        {/* Right actions: strictly authentication-aware */}
         <div className="nav-right-actions">
-          {profile || user ? (
-            <button
-              className="user-nav-badge"
-              onClick={onOpenProfile}
-              title="Click to view & edit Profile / Preferences"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '6px 14px',
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 229, 0, 0.3)',
-                borderRadius: '24px',
-                color: '#ffffff',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '13px'
-              }}
-            >
-              {profile?.avatarConfig || profile?.avatar_config ? (
-                <div style={{ width: '24px', height: '24px', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <CogetherAvatarRenderer
-                    config={profile.avatarConfig || profile.avatar_config}
-                    size={24}
-                    animated={false}
-                  />
-                </div>
-              ) : profile?.avatarUrl || profile?.avatar_url ? (
-                <img
-                  src={profile.avatarUrl || profile.avatar_url}
-                  alt={profile.displayName || profile.display_name}
-                  style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }}
-                />
-              ) : (
-                <div style={{
-                  width: '22px',
-                  height: '22px',
-                  borderRadius: '50%',
-                  background: '#FFE500',
-                  color: '#000',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '11px',
-                  fontWeight: '800'
-                }}>
-                  {(profile?.displayName || profile?.display_name || profile?.username || user?.name || 'U')[0].toUpperCase()}
-                </div>
-              )}
-              <span>{profile?.displayName || profile?.display_name || profile?.username || user?.name || 'Member'}</span>
-            </button>
+          {isAuthenticated ? (
+            <>
+              <button
+                type="button"
+                className="btn-hub-friends-trigger"
+                onClick={onOpenSocial}
+                title="Friends & Messages"
+              >
+                <Users size={15} />
+                <span>Friends</span>
+                {unreadCount > 0 && (
+                  <span className="hub-badge-count">{unreadCount}</span>
+                )}
+              </button>
+              <button
+                type="button"
+                className="btn-login-rect"
+                onClick={() => onTabChange('games')}
+                title="Enter CoPlay Games"
+              >
+                Enter App
+              </button>
+            </>
           ) : (
-            <button className="btn-login-rect" onClick={onOpenAuth}>
+            <button
+              type="button"
+              className="btn-login-rect"
+              onClick={onOpenAuth}
+            >
               Log In
             </button>
           )}

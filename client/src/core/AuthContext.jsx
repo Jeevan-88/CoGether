@@ -32,6 +32,7 @@ export function AuthProvider({ children }) {
             id: data.id,
             email: data.primaryEmail,
             status: data.status,
+            mfaEnabled: Boolean(data.mfaEnabled),
             emailVerified: Boolean(data.emailVerified),
             createdAt: data.createdAt || null
           });
@@ -142,6 +143,203 @@ export function AuthProvider({ children }) {
       const msg = 'Network error verifying passcode';
       setAuthError(msg);
       return { success: false, error: 'NETWORK_ERROR', message: msg };
+    }
+  };
+
+  // Email & Password Login
+  const loginWithPassword = async (email, password) => {
+    setAuthError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setAuthError(data.message || 'Invalid email or password');
+        return { success: false, ...data };
+      }
+
+      if (data.mfaRequired) {
+        return { success: true, mfaRequired: true, mfaTicket: data.mfaTicket };
+      }
+
+      localStorage.setItem('cogether_access_token', data.accessToken);
+      if (data.refreshToken) {
+        localStorage.setItem('cogether_refresh_token', data.refreshToken);
+      }
+      setAccessToken(data.accessToken);
+      setUser(data.user);
+      setProfile(data.profile);
+      setPreferences(data.preferences);
+      setEntitlement(data.entitlement || { tier: 'free' });
+
+      return { success: true, ...data };
+    } catch (err) {
+      const msg = 'Network error during login';
+      setAuthError(msg);
+      return { success: false, error: 'NETWORK_ERROR', message: msg };
+    }
+  };
+
+  // Verify MFA Login Challenge (TOTP code or recovery code)
+  const verifyMfaLogin = async (mfaTicket, { code, recoveryCode }) => {
+    setAuthError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/mfa/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ mfaTicket, code, recoveryCode })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setAuthError(data.message || 'MFA verification failed');
+        return { success: false, ...data };
+      }
+
+      localStorage.setItem('cogether_access_token', data.accessToken);
+      if (data.refreshToken) {
+        localStorage.setItem('cogether_refresh_token', data.refreshToken);
+      }
+      setAccessToken(data.accessToken);
+      setUser(data.user);
+      setProfile(data.profile);
+      setPreferences(data.preferences);
+      setEntitlement(data.entitlement || { tier: 'free' });
+
+      return { success: true, ...data };
+    } catch (err) {
+      const msg = 'Network error verifying MFA code';
+      setAuthError(msg);
+      return { success: false, error: 'NETWORK_ERROR', message: msg };
+    }
+  };
+
+  // Request password reset passcode
+  const requestPasswordReset = async (email) => {
+    setAuthError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/password/forgot`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      return { success: false, error: 'NETWORK_ERROR', message: 'Network error requesting password reset' };
+    }
+  };
+
+  // Reset password with verified OTP
+  const resetPassword = async (email, otp, newPassword) => {
+    setAuthError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/password/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, newPassword })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setAuthError(data.message || 'Failed to reset password');
+        return { success: false, ...data };
+      }
+      return { success: true, ...data };
+    } catch (err) {
+      return { success: false, error: 'NETWORK_ERROR', message: 'Network error resetting password' };
+    }
+  };
+
+  // Set or update password for authenticated user
+  const setPassword = async (newPassword, currentPassword = null) => {
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { success: false, error: 'UNAUTHORIZED' };
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/password/set`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ newPassword, currentPassword })
+      });
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      return { success: false, error: 'SET_PASSWORD_FAILED', message: err.message };
+    }
+  };
+
+  // MFA Management APIs
+  const getMfaStatus = async () => {
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { enabled: false };
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/mfa/status`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (e) {
+      return { enabled: false };
+    }
+  };
+
+  const enrollMfa = async () => {
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { success: false, error: 'UNAUTHORIZED' };
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/mfa/enroll`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, error: 'ENROLL_FAILED', message: err.message };
+    }
+  };
+
+  const confirmMfa = async (code) => {
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { success: false, error: 'UNAUTHORIZED' };
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/mfa/confirm`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code })
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, error: 'CONFIRM_FAILED', message: err.message };
+    }
+  };
+
+  const disableMfa = async (passwordOrCode) => {
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    if (!token) return { success: false, error: 'UNAUTHORIZED' };
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/mfa/disable`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: passwordOrCode, code: passwordOrCode })
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, error: 'DISABLE_FAILED', message: err.message };
     }
   };
 
@@ -341,12 +539,22 @@ export function AuthProvider({ children }) {
     preferences,
     entitlement,
     accessToken,
+    getAccessToken: () => accessToken || localStorage.getItem('cogether_access_token') || null,
     isAuthenticated: !!user && !!accessToken,
     isLoading,
     authError,
     setAuthError,
     requestOtp,
     verifyOtp,
+    loginWithPassword,
+    verifyMfaLogin,
+    requestPasswordReset,
+    resetPassword,
+    setPassword,
+    getMfaStatus,
+    enrollMfa,
+    confirmMfa,
+    disableMfa,
     loginWithGoogleToken,
     updateProfile,
     checkUsername,

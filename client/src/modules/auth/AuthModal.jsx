@@ -11,7 +11,11 @@ import {
   AtSign,
   Edit3,
   ShieldCheck,
-  Loader2
+  Loader2,
+  Lock,
+  Eye,
+  EyeOff,
+  Key
 } from 'lucide-react';
 import { useAuth } from '../../core/AuthContext';
 import { API_URL } from '../../config/api.js';
@@ -44,10 +48,40 @@ export default function AuthModal({
     profile,
     requestOtp,
     verifyOtp,
+    loginWithPassword,
+    verifyMfaLogin,
+    requestPasswordReset,
+    resetPassword,
+    setPassword,
     updateProfile,
     checkUsername,
     fetchAuthProviders
   } = useAuth();
+
+  // Secure Password & MFA states
+  const [signInMethod, setSignInMethod] = useState('password'); // 'password' | 'otp'
+  const [signInPassword, setSignInPassword] = useState('');
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [view, setView] = useState('auth'); // 'auth' | 'forgot_password' | 'mfa_challenge'
+
+  // Forgot Password states
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotOtp, setForgotOtp] = useState('');
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1);
+
+  // MFA Challenge states
+  const [mfaTicket, setMfaTicket] = useState(null);
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaRecoveryCode, setMfaRecoveryCode] = useState('');
+  const [useRecoveryCode, setUseRecoveryCode] = useState(false);
+
+  // Signup Password states (Step 3)
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
 
   const { manifest } = useAvatarManifest();
 
@@ -306,13 +340,17 @@ export default function AuthModal({
       setAvatarConfig(prof.avatarConfig || prof.avatar_config);
     }
 
-    // If user explicitly chose Sign In mode and already has a profile, complete login
-    if (mode === 'signin' && !result.isNewUser) {
+    // Returning users with an existing profile or existing username: complete login immediately!
+    const isExistingUser = !result.isNewUser || !!(result.profile && (result.profile.username || result.profile.first_name || result.profile.firstName));
+    if (isExistingUser || mode === 'signin') {
+      if (onLoginSuccess) {
+        onLoginSuccess(result);
+      }
       onClose();
       return;
     }
 
-    // Otherwise proceed to Step 3 (Personal Details) in the multi-step signup journey
+    // Otherwise proceed to Step 3 (Personal Details) in the multi-step signup journey for genuinely new accounts
     navigateToStep(3);
   };
 
@@ -368,10 +406,136 @@ export default function AuthModal({
     }
   };
 
-  // ── STEP 3: PERSONAL DETAILS (FIRST & LAST NAME) ──
+  // ── EMAIL & ARGON2ID PASSWORD SIGN IN ──
+  const handlePasswordSignIn = async (e) => {
+    e.preventDefault();
+    setError('');
+    setInfo('');
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (!signInPassword) {
+      setError('Please enter your password.');
+      return;
+    }
+
+    setLoading(true);
+    const result = await loginWithPassword(cleanEmail, signInPassword);
+    setLoading(false);
+
+    if (!result.success) {
+      setError(result.message || 'Invalid email or password.');
+      return;
+    }
+
+    if (result.mfaRequired) {
+      setMfaTicket(result.mfaTicket);
+      setView('mfa_challenge');
+      return;
+    }
+
+    if (onLoginSuccess) {
+      onLoginSuccess(result);
+    }
+    onClose();
+  };
+
+  // ── MFA CHALLENGE VERIFICATION ──
+  const handleMfaSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const payload = useRecoveryCode
+      ? { recoveryCode: mfaRecoveryCode.trim() }
+      : { code: mfaCode.trim() };
+
+    const result = await verifyMfaLogin(mfaTicket, payload);
+    setLoading(false);
+
+    if (!result.success) {
+      setError(result.message || 'MFA verification failed.');
+      return;
+    }
+
+    if (onLoginSuccess) {
+      onLoginSuccess(result);
+    }
+    onClose();
+  };
+
+  // ── FORGOT PASSWORD REQUEST ──
+  const handleForgotPasswordRequest = async (e) => {
+    e.preventDefault();
+    setError('');
+    setInfo('');
+
+    const cleanEmail = forgotEmail.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    setLoading(true);
+    const result = await requestPasswordReset(cleanEmail);
+    setLoading(false);
+
+    setForgotStep(2);
+    setInfo(result.message || 'If an account exists, a reset code was sent.');
+  };
+
+  // ── FORGOT PASSWORD RESET ──
+  const handleForgotPasswordReset = async (e) => {
+    e.preventDefault();
+    setError('');
+    setInfo('');
+
+    const cleanOtp = forgotOtp.replace(/\D/g, '').slice(0, 6);
+    if (cleanOtp.length !== 6) {
+      setError('Please enter the 6-digit reset passcode.');
+      return;
+    }
+    if (forgotNewPassword.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (forgotNewPassword.length > 128) {
+      setError('Password cannot exceed 128 characters.');
+      return;
+    }
+    if (!/[a-zA-Z]/.test(forgotNewPassword) || !/[0-9]/.test(forgotNewPassword)) {
+      setError('Password must contain at least one letter and one number.');
+      return;
+    }
+    if (forgotNewPassword !== forgotConfirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+    const result = await resetPassword(forgotEmail.trim().toLowerCase(), cleanOtp, forgotNewPassword);
+    setLoading(false);
+
+    if (!result.success) {
+      setError(result.message || 'Password reset failed.');
+      return;
+    }
+
+    setView('auth');
+    setMode('signin');
+    setSignInMethod('password');
+    setEmail(forgotEmail.trim().toLowerCase());
+    setSignInPassword('');
+    setInfo('Password reset successfully! Please sign in with your new password.');
+  };
+
+  // ── STEP 3: PERSONAL DETAILS (FIRST & LAST NAME + PASSWORD CREATION) ──
   const liveDisplayName = [firstName.trim(), lastName.trim()].filter(Boolean).join(' ');
 
-  const handleDetailsSubmit = (e) => {
+  const handleDetailsSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -383,6 +547,33 @@ export default function AuthModal({
     }
     if (!cleanLast) {
       setError('Please enter your last name.');
+      return;
+    }
+
+    if (signupPassword.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (signupPassword.length > 128) {
+      setError('Password cannot exceed 128 characters.');
+      return;
+    }
+    if (!/[a-zA-Z]/.test(signupPassword) || !/[0-9]/.test(signupPassword)) {
+      setError('Password must contain at least one letter and one number.');
+      return;
+    }
+    if (signupPassword !== signupConfirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    // Securely hash with Argon2id and store on user record
+    setLoading(true);
+    const passRes = await setPassword(signupPassword);
+    setLoading(false);
+
+    if (!passRes.success) {
+      setError(passRes.message || 'Failed to save password.');
       return;
     }
 
@@ -658,9 +849,258 @@ export default function AuthModal({
             className={`flow-form-content flow-step-transition-${slideDir}`}
           >
             {/* ════════════════════════════════════════════════════════════════
-                STEP 1: EMAIL ADDRESS
+                VIEW: FORGOT PASSWORD FLOW
                ════════════════════════════════════════════════════════════════ */}
-            {step === 1 && (
+            {view === 'forgot_password' && (
+              <>
+                <div className="flow-header-block">
+                  <h1 className="flow-title">Reset Password</h1>
+                  <p className="flow-subtitle">
+                    {forgotStep === 1
+                      ? 'Enter your account email to receive a password reset passcode'
+                      : `Enter the 6-digit passcode sent to ${forgotEmail} and choose a new password`}
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="flow-alert flow-alert-error" role="alert">
+                    <AlertCircle size={15} />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {info && (
+                  <div className="flow-alert flow-alert-info" role="status">
+                    <CheckCircle2 size={15} />
+                    <span>{info}</span>
+                  </div>
+                )}
+
+                {forgotStep === 1 ? (
+                  <form className="flow-interactive-form" onSubmit={handleForgotPasswordRequest}>
+                    <div className="flow-field-wrapper">
+                      <Mail className="flow-field-icon" size={18} />
+                      <input
+                        type="email"
+                        className="flow-input-control"
+                        placeholder="Email Address"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        required
+                        disabled={loading}
+                        data-testid="forgot-email-input"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="flow-action-button"
+                      disabled={loading || !forgotEmail.trim()}
+                      data-testid="forgot-send-btn"
+                    >
+                      <span>{loading ? 'Sending Code...' : 'Send Reset Passcode'}</span>
+                      <ArrowRight size={17} />
+                    </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                      <button
+                        type="button"
+                        className="flow-text-link"
+                        onClick={() => {
+                          setView('auth');
+                          setError('');
+                          setInfo('');
+                        }}
+                      >
+                        Back to Sign In
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <form className="flow-interactive-form" onSubmit={handleForgotPasswordReset}>
+                    <div className="flow-field-wrapper">
+                      <Key className="flow-field-icon" size={18} />
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={6}
+                        className="flow-input-control"
+                        placeholder="6-Digit Reset Passcode"
+                        value={forgotOtp}
+                        onChange={(e) => setForgotOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        required
+                        disabled={loading}
+                        data-testid="forgot-otp-input"
+                      />
+                    </div>
+
+                    <div className="flow-field-wrapper" style={{ marginTop: '10px' }}>
+                      <Lock className="flow-field-icon" size={18} />
+                      <input
+                        type={showForgotNewPassword ? 'text' : 'password'}
+                        className="flow-input-control"
+                        placeholder="New Password (min 8 chars)"
+                        value={forgotNewPassword}
+                        onChange={(e) => setForgotNewPassword(e.target.value)}
+                        maxLength={128}
+                        required
+                        disabled={loading}
+                        data-testid="forgot-new-password-input"
+                      />
+                      <button
+                        type="button"
+                        className="flow-password-toggle-btn"
+                        onClick={() => setShowForgotNewPassword(!showForgotNewPassword)}
+                      >
+                        {showForgotNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+
+                    <div className="flow-field-wrapper" style={{ marginTop: '10px' }}>
+                      <Lock className="flow-field-icon" size={18} />
+                      <input
+                        type={showForgotNewPassword ? 'text' : 'password'}
+                        className="flow-input-control"
+                        placeholder="Confirm New Password"
+                        value={forgotConfirmPassword}
+                        onChange={(e) => setForgotConfirmPassword(e.target.value)}
+                        maxLength={128}
+                        required
+                        disabled={loading}
+                        data-testid="forgot-confirm-password-input"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="flow-action-button"
+                      disabled={loading || forgotOtp.length !== 6 || forgotNewPassword.length < 8}
+                      data-testid="forgot-reset-submit-btn"
+                    >
+                      <span>{loading ? 'Resetting Password...' : 'Reset Password & Sign In'}</span>
+                      <ArrowRight size={17} />
+                    </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                      <button
+                        type="button"
+                        className="flow-text-link"
+                        onClick={() => {
+                          setView('auth');
+                          setError('');
+                          setInfo('');
+                        }}
+                      >
+                        Back to Sign In
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </>
+            )}
+
+            {/* ════════════════════════════════════════════════════════════════
+                VIEW: MFA LOGIN CHALLENGE
+               ════════════════════════════════════════════════════════════════ */}
+            {view === 'mfa_challenge' && (
+              <>
+                <div className="flow-header-block">
+                  <h1 className="flow-title">Two-Factor Authentication</h1>
+                  <p className="flow-subtitle">
+                    {useRecoveryCode
+                      ? 'Enter one of your 8-character emergency recovery codes'
+                      : 'Enter the 6-digit verification code from your authenticator app'}
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="flow-alert flow-alert-error" role="alert">
+                    <AlertCircle size={15} />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                <form className="flow-interactive-form" onSubmit={handleMfaSubmit}>
+                  {useRecoveryCode ? (
+                    <div className="flow-field-wrapper">
+                      <Key className="flow-field-icon" size={18} />
+                      <input
+                        type="text"
+                        className="flow-input-control"
+                        placeholder="XXXX-XXXX"
+                        value={mfaRecoveryCode}
+                        onChange={(e) => setMfaRecoveryCode(e.target.value.toUpperCase())}
+                        required
+                        disabled={loading}
+                        autoFocus
+                        data-testid="mfa-recovery-input"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flow-otp-wrapper">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={6}
+                        className="flow-otp-input"
+                        placeholder="000000"
+                        value={mfaCode}
+                        onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        disabled={loading}
+                        autoFocus
+                        data-testid="mfa-code-input"
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="flow-action-button"
+                    disabled={loading || (useRecoveryCode ? !mfaRecoveryCode.trim() : mfaCode.length !== 6)}
+                    data-testid="mfa-submit-btn"
+                  >
+                    <span>{loading ? 'Verifying...' : 'Verify & Continue'}</span>
+                    <ArrowRight size={17} />
+                  </button>
+
+                  <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                    <button
+                      type="button"
+                      className="flow-switch-method-btn"
+                      onClick={() => {
+                        setUseRecoveryCode(!useRecoveryCode);
+                        setError('');
+                      }}
+                    >
+                      {useRecoveryCode
+                        ? 'Use 6-digit authenticator code instead'
+                        : 'Use a single-use recovery code instead'}
+                    </button>
+                  </div>
+
+                  <div style={{ textAlign: 'center', marginTop: '8px' }}>
+                    <button
+                      type="button"
+                      className="flow-text-link"
+                      onClick={() => {
+                        setView('auth');
+                        setMfaTicket(null);
+                        setError('');
+                      }}
+                    >
+                      Cancel & Back to Sign In
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {/* ════════════════════════════════════════════════════════════════
+                STEP 1: EMAIL ADDRESS & AUTHENTICATION
+               ════════════════════════════════════════════════════════════════ */}
+            {view === 'auth' && step === 1 && (
               <>
                 <div className="flow-header-block">
                   <h1 className="flow-title">
@@ -680,38 +1120,146 @@ export default function AuthModal({
                   </div>
                 )}
 
-                <form className="flow-interactive-form" onSubmit={handleRequestOtpSubmit}>
-                  <div className="flow-field-wrapper">
-                    <Mail className="flow-field-icon" size={18} />
-                    <input
-                      type="email"
-                      className="flow-input-control"
-                      placeholder="Email Address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      autoComplete="email"
-                      required
-                      disabled={loading}
-                      data-testid="signup-email-input"
-                    />
+                {info && (
+                  <div className="flow-alert flow-alert-info" role="status">
+                    <CheckCircle2 size={15} />
+                    <span>{info}</span>
                   </div>
+                )}
 
-                  <button
-                    type="submit"
-                    className="flow-action-button"
-                    disabled={loading}
-                    data-testid="signup-email-continue-btn"
-                  >
-                    <span>
-                      {loading
-                        ? 'Sending Verification Code...'
-                        : mode === 'signup'
-                        ? 'Continue'
-                        : 'Sign In'}
-                    </span>
-                    <ArrowRight size={17} />
-                  </button>
-                </form>
+                {mode === 'signin' && signInMethod === 'password' ? (
+                  <form className="flow-interactive-form" onSubmit={handlePasswordSignIn}>
+                    <div className="flow-field-wrapper">
+                      <Mail className="flow-field-icon" size={18} />
+                      <input
+                        type="email"
+                        className="flow-input-control"
+                        placeholder="Email Address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="email"
+                        required
+                        disabled={loading}
+                        data-testid="signin-email-input"
+                      />
+                    </div>
+
+                    <div className="flow-field-wrapper" style={{ marginTop: '10px' }}>
+                      <Lock className="flow-field-icon" size={18} />
+                      <input
+                        type={showSignInPassword ? 'text' : 'password'}
+                        className="flow-input-control"
+                        placeholder="Password"
+                        value={signInPassword}
+                        onChange={(e) => setSignInPassword(e.target.value)}
+                        autoComplete="current-password"
+                        required
+                        disabled={loading}
+                        data-testid="signin-password-input"
+                      />
+                      <button
+                        type="button"
+                        className="flow-password-toggle-btn"
+                        onClick={() => setShowSignInPassword(!showSignInPassword)}
+                        aria-label={showSignInPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showSignInPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+                      <button
+                        type="button"
+                        className="flow-text-link"
+                        onClick={() => {
+                          setForgotEmail(email);
+                          setForgotStep(1);
+                          setError('');
+                          setInfo('');
+                          setView('forgot_password');
+                        }}
+                        data-testid="forgot-password-link"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="flow-action-button"
+                      disabled={loading || !email.trim() || !signInPassword}
+                      data-testid="signin-submit-btn"
+                    >
+                      <span>{loading ? 'Signing in...' : 'Sign In'}</span>
+                      <ArrowRight size={17} />
+                    </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                      <button
+                        type="button"
+                        className="flow-switch-method-btn"
+                        onClick={() => {
+                          setError('');
+                          setInfo('');
+                          setSignInMethod('otp');
+                        }}
+                        data-testid="toggle-otp-signin-btn"
+                      >
+                        Sign in with One-Time Passcode instead
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <form className="flow-interactive-form" onSubmit={handleRequestOtpSubmit}>
+                    <div className="flow-field-wrapper">
+                      <Mail className="flow-field-icon" size={18} />
+                      <input
+                        type="email"
+                        className="flow-input-control"
+                        placeholder="Email Address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="email"
+                        required
+                        disabled={loading}
+                        data-testid="signup-email-input"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="flow-action-button"
+                      disabled={loading}
+                      data-testid="signup-email-continue-btn"
+                    >
+                      <span>
+                        {loading
+                          ? 'Sending Verification Code...'
+                          : mode === 'signup'
+                          ? 'Continue'
+                          : 'Send Login Passcode'}
+                      </span>
+                      <ArrowRight size={17} />
+                    </button>
+
+                    {mode === 'signin' && (
+                      <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                        <button
+                          type="button"
+                          className="flow-switch-method-btn"
+                          onClick={() => {
+                            setError('');
+                            setInfo('');
+                            setSignInMethod('password');
+                          }}
+                          data-testid="toggle-password-signin-btn"
+                        >
+                          Sign in with password instead
+                        </button>
+                      </div>
+                    )}
+                  </form>
+                )}
 
                 {/* Only render social sign-in buttons when their backend integration is actually configured */}
                 {hasConfiguredSocial && (
@@ -828,14 +1376,14 @@ export default function AuthModal({
             )}
 
             {/* ════════════════════════════════════════════════════════════════
-                STEP 3: PERSONAL DETAILS (FIRST & LAST NAME)
+                STEP 3: PERSONAL DETAILS & SECURE PASSWORD CREATION
                ════════════════════════════════════════════════════════════════ */}
             {step === 3 && (
               <>
                 <div className="flow-header-block">
-                  <h1 className="flow-title">Your Name</h1>
+                  <h1 className="flow-title">Your Details & Password</h1>
                   <p className="flow-subtitle">
-                    How your name will appear on your CoGether profile and member card
+                    Set your display name and choose a secure password for your CoGether account
                   </p>
                 </div>
 
@@ -886,13 +1434,63 @@ export default function AuthModal({
                     </span>
                   </div>
 
+                  {/* Password & Confirm Password */}
+                  <div className="flow-field-wrapper" style={{ marginTop: '12px' }}>
+                    <Lock className="flow-field-icon" size={18} />
+                    <input
+                      type={showSignupPassword ? 'text' : 'password'}
+                      className="flow-input-control"
+                      placeholder="Create Password (min. 8 characters)"
+                      value={signupPassword}
+                      onChange={(e) => setSignupPassword(e.target.value)}
+                      maxLength={128}
+                      required
+                      data-testid="signup-password-input"
+                    />
+                    <button
+                      type="button"
+                      className="flow-password-toggle-btn"
+                      onClick={() => setShowSignupPassword(!showSignupPassword)}
+                      aria-label={showSignupPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showSignupPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  <div className="flow-field-wrapper" style={{ marginTop: '10px' }}>
+                    <Lock className="flow-field-icon" size={18} />
+                    <input
+                      type={showSignupPassword ? 'text' : 'password'}
+                      className="flow-input-control"
+                      placeholder="Confirm Password"
+                      value={signupConfirmPassword}
+                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                      maxLength={128}
+                      required
+                      data-testid="signup-confirm-password-input"
+                    />
+                  </div>
+
+                  {/* Password requirement hints */}
+                  <div className="flow-password-hints">
+                    <span className={`hint-item ${signupPassword.length >= 8 ? 'valid' : ''}`}>
+                      • At least 8 characters
+                    </span>
+                    <span className={`hint-item ${(/[a-zA-Z]/.test(signupPassword) && /[0-9]/.test(signupPassword)) ? 'valid' : ''}`}>
+                      • Letter & number
+                    </span>
+                    <span className={`hint-item ${signupPassword && signupPassword === signupConfirmPassword ? 'valid' : ''}`}>
+                      • Passwords match
+                    </span>
+                  </div>
+
                   <button
                     type="submit"
                     className="flow-action-button"
-                    disabled={!firstName.trim() || !lastName.trim()}
+                    disabled={loading || !firstName.trim() || !lastName.trim() || signupPassword.length < 8 || signupPassword !== signupConfirmPassword}
                     data-testid="details-continue-btn"
                   >
-                    <span>Continue</span>
+                    <span>{loading ? 'Saving Details...' : 'Continue'}</span>
                     <ArrowRight size={17} />
                   </button>
                 </form>

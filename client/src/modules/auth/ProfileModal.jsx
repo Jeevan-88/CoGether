@@ -80,7 +80,7 @@ export default function ProfileModal({ onClose }) {
         <div className="auth-header" style={{ marginBottom: '14px' }}>
           <div className="id-card-top-tag">
             <Shield size={12} />
-            <span>AUTHENTICATED MEMBER PASS // COGETHER IDENTITY</span>
+            <span>CoGether Member Profile</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '8px' }}>
             <div style={{ width: '52px', height: '52px', borderRadius: '14px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(255,255,255,0.16)' }}>

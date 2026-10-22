@@ -10,7 +10,7 @@ import MergedCameraView from './MergedCameraView';
  * CoStudy World — 2D Learning City & Gamified CSE Knowledge World
  * Master container managing HUD, View States, and Learning Loops.
  */
-export default function CoStudyWorld() {
+export default function CoStudyWorld({ onBackToHome, onSelectService } = {}) {
   // Current view state: 'CITY_MAP', 'BUILDING_INTERIOR', 'LESSON_STAGE', 'STUDY_ROOM'
   const [currentView, setCurrentView] = useState('CITY_MAP');
 
