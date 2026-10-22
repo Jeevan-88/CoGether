@@ -17,13 +17,21 @@ class EmailService {
 
     const subject = purpose === 'login' 
       ? `Your CoGether Login Passcode: ${otp}` 
+      : purpose === 'reset_password'
+      ? `Your CoGether Password Reset Passcode: ${otp}`
       : `Verify your CoGether account: ${otp}`;
+
+    const subtitle = purpose === 'login'
+      ? 'Sign In Passcode'
+      : purpose === 'reset_password'
+      ? 'Password Reset Passcode'
+      : 'Identity & Security Passcode';
 
     const html = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; background: #0b0b0f; color: #ffffff; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
         <div style="text-align: center; margin-bottom: 24px;">
           <h1 style="font-size: 24px; font-weight: 800; letter-spacing: 2px; color: #FFE500; margin: 0;">COGETHER</h1>
-          <p style="font-size: 13px; color: #94a3b8; margin-top: 4px; text-transform: uppercase; letter-spacing: 1.5px;">Identity & Security Passcode</p>
+          <p style="font-size: 13px; color: #94a3b8; margin-top: 4px; text-transform: uppercase; letter-spacing: 1.5px;">${subtitle}</p>
         </div>
         <div style="background: #14141a; border-radius: 8px; padding: 24px; text-align: center; border: 1px solid rgba(255,255,255,0.06);">
           <p style="font-size: 14px; color: #cbd5e1; margin: 0 0 16px 0;">Use the single-use passcode below to complete your authentication:</p>

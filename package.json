@@ -9,7 +9,7 @@
     "dev": "npm --prefix client run dev",
     "build": "npm --prefix client run build",
     "preview": "npm --prefix client run preview",
-    "test": "node test/platform_foundation.test.js && node test/phase2a_coplay_twodevice.test.js && node test/phase2b_webrtc_security.test.js && node test/phase2c_identity_foundation.test.js && node test/phase2c1_playwright_e2e.test.js && node test/phase2c3_coplay_hardening.test.js && node test/phase2c3_playwright_e2e.test.js && node test/phase3_cowatch_architecture.test.js && node test/phase3_cowatch_playwright_e2e.test.js && node test/phase4_costudy_architecture.test.js && node test/phase4_costudy_playwright_e2e.test.js",
+    "test": "node test/run_all_tests.js",
     "test:phase1": "node test/platform_foundation.test.js",
     "test:phase2a": "node test/phase2a_coplay_twodevice.test.js",
     "test:phase2b": "node test/phase2b_webrtc_security.test.js",
@@ -23,7 +23,10 @@
     "test:phase4:e2e": "node test/phase4_costudy_playwright_e2e.test.js"
   },
   "dependencies": {
+    "argon2": "^0.45.1",
     "lucide-react": "^0.380.0",
+    "otplib": "^13.5.0",
+    "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "socket.io-client": "^4.7.5"

@@ -1,8 +1,8 @@
 /**
  * Passwordless Cryptographic OTP Engine
  * Generates cryptographically secure 6-digit OTPs and computes/verifies
- * salted SHA-256 hashes using timing-safe comparisons. Plaintext OTPs
- * are never stored at rest.
+ * keyed HMAC-SHA-256 hashes using timing-safe comparisons.
+ * Plaintext OTPs are never stored at rest.
  */
 
 const crypto = require('crypto');
@@ -18,21 +18,62 @@ function generateOtp() {
   return crypto.randomInt(100000, 1000000).toString();
 }
 
-function hashOtp(rawOtp, customSalt = null) {
+function getOtpHmacKey() {
   const config = getConfig();
-  const salt = customSalt || config.auth.otpSalt || 'cogether-otp-salt-production-secure';
-  return crypto.createHash('sha256').update(`${salt}:${rawOtp}`).digest('hex');
+  const key = config.auth.otpHmacKey;
+  if (!key) {
+    if (config.isProd || config.isStaging) {
+      throw new Error('FATAL: OTP_HMAC_KEY is required in production/staging environments');
+    }
+    return 'cogether-dev-otp-hmac-key-never-use-in-production-32bytes!';
+  }
+  return key;
 }
 
-function verifyOtpHash(rawOtp, expectedHash, customSalt = null) {
+/**
+ * Computes a keyed HMAC-SHA-256 digest bound to the user's normalized email and purpose
+ */
+function hashOtp(rawOtp, email = '', purpose = 'signup') {
+  if (!rawOtp) {
+    throw new Error('rawOtp is required for hashing');
+  }
+  const key = getOtpHmacKey();
+  const cleanOtp = String(rawOtp).trim();
+  const cleanEmail = normalizeEmail(email);
+  const cleanPurpose = String(purpose || 'signup').trim().toLowerCase();
+
+  const payload = cleanEmail ? `${cleanPurpose}:${cleanEmail}:${cleanOtp}` : cleanOtp;
+  return crypto.createHmac('sha256', key).update(payload).digest('hex');
+}
+
+/**
+ * Timing-safe verification of an OTP against its stored hash
+ */
+function verifyOtpHash(rawOtp, expectedHash, email = '', purpose = 'signup') {
   if (!rawOtp || !expectedHash) return false;
-  const computedHash = hashOtp(String(rawOtp).trim(), customSalt);
+
+  const cleanOtp = String(rawOtp).trim();
+  const computedHash = hashOtp(cleanOtp, email, purpose);
 
   const bufA = Buffer.from(computedHash, 'hex');
   const bufB = Buffer.from(expectedHash, 'hex');
 
-  if (bufA.length !== bufB.length) return false;
-  return crypto.timingSafeEqual(bufA, bufB);
+  if (bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)) {
+    return true;
+  }
+
+  // Fallback for legacy salt-based hashes created before HMAC upgrade
+  try {
+    const config = getConfig();
+    const legacySalt = config.auth.otpSalt || 'cogether-otp-salt-production-secure';
+    const legacyHash = crypto.createHash('sha256').update(`${legacySalt}:${cleanOtp}`).digest('hex');
+    const legacyBuf = Buffer.from(legacyHash, 'hex');
+    if (legacyBuf.length === bufB.length && crypto.timingSafeEqual(legacyBuf, bufB)) {
+      return true;
+    }
+  } catch (_e) {}
+
+  return false;
 }
 
 module.exports = {

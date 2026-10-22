@@ -15,9 +15,13 @@ import ProfileModal from './modules/auth/ProfileModal.jsx';
 import CogetherAvatarRenderer from './modules/auth/CogetherAvatarRenderer.jsx';
 import InviteLandingView from './modules/invites/InviteLandingView.jsx';
 import PricingModal from './modules/pricing/PricingModal.jsx';
+import { SocialProvider, useSocial } from './core/SocialContext.jsx';
+import FriendsModal from './modules/social/FriendsModal.jsx';
+import IncomingGameInviteBanner from './modules/social/IncomingGameInviteBanner.jsx';
 
 function MainApp() {
   const { user, profile, preferences, isAuthenticated, restoreSession } = useAuth();
+  const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary } = useSocial();
 
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub' | 'coshop' | 'studyHub'
   const [activeRoom, setActiveRoom] = useState(null);
@@ -261,6 +265,7 @@ function MainApp() {
       return (
         <CoShopHub
           onBackToHome={() => setActiveTab('home')}
+          onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
       );
@@ -271,6 +276,7 @@ function MainApp() {
       return (
         <CoWatchCinemaHub
           onBackToHome={() => setActiveTab('home')}
+          onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
       );
@@ -281,6 +287,7 @@ function MainApp() {
       return (
         <CoPlayGamesHub
           onBackToHome={() => setActiveTab('home')}
+          onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
       );
@@ -288,7 +295,10 @@ function MainApp() {
 
     // ── CO-STUDY 2D LEARNING CITY & GAMIFIED CSE WORLD ──
     if (activeTab === 'studyHub' || activeTab === 'costudy' || activeTab === 'study') {
-      return <CoStudyWorld />;
+      return <CoStudyWorld
+          onBackToHome={() => setActiveTab('home')}
+          onSelectService={handleSelectCogetherService}
+        />;
     }
 
     return (
@@ -312,7 +322,8 @@ function MainApp() {
           profile={profile}
           onOpenAuth={() => setShowAuth(true)}
           onOpenProfile={() => setShowProfile(true)}
-          onOpenPricing={() => setShowPricing(true)}
+          onOpenSocial={() => setIsSocialModalOpen(true)}
+          unreadCount={unreadSummary?.totalUnread || 0}
           isScrolled={scrollProgress > 0.3}
           scrollProgress={scrollProgress}
           hideNavbar={isCoshopActive}
@@ -323,6 +334,8 @@ function MainApp() {
           onStartGames={() => setActiveTab('gamesHub')}
           onStartMergedCam={(r, u) => handleStartRoom(r, u, 'merged')}
           onOpenPricing={() => setShowPricing(true)}
+          onOpenSocial={() => setIsSocialModalOpen(true)}
+          unreadCount={unreadSummary?.totalUnread || 0}
           onOpenGamesHub={() => setActiveTab('gamesHub')}
           onOpenCinemaHub={() => setActiveTab('cinemaHub')}
         />
@@ -333,13 +346,16 @@ function MainApp() {
   return (
     <>
       {renderMainContent()}
-      {renderGlobalServiceMemberPill()}
+      <IncomingGameInviteBanner onAcceptInvite={() => setActiveTab('gamesHub')} />
 
       {showAuth && (
         <AuthModal
           onClose={() => setShowAuth(false)}
           onLoginSuccess={() => {
             setShowAuth(false);
+            if (activeTab === 'home' && !activeRoom && !activeInviteToken) {
+              setActiveTab('gamesHub');
+            }
           }}
           onSelectService={handleSelectCogetherService}
         />
@@ -353,6 +369,16 @@ function MainApp() {
           onSuccess={() => {}}
         />
       )}
+
+      {isSocialModalOpen && (
+        <FriendsModal
+          onClose={() => setIsSocialModalOpen(false)}
+          onLaunchGameDuel={() => {
+            setActiveTab('gamesHub');
+            setIsSocialModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 }
@@ -360,7 +386,9 @@ function MainApp() {
 export default function App() {
   return (
     <AuthProvider>
-      <MainApp />
+      <SocialProvider>
+        <MainApp />
+      </SocialProvider>
     </AuthProvider>
   );
 }

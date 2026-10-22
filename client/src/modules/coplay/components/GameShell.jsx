@@ -7,6 +7,10 @@ import GameViewport from './GameViewport.jsx';
 import GameSocialRail from './GameSocialRail.jsx';
 import ChallengeModal from './ChallengeModal.jsx';
 import DraggableCameraOverlay from './DraggableCameraOverlay.jsx';
+import PlayWithFriendModal from './PlayWithFriendModal.jsx';
+import FriendsModal from '../../social/FriendsModal.jsx';
+import { useSocial } from '../../../core/SocialContext.jsx';
+import { useAuth } from '../../../core/AuthContext.jsx';
 import { getSignalingUrl } from '../../../core/signalingConfig.js';
 import './GameShell.css';
 
@@ -34,6 +38,9 @@ export default function GameShell({
   const [launchError, setLaunchError] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showChallengeModal, setShowChallengeModal] = useState(false);
+  const [showPlayWithFriendModal, setShowPlayWithFriendModal] = useState(false);
+  const { profile } = useAuth();
+  const { isSocialModalOpen, setIsSocialModalOpen } = useSocial();
 
   // Challenge Sync & Arena State
   const [isLocalReady, setIsLocalReady] = useState(false);
@@ -314,7 +321,8 @@ export default function GameShell({
         isFullscreen={isFullscreen}
         onToggleFullscreen={handleToggleFullscreen}
         onClose={onClose}
-        onOpenChallenge={handleOpenChallenge}
+        roomId={roomId}
+        onOpenChallenge={() => setShowPlayWithFriendModal(true)}
         hasActiveSession={activeMode === 'CHALLENGE'}
       />
 
@@ -331,9 +339,11 @@ export default function GameShell({
             countdown={countdown}
             isFullscreen={isFullscreen}
             onToggleFullscreen={handleToggleFullscreen}
-            onOpenChallenge={handleOpenChallenge}
+            roomId={roomId}
+        onOpenChallenge={() => setShowPlayWithFriendModal(true)}
             isSplitArena={activeMode === 'CHALLENGE' && challengeStarted}
             currentUsername={currentUsername}
+            userProfile={profile}
             localScore={localScore}
             localOver={localOver}
             localWon={localWon}
@@ -347,18 +357,19 @@ export default function GameShell({
           <GameSocialRail
             roomId={roomId}
             currentUsername={currentUsername}
+            userProfile={profile}
             localStream={webrtc.localStream}
             remoteStreams={webrtc.remoteStreams}
             micEnabled={webrtc.micEnabled}
             cameraEnabled={webrtc.cameraEnabled}
-            isScreenSharing={webrtc.isScreenSharing}
+
             connected={webrtc.connected}
             connectionState={webrtc.connectionState}
             peerConnectionStates={webrtc.peerConnectionStates}
             chatMessages={webrtc.chatMessages}
             onToggleMic={webrtc.toggleMic}
             onToggleCamera={webrtc.toggleCamera}
-            onToggleScreenShare={webrtc.toggleScreenShare}
+
             onSendMessage={webrtc.sendChatMessage}
             onLeaveSession={handleLeaveSession}
             isChallengeMode={true}
@@ -366,6 +377,8 @@ export default function GameShell({
             isPeerReady={webrtc.peerReady}
             onToggleReady={handleToggleReady}
             onStartPracticeDuel={handleStartPracticeDuel}
+            onOpenInviteFriend={() => setShowPlayWithFriendModal(true)}
+            onOpenDirectMessages={() => setIsSocialModalOpen(true)}
           />
         )}
       </div>
@@ -392,6 +405,28 @@ export default function GameShell({
           onClose={() => setShowChallengeModal(false)}
           onStartDuel={handleEnterDuelArena}
           connectedPeerCount={connectedPeerCount}
+        />
+      )}
+
+      {showPlayWithFriendModal && (
+        <PlayWithFriendModal
+          game={game}
+          onClose={() => setShowPlayWithFriendModal(false)}
+          onJoinRoom={(newRoomCode) => {
+            setShowPlayWithFriendModal(false);
+            setRoomId(newRoomCode);
+            setActiveMode('CHALLENGE');
+          }}
+        />
+      )}
+
+      {isSocialModalOpen && (
+        <FriendsModal
+          onClose={() => setIsSocialModalOpen(false)}
+          onLaunchGameDuel={() => {
+            setIsSocialModalOpen(false);
+            setShowPlayWithFriendModal(true);
+          }}
         />
       )}
     </div>

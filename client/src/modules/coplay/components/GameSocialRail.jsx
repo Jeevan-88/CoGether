@@ -1,46 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Mic, MicOff, Video, VideoOff, Monitor, MessageSquare, 
-  Users, Send, Smile, LogOut, Swords, CheckCircle2, ChevronRight, ChevronDown, Zap,
-  Copy, Check
+  Mic, MicOff, Video, VideoOff, MessageSquare, 
+  Users, Send, Smile, LogOut, Swords, CheckCircle2,
+  ChevronRight, ChevronDown, Zap, Copy, Check, UserPlus
 } from 'lucide-react';
 import VideoTile from '../../videoroom/VideoTile.jsx';
+import CogetherAvatarRenderer from '../../auth/CogetherAvatarRenderer.jsx';
 import './GameSocialRail.css';
 
-const QUICK_EMOJIS = ['🎮', '🔥', '🏆', '👏', '😂', '🚀', '👍', '❤️', '⚡', '🕹️', '🎯', '💥'];
+const QUICK_EMOJIS = ['🎮', '🔥', '🏆', '👏', '😂', '🚀', '👍', '⚡', '🕹️', '🎯'];
 
-/**
- * GameSocialRail
- * Dedicated non-overlapping social sidebar for CoGether gameplay.
- * Features:
- * - Real participant count (no fake numbers)
- * - Live WebRTC camera tiles with avatar fallback
- * - Dark charcoal in-call chat with timestamp & auto-scroll
- * - Compact emoji picker
- * - In-call control actions (Mic, Camera, Screen, Leave)
- */
 export default function GameSocialRail({
   roomId,
   currentUsername = 'Player',
+  userProfile = null,
   localStream,
   remoteStreams = {},
   micEnabled = true,
   cameraEnabled = true,
-  isScreenSharing = false,
   connected = false,
   connectionState = 'NEW',
   peerConnectionStates = {},
   chatMessages = [],
   onToggleMic,
   onToggleCamera,
-  onToggleScreenShare,
   onSendMessage,
   onLeaveSession,
   isChallengeMode = false,
   isLocalReady = false,
   isPeerReady = false,
   onToggleReady,
-  onStartPracticeDuel
+  onStartPracticeDuel,
+  onOpenInviteFriend,
+  onOpenDirectMessages
 }) {
   const [chatInput, setChatInput] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -48,72 +40,94 @@ export default function GameSocialRail({
   const [copied, setCopied] = useState(false);
   const chatMessagesEndRef = useRef(null);
 
-  const handleCopyRoomCode = () => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(roomId);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   const remotePeerIds = Object.keys(remoteStreams);
-  const totalCount = 1 + remotePeerIds.length;
+  const totalParticipants = remotePeerIds.length + 1;
 
   useEffect(() => {
     chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
   const handleSendChat = (e) => {
-    e?.preventDefault();
-    if (chatInput.trim() && onSendMessage) {
-      onSendMessage(chatInput.trim());
-      setChatInput('');
-      setShowEmojiPicker(false);
-    }
-  };
-
-  const handleSelectEmoji = (emoji) => {
-    setChatInput((prev) => prev + emoji);
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    onSendMessage(chatInput.trim());
+    setChatInput('');
     setShowEmojiPicker(false);
   };
 
+  const handleSelectEmoji = (emoji) => {
+    onSendMessage(emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const handleCopyRoomCode = () => {
+    if (!roomId) return;
+    navigator.clipboard.writeText(roomId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const opponentName = remotePeerIds.length > 0 ? (remoteStreams[remotePeerIds[0]]?.username || 'Opponent') : 'Waiting...';
+
   return (
-    <aside className={`game-social-rail ${isCollapsed ? 'rail-collapsed' : ''}`} aria-label="Social Panel">
-      {/* ── Top Rail Status Header ── */}
+    <aside className={`game-social-rail ${isCollapsed ? 'is-collapsed' : ''}`} aria-label="Social Sidebar">
+      {/* ── Rail Top Header ── */}
       <div className="rail-top-header">
-        <div className="rail-room-info">
-          <div className={`live-status-dot ${connected ? 'dot-connected' : 'dot-connecting'}`} title={connected ? 'Connected' : 'Connecting'} />
-          <span className="rail-room-title">Party Room</span>
-          <span className="rail-count-pill" title={`${totalCount} in room`}>
-            <Users size={12} />
-            <span>{totalCount}</span>
-          </span>
+        <div className="rail-header-info">
+          <Users size={16} className="rail-users-icon" />
+          <span className="rail-title">Social ({totalParticipants})</span>
         </div>
-        <button
-          type="button"
-          className="rail-collapse-toggle"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          title={isCollapsed ? 'Expand Social Rail' : 'Collapse Social Rail'}
-          aria-label={isCollapsed ? 'Expand Social Rail' : 'Collapse Social Rail'}
-        >
-          {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
-        </button>
+
+        <div className="rail-header-actions">
+          {onOpenInviteFriend && !isCollapsed && (
+            <button
+              type="button"
+              className="btn-rail-quick-invite"
+              onClick={onOpenInviteFriend}
+              title="Invite a friend to this room"
+            >
+              <UserPlus size={14} />
+              <span>Invite</span>
+            </button>
+          )}
+
+          {onOpenDirectMessages && !isCollapsed && (
+            <button
+              type="button"
+              className="btn-rail-quick-dm"
+              onClick={onOpenDirectMessages}
+              title="Direct Messages"
+            >
+              <MessageSquare size={14} />
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="rail-collapse-toggle-btn"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+            aria-label={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronDown size={18} />}
+          </button>
+        </div>
       </div>
 
-      {/* ── Sub-header: 1-Click Room Code & Granular WebRTC State ── */}
+      {/* ── Sub-header: 1-Click Room Code & WebRTC State ── */}
       {!isCollapsed && (
         <div className="rail-room-meta-bar">
           <button
             type="button"
             className="rail-room-code-badge"
             onClick={handleCopyRoomCode}
-            title="Click to copy Room Code to invite friend or test second device"
+            title="Click to copy Room Code"
           >
             <span className="room-label">ROOM:</span>
             <span className="room-code">{roomId}</span>
             {copied ? <Check size={12} className="copy-icon copied" /> : <Copy size={12} className="copy-icon" />}
           </button>
-          <div className={`rail-webrtc-state-pill state-${(connectionState || 'NEW').toLowerCase()}`} title={`WebRTC Peer State: ${connectionState}`}>
+          <div className={`rail-webrtc-state-pill state-${(connectionState || 'NEW').toLowerCase()}`} title={`Connection: ${connectionState}`}>
             <span className="state-dot" />
             <span className="state-label">{connectionState}</span>
           </div>
@@ -122,38 +136,37 @@ export default function GameSocialRail({
 
       {!isCollapsed && (
         <div className="rail-scrollable-body">
-          {/* ── Challenge Readiness Card (If in challenge mode) ── */}
+          {/* ── Compact Ready Toggle (Refined, no bulky DUEL READINESS banner) ── */}
           {isChallengeMode && (
-            <div className="rail-challenge-status-card">
-              <div className="challenge-card-header">
-                <Swords size={15} className="swords-icon" />
-                <span>DUEL READINESS</span>
-              </div>
-
-              <div className="challenge-players-ready-grid">
-                <div className={`player-ready-pill ${isLocalReady ? 'is-ready' : 'not-ready'}`}>
-                  <span className="player-name">You</span>
-                  <span className="ready-indicator">{isLocalReady ? 'READY' : 'WAITING'}</span>
+            <div className="rail-compact-ready-bar">
+              <div className="ready-players-row">
+                <div className={`ready-player-chip ${isLocalReady ? 'is-ready' : 'not-ready'}`}>
+                  {userProfile?.avatarConfig ? (
+                    <div className="chip-avatar">
+                      <CogetherAvatarRenderer config={userProfile.avatarConfig} size={18} animated={false} />
+                    </div>
+                  ) : null}
+                  <span className="chip-name">You</span>
+                  <span className="chip-status">{isLocalReady ? 'READY' : 'NOT READY'}</span>
                 </div>
-                <div className={`player-ready-pill ${isPeerReady ? 'is-ready' : 'not-ready'}`}>
-                  <span className="player-name">
-                    {remotePeerIds.length > 0 ? remoteStreams[remotePeerIds[0]]?.username || 'Peer' : 'Waiting...'}
-                  </span>
-                  <span className="ready-indicator">
-                    {remotePeerIds.length === 0 ? 'NOT JOINED' : isPeerReady ? 'READY' : 'WAITING'}
+
+                <div className={`ready-player-chip ${isPeerReady ? 'is-ready' : 'not-ready'}`}>
+                  <span className="chip-name">{opponentName}</span>
+                  <span className="chip-status">
+                    {remotePeerIds.length === 0 ? 'WAITING' : isPeerReady ? 'READY' : 'WAITING'}
                   </span>
                 </div>
               </div>
 
               {onToggleReady && (
-                <div className="ready-btn-group">
+                <div className="ready-toggle-wrap">
                   <button
                     type="button"
-                    className={`btn-challenge-ready-toggle ${isLocalReady ? 'ready-active' : ''}`}
+                    className={`btn-compact-ready-toggle ${isLocalReady ? 'ready-active' : ''}`}
                     onClick={onToggleReady}
                   >
-                    <CheckCircle2 size={15} />
-                    <span>{isLocalReady ? 'YOU ARE READY' : 'CLICK WHEN READY'}</span>
+                    <CheckCircle2 size={14} />
+                    <span>{isLocalReady ? 'Ready' : 'Set Ready'}</span>
                   </button>
 
                   {remotePeerIds.length === 0 && onStartPracticeDuel && (
@@ -161,10 +174,10 @@ export default function GameSocialRail({
                       type="button"
                       className="btn-practice-duel-trigger"
                       onClick={onStartPracticeDuel}
-                      title="Launch Split Arena against practice bot"
+                      title="Launch Practice Duel against AI"
                     >
                       <Zap size={13} />
-                      <span>START SPLIT DUEL NOW</span>
+                      <span>Practice</span>
                     </button>
                   )}
                 </div>
@@ -185,43 +198,43 @@ export default function GameSocialRail({
             </div>
 
             {remotePeerIds.map((peerId) => {
-              const peer = remoteStreams[peerId];
+              const streamData = remoteStreams[peerId];
               return (
                 <div key={peerId} className="rail-video-tile-container">
                   <VideoTile
-                    stream={peer.stream}
-                    label={peer.username || 'Peer'}
+                    stream={streamData?.stream || streamData}
+                    label={streamData?.username || `Player`}
                     isLocal={false}
-                    micEnabled={peer.micEnabled}
-                    cameraEnabled={peer.cameraEnabled}
+                    micEnabled={streamData?.micEnabled ?? true}
+                    cameraEnabled={streamData?.cameraEnabled ?? true}
                   />
                 </div>
               );
             })}
           </section>
 
-          {/* ── Real-Time Dark Charcoal In-Call Chat ── */}
+          {/* ── Real-Time Room Chat ── */}
           <section className="rail-chat-section" aria-label="Room Chat">
-            <div className="chat-section-header">
-              <MessageSquare size={14} />
-              <span>ROOM CHAT</span>
+            <div className="rail-chat-header">
+              <MessageSquare size={13} />
+              <span>Room Chat</span>
             </div>
 
-            <div className="rail-chat-messages-box">
+            <div className="rail-chat-messages-stream">
               {chatMessages.length === 0 ? (
-                <div className="chat-empty-hint">
-                  <span>No messages yet. Chat with players in room!</span>
+                <div className="rail-chat-empty">
+                  <span>No chat messages yet.</span>
                 </div>
               ) : (
-                chatMessages.map((msg) => {
-                  const isMe = msg.senderName === currentUsername || msg.senderId === 'local';
+                chatMessages.map((msg, index) => {
+                  const isMine = msg.sender === currentUsername || msg.sender === 'You';
                   return (
-                    <div key={msg.id || Math.random()} className={`chat-message-row ${isMe ? 'msg-me' : 'msg-peer'}`}>
-                      <div className="msg-meta">
-                        <span className="msg-author">{isMe ? 'You' : msg.senderName}</span>
-                        {msg.timestamp && <span className="msg-time">{msg.timestamp}</span>}
+                    <div key={msg.id || index} className={`rail-chat-bubble ${isMine ? 'mine' : 'theirs'}`}>
+                      <div className="bubble-meta">
+                        <span className="bubble-sender">{isMine ? 'You' : msg.sender}</span>
+                        <span className="bubble-time">{msg.time || ''}</span>
                       </div>
-                      <div className="msg-bubble">{msg.text}</div>
+                      <div className="bubble-text">{msg.text}</div>
                     </div>
                   );
                 })
@@ -254,7 +267,7 @@ export default function GameSocialRail({
                 title="Insert emoji"
                 aria-label="Insert emoji"
               >
-                <Smile size={16} />
+                <Smile size={15} />
               </button>
               <input
                 type="text"
@@ -270,12 +283,12 @@ export default function GameSocialRail({
                 title="Send"
                 aria-label="Send"
               >
-                <Send size={14} />
+                <Send size={13} />
               </button>
             </form>
           </section>
 
-          {/* ── Bottom Controls Bar ── */}
+          {/* ── Bottom Controls Bar (Mic, Camera, Leave) ── */}
           <section className="rail-controls-bar" aria-label="Room Controls">
             <button
               type="button"
@@ -296,18 +309,6 @@ export default function GameSocialRail({
             >
               {cameraEnabled ? <Video size={16} /> : <VideoOff size={16} />}
             </button>
-
-            {onToggleScreenShare && (
-              <button
-                type="button"
-                className={`control-circle-btn ${isScreenSharing ? 'is-active' : ''}`}
-                onClick={onToggleScreenShare}
-                title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
-                aria-label={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
-              >
-                <Monitor size={16} />
-              </button>
-            )}
 
             <button
               type="button"

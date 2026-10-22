@@ -1,12 +1,13 @@
 /**
  * Persistent Session & Refresh Token Manager
  * Stores hashed refresh tokens in PostgreSQL (identity.sessions).
- * Implements token rotation and instant revocation.
+ * Implements token rotation, token reuse detection, and instant revocation.
  */
 
 const crypto = require('crypto');
 const { db } = require('../database');
 const { getConfig } = require('../config');
+const { logger } = require('../observability');
 
 function generateRefreshToken() {
   return crypto.randomBytes(32).toString('hex');
@@ -66,62 +67,96 @@ async function validateAndRotateSession(rawRefreshToken, metadata = {}) {
   }
 
   const session = lookup.rows[0];
+
+  // Token Reuse Detection (OWASP Recommendation):
+  // If an already-revoked refresh token is presented, someone may have intercepted it.
+  // Invalidate ALL active sessions for this user to protect the account.
   if (session.revoked_at) {
-    return { valid: false, error: 'SESSION_ALREADY_REVOKED' };
+    logger.warn('Refresh token reuse detected; revoking all sessions for compromised account', {
+      userId: session.user_id,
+      sessionId: session.id
+    });
+    await revokeAllUserSessions(session.user_id).catch(() => {});
+    return {
+      valid: false,
+      error: 'SESSION_ALREADY_REVOKED',
+      code: 'TOKEN_REUSE_DETECTED',
+      message: 'Security violation: Refresh token reuse detected. All active sessions have been terminated.'
+    };
   }
 
   if (new Date(session.expires_at) <= new Date()) {
-    return { valid: false, error: 'SESSION_EXPIRED' };
+    return { valid: false, error: 'SESSION_EXPIRED', message: 'Session has expired. Please sign in again.' };
   }
 
-  // Rotate refresh token atomically
+  // Rotate refresh token atomically within a transaction
   const newRawRefreshToken = generateRefreshToken();
   const newTokenHash = hashRefreshToken(newRawRefreshToken);
 
-  await db.query(
-    `UPDATE identity.sessions 
-     SET revoked_at = NOW() 
-     WHERE id = $1`,
-    [session.id]
-  );
+  const client = await db.pool.connect();
+  try {
+    await client.query('BEGIN');
 
-  const newSessionRes = await db.query(
-    `INSERT INTO identity.sessions 
-     (user_id, refresh_token_hash, user_agent, ip_address, expires_at)
-     VALUES ($1, $2, $3, $4, NOW() + ($5 || ' seconds')::interval)
-     RETURNING id, user_id, expires_at`,
-    [
-      session.user_id,
-      newTokenHash,
-      metadata.userAgent ? String(metadata.userAgent).substring(0, 500) : null,
-      metadata.ipAddress || null,
-      ttlSeconds
-    ]
-  );
+    // Revoke old token
+    await client.query(
+      `UPDATE identity.sessions 
+       SET revoked_at = NOW() 
+       WHERE id = $1`,
+      [session.id]
+    );
 
-  return {
-    valid: true,
-    userId: session.user_id,
-    newRefreshToken: newRawRefreshToken,
-    expiresAt: newSessionRes.rows[0].expires_at
-  };
+    // Issue new rotated session
+    const newSessionRes = await client.query(
+      `INSERT INTO identity.sessions 
+       (user_id, refresh_token_hash, user_agent, ip_address, expires_at)
+       VALUES ($1, $2, $3, $4, NOW() + ($5 || ' seconds')::interval)
+       RETURNING id, user_id, expires_at`,
+      [
+        session.user_id,
+        newTokenHash,
+        metadata.userAgent ? String(metadata.userAgent).substring(0, 500) : null,
+        metadata.ipAddress || null,
+        ttlSeconds
+      ]
+    );
+
+    await client.query('COMMIT');
+
+    return {
+      valid: true,
+      userId: session.user_id,
+      newRefreshToken: newRawRefreshToken,
+      expiresAt: newSessionRes.rows[0].expires_at
+    };
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    logger.error('Failed to rotate session atomically', { error: err.message });
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
-async function revokeSession(rawRefreshToken) {
+async function revokeSession(rawRefreshToken, expectedUserId = null) {
   if (!rawRefreshToken) return false;
   const tokenHash = hashRefreshToken(rawRefreshToken);
-  const res = await db.query(
-    `UPDATE identity.sessions 
-     SET revoked_at = NOW() 
-     WHERE refresh_token_hash = $1 AND revoked_at IS NULL
-     RETURNING id`,
-    [tokenHash]
-  );
+
+  let query = `UPDATE identity.sessions SET revoked_at = NOW() WHERE refresh_token_hash = $1 AND revoked_at IS NULL`;
+  const params = [tokenHash];
+
+  if (expectedUserId) {
+    query += ` AND user_id = $2`;
+    params.push(expectedUserId);
+  }
+
+  query += ` RETURNING id`;
+
+  const res = await db.query(query, params);
   return res.rows.length > 0;
 }
 
 async function revokeAllUserSessions(userId) {
-  if (!userId) return 0;
+  if (!userId) return false;
   const res = await db.query(
     `UPDATE identity.sessions 
      SET revoked_at = NOW() 
@@ -129,7 +164,7 @@ async function revokeAllUserSessions(userId) {
      RETURNING id`,
     [userId]
   );
-  return res.rows.length;
+  return res.rows.length > 0;
 }
 
 module.exports = {

@@ -291,7 +291,7 @@
 /* ── 2. EXPANDABLE LEFT SIDEBAR DRAWER (PLAYHOP STYLE) ── */
 .coplay-left-sidebar {
   position: fixed;
-  top: 68px;
+  top: 64px;
   left: 0;
   bottom: 0;
   width: 64px;
@@ -835,4 +835,159 @@
     grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
     gap: 14px;
   }
+}
+
+
+/* ==========================================================================
+   CoPlay Header: Upper-Left Profile Pill, Friends Trigger & Play with Friend
+   ========================================================================== */
+
+.hub-upper-left-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  background: #14141c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  margin-left: 6px;
+}
+
+.hub-upper-left-profile-btn:hover {
+  background: #1b1b26;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.hub-btn-avatar-wrap {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hub-btn-avatar-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.hub-btn-avatar-initial {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hub-btn-username {
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Header Friends & Duel Actions */
+.btn-hub-friends-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  background: #14141c;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  color: #f1f5f9;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  position: relative;
+}
+
+.btn-hub-friends-trigger:hover {
+  background: #1e1e28;
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.hub-badge-count {
+  background: #FFE500;
+  color: #000000;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.hub-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFE500;
+  box-shadow: 0 0 6px rgba(255, 229, 0, 0.6);
+}
+
+.btn-hub-play-friend {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  background: #FFE500;
+  color: #000000;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-hub-play-friend:hover {
+  background: #fff04d;
+  transform: translateY(-1px);
+}
+
+.sidebar-friends-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  margin-bottom: 2px;
+}
+
+.sidebar-friends-btn:hover {
+  background: rgba(255, 229, 0, 0.15) !important;
+  border-color: rgba(255, 229, 0, 0.4) !important;
+  color: #FFE500 !important;
+}
+
+.sidebar-badge-count {
+  background: #FFE500;
+  color: #000000;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.coplay-left-sidebar.expanded .sidebar-badge-count,
+.coplay-left-sidebar:hover .sidebar-badge-count {
+  opacity: 1;
 }

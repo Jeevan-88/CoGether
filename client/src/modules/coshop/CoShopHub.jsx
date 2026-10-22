@@ -17,7 +17,8 @@ export default function CoShopHub({
   initialUser,
   initialRoomId,
   initialUsername,
-  onBackToHome
+  onBackToHome,
+  onSelectService
 }) {
   const { profile } = useAuth();
   // Navigation & View Mode

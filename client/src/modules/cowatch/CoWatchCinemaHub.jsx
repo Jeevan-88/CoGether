@@ -19,7 +19,7 @@ import './CoWatchLayout.css';
 
 const API_BASE = API_URL;
 
-export default function CoWatchCinemaHub({ onBackToHome }) {
+export default function CoWatchCinemaHub({ onBackToHome, onSelectService }) {
   const { user, profile, isAuthenticated, getAccessToken } = useAuth();
   const currentUsername = profile?.displayName || profile?.username || user?.email?.split('@')[0] || 'Guest';
 
@@ -379,6 +379,8 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
           }}
           onOpenProfile={() => setIsProfileModalOpen(true)}
           onOpenAuth={() => setIsAuthModalOpen(true)}
+          onSelectService={onSelectService}
+          onBackToHome={onBackToHome}
         />
 
         {/* ── HERO BILLBOARD (ONLY IN HOME MODE) ── */}

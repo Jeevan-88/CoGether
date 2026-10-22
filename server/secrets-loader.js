@@ -45,6 +45,15 @@ async function loadStagingSecrets() {
   process.env.REDIS_URL = appSecret.REDIS_URL;
   process.env.JWT_SECRET = appSecret.JWT_SECRET;
   process.env.RESEND_API_KEY = appSecret.RESEND_API_KEY;
+  if (appSecret.FROM_EMAIL) {
+    process.env.FROM_EMAIL = appSecret.FROM_EMAIL;
+  }
+  if (appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET) {
+    process.env.OTP_HMAC_KEY = appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET;
+  }
+  if (appSecret.MFA_ENCRYPTION_KEY) {
+    process.env.MFA_ENCRYPTION_KEY = appSecret.MFA_ENCRYPTION_KEY;
+  }
   process.env.DATABASE_URL =
     `postgresql://${username}:${password}@${RDS_HOST}:${RDS_PORT}/${RDS_DATABASE}`;
   process.env.DATABASE_SSL = 'true';

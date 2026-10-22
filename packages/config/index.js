@@ -7,6 +7,8 @@
 function loadConfig(env = process.env) {
   const nodeEnv = (env.NODE_ENV || 'development').toLowerCase();
   const isProd = nodeEnv === 'production';
+  const isStaging = nodeEnv === 'staging' || env.STAGING === 'true';
+  const isProdOrStaging = isProd || isStaging;
   const isTest = nodeEnv === 'test';
 
   const port = parseInt(env.PORT || '3001', 10);
@@ -14,13 +16,29 @@ function loadConfig(env = process.env) {
     throw new Error(`Invalid PORT configuration: ${env.PORT}`);
   }
 
-  // Enforce strong secrets in production
+  // Enforce strong secrets in production and staging
   let jwtSecret = env.JWT_SECRET;
   if (!jwtSecret) {
-    if (isProd) {
-      throw new Error('FATAL: JWT_SECRET environment variable is required in production');
+    if (isProdOrStaging) {
+      throw new Error('FATAL: JWT_SECRET environment variable is required in production/staging');
     }
     jwtSecret = 'cogether-dev-fallback-secret-never-use-in-production-32bytes-min!';
+  }
+
+  let otpHmacKey = env.OTP_HMAC_KEY || env.OTP_SECRET;
+  if (!otpHmacKey) {
+    if (isProdOrStaging) {
+      throw new Error('FATAL: OTP_HMAC_KEY (or OTP_SECRET) environment variable is required in production/staging');
+    }
+    otpHmacKey = 'cogether-dev-otp-hmac-key-never-use-in-production-32bytes!';
+  }
+
+  let mfaEncryptionKey = env.MFA_ENCRYPTION_KEY;
+  if (!mfaEncryptionKey) {
+    if (isProdOrStaging) {
+      throw new Error('FATAL: MFA_ENCRYPTION_KEY environment variable is required in production/staging');
+    }
+    mfaEncryptionKey = 'cogether-dev-mfa-aes256-key-32b-min!!'; // Exactly 32 bytes
   }
 
   const databaseUrl = env.DATABASE_URL || 'postgresql://cogether_user:cogether_secret_dev_pass@127.0.0.1:5432/cogether_db';
@@ -29,6 +47,7 @@ function loadConfig(env = process.env) {
   const config = {
     env: nodeEnv,
     isProd,
+    isStaging,
     isTest,
     server: {
       port,
@@ -41,10 +60,21 @@ function loadConfig(env = process.env) {
       jwtExpiresInSeconds: parseInt(env.JWT_EXPIRES_IN_SECONDS || '900', 10),
       refreshTokenExpiresInSeconds: parseInt(env.REFRESH_TOKEN_EXPIRES_IN_SECONDS || '604800', 10),
       guestExpiresIn: env.GUEST_EXPIRES_IN || '24h',
+      otpHmacKey,
+      otpSalt: otpHmacKey, // For backward compatibility with legacy references
       otpExpiresInSeconds: parseInt(env.OTP_EXPIRES_IN_SECONDS || '600', 10),
       otpMaxAttempts: parseInt(env.OTP_MAX_ATTEMPTS || '5', 10),
       otpResendIntervalSeconds: parseInt(env.OTP_RESEND_INTERVAL_SECONDS || '60', 10),
-      otpSalt: env.OTP_SALT || 'cogether-otp-salt-production-secure',
+      mfaEncryptionKey,
+      password: {
+        minLength: 8,
+        maxLength: 128, // OWASP length limit before hashing to prevent DoS
+        argon2: {
+          memoryCost: 65536, // 64 MB (OWASP recommended)
+          timeCost: 3,       // 3 iterations (OWASP recommended)
+          parallelism: 4     // 4 threads (OWASP recommended)
+        }
+      },
       google: {
         clientId: env.GOOGLE_CLIENT_ID || null,
         clientSecret: env.GOOGLE_CLIENT_SECRET || null,
@@ -116,7 +146,9 @@ function getSanitizedConfig(cfg = getConfig()) {
     auth: {
       ...cfg.auth,
       jwtSecret: '***REDACTED***',
+      otpHmacKey: '***REDACTED***',
       otpSalt: '***REDACTED***',
+      mfaEncryptionKey: '***REDACTED***',
       cookieSecret: '***REDACTED***',
       google: {
         ...cfg.auth.google,

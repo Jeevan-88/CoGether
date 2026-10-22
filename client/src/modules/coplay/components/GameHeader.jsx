@@ -17,6 +17,7 @@ import './GameHeader.css';
 export default function GameHeader({
   game,
   mode = 'SINGLE_PLAYER', // 'SINGLE_PLAYER' | 'CHALLENGE' | 'LOCAL_COOP'
+  roomId = null,
   isFullscreen = false,
   onToggleFullscreen,
   onClose,
@@ -69,7 +70,7 @@ export default function GameHeader({
             aria-label="Back to Arcade"
           >
             <ArrowLeft size={16} />
-            <span className="back-text">BACK TO ARCADE</span>
+            <span className="back-text">Back to arcade</span>
           </button>
 
           <div className="header-title-divider" aria-hidden="true" />
@@ -78,7 +79,7 @@ export default function GameHeader({
             <h1 className="header-game-title">{displayTitle}</h1>
             {mode === 'CHALLENGE' && (
               <span className="header-mode-badge mode-challenge">
-                CHALLENGE
+                Challenge
               </span>
             )}
           </div>
@@ -95,7 +96,7 @@ export default function GameHeader({
               title="Challenge a Friend with synchronized countdown"
             >
               <Swords size={15} />
-              <span>CHALLENGE FRIEND</span>
+              <span>Play with Friend</span>
             </button>
           )}
 
