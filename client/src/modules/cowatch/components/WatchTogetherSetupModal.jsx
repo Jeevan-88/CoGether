@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './WatchTogetherSetupModal.css';
+import { PLATFORM_CONFIGS } from '../cowatchPlatformData.js';
 
 export default function WatchTogetherSetupModal({
   isOpen,
@@ -411,7 +412,13 @@ export default function WatchTogetherSetupModal({
                     <button
                       className="wt-btn wt-btn-secondary"
                       onClick={() => {
-                        window.open(`https://www.google.com/search?q=${encodeURIComponent(title + ' ' + currentPlatform)}`, '_blank');
+                        const platKey = Object.keys(PLATFORM_CONFIGS).find(
+                          (k) => PLATFORM_CONFIGS[k]?.name?.toLowerCase() === (currentPlatform || '').toLowerCase()
+                        );
+                        const targetUrl = platKey && PLATFORM_CONFIGS[platKey]?.officialUrl
+                          ? PLATFORM_CONFIGS[platKey].officialUrl
+                          : `https://www.${(currentPlatform || 'streaming').toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
+                        window.open(targetUrl, '_blank', 'noopener,noreferrer');
                       }}
                     >
                       Visit {currentPlatform} ↗

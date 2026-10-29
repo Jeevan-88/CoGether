@@ -35,13 +35,34 @@ export function AuthProvider({ children }) {
 
         if (res.ok) {
           const data = await res.json();
+          const isGuestUser = Boolean(data.isGuest);
+          const guestExp = data.guestExpiresAt || null;
+
+          if (isGuestUser && guestExp) {
+            const remaining = Math.max(0, Math.floor((new Date(guestExp).getTime() - Date.now()) / 1000));
+            if (remaining <= 0) {
+              setIsGuestExpired(true);
+              localStorage.removeItem('cogether_access_token');
+              localStorage.removeItem('cogether_refresh_token');
+              setAccessToken(null);
+              setUser(null);
+              setProfile(null);
+              setIsLoading(false);
+              return;
+            }
+            setGuestRemainingSeconds(remaining);
+          }
+
           setUser({
             id: data.id,
             email: data.primaryEmail,
             status: data.status,
             mfaEnabled: Boolean(data.mfaEnabled),
             emailVerified: Boolean(data.emailVerified),
-            createdAt: data.createdAt || null
+            createdAt: data.createdAt || null,
+            isGuest: isGuestUser,
+            guestExpiresAt: guestExp,
+            displayName: data.profile?.displayName || (isGuestUser ? 'Guest' : null)
           });
           setProfile(data.profile);
           setPreferences(data.preferences);
@@ -164,6 +185,31 @@ export function AuthProvider({ children }) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
   };
+
+  // 5-minute Guest countdown timer and expiration enforcement
+  useEffect(() => {
+    if (!user?.isGuest || !user?.guestExpiresAt) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const expiresAt = new Date(user.guestExpiresAt).getTime();
+      const remaining = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+      setGuestRemainingSeconds(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+        setIsGuestExpired(true);
+        localStorage.removeItem('cogether_access_token');
+        localStorage.removeItem('cogether_refresh_token');
+        setAccessToken(null);
+        setUser(null);
+        setProfile(null);
+        setAuthError('Guest session expired. Please sign up or log in to continue.');
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [user?.isGuest, user?.guestExpiresAt]);
 
   // Direct registration with Email, Password (Argon2id), Handle & Profile Setup
   const registerWithPassword = async ({

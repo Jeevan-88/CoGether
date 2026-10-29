@@ -17,7 +17,7 @@ export default function CoWatchSidebar({
   onJoinRoom
 }) {
   const { profile, user } = useAuth();
-  const displayName = profile?.displayName || profile?.display_name || profile?.username || 'Jeevan';
+  const displayName = profile?.displayName || profile?.display_name || profile?.username || (user?.isGuest ? 'Guest' : (user ? 'Member' : 'Guest'));
   const avatarConfig = profile?.avatarConfig || profile?.avatar_config;
 
   const TOP_NAV = [
@@ -222,8 +222,8 @@ export default function CoWatchSidebar({
           <div className="cowatch-profile-meta">
             <span className="cowatch-profile-name">{displayName}</span>
             <span className="cowatch-profile-status">
-              <span className="status-dot-green" />
-              Online
+              <span className="status-dot-green" style={!user ? { background: '#94A3B8' } : user.isGuest ? { background: '#F59E0B' } : undefined} />
+              {user ? (user.isGuest ? 'Guest (5m)' : 'Online') : 'Sign In'}
             </span>
           </div>
         </div>

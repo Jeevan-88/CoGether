@@ -18,6 +18,13 @@ import PricingModal from './modules/pricing/PricingModal.jsx';
 import { SocialProvider, useSocial } from './core/SocialContext.jsx';
 import FriendsModal from './modules/social/FriendsModal.jsx';
 import IncomingGameInviteBanner from './modules/social/IncomingGameInviteBanner.jsx';
+import {
+  parseCurrentRoute,
+  pushRoute,
+  replaceRoute,
+  navigateBackSafe,
+  subscribeToRoute
+} from './core/navigationHistory.js';
 
 function MainApp() {
   const { user, profile, preferences, isAuthenticated, restoreSession, isGuestExpired } = useAuth();
@@ -53,10 +60,8 @@ function MainApp() {
   }, []);
 
   useEffect(() => {
+    // Check for Google OAuth callback token
     const params = new URLSearchParams(window.location.search);
-    const pathname = window.location.pathname;
-
-    // Handle Google OAuth callback token
     const tokenParam = params.get('token');
     if (tokenParam) {
       localStorage.setItem('cogether_access_token', tokenParam);
@@ -65,65 +70,72 @@ function MainApp() {
       window.history.replaceState({}, document.title, cleanUrl);
     }
 
-    // Handle invite token in pathname (/invite/<token>) or query (?invite=<token>)
-    if (pathname.includes('/invite/')) {
-      const token = pathname.split('/invite/')[1]?.split('/')[0]?.split('?')[0];
-      if (token) setActiveInviteToken(token);
-    } else if (params.get('invite')) {
-      setActiveInviteToken(params.get('invite'));
-    }
+    const handleRouteChange = (route) => {
+      setActiveTab(route.tab || 'home');
+      if (route.inviteToken) {
+        setActiveInviteToken(route.inviteToken);
+      } else {
+        setActiveInviteToken(null);
+      }
 
-    const roomParam = params.get('room');
-    const modeParam = params.get('mode');
-    const gameParam = params.get('game');
-    const challengeParam = params.get('challenge');
+      if (route.room) {
+        const canonicalName = profile?.displayName || profile?.username || 'Member';
+        setActiveRoom({
+          roomId: route.room,
+          username: canonicalName,
+          mode: route.roomMode || 'video'
+        });
+      } else {
+        setActiveRoom(null);
+      }
 
-    if (roomParam) {
-      const canonicalName = profile?.displayName || profile?.username || 'Member';
-      setActiveRoom({
-        roomId: roomParam,
-        username: canonicalName,
-        mode: modeParam || 'video'
-      });
-    } else if (modeParam === 'coplay' || modeParam === 'games' || gameParam || challengeParam) {
-      setActiveTab('gamesHub');
-    } else if (modeParam === 'watch' || modeParam === 'cowatch' || modeParam === 'cinema') {
-      setActiveTab('cinemaHub');
-    } else if (modeParam === 'shop' || modeParam === 'coshop') {
-      setActiveTab('coshop');
-    } else if (modeParam === 'study' || modeParam === 'costudy') {
-      setActiveTab('studyHub');
-    }
+      if (route.auth === 'login' || route.auth === 'signup') {
+        setShowAuth(true);
+      } else if (route.auth === 'profile') {
+        setShowProfile(true);
+      }
+
+      if (route.pricing) {
+        setShowPricing(true);
+      }
+    };
+
+    const initialRoute = parseCurrentRoute();
+    handleRouteChange(initialRoute);
+
+    const unsubscribe = subscribeToRoute(handleRouteChange);
+    return () => unsubscribe();
   }, [profile, restoreSession]);
 
   const handleStartRoom = (roomId, username, mode) => {
     const canonicalName = username || profile?.displayName || profile?.username || 'Member';
-    const newUrl = `${window.location.pathname}?room=${roomId}&mode=${mode}`;
-    window.history.pushState({ path: newUrl }, '', newUrl);
+    pushRoute({ tab: activeTab, room: roomId, roomMode: mode });
     setActiveRoom({ roomId, username: canonicalName, mode });
   };
 
   const handleLeaveRoom = () => {
-    window.history.pushState({ path: window.location.pathname }, '', window.location.pathname);
     setActiveRoom(null);
-    setActiveTab('home');
+    navigateBackSafe({ tab: activeTab || 'home' });
   };
 
   // PART 7: Route directly from the Four-Service Choice into the selected CoGether experience
   const handleSelectCogetherService = (serviceId) => {
     const normalized = String(serviceId || '').toLowerCase();
     setActiveRoom(null);
+    let targetTab = 'home';
     if (normalized === 'coplay' || normalized === 'games') {
-      setActiveTab('gamesHub');
+      targetTab = 'gamesHub';
     } else if (normalized === 'coshop' || normalized === 'shop') {
-      setActiveTab('coshop');
+      targetTab = 'coshop';
     } else if (normalized === 'cowatch' || normalized === 'watch') {
-      setActiveTab('cinemaHub');
+      targetTab = 'cinemaHub';
     } else if (normalized === 'costudy' || normalized === 'study') {
-      setActiveTab('studyHub');
+      targetTab = 'studyHub';
     } else {
-      setActiveTab('home');
+      targetTab = 'home';
     }
+    setActiveTab(targetTab);
+    pushRoute({ tab: targetTab });
   };
 
   // PART 8: Persistent Member Pass & Custom Avatar Pill across CoPlay, CoShop, CoWatch & CoStudy
@@ -264,7 +276,7 @@ function MainApp() {
     if (activeTab === 'coshop' || activeTab === 'shop') {
       return (
         <CoShopHub
-          onBackToHome={() => setActiveTab('home')}
+          onBackToHome={() => navigateBackSafe({ tab: 'home' })}
           onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
@@ -275,7 +287,7 @@ function MainApp() {
     if (activeTab === 'cinemaHub') {
       return (
         <CoWatchCinemaHub
-          onBackToHome={() => setActiveTab('home')}
+          onBackToHome={() => navigateBackSafe({ tab: 'home' })}
           onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
@@ -286,7 +298,7 @@ function MainApp() {
     if (activeTab === 'gamesHub') {
       return (
         <CoPlayGamesHub
-          onBackToHome={() => setActiveTab('home')}
+          onBackToHome={() => navigateBackSafe({ tab: 'home' })}
           onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
@@ -296,7 +308,7 @@ function MainApp() {
     // ── CO-STUDY 2D LEARNING CITY & GAMIFIED CSE WORLD ──
     if (activeTab === 'studyHub' || activeTab === 'costudy' || activeTab === 'study') {
       return <CoStudyWorld
-          onBackToHome={() => setActiveTab('home')}
+          onBackToHome={() => navigateBackSafe({ tab: 'home' })}
           onSelectService={handleSelectCogetherService}
         />;
     }
@@ -306,17 +318,17 @@ function MainApp() {
         <Navbar
           activeTab={activeTab}
           onTabChange={(tab) => {
-            if (tab === 'watch' || tab === 'cowatch') setActiveTab('cinemaHub');
-            else if (tab === 'games' || tab === 'coplay') setActiveTab('gamesHub');
-            else if (tab === 'shop' || tab === 'coshop') setActiveTab('coshop');
-            else if (tab === 'study' || tab === 'costudy') setActiveTab('studyHub');
+            if (tab === 'watch' || tab === 'cowatch') handleSelectCogetherService('cowatch');
+            else if (tab === 'games' || tab === 'coplay') handleSelectCogetherService('coplay');
+            else if (tab === 'shop' || tab === 'coshop') handleSelectCogetherService('coshop');
+            else if (tab === 'study' || tab === 'costudy') handleSelectCogetherService('costudy');
             else if (tab === 'telepresence')
               handleStartRoom(
                 'room-' + Math.floor(1000 + Math.random() * 9000),
                 profile?.displayName || profile?.username || 'User',
                 'merged'
               );
-            else setActiveTab(tab);
+            else handleSelectCogetherService(tab);
           }}
           user={user}
           profile={profile}
@@ -330,14 +342,17 @@ function MainApp() {
         />
 
         <LandingPage
-          onStartWatchParty={() => setActiveTab('cinemaHub')}
-          onStartGames={() => setActiveTab('gamesHub')}
+          onStartWatchParty={() => handleSelectCogetherService('cowatch')}
+          onStartGames={() => handleSelectCogetherService('coplay')}
           onStartMergedCam={(r, u) => handleStartRoom(r, u, 'merged')}
-          onOpenPricing={() => setShowPricing(true)}
+          onOpenPricing={() => {
+            setShowPricing(true);
+            pushRoute({ tab: activeTab, pricing: true });
+          }}
           onOpenSocial={() => setIsSocialModalOpen(true)}
           unreadCount={unreadSummary?.totalUnread || 0}
-          onOpenGamesHub={() => setActiveTab('gamesHub')}
-          onOpenCinemaHub={() => setActiveTab('cinemaHub')}
+          onOpenGamesHub={() => handleSelectCogetherService('coplay')}
+          onOpenCinemaHub={() => handleSelectCogetherService('cowatch')}
         />
       </div>
     );

@@ -889,7 +889,7 @@ app.post('/api/v1/auth/email/request-otp', async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     logger.error('Failed to process OTP request', { error: err.message });
-    res.status(500).json({ success: false, error: 'OTP_REQUEST_FAILED', message: err.message });
+    res.status(500).json({ success: false, error: 'OTP_REQUEST_FAILED', message: 'Unable to process verification code. Please try again.' });
   }
 });
 
@@ -922,7 +922,7 @@ app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     logger.error('Failed to verify OTP', { error: err.message });
-    res.status(500).json({ success: false, error: 'OTP_VERIFICATION_FAILED', message: err.message });
+    res.status(500).json({ success: false, error: 'OTP_VERIFICATION_FAILED', message: 'Unable to verify passcode. Please try again.' });
   }
 });
 

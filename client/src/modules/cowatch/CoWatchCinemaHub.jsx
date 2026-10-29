@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useAuth } from '../../core/AuthContext.jsx';
 import { useSocial } from '../../core/SocialContext.jsx';
+import {
+  pushRoute,
+  replaceRoute,
+  navigateBackSafe,
+  subscribeToRoute,
+  parseCurrentRoute
+} from '../../core/navigationHistory.js';
 import './CoWatchTemplateDesign.css';
 import { PLATFORM_CATALOGS } from './cowatchPlatformData.js';
 import ContentDetailsModal from './components/ContentDetailsModal.jsx';
@@ -208,11 +215,29 @@ const BG = [
   'radial-gradient(circle at 50% 30%,#b02347,#0a090b 70%)'
 ];
 
+function getPlatformOfficialUrl(platformKey, title) {
+  const p = (platformKey || '').toLowerCase();
+  const t = encodeURIComponent(title || '');
+  if (p === 'netflix') return t ? `https://www.netflix.com/search?q=${t}` : 'https://www.netflix.com';
+  if (p === 'prime') return t ? `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${t}` : 'https://www.primevideo.com';
+  if (p === 'hotstar' || p === 'disney') return 'https://www.hotstar.com';
+  if (p === 'apple') return 'https://tv.apple.com';
+  if (p === 'max') return 'https://www.max.com';
+  if (p === 'hulu') return 'https://www.hulu.com';
+  if (p === 'param') return 'https://www.paramountplus.com';
+  if (p === 'crunchyroll') return t ? `https://www.crunchyroll.com/search?q=${t}` : 'https://www.crunchyroll.com';
+  if (p === 'jiocinema') return 'https://www.jiocinema.com';
+  if (p === 'tubi') return 'https://tubitv.com';
+  if (p === 'archive') return 'https://archive.org';
+  if (p === 'youtube') return t ? `https://www.youtube.com/results?search_query=${t}` : 'https://www.youtube.com';
+  return `https://www.${p.replace(/[^a-z0-9]/g, '')}.com`;
+}
+
 export default function CoWatchCinemaHub({ onBackToHome }) {
   const { user, profile } = useAuth();
   const social = useSocial ? useSocial() : null;
   const friends = social?.friends || [];
-  const displayName = profile?.displayName || profile?.display_name || profile?.username || 'Jeevan';
+  const displayName = profile?.displayName || profile?.display_name || profile?.username || (user?.isGuest ? 'Guest' : (user ? 'Member' : 'Guest'));
   const displayInitial = (displayName || 'J').charAt(0).toUpperCase();
 
   // 1. Hero State
@@ -371,7 +396,10 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
   };
 
   // Open Room
-  const openRoom = (title, platform = null, defaultUrl = null, ytId = null) => {
+  const openRoom = (title, platform = null, defaultUrl = null, ytId = null, push = true) => {
+    if (push) {
+      pushRoute({ tab: 'cinemaHub', category: activeCategory, platform: selectedPlatform, content: title, watchRoom: true });
+    }
     stopAllMedia();
     setRoomTitle(title);
     setRoomPlatform(platform);
@@ -412,7 +440,7 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
   };
 
   // Close Room
-  const closeRoom = () => {
+  const closeRoom = (pushBack = true) => {
     stopAllMedia();
     setIsRoomOpen(false);
     document.body.style.overflow = '';
@@ -422,6 +450,9 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
     }
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
+    }
+    if (pushBack) {
+      navigateBackSafe({ tab: 'cinemaHub', category: activeCategory, platform: selectedPlatform, content: selectedDetailsContent?.title });
     }
   };
 
@@ -540,9 +571,12 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
   };
 
   // Category change
-  const selectCategory = (k) => {
+  const selectCategory = (k, push = true) => {
     setActiveCategory(k);
     setSelectedPlatform(null);
+    if (push) {
+      pushRoute({ tab: 'cinemaHub', category: k, platform: null });
+    }
   };
 
   // Active Category Items with Search & Platform filtering
@@ -559,7 +593,7 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
   }, [activeCategory, selectedPlatform, searchTerm]);
 
   // Handle Card Click
-  const handleCardClick = (item) => {
+  const handleCardClick = (item, push = true) => {
     const isFree = item.free || item.p === 'tubi' || item.stream;
     const isYt = item.p === 'youtube' || item.ytId;
 
@@ -574,10 +608,13 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
       playbackMode: isFree ? 'NATIVE_PLAYER' : isYt ? 'YOUTUBE_PLAYER' : 'EXTERNAL_PROVIDER',
       videoStreamUrl: item.stream || item.ytId,
       description: item.desc || `${item.t} is available on ${N[item.p] || item.p}. Watch with friends in high definition.`,
-      externalUrl: `https://www.google.com/search?q=${encodeURIComponent(item.t + ' ' + (N[item.p] || item.p))}`
+      externalUrl: isFree ? item.stream : isYt ? `https://www.youtube.com/watch?v=${item.ytId}` : getPlatformOfficialUrl(item.p, item.t)
     };
 
     setSelectedDetailsContent(contentObj);
+    if (push) {
+      pushRoute({ tab: 'cinemaHub', category: activeCategory, platform: selectedPlatform, content: item.t });
+    }
   };
 
   // Handle Card Play / Watch Together Trigger
@@ -726,6 +763,45 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
 
   // Participants for Camera deck (strictly real authenticated participants)
   const [remotePeers, setRemotePeers] = useState([]);
+
+  // CoWatch route synchronization listener for browser Back/Forward navigation
+  useEffect(() => {
+    const handleRouteChange = (route) => {
+      if (route.tab !== 'cinemaHub') return;
+
+      if (route.category && route.category !== activeCategory) {
+        setActiveCategory(route.category);
+      }
+      if (route.platform !== selectedPlatform) {
+        setSelectedPlatform(route.platform || null);
+      }
+
+      // Handle Details Modal
+      if (route.content) {
+        if (!selectedDetailsContent || selectedDetailsContent.title !== route.content) {
+          const allItems = Object.values(C).flatMap((cat) => cat.items || []);
+          const matched = allItems.find((it) => it.t.toLowerCase() === route.content.toLowerCase());
+          if (matched) {
+            handleCardClick(matched, false);
+          }
+        }
+      } else if (selectedDetailsContent && !route.watchRoom) {
+        setSelectedDetailsContent(null);
+      }
+
+      // Handle Watch Room
+      if (route.watchRoom) {
+        if (!isRoomOpen) {
+          openRoom(route.content || 'Party Room', null, null, null, false);
+        }
+      } else if (isRoomOpen) {
+        closeRoom(false);
+      }
+    };
+
+    const unsubscribe = subscribeToRoute(handleRouteChange);
+    return () => unsubscribe();
+  }, [activeCategory, selectedPlatform, selectedDetailsContent, isRoomOpen]);
 
   const participants = [
     { n: displayName, c: ['#9a2a45', '#2a2a30'], me: true, id: user?.id },
@@ -1763,7 +1839,10 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
       <ContentDetailsModal
         isOpen={Boolean(selectedDetailsContent)}
         content={selectedDetailsContent}
-        onClose={() => setSelectedDetailsContent(null)}
+        onClose={() => {
+            setSelectedDetailsContent(null);
+            navigateBackSafe({ tab: 'cinemaHub', category: activeCategory, platform: selectedPlatform });
+          }}
         onPlayDirect={(c) => {
           openRoom(c.title, c.providerName?.toLowerCase(), c.videoStreamUrl);
         }}

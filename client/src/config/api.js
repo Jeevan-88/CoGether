@@ -4,10 +4,17 @@
  * as well as staging and production (e.g. VITE_API_URL=https://api.cogether.tech).
  */
 
+const isBrowser = typeof window !== 'undefined';
+const isProdHost = isBrowser && (
+  window.location.hostname === 'cogether.tech' ||
+  window.location.hostname.endsWith('.cogether.tech') ||
+  window.location.hostname.endsWith('.vercel.app')
+);
+
 const rawApiUrl =
   import.meta.env.VITE_API_URL ||
   import.meta.env.VITE_API_BASE ||
-  'http://localhost:3001';
+  (isProdHost ? 'https://api.cogether.tech' : 'http://localhost:3001');
 
 export const API_URL = rawApiUrl.replace(/\/+$/, '');
 

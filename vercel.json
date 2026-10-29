@@ -3,6 +3,10 @@
   "outputDirectory": "client/dist",
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://api.cogether.tech/api/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
