@@ -78,6 +78,28 @@ export default function AuthModal({
   const [mfaRecoveryCode, setMfaRecoveryCode] = useState('');
   const [useRecoveryCode, setUseRecoveryCode] = useState(false);
 
+  const handleExploreAsGuest = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      if (startGuestSession) {
+        const res = await startGuestSession('Guest');
+        if (res && res.success !== false) {
+          if (onLoginSuccess) onLoginSuccess();
+          if (onClose) onClose();
+          return;
+        }
+      }
+      if (onLoginSuccess) onLoginSuccess();
+      if (onClose) onClose();
+    } catch (err) {
+      setError(err?.message || 'Failed to start guest session');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   // Signup Password states (Step 3)
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');

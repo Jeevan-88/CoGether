@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useAuth } from '../../core/AuthContext.jsx';
+import { useSocial } from '../../core/SocialContext.jsx';
 import './CoWatchTemplateDesign.css';
 import { PLATFORM_CATALOGS } from './cowatchPlatformData.js';
 import ContentDetailsModal from './components/ContentDetailsModal.jsx';
@@ -208,7 +209,9 @@ const BG = [
 ];
 
 export default function CoWatchCinemaHub({ onBackToHome }) {
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+  const social = useSocial ? useSocial() : null;
+  const friends = social?.friends || [];
   const displayName = profile?.displayName || profile?.display_name || profile?.username || 'Jeevan';
   const displayInitial = (displayName || 'J').charAt(0).toUpperCase();
 

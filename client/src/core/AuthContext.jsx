@@ -705,7 +705,13 @@ export function AuthProvider({ children }) {
     updatePreferences,
     createInvite,
     logout,
-    restoreSession
+    restoreSession,
+    startGuestSession,
+    registerWithPassword,
+    isGuest: Boolean(user?.isGuest),
+    isGuestExpired,
+    guestRemainingSeconds,
+    guestExpiresAt: user?.guestExpiresAt || null
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
