@@ -12,7 +12,9 @@ export default function GamePlayer({
   onLaunchSquadRoom,
   initialMode = 'SINGLE_PLAYER',
   initialRoomId = null,
-  currentUsername = null
+  currentUsername = null,
+  onSelectService,
+  onBackToHome
 }) {
   const { profile } = useAuth();
   const username = currentUsername || profile?.displayName || profile?.username || 'ArcadePlayer';
@@ -24,6 +26,8 @@ export default function GamePlayer({
       initialMode={initialMode}
       initialRoomId={initialRoomId}
       currentUsername={username}
+      onSelectService={onSelectService}
+      onBackToHome={onBackToHome}
     />
   );
 }

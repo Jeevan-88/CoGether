@@ -20,7 +20,7 @@ import FriendsModal from './modules/social/FriendsModal.jsx';
 import IncomingGameInviteBanner from './modules/social/IncomingGameInviteBanner.jsx';
 
 function MainApp() {
-  const { user, profile, preferences, isAuthenticated, restoreSession } = useAuth();
+  const { user, profile, preferences, isAuthenticated, restoreSession, isGuestExpired } = useAuth();
   const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary } = useSocial();
 
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub' | 'coshop' | 'studyHub'
@@ -350,7 +350,7 @@ function MainApp() {
 
       {showAuth && (
         <AuthModal
-          onClose={() => setShowAuth(false)}
+          onClose={() => { if (!isGuestExpired) setShowAuth(false); }}
           onLoginSuccess={() => {
             setShowAuth(false);
             if (activeTab === 'home' && !activeRoom && !activeInviteToken) {

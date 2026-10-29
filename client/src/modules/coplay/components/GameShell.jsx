@@ -2,13 +2,16 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { getGameProviderAdapter, GameLaunchError } from '../services/GameProviderAdapter.js';
 import { GameMode } from '../gameSchema.js';
 import { useWebRTC } from '../../../core/useWebRTC.js';
+import AppNavShell from '../../../components/common/AppNavShell.jsx';
 import GameHeader from './GameHeader.jsx';
 import GameViewport from './GameViewport.jsx';
 import GameSocialRail from './GameSocialRail.jsx';
 import ChallengeModal from './ChallengeModal.jsx';
+import LeaderboardModal from './LeaderboardModal.jsx';
 import DraggableCameraOverlay from './DraggableCameraOverlay.jsx';
 import PlayWithFriendModal from './PlayWithFriendModal.jsx';
 import FriendsModal from '../../social/FriendsModal.jsx';
+import ProfileModal from '../../auth/ProfileModal.jsx';
 import { useSocial } from '../../../core/SocialContext.jsx';
 import { useAuth } from '../../../core/AuthContext.jsx';
 import { getSignalingUrl } from '../../../core/signalingConfig.js';
@@ -19,18 +22,20 @@ const SIGNALING_URL = getSignalingUrl();
 /**
  * GameShell
  * The core production gameplay environment for CoGether.
- * Features:
- * 1. Sandboxed Game runtime
- * 2. Seamless transition to Split-Screen Arena on challenge start (up to 3 players)
- * 3. Real-time board sync & automated win/loss resolution
- * 4. Advanced Camera Overlay (Grouped, Separate, Merged with virtual background) visible in both normal & fullscreen mode
+ * Matches CoGether reference design:
+ * 1. Global AppNavShell (CO-WATCH, CO-PLAY, CO-SHOP, CO-STUDY, Search, Bell, Profile)
+ * 2. GameHeader (< BACK TO ARCADE | 2048 | CHALLENGE FRIEND | Fullscreen)
+ * 3. Elevated Game Canvas with floating bottom-left info dock (2048, Puzzle, Heart, Leaderboard)
+ * 4. Dedicated Right Social Rail (Party Room with Room Code, Invite Friend, Participant List with Host Crown, and Live Chat)
  */
 export default function GameShell({
   game,
   onClose,
   initialMode = 'SINGLE_PLAYER', // 'SINGLE_PLAYER' | 'CHALLENGE'
   initialRoomId = null,
-  currentUsername = 'Player'
+  currentUsername = 'Player',
+  onSelectService,
+  onBackToHome
 }) {
   const [activeMode, setActiveMode] = useState(initialMode);
   const [roomId, setRoomId] = useState(() => initialRoomId || 'duel-' + Math.floor(1000 + Math.random() * 9000));
@@ -39,8 +44,10 @@ export default function GameShell({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showChallengeModal, setShowChallengeModal] = useState(false);
   const [showPlayWithFriendModal, setShowPlayWithFriendModal] = useState(false);
-  const { profile } = useAuth();
-  const { isSocialModalOpen, setIsSocialModalOpen } = useSocial();
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const { user, profile } = useAuth();
+  const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary } = useSocial();
 
   // Challenge Sync & Arena State
   const [isLocalReady, setIsLocalReady] = useState(false);
@@ -198,101 +205,69 @@ export default function GameShell({
     const handleMessage = (event) => {
       if (!event.data || event.data.type !== 'COPLAY_GAME_SYNC') return;
 
-      const { score = 0, over = false, won = false, grid = [] } = event.data;
-      setLocalScore(score);
-      if (over) setLocalOver(true);
-      if (won) setLocalWon(true);
+      const { payload } = event.data;
+      if (!payload) return;
 
-      if (activeMode === 'CHALLENGE') {
-        webrtc.sendChallengeBoardSync({ score, over, won, grid });
-        webrtc.sendChallengeScore(score, Boolean(over || won));
-        if (over) webrtc.sendPlayerEliminated(score);
-        if (won) webrtc.sendPlayerWon(score);
+      if (typeof payload.score === 'number') {
+        setLocalScore(payload.score);
+        webrtc.sendScore(payload.score);
+      }
+
+      if (payload.board) {
+        webrtc.sendBoardUpdate(payload.board);
+      }
+
+      if (payload.over) {
+        setLocalOver(true);
+        webrtc.sendEliminated();
+      }
+
+      if (payload.won) {
+        setLocalWon(true);
+        webrtc.sendVictory();
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [activeMode, webrtc]);
+  }, [webrtc]);
 
-  const [isPractice, setIsPractice] = useState(false);
-  const [practiceOpponent, setPracticeOpponent] = useState(null);
+  // Construct structured opponents array for Split-Screen Arena
+  const opponents = Object.entries(webrtc.remoteStreams).map(([peerId, streamData]) => {
+    const peerScore = webrtc.peerScores?.[peerId] ?? 0;
+    const peerBoard = webrtc.peerBoards?.[peerId] ?? null;
+    const isEliminated = Boolean(webrtc.peerEliminated?.[peerId]);
+    const isWinner = webrtc.peerWon === peerId;
 
-  const handleStartPracticeDuel = () => {
-    setIsPractice(true);
-    setPracticeOpponent({
-      id: 'ghost_arcade',
-      username: 'ArcadeBot_99',
-      score: 128,
-      grid: [
-        [null, null, null, { value: 2 }],
-        [null, { value: 4 }, null, null],
-        [{ value: 8 }, null, { value: 16 }, null],
-        [null, null, { value: 32 }, { value: 64 }]
-      ],
-      over: false,
-      won: false
-    });
-    startCountdownSequence();
-  };
-
-  useEffect(() => {
-    if (!isPractice || !challengeStarted) return;
-    const botTimer = setInterval(() => {
-      setPracticeOpponent((prev) => {
-        if (!prev || prev.over || prev.won) return prev;
-        const newScore = prev.score + Math.floor(Math.random() * 8 + 4) * 4;
-        return {
-          ...prev,
-          score: newScore,
-          grid: [
-            [null, null, { value: 2 }, { value: 4 }],
-            [null, { value: 4 }, null, { value: 8 }],
-            [{ value: 16 }, null, { value: 32 }, null],
-            [null, { value: 64 }, { value: 128 }, { value: 256 }]
-          ]
-        };
-      });
-    }, 2800);
-    return () => clearInterval(botTimer);
-  }, [isPractice, challengeStarted]);
-
-  // Construct opponents array for Split Screen
-  const opponents = Object.entries(webrtc.remoteStreams).map(([id, peer]) => {
-    const board = webrtc.peerBoards[id] || {};
-    const eliminated = webrtc.peerEliminated[id];
-    const won = webrtc.peerWon?.peerId === id;
     return {
-      id,
-      username: peer.username || board.username || 'Opponent',
-      score: eliminated ? eliminated.score : (board.score || 0),
-      grid: board.grid || [],
-      over: Boolean(eliminated || board.over),
-      won: Boolean(won || board.won)
+      id: peerId,
+      username: streamData.username || 'Opponent',
+      stream: streamData.stream,
+      score: peerScore,
+      board: peerBoard,
+      isEliminated,
+      isWinner,
+      micEnabled: streamData.micEnabled,
+      cameraEnabled: streamData.cameraEnabled
     };
   });
-
-  if (opponents.length === 0 && isPractice && practiceOpponent) {
-    opponents.push(practiceOpponent);
-  }
-
-  const handleOpenChallenge = () => {
-    setShowChallengeModal(true);
-  };
 
   const handleEnterDuelArena = () => {
     setShowChallengeModal(false);
     setActiveMode('CHALLENGE');
+    setIsLocalReady(false);
   };
 
   const handleLeaveSession = () => {
-    setActiveMode('SINGLE_PLAYER');
-    setIsLocalReady(false);
-    setChallengeStarted(false);
-    setIsPractice(false);
-    setPracticeOpponent(null);
-    setLocalOver(false);
-    setLocalWon(false);
+    if (activeMode === 'CHALLENGE') {
+      setActiveMode('SINGLE_PLAYER');
+      setChallengeStarted(false);
+      setIsLocalReady(false);
+      setCountdown(null);
+      launchGame();
+    } else {
+      onClose();
+    }
   };
 
   const handleToggleReady = () => {
@@ -314,7 +289,21 @@ export default function GameShell({
 
   return (
     <div className={`game-shell-root fade-in ${isFullscreen ? 'is-fullscreen' : ''}`} ref={containerRef}>
-      {/* ── Top Game Header (Compact 52px) ── */}
+      {/* ── Top Unified App Navigation Shell (Matches Reference Design) ── */}
+      {!isFullscreen && (
+        <AppNavShell
+          activeService="coplay"
+          onSelectService={onSelectService}
+          onBackToHome={onBackToHome || onClose}
+          user={user}
+          profile={profile}
+          onOpenProfile={() => setShowProfileModal(true)}
+          onOpenSocial={() => setIsSocialModalOpen(true)}
+          unreadCount={unreadSummary?.totalUnread || 0}
+        />
+      )}
+
+      {/* ── Top Game Header Bar (Matches Reference Design) ── */}
       <GameHeader
         game={game}
         mode={activeMode}
@@ -326,7 +315,7 @@ export default function GameShell({
         hasActiveSession={activeMode === 'CHALLENGE'}
       />
 
-      {/* ── Main Gameplay Body (Game Hero / Split Screen + Right Social Rail) ── */}
+      {/* ── Main Gameplay Body (Game Stage + Right Social Rail) ── */}
       <div className="game-shell-body">
         <div className="game-stage-column">
           <GameViewport
@@ -339,11 +328,10 @@ export default function GameShell({
             countdown={countdown}
             isFullscreen={isFullscreen}
             onToggleFullscreen={handleToggleFullscreen}
-            roomId={roomId}
-        onOpenChallenge={() => setShowPlayWithFriendModal(true)}
+            onOpenChallenge={() => setShowPlayWithFriendModal(true)}
+            onOpenLeaderboard={() => setShowLeaderboardModal(true)}
             isSplitArena={activeMode === 'CHALLENGE' && challengeStarted}
             currentUsername={currentUsername}
-            userProfile={profile}
             localScore={localScore}
             localOver={localOver}
             localWon={localWon}
@@ -352,8 +340,8 @@ export default function GameShell({
           />
         </div>
 
-        {/* ── Right-Side Social Rail (Always active in Challenge Mode) ── */}
-        {!isFullscreen && activeMode === 'CHALLENGE' && (
+        {/* ── Right-Side Social Rail (Matches Reference Image) ── */}
+        {!isFullscreen && (
           <GameSocialRail
             roomId={roomId}
             currentUsername={currentUsername}
@@ -362,28 +350,23 @@ export default function GameShell({
             remoteStreams={webrtc.remoteStreams}
             micEnabled={webrtc.micEnabled}
             cameraEnabled={webrtc.cameraEnabled}
-
+            isScreenSharing={webrtc.isScreenSharing}
             connected={webrtc.connected}
             connectionState={webrtc.connectionState}
             peerConnectionStates={webrtc.peerConnectionStates}
             chatMessages={webrtc.chatMessages}
             onToggleMic={webrtc.toggleMic}
             onToggleCamera={webrtc.toggleCamera}
-
+            onToggleScreenShare={webrtc.toggleScreenShare}
             onSendMessage={webrtc.sendChatMessage}
             onLeaveSession={handleLeaveSession}
-            isChallengeMode={true}
-            isLocalReady={isLocalReady}
-            isPeerReady={webrtc.peerReady}
-            onToggleReady={handleToggleReady}
-            onStartPracticeDuel={handleStartPracticeDuel}
             onOpenInviteFriend={() => setShowPlayWithFriendModal(true)}
             onOpenDirectMessages={() => setIsSocialModalOpen(true)}
           />
         )}
       </div>
 
-      {/* ── Advanced Floating Camera Overlay (Visible in BOTH normal & fullscreen modes) ── */}
+      {/* ── Floating Camera Overlay ── */}
       {webrtc.cameraEnabled && (
         <DraggableCameraOverlay
           localStream={webrtc.localStream}
@@ -397,7 +380,7 @@ export default function GameShell({
         />
       )}
 
-      {/* ── Challenge Room Invitation Modal (up to 3 players) ── */}
+      {/* ── Challenge Room Invitation Modal ── */}
       {showChallengeModal && (
         <ChallengeModal
           game={game}
@@ -408,6 +391,7 @@ export default function GameShell({
         />
       )}
 
+      {/* ── Play With Friend / Invite Modal ── */}
       {showPlayWithFriendModal && (
         <PlayWithFriendModal
           game={game}
@@ -420,6 +404,15 @@ export default function GameShell({
         />
       )}
 
+      {/* ── Leaderboard & Stats Modal ── */}
+      {showLeaderboardModal && (
+        <LeaderboardModal
+          game={game}
+          onClose={() => setShowLeaderboardModal(false)}
+        />
+      )}
+
+      {/* ── Friends & Messaging Modal ── */}
       {isSocialModalOpen && (
         <FriendsModal
           onClose={() => setIsSocialModalOpen(false)}
@@ -428,6 +421,11 @@ export default function GameShell({
             setShowPlayWithFriendModal(true);
           }}
         />
+      )}
+
+      {/* ── Profile & Member Card Modal ── */}
+      {showProfileModal && (
+        <ProfileModal onClose={() => setShowProfileModal(false)} />
       )}
     </div>
   );

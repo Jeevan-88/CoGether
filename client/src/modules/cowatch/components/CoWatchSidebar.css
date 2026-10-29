@@ -1,0 +1,366 @@
+/* ══════════════════════════════════════════════════════════════════════
+   COWATCH SIDEBAR — CRIMSON VELVET & SPACE BLACK DESIGN
+   Matches Target Reference with 1:1 Precision:
+   - Deep space black background (#08090B / #0D0E11)
+   - Exit to CoGether dedicated top navigation button
+   - Retro TV logo with "CoWatch" + "CINEMA SOCIAL"
+   - Burgundy glass active pill with crimson left accent
+   - Muted uppercase section headers (PLATFORMS, CHANNELS, LIBRARY, ROOMS)
+   - Micro category badges (Free, Embed, DRM, Stream, Live)
+   - Profile footer with Jeevan avatar, green online dot, and settings gear
+   ══════════════════════════════════════════════════════════════════════ */
+
+.cowatch-sidebar-target {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: #08090B;
+  border-right: 1px solid rgba(255, 235, 230, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 14px 16px 14px;
+  z-index: 100;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.cowatch-sidebar-top-group {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+/* ── 1. EXIT TO COGETHER BACK BUTTON ── */
+.cowatch-exit-to-cogether-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 9px;
+  background: rgba(255, 235, 230, 0.04);
+  border: 1px solid rgba(255, 235, 230, 0.08);
+  color: #B9B2B2;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.cowatch-exit-to-cogether-btn:hover {
+  background: rgba(201, 41, 58, 0.15);
+  border-color: rgba(201, 41, 58, 0.35);
+  color: #FFFFFF;
+  transform: translateX(-2px);
+}
+
+.cowatch-exit-arrow-icon {
+  transition: transform 0.2s ease;
+}
+
+.cowatch-exit-to-cogether-btn:hover .cowatch-exit-arrow-icon {
+  transform: translateX(-3px);
+  color: #C9293A;
+}
+
+/* ── 2. BRAND LOGO & TITLE ── */
+.cowatch-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px 16px 4px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.cowatch-sidebar-brand:hover {
+  opacity: 0.9;
+}
+
+.cowatch-logo-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #C9293A 0%, #6B1E23 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(201, 41, 58, 0.35);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.cowatch-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cowatch-brand-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cowatch-brand-name {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.cowatch-brand-sub {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #817A7C;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+/* ── 3. NAVIGATION LIST ── */
+.cowatch-sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-right: 4px;
+}
+
+.cowatch-sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.cowatch-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 235, 230, 0.12);
+  border-radius: 4px;
+}
+.cowatch-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 41, 58, 0.4);
+}
+
+.cowatch-nav-section-title {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #817A7C;
+  text-transform: uppercase;
+  padding: 14px 10px 4px 10px;
+}
+
+/* Nav Item Button */
+.cowatch-nav-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #B9B2B2;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cowatch-nav-item-btn:hover {
+  color: #F5F2F0;
+  background: rgba(255, 235, 230, 0.05);
+}
+
+/* Active Nav Item (Crimson Velvet Glass Pill) */
+.cowatch-nav-item-btn.active {
+  background: rgba(44, 15, 18, 0.65);
+  border: 1px solid rgba(201, 41, 58, 0.32);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 235, 230, 0.08);
+}
+
+/* Left Accent Indicator Pill */
+.cowatch-active-left-pill {
+  position: absolute;
+  left: 0;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
+  background: #C9293A;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 10px rgba(201, 41, 58, 0.6);
+}
+
+.cowatch-nav-icon {
+  flex-shrink: 0;
+  color: #8E8688;
+  transition: color 0.18s ease;
+}
+
+.cowatch-nav-item-btn:hover .cowatch-nav-icon {
+  color: #F5F2F0;
+}
+
+.cowatch-nav-item-btn.active .cowatch-nav-icon {
+  color: #C9293A;
+}
+
+.cowatch-nav-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badges next to navigation items */
+.cowatch-nav-item-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.badge-free {
+  background: rgba(34, 197, 94, 0.16);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-yt {
+  background: rgba(239, 68, 68, 0.16);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-drm {
+  background: rgba(148, 163, 184, 0.12);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.badge-stream {
+  background: rgba(168, 85, 247, 0.16);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.badge-live {
+  background: rgba(234, 179, 8, 0.16);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+/* ── 4. BOTTOM PROFILE BAR ── */
+.cowatch-sidebar-profile-card {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(28, 29, 33, 0.65);
+  border: 1px solid rgba(255, 235, 230, 0.09);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.cowatch-sidebar-profile-card:hover {
+  background: rgba(44, 15, 18, 0.55);
+  border-color: rgba(201, 41, 58, 0.3);
+}
+
+.cowatch-profile-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cowatch-profile-avatar-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1C1D21;
+  border: 1px solid rgba(255, 235, 230, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cowatch-profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cowatch-profile-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cowatch-profile-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #F5F2F0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cowatch-profile-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #00E676;
+}
+
+.status-dot-green {
+  width: 5.5px;
+  height: 5.5px;
+  border-radius: 50%;
+  background: #00E676;
+  box-shadow: 0 0 6px rgba(0, 230, 118, 0.6);
+  flex-shrink: 0;
+}
+
+.cowatch-profile-settings-btn {
+  background: transparent;
+  border: none;
+  color: #817A7C;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+}
+
+.cowatch-profile-settings-btn:hover {
+  color: #F5F2F0;
+}

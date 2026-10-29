@@ -1,13 +1,15 @@
 /* ══════════════════════════════════════════════════════════════════════
    COMPACT TOP GAME HEADER
-   Fixed height 52px, arcade yellow baseline, minimal visual distraction
+   Matches reference image:
+   Height 52px, deep pitch black, Left: < BACK TO ARCADE | 2048
+   Right: [icon] CHALLENGE FRIEND | Fullscreen toggle
    ══════════════════════════════════════════════════════════════════════ */
 
 .game-header-bar {
   height: 52px;
-  background: #09090b;
-  border-bottom: 2px solid #FFE500;
-  padding: 0 20px;
+  background: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,7 +23,7 @@
 .header-left-cluster {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
   min-width: 0;
 }
 
@@ -29,176 +31,130 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #141418;
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+  background: #111318;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #E2E8F0;
   padding: 6px 14px;
-  border-radius: 6px;
-  font-family: 'Space Grotesk', sans-serif;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.18s ease;
   white-space: nowrap;
 }
 
 .btn-header-back:hover {
-  background: #FFE500;
-  color: #000000;
-  border-color: #FFE500;
-}
-
-.header-title-divider {
-  width: 1px;
-  height: 22px;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.header-meta-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
+  background: #1A1D26;
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
 }
 
 .header-game-title {
   margin: 0;
-  font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 28px;
-  font-weight: 200;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
   color: #ffffff;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  letter-spacing: -0.5px;
   line-height: 1;
-}
-
-.header-mode-badge {
-  font-family: 'Space Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 800;
-  padding: 2.5px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-}
-
-.header-mode-badge.mode-single {
-  background: #0f172a;
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-}
-
-.header-mode-badge.mode-challenge {
-  background: rgba(255, 229, 0, 0.12);
-  color: #FFE500;
-  border: 1px solid #FFE500;
-}
-
-.header-mode-badge.mode-coop {
-  background: #141400;
-  color: #FFE500;
-  border: 1px solid #FFE500;
-}
-
-.header-mode-badge.mode-multi {
-  background: #201335;
-  color: #c084fc;
-  border: 1px solid #a855f7;
 }
 
 /* ── Right Action Controls ── */
 .header-right-cluster {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .btn-header-challenge-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  background: #18181c;
-  color: #FFE500;
+  gap: 8px;
+  background: #0B0C10;
   border: 1.5px solid #FFE500;
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-family: 'Space Grotesk', sans-serif;
+  color: #FFE500;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.18s ease;
+  white-space: nowrap;
 }
 
 .btn-header-challenge-trigger:hover {
   background: #FFE500;
   color: #000000;
-  box-shadow: 0 0 12px rgba(255, 229, 0, 0.35);
 }
 
-.btn-header-icon-action,
-.btn-header-close-action {
+.btn-header-challenge-trigger:hover .btn-challenge-icon {
+  color: #000000;
+}
+
+.btn-challenge-icon {
+  color: #FFE500;
+  transition: color 0.18s ease;
+}
+
+/* Fullscreen Toggle Button */
+.btn-header-fullscreen {
   width: 36px;
   height: 36px;
-  background: #141418;
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
-  color: #cbd5e1;
-  border-radius: 6px;
-  display: inline-flex;
+  background: #111318;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #8E95A5;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.18s ease;
 }
 
-.btn-header-icon-action:hover {
-  border-color: #FFE500;
-  color: #FFE500;
-  background: #1e1e24;
-}
-
-.btn-header-close-action:hover {
-  background: #e11d48;
-  border-color: #e11d48;
+.btn-header-fullscreen:hover {
+  background: #1A1D26;
+  border-color: rgba(255, 255, 255, 0.25);
   color: #ffffff;
 }
 
-/* ── Active Session Exit Confirmation Modal ── */
+/* ── Exit Confirmation Modal ── */
 .exit-confirm-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.82);
-  z-index: 1500;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  backdrop-filter: blur(3px);
 }
 
 .exit-confirm-card {
-  background: #0d0d12;
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  padding: 28px;
-  max-width: 440px;
   width: 100%;
+  max-width: 420px;
+  background: #0e0e14;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 28px 24px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
 }
 
 .exit-confirm-icon-wrap {
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: rgba(255, 229, 0, 0.1);
-  border: 1.5px solid #FFE500;
-  color: #FFE500;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1.5px solid #f59e0b;
+  color: #f59e0b;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -207,10 +163,10 @@
 
 .exit-confirm-title {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 20px;
-  font-weight: 900;
+  font-size: 18px;
+  font-weight: 800;
   color: #ffffff;
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
 }
 
 .exit-confirm-text {
@@ -224,30 +180,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: 12px;
 }
 
-/* ── Mobile Responsive ── */
 @media (max-width: 640px) {
   .game-header-bar {
     padding: 0 12px;
   }
-  
-  .back-text {
-    display: none;
-  }
 
-  .header-title-divider {
-    display: none;
+  .header-left-cluster {
+    gap: 10px;
   }
 
   .header-game-title {
-    font-size: 14px;
-    max-width: 140px;
+    font-size: 18px;
   }
 
   .btn-header-challenge-trigger span {
+    display: none;
+  }
+
+  .btn-header-back span {
     display: none;
   }
 }

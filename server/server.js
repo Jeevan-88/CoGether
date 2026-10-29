@@ -763,13 +763,31 @@ app.get('/metrics', (_req, res) => {
 // ── Identity & Authentication Endpoints (/api/v1/auth) ───────────────────────
 
 // Mint a guest session token
-app.post('/api/v1/auth/guest', (req, res) => {
+app.post('/api/v1/auth/guest', async (req, res) => {
   const validation = validateGuestSessionInput(req.body);
   if (!validation.valid) {
     return res.status(400).json({ error: { code: 'INVALID_INPUT', message: validation.error, requestId: req.id } });
   }
-  const session = createGuestSession({ displayName: validation.data.displayName });
+  const session = await createGuestSession({ displayName: validation.data.displayName });
   res.status(201).json(session);
+});
+
+// Check guest session status & remaining seconds
+app.get('/api/v1/auth/guest/session', authenticateToken, async (req, res) => {
+  if (!req.user?.isGuest) {
+    return res.status(400).json({ error: { code: 'NOT_A_GUEST', message: 'Current session is not a guest session' } });
+  }
+  const validation = await validateGuestSession(req.user.id || req.user.sub);
+  if (!validation.valid) {
+    return res.status(401).json({ error: { code: validation.error || 'GUEST_SESSION_EXPIRED' } });
+  }
+  res.json({
+    valid: true,
+    guestId: req.user.id || req.user.sub,
+    displayName: validation.session.displayName,
+    expiresAt: validation.session.expiresAt,
+    remainingSeconds: validation.remainingSeconds
+  });
 });
 
 // Validate an existing session token
@@ -905,6 +923,65 @@ app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
   } catch (err) {
     logger.error('Failed to verify OTP', { error: err.message });
     res.status(500).json({ success: false, error: 'OTP_VERIFICATION_FAILED', message: err.message });
+  }
+});
+
+// Direct user registration with Argon2id hashing and database persistence
+app.post('/api/v1/auth/register', async (req, res) => {
+  try {
+    const rateLimit = await redis.consumeRateLimit(`auth:register:ip:${req.ip}`, 20, 60);
+    if (!rateLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many registration attempts. Please slow down.'
+      });
+    }
+
+    const { email, password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences, guestToken } = req.body || {};
+    
+    // If a guestToken was provided, validate it to associate guest preferences
+    let guestPrefs = null;
+    if (guestToken) {
+      const guestVerification = verifyToken(guestToken);
+      if (guestVerification.valid && guestVerification.decoded?.isGuest) {
+        guestPrefs = { guestMigrated: true };
+      }
+    }
+
+    const metadata = {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip || req.connection?.remoteAddress
+    };
+
+    const result = await userService.registerWithPassword({
+      email,
+      password,
+      username,
+      displayName,
+      firstName,
+      lastName,
+      avatarUrl,
+      avatarConfig,
+      preferences: preferences || guestPrefs,
+      metadata
+    });
+
+    if (!result.success) {
+      const status = result.error === 'EMAIL_EXISTS' || result.error === 'EMAIL_ALREADY_EXISTS' || result.error === 'USERNAME_EXISTS' || result.error === 'USERNAME_ALREADY_TAKEN' ? 409 : 400;
+      return res.status(status).json(result);
+    }
+
+    metrics.incrementCounter('cogether_auth_register_total', 1);
+
+    if (result.refreshToken) {
+      res.cookie('cogether_refresh', result.refreshToken, getRefreshCookieOptions());
+    }
+
+    res.status(201).json({ ...result, tokens: { accessToken: result.accessToken, refreshToken: result.refreshToken } });
+  } catch (err) {
+    logger.error('Registration failed', { error: err.message, stack: err.stack });
+    res.status(500).json({ success: false, error: 'REGISTRATION_FAILED', message: 'Internal server error during registration' });
   }
 });
 
@@ -1242,7 +1319,31 @@ app.get('/api/v1/me', authenticateToken, async (req, res) => {
     return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Not authenticated', requestId: req.id } });
   }
 
-  const activeSession = await db.query(
+  // Handle guest sessions immediately without querying identity.sessions
+  if (req.user?.isGuest) {
+    return res.json({
+      success: true,
+      id: req.user.id,
+      primaryEmail: null,
+      status: 'guest',
+      isGuest: true,
+      profile: {
+        username: req.user.username || 'guest',
+        displayName: req.user.displayName || 'Guest',
+        avatarConfig: null
+      },
+      preferences: {
+        primaryInterest: 'all',
+        interests: [],
+        timezone: 'UTC',
+        language: 'en'
+      },
+      entitlement: { tier: 'free' },
+      guestExpiresAt: req.user.guestExpiresAt,
+      remainingSeconds: req.user.remainingSeconds
+    });
+  }
+const activeSession = await db.query(
     'SELECT id FROM identity.sessions WHERE user_id = $1 AND revoked_at IS NULL AND expires_at > NOW() LIMIT 1',
     [userId]
   );
@@ -1472,9 +1573,12 @@ app.get('/api/v1/social/users/search', authenticateToken, async (req, res) => {
 
 // Send a friend request
 app.post('/api/v1/social/friends/request', authenticateToken, async (req, res) => {
+  if (req.user?.isGuest) {
+    return res.status(403).json({ error: { code: 'GUEST_RESTRICTED', message: 'Guests cannot send friend requests. Please create an account.' } });
+  }
   const userId = req.user?.id || req.user?.sub;
   if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
-  const { target } = req.body || {};
+  const target = req.body?.target || req.body?.targetUsername || req.body?.targetUserId;
 
   try {
     const result = await friendService.sendFriendRequest(userId, target);
@@ -1504,7 +1608,8 @@ app.post('/api/v1/social/friends/request', authenticateToken, async (req, res) =
 app.post('/api/v1/social/friends/respond', authenticateToken, async (req, res) => {
   const userId = req.user?.id || req.user?.sub;
   if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
-  const { requesterId, action } = req.body || {};
+  const requesterId = req.body?.requesterId || req.body?.targetUserId || req.body?.friendshipId;
+  const action = req.body?.action;
 
   try {
     const result = await friendService.respondToFriendRequest(userId, requesterId, action);
@@ -1774,9 +1879,13 @@ app.get('/api/v1/social/keys/:targetUserId', authenticateToken, async (req, res)
 
 // Store & route end-to-end encrypted direct message (ciphertext + IV only)
 app.post('/api/v1/social/messages', authenticateToken, async (req, res) => {
+  if (req.user?.isGuest) {
+    return res.status(403).json({ error: { code: 'GUEST_RESTRICTED', message: 'Guests cannot send direct messages. Please create an account.' } });
+  }
   const userId = req.user?.id || req.user?.sub;
   if (!userId) return res.status(401).json({ error: 'UNAUTHORIZED' });
-  const { recipientId, ciphertext, iv, senderKeyId, recipientKeyId } = req.body || {};
+  const recipientId = req.body?.recipientId || req.body?.recipientUserId;
+  const { ciphertext, iv, senderKeyId, recipientKeyId } = req.body || {};
 
   try {
     const result = await messagingService.sendDirectMessage(userId, recipientId, {

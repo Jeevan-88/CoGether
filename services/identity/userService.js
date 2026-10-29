@@ -356,6 +356,173 @@ class UserService {
    * - Progressive lockout (1 min after 5 fails, 15 min after 10 fails)
    * - Seamless interception for RFC 6238 TOTP Multi-Factor Authentication
    */
+  /**
+   * Direct Registration with Email, Argon2id Password, Handle, and Profile Setup
+   */
+  async registerWithPassword({
+    email: rawEmail,
+    password,
+    username,
+    displayName,
+    firstName,
+    lastName,
+    avatarUrl,
+    avatarConfig,
+    preferences,
+    metadata = {}
+  }) {
+    if (!rawEmail || typeof rawEmail !== 'string') {
+      return { success: false, error: 'EMAIL_REQUIRED', message: 'Email address is required.' };
+    }
+
+    const email = normalizeEmail(rawEmail);
+    if (!email || !email.includes('@') || email.length < 5) {
+      return { success: false, error: 'INVALID_EMAIL', message: 'Please provide a valid email address.' };
+    }
+
+    // Validate password
+    const passValidation = validatePassword(password);
+    if (!passValidation.valid) {
+      return { success: false, error: passValidation.error, message: passValidation.message };
+    }
+
+    // Check if email already registered
+    const existingEmail = await db.query(
+      'SELECT user_id FROM identity.emails WHERE email_normalized = $1 LIMIT 1',
+      [email]
+    );
+    if (existingEmail.rows.length > 0) {
+      return {
+        success: false,
+        error: 'EMAIL_ALREADY_EXISTS',
+        message: 'An account with this email address already exists. Please log in.'
+      };
+    }
+
+    // Validate username if provided, or generate one
+    let chosenUsername;
+    if (username) {
+      const valid = profileService.validateUsername(username);
+      if (!valid.valid) {
+        return { success: false, error: valid.error, message: valid.message || 'Invalid username handle.' };
+      }
+      const available = await profileService.isUsernameAvailable(valid.normalized);
+      if (!available) {
+        return {
+          success: false,
+          error: 'USERNAME_ALREADY_TAKEN',
+          message: 'That username is already taken. Please choose another handle.'
+        };
+      }
+      chosenUsername = valid.cleanUsername;
+    } else {
+      const baseName = (firstName || email.split('@')[0] || 'member').toLowerCase().replace(/[^a-z0-9_]/g, '');
+      chosenUsername = await profileService.generateUniqueUsername(baseName || 'member');
+    }
+
+    // Hash password with Argon2id
+    const passwordHash = await hashPassword(password);
+
+    // Compute display name
+    const computedDisplayName = displayName || [firstName, lastName].filter(Boolean).join(' ').trim() || chosenUsername;
+
+    // Database transaction
+    const client = await db.pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // 1. Create User
+      const userRes = await client.query(
+        `INSERT INTO identity.users 
+         (status, display_name, email, password_hash, last_login_at, created_at, updated_at)
+         VALUES ('active', $1, $2, $3, NOW(), NOW(), NOW())
+         RETURNING id, created_at`,
+        [computedDisplayName, email, passwordHash]
+      );
+      const userId = userRes.rows[0].id;
+
+      // 2. Primary Email
+      await client.query(
+        `INSERT INTO identity.emails (user_id, email_normalized, is_primary, verified_at, created_at)
+         VALUES ($1, $2, true, NOW(), NOW())`,
+        [userId, email]
+      );
+
+      // 3. Identity
+      await client.query(
+        `INSERT INTO identity.identities (user_id, provider, provider_subject, provider_email, created_at)
+         VALUES ($1, 'password', $2, $2, NOW())`,
+        [userId, email]
+      );
+
+      // 4. Profile
+      await profileService.createProfile(
+        userId,
+        {
+          username: chosenUsername,
+          displayName: computedDisplayName,
+          firstName: firstName || null,
+          lastName: lastName || null,
+          avatarUrl: avatarUrl || null,
+          avatarConfig: avatarConfig || null,
+          bio: null
+        },
+        client
+      );
+
+      // 5. Preferences (incorporates eligible guest preferences if passed)
+      await profileService.createPreferences(
+        userId,
+        {
+          primaryInterest: preferences?.primaryInterest || 'all',
+          interests: preferences?.interests || [],
+          timezone: preferences?.timezone || 'UTC',
+          language: preferences?.language || 'en'
+        },
+        client
+      );
+
+      // 6. Entitlements
+      await client.query(
+        `INSERT INTO identity.entitlements (user_id, tier, status, created_at, updated_at)
+         VALUES ($1, 'free', 'active', NOW(), NOW())`,
+        [userId]
+      );
+
+      await client.query('COMMIT');
+
+      // 7. Establish real authenticated session & tokens
+      const session = await createSession(userId, metadata);
+      const createdProfile = await profileService.getProfileByUserId(userId);
+      const createdPreferences = await profileService.getPreferences(userId);
+
+      const accessToken = signToken({
+        sub: userId,
+        email,
+        username: createdProfile?.username || chosenUsername,
+        displayName: createdProfile?.display_name || computedDisplayName,
+        tier: 'free'
+      });
+
+      return {
+        success: true,
+        isNewUser: true,
+        user: { id: userId, email, emailVerified: true, status: 'active', createdAt: userRes.rows[0].created_at },
+        profile: createdProfile,
+        preferences: createdPreferences,
+        accessToken,
+        refreshToken: session.refreshToken,
+        expiresAt: session.expiresAt
+      };
+    } catch (err) {
+      await client.query('ROLLBACK');
+      logger.error('Error during password registration transaction', { error: err.message });
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   async authenticateWithPassword({ email: rawEmail, password, metadata = {} }) {
     if (!rawEmail || typeof rawEmail !== 'string') {
       return { success: false, error: 'INVALID_CREDENTIALS', message: 'Invalid email or password.' };

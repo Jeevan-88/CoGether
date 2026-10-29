@@ -1,8 +1,9 @@
 import React from 'react';
 import {
-  ArrowLeft, Users, Swords, LogIn, Search, Film, Gamepad2, ShoppingBag, BookOpen
+  ArrowLeft, Users, Swords, LogIn, Search, Bell, ChevronDown, Film, Gamepad2, ShoppingBag, BookOpen, Clock, Sparkles
 } from 'lucide-react';
 import CogetherAvatarRenderer from '../../modules/auth/CogetherAvatarRenderer.jsx';
+import { useAuth } from '../../core/AuthContext.jsx';
 import './AppNavShell.css';
 
 export default function AppNavShell({
@@ -19,23 +20,36 @@ export default function AppNavShell({
   centerContent = null,
   rightActions = null
 }) {
-  const displayName =
-    profile?.displayName ||
-    profile?.display_name ||
-    [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') ||
-    profile?.username ||
-    user?.email?.split('@')[0] ||
-    'Member';
+  const { guestRemainingSeconds, isGuestExpired } = useAuth() || {};
+
+  const isGuest = Boolean(user?.isGuest);
+  const isAuthenticated = Boolean((user && !isGuest) || (profile && !isGuest));
+
+  const displayName = isGuest
+    ? 'Guest'
+    : (profile?.displayName ||
+       profile?.display_name ||
+       [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') ||
+       profile?.username ||
+       user?.email?.split('@')[0] ||
+       'Member');
+
+  const formatGuestTime = (seconds) => {
+    if (seconds == null || isNaN(seconds)) return '5:00';
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   const avatar = profile?.avatarUrl || profile?.avatar_url || user?.avatarUrl || '';
   const avatarConfig = profile?.avatarConfig || profile?.avatar_config;
-  const isAuthenticated = Boolean(user || profile);
+  
 
   const services = [
-    { id: 'coplay', label: 'Co-Play', tabId: 'gamesHub', icon: Gamepad2 },
-    { id: 'cowatch', label: 'Co-Watch', tabId: 'cinemaHub', icon: Film },
-    { id: 'coshop', label: 'Co-Shop', tabId: 'coshop', icon: ShoppingBag },
-    { id: 'costudy', label: 'Co-Study', tabId: 'studyHub', icon: BookOpen }
+    { id: 'cowatch', label: 'CO-WATCH', tabId: 'cinemaHub', icon: Film },
+    { id: 'coplay', label: 'CO-PLAY', tabId: 'gamesHub', icon: Gamepad2 },
+    { id: 'coshop', label: 'CO-SHOP', tabId: 'coshop', icon: ShoppingBag },
+    { id: 'costudy', label: 'CO-STUDY', tabId: 'studyHub', icon: BookOpen }
   ];
 
   const isCurrentService = (item) => {
@@ -51,7 +65,7 @@ export default function AppNavShell({
 
   return (
     <header className="cogether-app-nav-shell">
-      {/* ── LEFT: BRAND & TOP-LEFT PROFILE CONTROLS ── */}
+      {/* ── LEFT: BRAND LOGO ── */}
       <div className="app-nav-left">
         {onBackToHome && (
           <button
@@ -70,40 +84,16 @@ export default function AppNavShell({
           onClick={onBackToHome}
           title="CoGether Platform"
         >
-          <span className="app-nav-brand-prefix">CO</span>
-          <span className="app-nav-brand-accent">GETHER</span>
+          <span className="app-nav-brand-prefix">Co</span>
+          <span className="app-nav-brand-accent">Gether</span>
         </div>
-
-        {/* TOP-LEFT AUTHENTICATED PROFILE BUTTON */}
-        {isAuthenticated && (
-          <button
-            type="button"
-            className="app-nav-profile-btn hub-upper-left-profile-btn"
-            onClick={onOpenProfile}
-            title={`${displayName} — Open Profile & Avatar Studio`}
-          >
-            {avatarConfig ? (
-              <div className="app-nav-avatar-wrap hub-btn-avatar-wrap">
-                <CogetherAvatarRenderer config={avatarConfig} size={24} animated={false} />
-              </div>
-            ) : avatar && (avatar.startsWith('http') || avatar.startsWith('data:')) ? (
-              <img src={avatar} alt="" className="app-nav-avatar-img hub-btn-avatar-img" />
-            ) : (
-              <span className="app-nav-avatar-initial hub-btn-avatar-initial">
-                {(displayName || 'U')[0].toUpperCase()}
-              </span>
-            )}
-            <span className="app-nav-username hub-btn-username">{displayName}</span>
-          </button>
-        )}
       </div>
 
-      {/* ── CENTER: SHARED PRODUCT MODULE SWITCHER ── */}
+      {/* ── CENTER: PRODUCT MODULE SWITCHER ── */}
       <div className="app-nav-center">
         <nav className="app-nav-services-bar" aria-label="Product modules">
           {services.map((item) => {
             const active = isCurrentService(item);
-            const IconComponent = item.icon;
             return (
               <button
                 key={item.id}
@@ -111,7 +101,6 @@ export default function AppNavShell({
                 className={`app-nav-service-pill ${active ? 'active' : ''}`}
                 onClick={() => onSelectService && onSelectService(item.id)}
               >
-                <IconComponent size={14} className="service-pill-icon" />
                 <span>{item.label}</span>
               </button>
             );
@@ -123,27 +112,67 @@ export default function AppNavShell({
         )}
       </div>
 
-      {/* ── RIGHT: SOCIAL, FRIENDS & CUSTOM MODULE ACTIONS ── */}
+      {/* ── RIGHT: SEARCH, NOTIFICATIONS, PROFILE ── */}
       <div className="app-nav-right">
-        {/* Module-specific actions (e.g. Play with Friend, New Party) */}
         {rightActions}
 
-        {/* Global Friends & Messages Button */}
-        {isAuthenticated ? (
+        {/* Global Search Button */}
+        <button
+          type="button"
+          className="app-nav-icon-btn"
+          title="Search"
+          aria-label="Search"
+        >
+          <Search size={18} />
+        </button>
+
+        {/* Notifications / Friends Trigger */}
+        <button
+          type="button"
+          className="app-nav-icon-btn btn-hub-friends-trigger"
+          onClick={onOpenSocial}
+          title="Notifications & Friends"
+          aria-label="Notifications & Friends"
+        >
+          <Bell size={18} />
+          <span className="app-nav-badge-dot hub-badge-dot" />
+        </button>
+
+        {/* User Profile Pill Menu */}
+        {isGuest ? (
+          <div className="app-nav-guest-pill" title="5-minute guest session is active">
+            <Clock size={13} className="guest-clock-icon" />
+            <span className="guest-time-text">Guest: {formatGuestTime(guestRemainingSeconds)}</span>
+            <button
+              type="button"
+              className="app-nav-guest-signup-cta"
+              onClick={onOpenAuth}
+              title="Create account to save preferences and remove 5-minute limit"
+            >
+              <Sparkles size={11} />
+              <span>Sign Up</span>
+            </button>
+          </div>
+        ) : isAuthenticated ? (
           <button
             type="button"
-            className="app-nav-friends-btn btn-hub-friends-trigger"
-            onClick={onOpenSocial}
-            title="Friends & Messages"
+            className="app-nav-profile-btn hub-upper-left-profile-btn"
+            onClick={onOpenProfile}
+            title={`${displayName} — Profile Settings`}
           >
-            <Users size={15} />
-            <span className="friends-btn-label">Friends</span>
-            {unreadCount > 0 && (
-              <span className="app-nav-badge-count hub-badge-count">{unreadCount}</span>
-            )}
-            {pendingCount > 0 && (
-              <span className="app-nav-badge-dot hub-badge-dot" />
-            )}
+            <div className="app-nav-avatar-wrap hub-btn-avatar-wrap">
+              {avatarConfig ? (
+                <CogetherAvatarRenderer config={avatarConfig} size={28} animated={false} />
+              ) : avatar && (avatar.startsWith('http') || avatar.startsWith('data:')) ? (
+                <img src={avatar} alt="" className="app-nav-avatar-img hub-btn-avatar-img" />
+              ) : (
+                <span className="app-nav-avatar-initial hub-btn-avatar-initial">
+                  {(displayName || 'J')[0].toUpperCase()}
+                </span>
+              )}
+            </div>
+            <span className="app-nav-username hub-btn-username">{displayName}</span>
+            <ChevronDown size={14} className="app-nav-chevron" />
           </button>
         ) : (
           <button

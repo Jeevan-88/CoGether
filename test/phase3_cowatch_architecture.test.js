@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const path = require('path');
 const { db } = require('../packages/database/client');
 const cowatchContentRepo = require('../services/cowatch/contentRepository');
 const cowatchRoomService = require('../services/cowatch/roomService');
@@ -249,7 +250,8 @@ async function runPhase3ArchitectureTests() {
   console.log('\n── [7/7] Zero DIRECT CINEMA & Factual Content Copy Audit ──');
   try {
     const fs = require('fs');
-    const contentCardCode = fs.readFileSync('client/src/modules/cowatch/components/ContentCard.jsx', 'utf8');
+    const contentCardPath = path.resolve(__dirname, '../client/src/modules/cowatch/components/ContentCard.jsx');
+    const contentCardCode = fs.readFileSync(contentCardPath, 'utf8');
     assert(!contentCardCode.includes('Direct Cinema'), 'ContentCard must NOT contain Direct Cinema label');
     assert(!contentCardCode.includes('DIRECT CINEMA'), 'ContentCard must NOT contain DIRECT CINEMA uppercase label');
     recordPass('ContentCard has 100% removed all Direct Cinema / DIRECT CINEMA labels');
@@ -260,7 +262,8 @@ async function runPhase3ArchitectureTests() {
     assert(desc.includes('fantasy'), 'Sintel description must be concise and factual');
     recordPass('Content catalog descriptions are de-bloated into factual human-readable records');
 
-    const providerCardCode = fs.readFileSync('client/src/modules/cowatch/components/ProviderCard.jsx', 'utf8');
+    const providerCardPath = path.resolve(__dirname, '../client/src/modules/cowatch/components/ProviderCard.jsx');
+    const providerCardCode = fs.readFileSync(providerCardPath, 'utf8');
     assert(providerCardCode.includes('provider.embedSupported'), 'ProviderCard dynamically inspects provider capabilities');
     recordPass('ProviderCard component implements dynamic capability inspection');
   } catch (err) {

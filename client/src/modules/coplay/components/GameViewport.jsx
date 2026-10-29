@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
-  Maximize2, Minimize2, RotateCw, Volume2, VolumeX, 
-  Heart, AlertOctagon, ArrowLeft, ShieldCheck, Swords 
+  Maximize2, Minimize2, RotateCw, 
+  Heart, AlertOctagon, ArrowLeft, ShieldCheck, Swords, BarChart2 
 } from 'lucide-react';
 import CoGetherButton from './CoGetherButton.jsx';
 import GameSplitArena from './GameSplitArena.jsx';
@@ -10,7 +10,7 @@ import './GameViewport.css';
 /**
  * GameViewport
  * The Stage Container for the Active Game.
- * Switches smoothly between Single-Player Stage and Multiplayer Split Arena.
+ * Displays the elevated game canvas and the floating bottom-left game metadata pill.
  */
 export default function GameViewport({
   game,
@@ -23,6 +23,7 @@ export default function GameViewport({
   isFullscreen = false,
   onToggleFullscreen,
   onOpenChallenge,
+  onOpenLeaderboard,
   resultOverlay = null,
   isSplitArena = false,
   currentUsername = 'You',
@@ -33,12 +34,12 @@ export default function GameViewport({
   onPlayAgain
 }) {
   const [isLiked, setIsLiked] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
 
   const isPortrait = game?.orientation === 'portrait';
   const frameAspectClass = isPortrait ? 'frame-aspect-portrait' : 'frame-aspect-standard';
 
-  const displayTitle = game?.title?.replace(/\(Official Open-Source\)/i, '— Open Source') || 'Game';
+  const displayTitle = game?.title?.replace(/\(Official Open-Source\)/i, '').replace(/— Open Source/i, '').trim() || '2048';
+  const displayCategory = game?.category ? (game.category.charAt(0).toUpperCase() + game.category.slice(1).toLowerCase()) : 'Puzzle';
 
   return (
     <div className={`game-viewport-stage ${isFullscreen ? 'stage-fullscreen' : ''}`}>
@@ -138,60 +139,54 @@ export default function GameViewport({
                 </div>
               </div>
             )}
-          </div>
 
-          {/* ── Bottom Metadata & Control Bar ── */}
-          <div className="dark-stage-bottom-bar">
-            <div className="bottom-bar-left">
-              {game?.thumbnail && (
-                <div className="bottom-bar-thumb">
-                  <img
-                    src={game.thumbnail}
-                    alt={game.title}
-                    className="bottom-thumb-img"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                  />
+            {/* ── Docked Bottom-Left Floating Metadata Pill (Matches Reference) ── */}
+            {!isFullscreen && (
+              <div className="game-floating-meta-dock">
+                <div className="dock-left-group">
+                  <div className="dock-thumbnail">
+                    {game?.thumbnail ? (
+                      <img
+                        src={game.thumbnail}
+                        alt={game.title}
+                        className="dock-thumb-img"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <span className="dock-thumb-text">2048</span>
+                    )}
+                  </div>
+                  <div className="dock-titles">
+                    <span className="dock-title">{displayTitle}</span>
+                    <span className="dock-category">{displayCategory}</span>
+                  </div>
                 </div>
-              )}
-              <div className="bottom-bar-titles">
-                <h2 className="bottom-game-title">{displayTitle}</h2>
-                <span className="bottom-game-category">{game?.category || 'Arcade'}</span>
+
+                <div className="dock-divider" />
+
+                <div className="dock-actions">
+                  <button
+                    type="button"
+                    className={`btn-dock-action ${isLiked ? 'is-liked' : ''}`}
+                    onClick={() => setIsLiked(!isLiked)}
+                    title="Add to Favorites"
+                    aria-label="Add to Favorites"
+                  >
+                    <Heart size={15} fill={isLiked ? '#e11d48' : 'none'} color={isLiked ? '#e11d48' : '#8E95A5'} />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-dock-action"
+                    onClick={onOpenLeaderboard}
+                    title="Leaderboard & Stats"
+                    aria-label="Leaderboard & Stats"
+                  >
+                    <BarChart2 size={15} color="#8E95A5" />
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div className="bottom-bar-right">
-              <button
-                type="button"
-                className={`btn-stage-action ${isLiked ? 'is-liked' : ''}`}
-                onClick={() => setIsLiked(!isLiked)}
-                title="Add to Favorites"
-                aria-label="Add to Favorites"
-              >
-                <Heart size={15} fill={isLiked ? '#e11d48' : 'none'} color={isLiked ? '#e11d48' : 'currentColor'} />
-              </button>
-
-              {game?.challengeSupported && onOpenChallenge && (
-                <button
-                  type="button"
-                  className="btn-stage-action btn-challenge-action"
-                  onClick={onOpenChallenge}
-                  title="Challenge Friend"
-                >
-                  <Swords size={14} />
-                  <span>CHALLENGE</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                className="btn-stage-action"
-                onClick={onToggleFullscreen}
-                title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-                aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-              >
-                {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-              </button>
-            </div>
+            )}
           </div>
         </div>
       )}

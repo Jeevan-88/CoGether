@@ -1,125 +1,111 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, Plus, Users, Link2, MoreHorizontal } from 'lucide-react';
-import { useAuth } from '../../../core/AuthContext.jsx';
-import { useSocial } from '../../../core/SocialContext.jsx';
-import AppNavShell from '../../../components/common/AppNavShell.jsx';
+import React from 'react';
+import { Search, SlidersHorizontal, Bell, Users, X, Link2, Play } from 'lucide-react';
+import './CoWatchHeader.css';
 
 export default function CoWatchHeader({
-  searchQuery,
+  searchQuery = '',
   onSearchChange,
   onCreateRoom,
-  onJoinRoom,
-  onOpenImportModal,
-  onOpenProfile,
-  onOpenAuth,
-  onSelectService,
-  onBackToHome
+  onOpenFilter,
+  onOpenNotifications,
+  onOpenPasteLink,
+  onLaunchStreamUrl
 }) {
-  const { profile, user } = useAuth();
-  const { unreadSummary, pendingRequests, setIsSocialModalOpen } = useSocial();
-  const [showUtilityMenu, setShowUtilityMenu] = useState(false);
-  const menuRef = useRef(null);
-
-  // Close utility menu on outside click
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowUtilityMenu(false);
-      }
-    }
-    if (showUtilityMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showUtilityMenu]);
+  const isUrl = searchQuery.trim().startsWith('http://') || 
+                searchQuery.trim().startsWith('https://') || 
+                searchQuery.trim().includes('youtu.be/') || 
+                searchQuery.trim().includes('youtube.com/');
 
   return (
-    <AppNavShell
-      activeService="cowatch"
-      onSelectService={onSelectService}
-      onBackToHome={onBackToHome}
-      user={user}
-      profile={profile}
-      onOpenProfile={onOpenProfile}
-      onOpenSocial={() => setIsSocialModalOpen(true)}
-      onOpenAuth={onOpenAuth}
-      unreadCount={unreadSummary?.totalUnread || 0}
-      pendingCount={pendingRequests?.incoming?.length || 0}
-      centerContent={
-        <div className="cowatch-search-box" style={{ maxWidth: '380px', width: '100%' }}>
-          <Search size={15} className="cowatch-search-icon" />
+    <header className="cowatch-header-target" aria-label="CoWatch Top Toolbar">
+      {/* ── 1. Centered Wide Search & Paste Link Pill ── */}
+      <div className="cowatch-search-container">
+        <div className={`cowatch-search-pill cowatch-search-box ${isUrl ? 'has-detected-url' : ''}`}>
+          <Search size={16} className="cowatch-search-icon" />
           <input
             type="text"
-            placeholder="Search titles, genres, providers..."
+            className="cowatch-search-input"
+            placeholder="Search movies, series, anime, or paste YouTube / MP4 stream link..."
             value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && isUrl && onLaunchStreamUrl) {
+                onLaunchStreamUrl(searchQuery);
+              }
+            }}
           />
+          {isUrl && onLaunchStreamUrl && (
+            <button
+              type="button"
+              className="cowatch-stream-url-pill-btn"
+              onClick={() => onLaunchStreamUrl(searchQuery)}
+              title="Launch instant watch party with this link"
+            >
+              <Play size={12} fill="currentColor" />
+              <span>Stream Link</span>
+            </button>
+          )}
           {searchQuery && (
             <button
               type="button"
-              className="cowatch-search-clear"
-              onClick={() => onSearchChange('')}
+              className="cowatch-search-clear-btn"
+              onClick={() => onSearchChange && onSearchChange('')}
               title="Clear search"
+              aria-label="Clear search"
             >
-              ×
+              <X size={15} />
             </button>
           )}
         </div>
-      }
-      rightActions={
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button
-            type="button"
-            className="btn-cowatch-create-room"
-            onClick={onCreateRoom}
-            title="Create a new watch party"
-          >
-            <Plus size={14} />
-            <span>New Party</span>
-          </button>
+      </div>
 
-          <div className="cowatch-header-menu-container" ref={menuRef} style={{ position: 'relative' }}>
-            <button
-              type="button"
-              className="btn-cowatch-utility-toggle"
-              onClick={() => setShowUtilityMenu((prev) => !prev)}
-              title="More room actions"
-              aria-label="More actions"
-            >
-              <MoreHorizontal size={16} />
-            </button>
+      {/* ── 2. Right Toolbar Action Controls ── */}
+      <div className="cowatch-header-actions">
+        {/* Paste Link Button */}
+        <button
+          type="button"
+          className="btn-cowatch-paste-link"
+          onClick={onOpenPasteLink}
+          title="Paste any video file (.mp4, .m3u8) or YouTube URL"
+        >
+          <Link2 size={15} />
+          <span>Paste Link</span>
+        </button>
 
-            {showUtilityMenu && (
-              <div className="cowatch-utility-dropdown">
-                <button
-                  type="button"
-                  className="cowatch-utility-menu-item"
-                  onClick={() => {
-                    setShowUtilityMenu(false);
-                    onJoinRoom();
-                  }}
-                >
-                  <Users size={14} />
-                  <span>Join by Room Code</span>
-                </button>
-                <button
-                  type="button"
-                  className="cowatch-utility-menu-item"
-                  onClick={() => {
-                    setShowUtilityMenu(false);
-                    onOpenImportModal();
-                  }}
-                >
-                  <Link2 size={14} />
-                  <span>Import Stream URL</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      }
-    />
+        {/* Filter Button */}
+        <button
+          type="button"
+          className="btn-cowatch-filter"
+          onClick={onOpenFilter}
+          title="Filter content by genre and quality"
+        >
+          <SlidersHorizontal size={15} />
+          <span>Filter</span>
+        </button>
+
+        {/* Notifications Bell */}
+        <button
+          type="button"
+          className="btn-cowatch-bell"
+          onClick={onOpenNotifications}
+          title="Notifications & Invites"
+          aria-label="Notifications & Invites"
+        >
+          <Bell size={17} />
+          <span className="bell-badge-peach" />
+        </button>
+
+        {/* New Party Crimson Button */}
+        <button
+          type="button"
+          className="btn-cowatch-new-party btn-cowatch-create-room"
+          onClick={onCreateRoom}
+          title="Create a new synchronized watch party"
+        >
+          <Users size={16} />
+          <span>New Party</span>
+        </button>
+      </div>
+    </header>
   );
 }

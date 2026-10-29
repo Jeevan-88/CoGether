@@ -97,27 +97,6 @@ export default function Navbar({
         {/* Upper-Left: Brand logo spacer & conditional authenticated profile control */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div className="navbar-brand-logo" onClick={() => onTabChange('home')} />
-          {isAuthenticated && (
-            <button
-              type="button"
-              className="user-nav-badge-upper-left hub-upper-left-profile-btn"
-              onClick={onOpenProfile}
-              title={`${displayName} — Manage Profile & Avatar`}
-            >
-              {avatarConfig ? (
-                <div className="hub-btn-avatar-wrap">
-                  <CogetherAvatarRenderer config={avatarConfig} size={22} animated={false} />
-                </div>
-              ) : avatar && (avatar.startsWith('http') || avatar.startsWith('data:')) ? (
-                <img src={avatar} alt="" className="hub-btn-avatar-img" />
-              ) : (
-                <span className="hub-btn-avatar-initial">
-                  {(displayName || 'U')[0].toUpperCase()}
-                </span>
-              )}
-              <span className="hub-btn-username">{displayName}</span>
-            </button>
-          )}
         </div>
 
         {/* Pixar-style nav links: uppercase, spaced, pure white */}
@@ -151,28 +130,14 @@ export default function Navbar({
         {/* Right actions: strictly authentication-aware */}
         <div className="nav-right-actions">
           {isAuthenticated ? (
-            <>
-              <button
-                type="button"
-                className="btn-hub-friends-trigger"
-                onClick={onOpenSocial}
-                title="Friends & Messages"
-              >
-                <Users size={15} />
-                <span>Friends</span>
-                {unreadCount > 0 && (
-                  <span className="hub-badge-count">{unreadCount}</span>
-                )}
-              </button>
-              <button
-                type="button"
-                className="btn-login-rect"
-                onClick={() => onTabChange('games')}
-                title="Enter CoPlay Games"
-              >
-                Enter App
-              </button>
-            </>
+            <button
+              type="button"
+              className="btn-login-rect"
+              onClick={() => onTabChange('games')}
+              title="Launch CoGether App"
+            >
+              Launch App
+            </button>
           ) : (
             <button
               type="button"

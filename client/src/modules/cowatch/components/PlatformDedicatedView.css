@@ -1,0 +1,393 @@
+/* ══════════════════════════════════════════════════════════════════════
+   PLATFORM DEDICATED VIEW — CRIMSON GLASS AESTHETIC
+   ══════════════════════════════════════════════════════════════════════ */
+
+.platform-dedicated-container {
+  padding: 24px 32px 64px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── 1. PLATFORM HERO BANNER ── */
+.platform-hero-banner {
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(44, 15, 18, 0.45) 0%, rgba(20, 21, 24, 0.75) 100%);
+  border: 1px solid rgba(255, 235, 230, 0.1);
+  padding: 32px 36px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+
+.platform-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--platform-accent, #C9293A), transparent);
+}
+
+.platform-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 860px;
+}
+
+.platform-hero-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.platform-capability-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.platform-drm-warning-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #FED7B8;
+  background: rgba(254, 215, 184, 0.1);
+  border: 1px solid rgba(254, 215, 184, 0.25);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.platform-free-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.platform-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.platform-title-icon-box {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.platform-brand-heading {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+}
+
+.platform-tagline-text {
+  font-size: 13.5px;
+  color: #B9B2B2;
+  margin: 4px 0 0 0;
+}
+
+.platform-description-paragraph {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #D6D0CF;
+  margin: 0;
+}
+
+.platform-capabilities-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px 16px;
+  background: rgba(14, 15, 18, 0.65);
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 235, 230, 0.06);
+}
+
+.platform-capability-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #B9B2B2;
+  font-weight: 500;
+}
+
+.platform-hero-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.btn-platform-official {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: rgba(28, 29, 33, 0.85);
+  border: 1px solid rgba(255, 235, 230, 0.16);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-platform-official:hover {
+  background: rgba(255, 235, 230, 0.1);
+  border-color: rgba(255, 235, 230, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-platform-start-party {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #C9293A 0%, #A01B29 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(201, 41, 58, 0.45);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-platform-start-party:hover {
+  background: linear-gradient(135deg, #E43B4C 0%, #C9293A 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(228, 59, 76, 0.55);
+}
+
+/* ── 2. IMPORTER SECTION ── */
+.platform-importer-section {
+  border-radius: 16px;
+  background: rgba(28, 29, 33, 0.55);
+  border: 1px solid rgba(255, 235, 230, 0.09);
+  padding: 22px 26px;
+}
+
+.importer-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.importer-header-icon {
+  color: #a855f7;
+}
+
+.importer-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.importer-sub {
+  font-size: 12px;
+  color: #817A7C;
+  margin: 2px 0 0 0;
+}
+
+.importer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.importer-inputs-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.importer-text-input {
+  flex: 2;
+  min-width: 260px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(14, 15, 18, 0.85);
+  border: 1px solid rgba(255, 235, 230, 0.12);
+  color: #FFFFFF;
+  padding: 0 16px;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.importer-text-input:focus {
+  border-color: #a855f7;
+}
+
+.importer-title-input {
+  flex: 1;
+  min-width: 160px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(14, 15, 18, 0.85);
+  border: 1px solid rgba(255, 235, 230, 0.12);
+  color: #FFFFFF;
+  padding: 0 16px;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.importer-title-input:focus {
+  border-color: #a855f7;
+}
+
+.importer-submit-btn {
+  height: 42px;
+  padding: 0 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+  border: none;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.importer-submit-btn:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
+  transform: translateY(-1px);
+}
+
+.importer-error-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f87171;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ── 3. CATALOG & SEARCH ── */
+.platform-catalog-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.platform-catalog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.platform-catalog-title {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.platform-catalog-count {
+  font-size: 11.5px;
+  color: #817A7C;
+}
+
+.platform-catalog-search-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  height: 36px;
+  background: rgba(28, 29, 33, 0.7);
+  border: 1px solid rgba(255, 235, 230, 0.1);
+  border-radius: 999px;
+  width: 240px;
+}
+
+.platform-catalog-search-pill input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-size: 12.5px;
+  width: 100%;
+}
+
+.platform-catalog-search-pill input::placeholder {
+  color: #817A7C;
+}
+
+.platform-content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 18px;
+}
+
+.platform-empty-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: rgba(28, 29, 33, 0.35);
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 235, 230, 0.1);
+  gap: 10px;
+}
+
+.empty-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: #F5F2F0;
+}
+
+.empty-sub {
+  font-size: 13px;
+  color: #817A7C;
+  margin: 0;
+}

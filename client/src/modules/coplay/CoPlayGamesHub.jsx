@@ -297,6 +297,8 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService, onLaunch
           setActivePlayRoomId(null);
         }}
         onLaunchSquadRoom={handleSquadGame}
+        onSelectService={onSelectService}
+        onBackToHome={onBackToHome}
       />
     );
   }

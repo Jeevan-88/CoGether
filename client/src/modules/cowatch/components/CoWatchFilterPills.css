@@ -1,0 +1,87 @@
+/* ══════════════════════════════════════════════════════════════════════
+   COWATCH GENRE FILTER PILLS — HORIZONTAL SCROLL & CRIMSON ACTIVE
+   Matches Target Reference with 1:1 Precision:
+   - All (Selected crimson #C9293A with white text)
+   - Popular, Movies, Series, Anime, Action, Comedy, Drama, Sci-Fi...
+   - Subtle charcoal glass background for inactive pills
+   - Circular glass arrow scroll button
+   ══════════════════════════════════════════════════════════════════════ */
+
+.cowatch-filters-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.cowatch-filters-scroll-track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 0;
+  width: 100%;
+}
+
+.cowatch-filters-scroll-track::-webkit-scrollbar {
+  display: none;
+}
+
+.cowatch-filter-pill-btn {
+  height: 36px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: rgba(28, 29, 33, 0.78);
+  border: 1px solid rgba(255, 235, 230, 0.1);
+  color: #B9B2B2;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.cowatch-filter-pill-btn:hover {
+  background: rgba(44, 15, 18, 0.6);
+  border-color: rgba(201, 41, 58, 0.35);
+  color: #FFFFFF;
+}
+
+/* Active Filter Pill (Crimson Solid Fill) */
+.cowatch-filter-pill-btn.active {
+  background: #C9293A;
+  border-color: #E43B4C;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(201, 41, 58, 0.45);
+}
+
+.btn-filter-scroll-arrow {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(28, 29, 33, 0.85);
+  border: 1px solid rgba(255, 235, 230, 0.14);
+  color: #F5F2F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 10px;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.btn-filter-scroll-arrow:hover {
+  background: rgba(44, 15, 18, 0.85);
+  border-color: rgba(201, 41, 58, 0.5);
+  transform: scale(1.06);
+}

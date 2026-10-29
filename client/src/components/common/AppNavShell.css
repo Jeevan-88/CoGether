@@ -1,13 +1,14 @@
 /* ==========================================================================
    AUTHENTICATED PRODUCT MODULES SHARED NAVIGATION SHELL
-   High-contrast deep black (#000000 / #09090d), silver borders, restrained gold
+   High-contrast deep black (#000000 / #070709), silver borders, restrained gold
+   Exact match to CoGether reference design
    ========================================================================== */
 
 .cogether-app-nav-shell {
-  height: 64px;
+  height: 60px;
   background: #000000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0 20px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -15,24 +16,24 @@
   position: sticky;
   top: 0;
   z-index: 500;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
 }
 
-/* ── LEFT: BRAND & TOP-LEFT AVATAR / PROFILE ── */
+/* ── LEFT: BRAND ── */
 .app-nav-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-shrink: 0;
 }
 
 .app-nav-btn-home {
-  background: #14141c;
-  color: #a1a1aa;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 9px;
-  width: 34px;
-  height: 34px;
+  background: #12141A;
+  color: #8E95A5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,9 +42,9 @@
 }
 
 .app-nav-btn-home:hover {
-  background: #FFE500;
-  color: #000000;
-  border-color: #FFE500;
+  background: #1A1D26;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .app-nav-brand {
@@ -51,10 +52,10 @@
   align-items: center;
   cursor: pointer;
   user-select: none;
-  font-family: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
-  font-size: 1.05rem;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.28rem;
   font-weight: 800;
-  letter-spacing: 2.5px;
+  letter-spacing: -0.2px;
 }
 
 .app-nav-brand-prefix {
@@ -62,74 +63,10 @@
 }
 
 .app-nav-brand-accent {
-  color: #FFE500;
+  color: #E11D48; /* Brand Coral / Red */
 }
 
-/* TOP-LEFT USER PROFILE BUTTON */
-.app-nav-profile-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 12px 4px 5px;
-  background: #14141c;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  color: #ffffff;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  font-family: inherit;
-  margin-left: 4px;
-}
-
-.app-nav-profile-btn:hover {
-  background: #1e1e2c;
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
-}
-
-.app-nav-avatar-wrap {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.app-nav-avatar-img {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.app-nav-avatar-initial {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.app-nav-username {
-  font-size: 12px;
-  font-weight: 600;
-  max-width: 105px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #f1f5f9;
-}
-
-/* ── CENTER: PRODUCT MODULE SWITCHER & SEARCH ── */
+/* ── CENTER: PRODUCT MODULE SWITCHER ── */
 .app-nav-center {
   display: flex;
   align-items: center;
@@ -142,49 +79,47 @@
 .app-nav-services-bar {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  background: #0d0d12;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 3px 4px;
-  border-radius: 24px;
+  gap: 28px;
 }
 
 .app-nav-service-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border-radius: 20px;
+  padding: 8px 4px;
   border: none;
   background: transparent;
-  color: #94a3b8;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 11.5px;
+  color: #8E95A5;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.18s ease;
   white-space: nowrap;
+  position: relative;
 }
 
 .app-nav-service-pill:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .app-nav-service-pill.active {
-  background: #181822;
   color: #FFE500;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  font-weight: 700;
 }
 
-.service-pill-icon {
-  opacity: 0.85;
-}
-
-.app-nav-service-pill.active .service-pill-icon {
-  opacity: 1;
-  color: #FFE500;
+.app-nav-service-pill.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: #FFE500;
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(255, 229, 0, 0.4);
 }
 
 .app-nav-custom-center {
@@ -195,99 +130,202 @@
   flex: 1;
 }
 
-/* ── RIGHT: FRIENDS & ACTIONS ── */
+/* ── RIGHT: SEARCH, NOTIFICATIONS, PROFILE ── */
 .app-nav-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
-.app-nav-friends-btn {
-  display: inline-flex;
+.app-nav-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #8E95A5;
+  display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 7px 14px;
-  background: #14141c;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 20px;
-  color: #f1f5f9;
-  font-size: 12px;
-  font-weight: 600;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.18s ease;
   position: relative;
+  transition: all 0.18s ease;
 }
 
-.app-nav-friends-btn:hover {
-  background: #1e1e28;
-  border-color: rgba(255, 255, 255, 0.28);
+.app-nav-icon-btn:hover {
   color: #ffffff;
-}
-
-.app-nav-badge-count {
-  background: #FFE500;
-  color: #000000;
-  font-size: 10px;
-  font-weight: 800;
-  padding: 1px 6px;
-  border-radius: 10px;
-  line-height: 1.2;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .app-nav-badge-dot {
+  position: absolute;
+  top: 6px;
+  right: 7px;
   width: 7px;
   height: 7px;
-  border-radius: 50%;
   background: #FFE500;
-  box-shadow: 0 0 6px rgba(255, 229, 0, 0.7);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 229, 0, 0.8);
 }
 
+/* USER PROFILE PILL BUTTON */
+.app-nav-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 5px;
+  background: #111318;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  margin-left: 4px;
+}
+
+.app-nav-profile-btn:hover {
+  background: #1A1D26;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.app-nav-avatar-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(225, 29, 72, 0.5); /* Subtle brand ring */
+  background: #1A1D26;
+}
+
+.app-nav-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.app-nav-avatar-initial {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #991B1B;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.app-nav-username {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #F8FAFC;
+}
+
+.app-nav-chevron {
+  color: #8E95A5;
+  transition: transform 0.18s ease;
+}
+
+.app-nav-profile-btn:hover .app-nav-chevron {
+  color: #ffffff;
+}
+
+/* Sign In Button */
 .app-nav-signin-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 15px;
-  background: #14141c;
-  border: 1px solid rgba(255, 229, 0, 0.35);
-  border-radius: 20px;
-  color: #FFE500;
-  font-size: 11.5px;
+  gap: 7px;
+  padding: 6px 14px;
+  background: #FFE500;
+  color: #000000;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 12px;
   font-weight: 700;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.18s ease;
 }
 
 .app-nav-signin-btn:hover {
-  background: #FFE500;
-  color: #000000;
+  background: #FFF04D;
+  box-shadow: 0 0 14px rgba(255, 229, 0, 0.4);
 }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .cogether-app-nav-shell {
     padding: 0 12px;
-    height: 60px;
+    height: 54px;
   }
+
+  .app-nav-services-bar {
+    gap: 12px;
+  }
+
+  .app-nav-service-pill {
+    font-size: 11px;
+    padding: 6px 2px;
+  }
+
   .app-nav-username {
     display: none;
   }
-  .friends-btn-label {
-    display: none;
-  }
-  .app-nav-service-pill span {
-    display: none;
-  }
-  .app-nav-service-pill {
-    padding: 6px 10px;
-  }
 }
 
-@media (max-width: 600px) {
-  .app-nav-brand {
-    display: none;
-  }
-  .app-nav-center {
-    justify-content: flex-start;
-  }
+/* ── Guest Session Status Pill ── */
+.app-nav-guest-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(25, 20, 24, 0.85);
+  border: 1px solid rgba(176, 35, 71, 0.4);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11.5px;
+  color: #f2eef0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.guest-clock-icon {
+  color: #f59e0b;
+}
+
+.guest-time-text {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: #fef08a;
+}
+
+.app-nav-guest-signup-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #b02347, #7a1530);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-nav-guest-signup-cta:hover {
+  filter: brightness(1.15);
+  transform: translateY(-0.5px);
 }

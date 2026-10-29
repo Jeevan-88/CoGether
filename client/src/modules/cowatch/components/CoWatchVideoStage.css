@@ -41,6 +41,36 @@
   justify-content: center;
 }
 
+/* Premium Glossy Edge Reflection for Video Stage */
+.cowatch-video-frame-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(254, 215, 184, 0.35) 0%,
+    rgba(201, 41, 58, 0.5) 25%,
+    rgba(44, 15, 18, 0.05) 50%,
+    rgba(201, 41, 58, 0.35) 75%,
+    rgba(254, 215, 184, 0.25) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0.75;
+  animation: videoStageEdgePulse 5s ease-in-out infinite alternate;
+}
+
+@keyframes videoStageEdgePulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 0.85; }
+  100% { opacity: 0.6; }
+}
+
 .cowatch-video-stage-root.is-cinema-mode .cowatch-video-frame-inner {
   border-color: rgba(255, 229, 0, 0.15);
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);

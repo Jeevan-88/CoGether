@@ -1,5 +1,5 @@
 const { signToken, verifyToken } = require('./jwt');
-const { createGuestSession } = require('./guest');
+const { createGuestSession, validateGuestSession, GUEST_SESSION_DURATION_SECONDS } = require('./guest');
 const { authenticateToken, requireEntitlement, hasSufficientTier, TIER_RANK } = require('./entitlements');
 const { normalizeEmail, generateOtp, hashOtp, verifyOtpHash } = require('./passwordless');
 const { createSession, validateAndRotateSession, revokeSession, revokeAllUserSessions } = require('./sessionManager');
@@ -16,10 +16,12 @@ const {
 } = require('./mfa');
 
 module.exports = {
-  // JWT
+  // JWT & Guest
   signToken,
   verifyToken,
   createGuestSession,
+  validateGuestSession,
+  GUEST_SESSION_DURATION_SECONDS,
   authenticateToken,
   requireEntitlement,
   hasSufficientTier,

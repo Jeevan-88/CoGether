@@ -1,5 +1,6 @@
 import React from 'react';
-import { Play, Users, ExternalLink, Heart } from 'lucide-react';
+import { Play, Star } from 'lucide-react';
+import './ContentCard.css';
 
 export default function ContentCard({
   content,
@@ -8,12 +9,15 @@ export default function ContentCard({
   onWatchSolo,
   onWatchParty
 }) {
-  const isCompanion = content.playbackMode === 'EXTERNAL_PROVIDER';
-  const isYouTube = content.playbackMode === 'YOUTUBE_PLAYER';
-  const isFree = content.playbackMode === 'NATIVE_PLAYER' && (content.sourceType === 'PUBLIC_DOMAIN' || content.sourceType === 'OPEN_LICENSE');
+  if (!content) return null;
 
-  const formatRuntime = (seconds) => {
-    if (!seconds) return '';
+  const displayTitle = content.title || 'Untitled';
+  const displayYear = content.year || '2024';
+  
+  // Format duration into "2h 46m"
+  const formatDuration = (seconds) => {
+    if (!seconds) return '2h 15m';
+    if (typeof seconds === 'string' && seconds.includes('h')) return seconds;
     const m = Math.floor(seconds / 60);
     if (m >= 60) {
       const h = Math.floor(m / 60);
@@ -23,114 +27,94 @@ export default function ContentCard({
     return `${m}m`;
   };
 
-  const getSubtleBadge = () => {
-    if (isFree) {
-      return <span className="card-minimal-badge badge-free">FREE</span>;
+  const displayRuntime = content.runtime || formatDuration(content.duration);
+  const displayRating = content.rating || (content.score ? content.score.toFixed(1) : '8.6');
+  const qualityBadge = content.quality || (content.is4K ? '4K' : (content.year >= 2020 ? '4K' : 'HD'));
+  const isNativeMedia = content.playbackMode === 'NATIVE_PLAYER' || content.sourceType === 'PUBLIC_DOMAIN' || content.isFree;
+
+  // Source type badge
+  let sourceBadge = null;
+  if (content.badge) {
+    sourceBadge = { label: content.badge, cls: 'badge-custom' };
+  } else if (isNativeMedia) {
+    sourceBadge = { label: 'FREE STREAM', cls: 'badge-free' };
+  } else if (content.playbackMode === 'YOUTUBE_PLAYER' || content.sourceType === 'YOUTUBE') {
+    sourceBadge = { label: 'YOUTUBE', cls: 'badge-yt' };
+  } else if (content.playbackMode === 'EXTERNAL_PROVIDER') {
+    sourceBadge = { label: content.providerName || 'COMPANION', cls: 'badge-drm' };
+  }
+
+  const posterSrc = content.poster || content.thumbnail || content.backdrop || '/assets/cinema/poster_dune.png';
+
+  const handleClick = (e) => {
+    if (onWatchParty) {
+      onWatchParty(content);
+    } else if (onWatchSolo) {
+      onWatchSolo(content);
     }
-    if (isYouTube) {
-      return <span className="card-minimal-badge badge-yt">YOUTUBE</span>;
-    }
-    if (content.providerId === 'netflix') {
-      return <span className="card-minimal-badge badge-netflix">NETFLIX</span>;
-    }
-    if (content.providerId === 'crunchyroll') {
-      return <span className="card-minimal-badge badge-crunchy">CRUNCHYROLL</span>;
-    }
-    if (content.providerId === 'prime_video') {
-      return <span className="card-minimal-badge badge-prime">PRIME</span>;
-    }
-    if (content.providerId === 'disney_plus') {
-      return <span className="card-minimal-badge badge-disney">DISNEY+</span>;
-    }
-    if (content.providerId === 'jiohotstar') {
-      return <span className="card-minimal-badge badge-hotstar">HOTSTAR</span>;
-    }
-    return null;
   };
 
-  const metadataString = [
-    content.year || '',
-    formatRuntime(content.duration),
-    content.genre || ''
-  ].filter(Boolean).join(' · ');
-
   return (
-    <div className="cowatch-content-card" onClick={() => onWatchParty(content)}>
-      <div className="card-poster-wrapper">
+    <div
+      className={`cowatch-portrait-card ${isNativeMedia ? 'cowatch-content-card' : ''}`}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      title={`${displayTitle} (${displayYear}) — Watch together`}
+      aria-label={`${displayTitle}`}
+    >
+      {/* ── 1. Poster Artwork & Quality Badge ── */}
+      <div className="portrait-poster-box">
         <img
-          src={content.thumbnail || content.backdrop}
-          alt={content.title}
-          className="card-poster-img"
+          src={posterSrc}
+          alt={displayTitle}
+          className="portrait-poster-img"
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = '/assets/cinema/poster_dune.png';
+          }}
         />
-        {getSubtleBadge()}
-      </div>
 
-      <div className="card-details-box">
-        {metadataString && (
-          <span className="card-metadata-line">
-            {metadataString}
+        {/* Source Badge (Top Left) */}
+        {sourceBadge && (
+          <span className={`portrait-source-badge ${sourceBadge.cls}`}>
+            {sourceBadge.label}
           </span>
         )}
 
-        <h3 className="card-title-text" title={content.title}>
-          {content.title}
-        </h3>
+        {/* Quality Pill Badge (4K / HD) */}
+        <span className="portrait-quality-badge">{qualityBadge}</span>
 
-        {content.description && (
-          <p className="card-desc-factual">
-            {content.description}
-          </p>
-        )}
-
-        <div className="card-actions-row">
-          <button
-            type="button"
-            className="btn-card-watch"
+        {/* Hover Action Scrim */}
+        <div className="portrait-hover-scrim">
+          <button 
+            type="button" 
+            className="hover-play-circle btn-card-party"
             onClick={(e) => {
               e.stopPropagation();
-              onWatchSolo(content);
+              if (onWatchParty) onWatchParty(content);
+              else if (onWatchSolo) onWatchSolo(content);
             }}
+            aria-label={`Start Watch Party for ${displayTitle}`}
           >
-            {isCompanion ? (
-              <>
-                <ExternalLink size={12} />
-                <span>Open</span>
-              </>
-            ) : (
-              <>
-                <Play size={11} fill="currentColor" />
-                <span>Watch</span>
-              </>
-            )}
+            <Play size={16} fill="#FFFFFF" color="#FFFFFF" style={{ marginLeft: '2px' }} />
           </button>
+        </div>
+      </div>
 
-          <button
-            type="button"
-            className="btn-card-party"
-            onClick={(e) => {
-              e.stopPropagation();
-              onWatchParty(content);
-            }}
-            title="Watch Together"
-          >
-            <Users size={12} />
-            <span>Watch Together</span>
-          </button>
+      {/* ── 2. Metadata Beneath Poster ── */}
+      <div className="portrait-meta-block">
+        <span className="portrait-title">{displayTitle}</span>
 
-          {onToggleFavorite && (
-            <button
-              type="button"
-              className={`btn-card-heart ${isFavorited ? 'favorited' : ''}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFavorite(content.id);
-              }}
-              title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
-            >
-              <Heart size={13} fill={isFavorited ? 'currentColor' : 'none'} />
-            </button>
-          )}
+        <div className="portrait-sub-row">
+          <span className="portrait-runtime">
+            {displayYear} · {displayRuntime}
+          </span>
+
+          <div className="portrait-rating">
+            <Star size={11} className="rating-star-icon" />
+            <span>{displayRating}</span>
+          </div>
         </div>
       </div>
     </div>

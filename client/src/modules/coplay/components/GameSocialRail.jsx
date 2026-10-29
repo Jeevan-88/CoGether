@@ -1,327 +1,411 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Mic, MicOff, Video, VideoOff, MessageSquare, 
-  Users, Send, Smile, LogOut, Swords, CheckCircle2,
-  ChevronRight, ChevronDown, Zap, Copy, Check, UserPlus
+  Users, Copy, Check, Link, Crown, Lock, 
+  MessageSquare, MoreVertical, Smile, Send, ChevronDown, ChevronRight,
+  Mic, MicOff, Video, VideoOff, Monitor, LogOut
 } from 'lucide-react';
 import VideoTile from '../../videoroom/VideoTile.jsx';
 import CogetherAvatarRenderer from '../../auth/CogetherAvatarRenderer.jsx';
 import './GameSocialRail.css';
 
-const QUICK_EMOJIS = ['🎮', '🔥', '🏆', '👏', '😂', '🚀', '👍', '⚡', '🕹️', '🎯'];
+const QUICK_EMOJIS = ['🎮', '🔥', '🏆', '👏', '😂', '🚀', '👍', '⚡', '🕹️', '🎯', '😊', '🙌'];
 
 export default function GameSocialRail({
-  roomId,
+  roomId = 'duel-3852',
   currentUsername = 'Player',
   userProfile = null,
   localStream,
   remoteStreams = {},
   micEnabled = true,
   cameraEnabled = true,
+  isScreenSharing = false,
   connected = false,
   connectionState = 'NEW',
   peerConnectionStates = {},
   chatMessages = [],
   onToggleMic,
   onToggleCamera,
+  onToggleScreenShare,
   onSendMessage,
   onLeaveSession,
-  isChallengeMode = false,
-  isLocalReady = false,
-  isPeerReady = false,
-  onToggleReady,
-  onStartPracticeDuel,
   onOpenInviteFriend,
   onOpenDirectMessages
 }) {
   const [chatInput, setChatInput] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isPartyCollapsed, setIsPartyCollapsed] = useState(false);
   const [copied, setCopied] = useState(false);
   const chatMessagesEndRef = useRef(null);
 
-  const remotePeerIds = Object.keys(remoteStreams);
-  const totalParticipants = remotePeerIds.length + 1;
+  const remotePeerIds = Object.keys(remoteStreams || {});
+  const totalCount = 1 + remotePeerIds.length;
+  const hasRemotePeer = remotePeerIds.length > 0;
+  const remotePlayerName = hasRemotePeer 
+    ? (remoteStreams[remotePeerIds[0]]?.username || 'Player 2') 
+    : null;
 
+  // Auto-scroll chat to latest message
   useEffect(() => {
     chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  const handleSendChat = (e) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
-    onSendMessage(chatInput.trim());
-    setChatInput('');
-    setShowEmojiPicker(false);
-  };
-
-  const handleSelectEmoji = (emoji) => {
-    onSendMessage(emoji);
-    setShowEmojiPicker(false);
-  };
-
-  const handleCopyRoomCode = () => {
+  const handleCopyCode = () => {
     if (!roomId) return;
     navigator.clipboard.writeText(roomId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const opponentName = remotePeerIds.length > 0 ? (remoteStreams[remotePeerIds[0]]?.username || 'Opponent') : 'Waiting...';
+  const handleSendChat = (e) => {
+    e?.preventDefault();
+    if (!chatInput.trim()) return;
+
+    if (onSendMessage) {
+      onSendMessage(chatInput.trim());
+    }
+
+    setChatInput('');
+    setShowEmojiPicker(false);
+  };
+
+  const handleSelectEmoji = (emoji) => {
+    setChatInput((prev) => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const displayName = currentUsername?.replace(/\s*\(You\)$/i, '') || 'Player';
 
   return (
-    <aside className={`game-social-rail ${isCollapsed ? 'is-collapsed' : ''}`} aria-label="Social Sidebar">
-      {/* ── Rail Top Header ── */}
-      <div className="rail-top-header">
-        <div className="rail-header-info">
-          <Users size={16} className="rail-users-icon" />
-          <span className="rail-title">Social ({totalParticipants})</span>
-        </div>
-
-        <div className="rail-header-actions">
-          {onOpenInviteFriend && !isCollapsed && (
-            <button
-              type="button"
-              className="btn-rail-quick-invite"
-              onClick={onOpenInviteFriend}
-              title="Invite a friend to this room"
-            >
-              <UserPlus size={14} />
-              <span>Invite</span>
-            </button>
-          )}
-
-          {onOpenDirectMessages && !isCollapsed && (
-            <button
-              type="button"
-              className="btn-rail-quick-dm"
-              onClick={onOpenDirectMessages}
-              title="Direct Messages"
-            >
-              <MessageSquare size={14} />
-            </button>
-          )}
-
-          <button
-            type="button"
-            className="rail-collapse-toggle-btn"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-            aria-label={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          >
-            {isCollapsed ? <ChevronRight size={18} /> : <ChevronDown size={18} />}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Sub-header: 1-Click Room Code & WebRTC State ── */}
-      {!isCollapsed && (
-        <div className="rail-room-meta-bar">
-          <button
-            type="button"
-            className="rail-room-code-badge"
-            onClick={handleCopyRoomCode}
-            title="Click to copy Room Code"
-          >
-            <span className="room-label">ROOM:</span>
-            <span className="room-code">{roomId}</span>
-            {copied ? <Check size={12} className="copy-icon copied" /> : <Copy size={12} className="copy-icon" />}
-          </button>
-          <div className={`rail-webrtc-state-pill state-${(connectionState || 'NEW').toLowerCase()}`} title={`Connection: ${connectionState}`}>
-            <span className="state-dot" />
-            <span className="state-label">{connectionState}</span>
+    <aside className="game-social-rail game-social-rail-target" aria-label="Game and Party Social Rail">
+      {/* ══════════════════════════════════════════════════════════
+          TOP SECTION: PARTY ROOM & VIDEO FEEDS
+          ══════════════════════════════════════════════════════════ */}
+      <section className="party-room-panel">
+        {/* Header Bar */}
+        <div 
+          className="party-room-header" 
+          onClick={() => setIsPartyCollapsed(!isPartyCollapsed)}
+        >
+          <div className="party-room-title-group">
+            <Users size={16} className="party-icon-yellow" />
+            <span className="party-title-text">Party Room</span>
+            <span className="party-badge-count">
+              <Users size={11} className="badge-user-icon" />
+              <span>{totalCount}/2</span>
+            </span>
           </div>
-        </div>
-      )}
 
-      {!isCollapsed && (
-        <div className="rail-scrollable-body">
-          {/* ── Compact Ready Toggle (Refined, no bulky DUEL READINESS banner) ── */}
-          {isChallengeMode && (
-            <div className="rail-compact-ready-bar">
-              <div className="ready-players-row">
-                <div className={`ready-player-chip ${isLocalReady ? 'is-ready' : 'not-ready'}`}>
+          <button 
+            type="button" 
+            className="party-chevron-btn" 
+            aria-label="Toggle party room"
+          >
+            {isPartyCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+          </button>
+        </div>
+
+        {/* Party Body */}
+        {!isPartyCollapsed && (
+          <div className="party-room-content">
+            {/* Room Code & Invite Row */}
+            <div className="party-action-row">
+              <div 
+                className="party-room-code-box" 
+                onClick={handleCopyCode}
+                title="Click to copy Room Code"
+              >
+                <div className="code-meta-col">
+                  <span className="code-label">Room Code</span>
+                  <span className="code-string">{roomId}</span>
+                </div>
+                <button type="button" className="code-copy-btn" aria-label="Copy room code">
+                  {copied ? <Check size={14} className="copy-check" /> : <Copy size={14} />}
+                </button>
+              </div>
+
+              {onOpenInviteFriend && (
+                <button
+                  type="button"
+                  className="btn-party-invite-yellow"
+                  onClick={onOpenInviteFriend}
+                  title="Invite a friend to this room"
+                >
+                  <Link size={14} />
+                  <span>Invite friend</span>
+                </button>
+              )}
+            </div>
+
+            {/* Connected Participants List */}
+            <div className="party-members-card">
+              {/* Member 1: Local User (You) */}
+              <div className="party-member-row">
+                <div className="member-avatar-wrap bg-red-user">
                   {userProfile?.avatarConfig ? (
-                    <div className="chip-avatar">
-                      <CogetherAvatarRenderer config={userProfile.avatarConfig} size={18} animated={false} />
-                    </div>
-                  ) : null}
-                  <span className="chip-name">You</span>
-                  <span className="chip-status">{isLocalReady ? 'READY' : 'NOT READY'}</span>
+                    <CogetherAvatarRenderer config={userProfile.avatarConfig} size={28} animated={false} />
+                  ) : (
+                    <span className="member-avatar-char">
+                      {(displayName || 'P')[0].toUpperCase()}
+                    </span>
+                  )}
                 </div>
 
-                <div className={`ready-player-chip ${isPeerReady ? 'is-ready' : 'not-ready'}`}>
-                  <span className="chip-name">{opponentName}</span>
-                  <span className="chip-status">
-                    {remotePeerIds.length === 0 ? 'WAITING' : isPeerReady ? 'READY' : 'WAITING'}
-                  </span>
+                <div className="member-info-col">
+                  <span className="member-name">{displayName} (You)</span>
+                  <div className="member-status-row">
+                    <span className="status-dot-green" />
+                    <span className="status-label">{connected ? 'Connected' : 'Online'}</span>
+                  </div>
+                </div>
+
+                <div className="member-crown-badge" title="Room Host">
+                  <Crown size={15} className="crown-icon-gold" />
                 </div>
               </div>
 
-              {onToggleReady && (
-                <div className="ready-toggle-wrap">
-                  <button
-                    type="button"
-                    className={`btn-compact-ready-toggle ${isLocalReady ? 'ready-active' : ''}`}
-                    onClick={onToggleReady}
-                  >
-                    <CheckCircle2 size={14} />
-                    <span>{isLocalReady ? 'Ready' : 'Set Ready'}</span>
-                  </button>
+              {/* Member 2: Remote Peer or Open Invitation Slot */}
+              {hasRemotePeer ? (
+                <div className="party-member-row">
+                  <div className="member-avatar-wrap bg-blue-peer">
+                    <span className="member-avatar-char">
+                      {(remotePlayerName || 'P')[0].toUpperCase()}
+                    </span>
+                  </div>
 
-                  {remotePeerIds.length === 0 && onStartPracticeDuel && (
-                    <button
-                      type="button"
-                      className="btn-practice-duel-trigger"
-                      onClick={onStartPracticeDuel}
-                      title="Launch Practice Duel against AI"
-                    >
-                      <Zap size={13} />
-                      <span>Practice</span>
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── Live Video Stream Grid (16:9 Tiles) ── */}
-          <section className="rail-video-grid" aria-label="WebRTC Cameras">
-            <div className="rail-video-tile-container">
-              <VideoTile
-                stream={localStream}
-                label={currentUsername}
-                isLocal={true}
-                micEnabled={micEnabled}
-                cameraEnabled={cameraEnabled}
-              />
-            </div>
-
-            {remotePeerIds.map((peerId) => {
-              const streamData = remoteStreams[peerId];
-              return (
-                <div key={peerId} className="rail-video-tile-container">
-                  <VideoTile
-                    stream={streamData?.stream || streamData}
-                    label={streamData?.username || `Player`}
-                    isLocal={false}
-                    micEnabled={streamData?.micEnabled ?? true}
-                    cameraEnabled={streamData?.cameraEnabled ?? true}
-                  />
-                </div>
-              );
-            })}
-          </section>
-
-          {/* ── Real-Time Room Chat ── */}
-          <section className="rail-chat-section" aria-label="Room Chat">
-            <div className="rail-chat-header">
-              <MessageSquare size={13} />
-              <span>Room Chat</span>
-            </div>
-
-            <div className="rail-chat-messages-stream">
-              {chatMessages.length === 0 ? (
-                <div className="rail-chat-empty">
-                  <span>No chat messages yet.</span>
+                  <div className="member-info-col">
+                    <span className="member-name">{remotePlayerName}</span>
+                    <div className="member-status-row">
+                      <span className="status-dot-green" />
+                      <span className="status-label">In Arena</span>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                chatMessages.map((msg, index) => {
-                  const isMine = msg.sender === currentUsername || msg.sender === 'You';
-                  return (
-                    <div key={msg.id || index} className={`rail-chat-bubble ${isMine ? 'mine' : 'theirs'}`}>
-                      <div className="bubble-meta">
-                        <span className="bubble-sender">{isMine ? 'You' : msg.sender}</span>
-                        <span className="bubble-time">{msg.time || ''}</span>
-                      </div>
-                      <div className="bubble-text">{msg.text}</div>
+                <div 
+                  className="party-member-row party-member-empty" 
+                  onClick={onOpenInviteFriend} 
+                  style={{ cursor: 'pointer', opacity: 0.75 }}
+                  title="Click to invite friend"
+                >
+                  <div className="member-avatar-wrap member-avatar-waiting">
+                    <span className="member-avatar-char" style={{ color: '#8E95A5' }}>+</span>
+                  </div>
+
+                  <div className="member-info-col">
+                    <span className="member-name" style={{ color: '#8E95A5', fontStyle: 'italic' }}>Waiting for opponent...</span>
+                    <div className="member-status-row">
+                      <span className="status-dot-green" style={{ background: '#F59E0B' }} />
+                      <span className="status-label" style={{ color: '#8E95A5' }}>Ready to invite</span>
                     </div>
-                  );
-                })
+                  </div>
+                </div>
               )}
-              <div ref={chatMessagesEndRef} />
             </div>
 
-            {/* Emoji Quick Picker Dropdown */}
-            {showEmojiPicker && (
-              <div className="emoji-quick-picker-popover fade-in">
-                {QUICK_EMOJIS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    className="emoji-popover-item"
-                    onClick={() => handleSelectEmoji(emoji)}
-                  >
-                    {emoji}
-                  </button>
-                ))}
+            {/* ── Live WebRTC Video Calling Stage ── */}
+            {(cameraEnabled || localStream || hasRemotePeer) && (
+              <div className="rail-video-grid" style={{ marginTop: '10px' }}>
+                <div className="rail-video-tile-container">
+                  <VideoTile
+                    stream={localStream}
+                    label={displayName}
+                    isLocal={true}
+                    micEnabled={micEnabled}
+                    cameraEnabled={cameraEnabled}
+                  />
+                </div>
+
+                {remotePeerIds.map((peerId) => {
+                  const peerData = remoteStreams[peerId];
+                  return (
+                    <div key={peerId} className="rail-video-tile-container">
+                      <VideoTile
+                        stream={peerData?.stream || peerData}
+                        label={peerData?.username || 'Player 2'}
+                        isLocal={false}
+                        micEnabled={peerData?.micEnabled ?? true}
+                        cameraEnabled={peerData?.cameraEnabled ?? true}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             )}
 
-            {/* Chat Input Bar */}
-            <form onSubmit={handleSendChat} className="rail-chat-form">
+            {/* ── In-Call Controls Bar (Mic, Camera, Screen Share, Leave) ── */}
+            <div className="rail-controls-bar" style={{ marginTop: '8px' }}>
               <button
                 type="button"
-                className="chat-emoji-btn"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                title="Insert emoji"
-                aria-label="Insert emoji"
+                className={`control-circle-btn ${!micEnabled ? 'is-off' : ''}`}
+                onClick={onToggleMic}
+                title={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
+                aria-label={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
               >
-                <Smile size={15} />
+                {micEnabled ? <Mic size={16} /> : <MicOff size={16} />}
               </button>
-              <input
-                type="text"
-                placeholder="Type message..."
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                className="rail-chat-input"
-              />
+
               <button
-                type="submit"
-                className="chat-send-btn"
-                disabled={!chatInput.trim()}
-                title="Send"
-                aria-label="Send"
+                type="button"
+                className={`control-circle-btn ${!cameraEnabled ? 'is-off' : ''}`}
+                onClick={onToggleCamera}
+                title={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
+                aria-label={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
               >
-                <Send size={13} />
+                {cameraEnabled ? <Video size={16} /> : <VideoOff size={16} />}
               </button>
-            </form>
-          </section>
 
-          {/* ── Bottom Controls Bar (Mic, Camera, Leave) ── */}
-          <section className="rail-controls-bar" aria-label="Room Controls">
-            <button
-              type="button"
-              className={`control-circle-btn ${!micEnabled ? 'is-off' : ''}`}
-              onClick={onToggleMic}
-              title={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
-              aria-label={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
-            >
-              {micEnabled ? <Mic size={16} /> : <MicOff size={16} />}
-            </button>
+              <button
+                type="button"
+                className={`control-circle-btn ${isScreenSharing ? 'is-active' : ''}`}
+                onClick={onToggleScreenShare}
+                title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
+                aria-label={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
+              >
+                <Monitor size={16} />
+              </button>
 
-            <button
-              type="button"
-              className={`control-circle-btn ${!cameraEnabled ? 'is-off' : ''}`}
-              onClick={onToggleCamera}
-              title={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
-              aria-label={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
-            >
-              {cameraEnabled ? <Video size={16} /> : <VideoOff size={16} />}
-            </button>
+              {onLeaveSession && (
+                <button
+                  type="button"
+                  className="control-circle-btn btn-leave-room"
+                  onClick={onLeaveSession}
+                  title="Leave Room"
+                  aria-label="Leave Room"
+                >
+                  <LogOut size={16} />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
 
-            <button
-              type="button"
-              className="control-circle-btn btn-leave-room"
-              onClick={onLeaveSession}
-              title="Leave Room"
-              aria-label="Leave Room"
-            >
-              <LogOut size={16} />
-            </button>
-          </section>
+      {/* ══════════════════════════════════════════════════════════
+          BOTTOM SECTION: REAL-TIME ROOM CHAT
+          ══════════════════════════════════════════════════════════ */}
+      <section className="party-chat-panel">
+        {/* Chat Header */}
+        <div className="party-chat-header">
+          <div className="chat-title-group">
+            <MessageSquare size={15} className="chat-icon-muted" />
+            <span className="chat-title-text">Chat</span>
+          </div>
+
+          <button 
+            type="button" 
+            className="chat-more-btn"
+            onClick={onOpenDirectMessages}
+            title="Chat Options"
+            aria-label="Chat Options"
+          >
+            <MoreVertical size={16} />
+          </button>
         </div>
-      )}
+
+        {/* Chat Messages Stream */}
+        <div className="party-chat-stream">
+          {(!chatMessages || chatMessages.length === 0) ? (
+            <div className="telegram-chat-empty-state">
+              <div className="telegram-date-badge">TODAY</div>
+              <div className="telegram-encryption-notice">
+                <Lock size={14} className="notice-lock-icon" />
+                <span className="notice-heading">End-to-End Encrypted Room</span>
+                <p className="notice-sub">Messages are sent in real time directly to connected room members.</p>
+              </div>
+            </div>
+          ) : (
+            chatMessages.map((msg, index) => {
+              const sender = msg.senderName || msg.sender || 'Player';
+              const isMine = sender === currentUsername || sender === displayName || sender === 'You' || msg.senderId === 'local';
+              const text = msg.text || '';
+              const time = msg.timestamp || msg.time || '';
+
+              if (isMine) {
+                return (
+                  <div key={msg.id || index} className="chat-message-row outgoing">
+                    <div className="chat-bubble outgoing">
+                      <span className="bubble-text-content">{text}</span>
+                    </div>
+                    <div className="bubble-sub-meta">
+                      <span className="bubble-timestamp">{time}</span>
+                      <span className="read-receipt-ticks">✓✓</span>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={msg.id || index} className="chat-message-row incoming">
+                  <div className="incoming-avatar-col">
+                    <div className="incoming-avatar" style={{ background: '#3B82F6' }}>
+                      {sender[0]?.toUpperCase() || 'P'}
+                    </div>
+                  </div>
+                  <div className="incoming-bubble-col">
+                    <div className="bubble-meta" style={{ fontSize: '10px', color: '#94a3b8', marginBottom: '2px' }}>
+                      <span>{sender}</span>
+                    </div>
+                    <div className="chat-bubble incoming">
+                      <span className="bubble-text-content">{text}</span>
+                    </div>
+                    <div className="bubble-sub-meta">
+                      <span className="bubble-timestamp">{time}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={chatMessagesEndRef} />
+        </div>
+
+        {/* Emoji Quick Picker Popover */}
+        {showEmojiPicker && (
+          <div className="emoji-picker-dock fade-in">
+            {QUICK_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                className="emoji-dock-item"
+                onClick={() => handleSelectEmoji(emoji)}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Chat Input Pill */}
+        <form onSubmit={handleSendChat} className="party-chat-input-pill">
+          <button
+            type="button"
+            className="btn-chat-emoji"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            title="Emoji"
+            aria-label="Add emoji"
+          >
+            <Smile size={18} />
+          </button>
+
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            className="party-chat-textfield"
+          />
+
+          <button
+            type="submit"
+            className="btn-chat-send-yellow"
+            disabled={!chatInput.trim()}
+            title="Send Message"
+            aria-label="Send Message"
+          >
+            <Send size={14} className="send-icon-black" />
+          </button>
+        </form>
+      </section>
     </aside>
   );
 }

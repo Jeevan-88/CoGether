@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CoGether Cinema Sync</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      width: 320px;
+      background: #09080a;
+      color: #f2eef0;
+      padding: 18px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #b02347;
+      box-shadow: 0 0 10px #b02347;
+    }
+    .brand {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #f2eef0;
+    }
+    .brand span {
+      color: #b02347;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #9c979e;
+    }
+    .status-badge.connected {
+      background: rgba(30, 180, 80, 0.15);
+      border-color: rgba(30, 180, 80, 0.3);
+      color: #4ade80;
+    }
+    .status-badge.connected .dot {
+      background: #4ade80;
+      box-shadow: 0 0 6px #4ade80;
+    }
+    .status-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #777;
+    }
+    .card {
+      background: #141114;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #9c979e;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      background: #09080a;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 13px;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: #b02347;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #7a1530, #b02347);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(176, 35, 71, 0.35);
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+      color: #e0dedf;
+    }
+    .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .hint {
+      font-size: 11px;
+      line-height: 1.5;
+      color: #8b858e;
+      margin-top: 10px;
+    }
+    .platforms {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .platforms span {
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: #bfb9c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-area">
+      <div class="logo-dot"></div>
+      <div class="brand">Co<span>Watch</span> Sync</div>
+    </div>
+    <div class="status-badge" id="statusBadge">
+      <div class="dot"></div>
+      <span id="statusText">Offline</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <label for="roomInput">Party Room Code</label>
+    <input type="text" id="roomInput" placeholder="e.g. party-9x3k" />
+    <button class="btn" id="connectBtn">Connect to Party</button>
+    <button class="btn secondary" id="disconnectBtn" style="display: none;">Leave Sync</button>
+  </div>
+
+  <div class="hint">
+    Open Netflix, Prime, Disney+, or YouTube in your browser. When everyone has their subscription active, playback syncs smoothly across all tabs.
+  </div>
+
+  <div class="platforms">
+    <span>Netflix</span>
+    <span>Prime</span>
+    <span>Disney+</span>
+    <span>Crunchyroll</span>
+    <span>YouTube</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

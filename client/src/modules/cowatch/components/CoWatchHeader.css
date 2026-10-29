@@ -1,0 +1,241 @@
+/* ══════════════════════════════════════════════════════════════════════
+   COWATCH TOP TOOLBAR — CRIMSON VELVET & SPACE BLACK DESIGN
+   Matches Target Reference with 1:1 Precision:
+   - Deep background with subtle glass blur
+   - Wide centered search input pill with URL detection & Stream Link button
+   - Paste Link quick action button
+   - Filter button, Notifications bell with peach dot, and New Party crimson pill
+   ══════════════════════════════════════════════════════════════════════ */
+
+.cowatch-header-target {
+  height: 64px;
+  position: sticky;
+  top: 0;
+  background: rgba(8, 9, 11, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 235, 230, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  z-index: 95;
+  box-sizing: border-box;
+  gap: 20px;
+}
+
+/* ── 1. CENTER SEARCH BOX ── */
+.cowatch-search-container {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+}
+
+.cowatch-search-pill {
+  width: 100%;
+  height: 42px;
+  background: rgba(28, 29, 33, 0.78);
+  border: 1px solid rgba(255, 235, 230, 0.12);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 235, 230, 0.06);
+}
+
+.cowatch-search-pill:focus-within {
+  border-color: rgba(201, 41, 58, 0.65);
+  background: rgba(44, 15, 18, 0.55);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(201, 41, 58, 0.25);
+}
+
+.cowatch-search-pill.has-detected-url {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(20, 35, 25, 0.6);
+}
+
+.cowatch-search-icon {
+  color: #817A7C;
+  flex-shrink: 0;
+}
+
+.cowatch-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #F5F2F0;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 400;
+  width: 100%;
+}
+
+.cowatch-search-input::placeholder {
+  color: #817A7C;
+  font-weight: 400;
+}
+
+.cowatch-stream-url-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  transition: all 0.2s ease;
+}
+
+.cowatch-stream-url-pill-btn:hover {
+  background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
+  transform: translateY(-1px);
+}
+
+.cowatch-search-clear-btn {
+  background: transparent;
+  border: none;
+  color: #817A7C;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cowatch-search-clear-btn:hover {
+  color: #F5F2F0;
+}
+
+/* ── 2. RIGHT TOOLBAR ACTIONS ── */
+.cowatch-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Paste Link Button */
+.btn-cowatch-paste-link {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(28, 29, 33, 0.78);
+  border: 1px solid rgba(255, 235, 230, 0.12);
+  color: #F5F2F0;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.btn-cowatch-paste-link:hover {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #d8b4fe;
+}
+
+/* Filter Button */
+.btn-cowatch-filter {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(28, 29, 33, 0.78);
+  border: 1px solid rgba(255, 235, 230, 0.12);
+  color: #F5F2F0;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.btn-cowatch-filter:hover {
+  background: rgba(44, 15, 18, 0.65);
+  border-color: rgba(201, 41, 58, 0.4);
+  color: #FFFFFF;
+}
+
+/* Notification Bell */
+.btn-cowatch-bell {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(28, 29, 33, 0.78);
+  border: 1px solid rgba(255, 235, 230, 0.12);
+  color: #B9B2B2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.btn-cowatch-bell:hover {
+  background: rgba(44, 15, 18, 0.65);
+  border-color: rgba(201, 41, 58, 0.4);
+  color: #FFFFFF;
+}
+
+.bell-badge-peach {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 6.5px;
+  height: 6.5px;
+  border-radius: 50%;
+  background: #FED7B8;
+  box-shadow: 0 0 6px rgba(254, 215, 184, 0.8);
+}
+
+/* New Party Crimson Button */
+.btn-cowatch-new-party {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #C9293A 0%, #B01E2E 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(201, 41, 58, 0.45);
+}
+
+.btn-cowatch-new-party:hover {
+  background: linear-gradient(135deg, #E43B4C 0%, #C9293A 100%);
+  box-shadow: 0 6px 24px rgba(228, 59, 76, 0.55);
+  transform: translateY(-1px);
+}
+
+.btn-cowatch-new-party:active {
+  transform: translateY(0);
+}

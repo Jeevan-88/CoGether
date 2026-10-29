@@ -13,12 +13,19 @@ export function AuthProvider({ children }) {
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('cogether_access_token') || null);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
+  const [guestRemainingSeconds, setGuestRemainingSeconds] = useState(null);
+  const [isGuestExpired, setIsGuestExpired] = useState(false);
 
   // Restore authenticated session on mount
   const restoreSession = useCallback(async () => {
     setIsLoading(true);
     const storedToken = localStorage.getItem('cogether_access_token');
     const storedRefreshToken = localStorage.getItem('cogether_refresh_token');
+
+    if (!storedToken && !storedRefreshToken) {
+      setIsLoading(false);
+      return;
+    }
 
     if (storedToken) {
       try {
@@ -86,6 +93,141 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
+
+  // Server-authoritative 5-minute guest countdown
+  useEffect(() => {
+    if (!user?.isGuest || !user?.guestExpiresAt) return;
+
+    const updateCountdown = () => {
+      const now = Date.now();
+      const expiresAt = new Date(user.guestExpiresAt).getTime();
+      const diff = Math.max(0, Math.floor((expiresAt - now) / 1000));
+      setGuestRemainingSeconds(diff);
+
+      if (diff <= 0) {
+        setIsGuestExpired(true);
+        localStorage.removeItem('cogether_access_token');
+        localStorage.removeItem('cogether_refresh_token');
+        setAccessToken(null);
+        setUser(null);
+        setProfile(null);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Start 5-minute Guest Exploration Session
+  const startGuestSession = async (displayName = 'Guest') => {
+    setAuthError(null);
+    setIsGuestExpired(false);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/guest`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ displayName })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.token) {
+        setAuthError(data.error?.message || 'Failed to start guest session');
+        return { success: false, ...data };
+      }
+
+      localStorage.setItem('cogether_access_token', data.token);
+      localStorage.removeItem('cogether_refresh_token');
+      setAccessToken(data.token);
+      setUser({
+        id: data.user.id,
+        displayName: data.user.displayName,
+        isGuest: true,
+        guestExpiresAt: data.expiresAt,
+        durationSeconds: data.durationSeconds || 300
+      });
+      setProfile({
+        username: data.user.displayName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'guest',
+        displayName: data.user.displayName,
+        avatarConfig: null
+      });
+      setPreferences({
+        primaryInterest: 'all',
+        interests: [],
+        timezone: 'UTC',
+        language: 'en'
+      });
+      setEntitlement({ tier: 'free' });
+      setGuestRemainingSeconds(data.durationSeconds || 300);
+      return { success: true, ...data };
+    } catch (err) {
+      setAuthError('Network error starting guest session');
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  };
+
+  // Direct registration with Email, Password (Argon2id), Handle & Profile Setup
+  const registerWithPassword = async ({
+    email,
+    password,
+    username,
+    displayName,
+    firstName,
+    lastName,
+    avatarUrl,
+    avatarConfig,
+    preferences: regPreferences
+  }) => {
+    setAuthError(null);
+    try {
+      const preferencesToSave = regPreferences || preferences || {
+        primaryInterest: 'all',
+        interests: [],
+        timezone: 'UTC',
+        language: 'en'
+      };
+
+      const res = await fetch(`${API_BASE}/api/v1/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          email,
+          password,
+          username,
+          displayName,
+          firstName,
+          lastName,
+          avatarUrl,
+          avatarConfig,
+          preferences: preferencesToSave
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setAuthError(data.message || data.error || 'Registration failed');
+        return { success: false, ...data };
+      }
+
+      localStorage.setItem('cogether_access_token', data.accessToken);
+      if (data.refreshToken) {
+        localStorage.setItem('cogether_refresh_token', data.refreshToken);
+      }
+      setAccessToken(data.accessToken);
+      setUser(data.user);
+      setProfile(data.profile);
+      setPreferences(data.preferences);
+      setEntitlement(data.entitlement || { tier: 'free' });
+      setIsGuestExpired(false);
+      setGuestRemainingSeconds(null);
+
+      return { success: true, ...data };
+    } catch (err) {
+      const msg = 'Network error during registration';
+      setAuthError(msg);
+      return { success: false, error: 'NETWORK_ERROR', message: msg };
+    }
+  };
 
   // Request passwordless 6-digit OTP
   const requestOtp = async (email, purpose = 'signup') => {

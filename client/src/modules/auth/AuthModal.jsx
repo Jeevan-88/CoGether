@@ -1286,6 +1286,29 @@ export default function AuthModal({
                   </>
                 )}
 
+                <div className="flow-guest-action-wrap" style={{ textAlign: 'center', marginTop: '14px', marginBottom: '10px' }}>
+                  <button
+                    type="button"
+                    className="flow-explore-guest-btn"
+                    onClick={handleExploreAsGuest}
+                    disabled={loading}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.16)',
+                      borderRadius: '8px',
+                      color: '#e2e8f0',
+                      padding: '8px 16px',
+                      fontSize: '12.5px',
+                      cursor: 'pointer',
+                      width: '100%',
+                      fontWeight: '500',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Explore as Guest (5-minute session)
+                  </button>
+                </div>
+
                 <p className="flow-legal-disclaimer">
                   By signing up, you agree to our{' '}
                   <a href="#terms" onClick={(e) => e.preventDefault()}>

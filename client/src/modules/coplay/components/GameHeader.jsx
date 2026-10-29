@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Maximize, Minimize, X, Swords, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Maximize, Minimize, Users, AlertTriangle } from 'lucide-react';
 import CoGetherButton from './CoGetherButton.jsx';
-import { GameMode } from '../gameSchema.js';
 import './GameHeader.css';
 
 /**
  * GameHeader
  * Compact fixed top header bar for the CoGether gameplay environment.
- * Contains:
- * - Back to Arcade navigation
- * - Verified game title & mode badge
- * - Challenge Friend quick-action trigger
- * - Native Fullscreen toggle (browser API)
- * - Close button with exit confirmation protection for active challenge rooms
+ * Matches exact reference design:
+ * Left: < BACK TO ARCADE | 2048
+ * Right: [icon] CHALLENGE FRIEND | Fullscreen toggle
  */
 export default function GameHeader({
   game,
@@ -39,28 +35,12 @@ export default function GameHeader({
     onClose();
   };
 
-  // Determine mode badge label and color
-  let modeLabel = 'SINGLE PLAYER';
-  let modeBadgeClass = 'mode-single';
-
-  if (mode === 'CHALLENGE') {
-    modeLabel = 'CHALLENGE MODE';
-    modeBadgeClass = 'mode-challenge';
-  } else if (game?.gameMode === GameMode.LOCAL_COOP) {
-    modeLabel = 'LOCAL 2-PLAYER';
-    modeBadgeClass = 'mode-coop';
-  } else if (game?.gameMode === GameMode.ONLINE_MULTIPLAYER) {
-    modeLabel = 'MULTIPLAYER';
-    modeBadgeClass = 'mode-multi';
-  }
-
-  // Sanitize title so "Official" is not displayed unless legally verified
-  const displayTitle = game?.title?.replace(/\(Official Open-Source\)/i, '— Open Source') || 'Game';
+  const displayTitle = game?.title?.replace(/\(Official Open-Source\)/i, '').replace(/— Open Source/i, '').trim() || '2048';
 
   return (
     <>
       <header className="game-header-bar">
-        {/* ── Left Navigation & Metadata ── */}
+        {/* ── Left Navigation & Title ── */}
         <div className="header-left-cluster">
           <button
             type="button"
@@ -69,57 +49,37 @@ export default function GameHeader({
             title="Back to Arcade"
             aria-label="Back to Arcade"
           >
-            <ArrowLeft size={16} />
-            <span className="back-text">Back to arcade</span>
+            <ArrowLeft size={15} />
+            <span className="back-text">BACK TO ARCADE</span>
           </button>
 
-          <div className="header-title-divider" aria-hidden="true" />
-
-          <div className="header-meta-group">
-            <h1 className="header-game-title">{displayTitle}</h1>
-            {mode === 'CHALLENGE' && (
-              <span className="header-mode-badge mode-challenge">
-                Challenge
-              </span>
-            )}
-          </div>
+          <h1 className="header-game-title">{displayTitle}</h1>
         </div>
 
         {/* ── Right Action Controls ── */}
         <div className="header-right-cluster">
-          {/* Challenge Friend Action (if supported and not already in challenge) */}
-          {game?.challengeSupported && mode !== 'CHALLENGE' && onOpenChallenge && (
+          {/* Challenge Friend Action */}
+          {onOpenChallenge && (
             <button
               type="button"
-              className="btn-header-challenge-trigger"
+              className="btn-header-challenge-trigger game-header-challenge-btn"
               onClick={onOpenChallenge}
-              title="Challenge a Friend with synchronized countdown"
+              title="Challenge a Friend with synchronized duel room"
             >
-              <Swords size={15} />
-              <span>Play with Friend</span>
+              <Users size={15} className="btn-challenge-icon" />
+              <span>CHALLENGE FRIEND</span>
             </button>
           )}
 
           {/* Fullscreen Toggle */}
           <button
             type="button"
-            className="btn-header-icon-action"
+            className="btn-header-fullscreen"
             onClick={onToggleFullscreen}
-            title={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Enter Fullscreen'}
-            aria-label={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Enter Fullscreen'}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+            aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           >
-            {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-          </button>
-
-          {/* Close Game Action */}
-          <button
-            type="button"
-            className="btn-header-close-action"
-            onClick={handleExitClick}
-            title="Close Game"
-            aria-label="Close Game"
-          >
-            <X size={20} />
+            {isFullscreen ? <Minimize size={17} /> : <Maximize size={17} />}
           </button>
         </div>
       </header>
@@ -129,11 +89,11 @@ export default function GameHeader({
         <div className="exit-confirm-overlay fade-in">
           <div className="exit-confirm-card">
             <div className="exit-confirm-icon-wrap">
-              <AlertTriangle size={32} />
+              <AlertTriangle size={30} />
             </div>
-            <h3 className="exit-confirm-title">LEAVE CHALLENGE?</h3>
+            <h3 className="exit-confirm-title">LEAVE GAME?</h3>
             <p className="exit-confirm-text">
-              You are currently in an active challenge session. Leaving will disconnect you from your room and peer.
+              You are currently in an active multiplayer room. Leaving will disconnect you from the session.
             </p>
             <div className="exit-confirm-actions">
               <CoGetherButton
