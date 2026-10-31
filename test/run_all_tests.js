@@ -18,7 +18,8 @@ const SUITES = [
   'test/phase2c3_coplay_hardening.test.js',
   'test/phase3_cowatch_architecture.test.js',
   'test/phase4_costudy_architecture.test.js',
-  'test/phase5_production_auth_database.test.js'
+  'test/phase5_production_auth_database.test.js',
+  'test/authentication_strict_ui_flows.test.js'
 ];
 
 console.log('═══════════════════════════════════════════════════════════');

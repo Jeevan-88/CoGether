@@ -41,8 +41,32 @@ function loadConfig(env = process.env) {
     mfaEncryptionKey = 'cogether-dev-mfa-aes256-key-32b-min!!'; // Exactly 32 bytes
   }
 
-  const databaseUrl = env.DATABASE_URL || 'postgresql://cogether_user:cogether_secret_dev_pass@127.0.0.1:5432/cogether_db';
-  const redisUrl = env.REDIS_URL || 'redis://127.0.0.1:6379';
+  let defaultHost = '127.0.0.1';
+  if (process.platform === 'win32' && !env.DATABASE_URL && !env.CI) {
+    const fs = require('fs');
+    const path = require('path');
+    const ipFile = path.join(__dirname, '../../.wsl_ip');
+    if (fs.existsSync(ipFile)) {
+      try {
+        const saved = fs.readFileSync(ipFile, 'utf8').trim();
+        if (/^\d+\.\d+\.\d+\.\d+$/.test(saved)) {
+          defaultHost = saved;
+        }
+      } catch (_e) {}
+    } else {
+      try {
+        const { execSync } = require('child_process');
+        const wslIp = execSync('wsl hostname -I', { encoding: 'utf8', timeout: 6000 }).trim().split(/\s+/)[0];
+        if (wslIp && /^\d+\.\d+\.\d+\.\d+$/.test(wslIp)) {
+          defaultHost = wslIp;
+          try { fs.writeFileSync(ipFile, defaultHost, 'utf8'); } catch (_e) {}
+        }
+      } catch (_e) {}
+    }
+  }
+
+  const databaseUrl = env.DATABASE_URL || `postgresql://cogether_user:cogether_secret_dev_pass@${defaultHost}:5432/cogether_db`;
+  const redisUrl = env.REDIS_URL || `redis://${defaultHost}:6379`;
 
   const config = {
     env: nodeEnv,

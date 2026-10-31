@@ -30,10 +30,11 @@ class UserService {
     const resendInterval = config.auth.otpResendIntervalSeconds || 60;
     const otpTtl = config.auth.otpExpiresInSeconds || 600; // 10 minutes
 
-    // 1. Enforce resend throttling: check if an OTP was created recently for this email
+    // 1. Enforce resend throttling: check if an unconsumed OTP was created recently for this email
     const recentOtp = await db.query(
       `SELECT created_at FROM identity.email_otps 
        WHERE email_normalized = $1 
+         AND consumed_at IS NULL
          AND created_at > NOW() - ($2 || ' seconds')::interval 
        ORDER BY created_at DESC LIMIT 1`,
       [email, resendInterval]
@@ -50,15 +51,32 @@ class UserService {
       };
     }
 
-    // 2. Determine accurate purpose
-    let purpose = requestedPurpose;
-    if (requestedPurpose !== 'reset_password') {
-      const existingUser = await db.query(
-        `SELECT user_id FROM identity.emails WHERE email_normalized = $1`,
-        [email]
-      );
-      purpose = existingUser.rows.length > 0 ? 'login' : requestedPurpose;
+    // 2. Determine accurate purpose & validate user existence for the purpose
+    const existingUser = await db.query(
+      `SELECT user_id FROM identity.emails WHERE email_normalized = $1`,
+      [email]
+    );
+    const hasAccount = existingUser.rows.length > 0;
+
+    if (requestedPurpose === 'login' && !hasAccount) {
+      return {
+        success: false,
+        error: 'ACCOUNT_NOT_FOUND',
+        message: 'No account found with this email address. Please sign up first.'
+      };
     }
+
+    if (requestedPurpose === 'signup' && hasAccount) {
+      return {
+        success: false,
+        error: 'EMAIL_ALREADY_EXISTS',
+        message: 'An account with this email address already exists. Please log in.'
+      };
+    }
+
+    const purpose = requestedPurpose === 'reset_password'
+      ? 'reset_password'
+      : (hasAccount ? 'login' : 'signup');
 
     // 3. Generate cryptographic 6-digit OTP and compute HMAC hash
     const rawOtp = generateOtp();
@@ -120,14 +138,17 @@ class UserService {
       await client.query('BEGIN');
 
       // 1. Fetch latest unconsumed OTP for this email with row lock to prevent race conditions
-      const otpLookup = await client.query(
-        `SELECT id, otp_hash, purpose, expires_at, attempt_count, created_at 
-         FROM identity.email_otps 
-         WHERE email_normalized = $1 AND consumed_at IS NULL
-         ORDER BY created_at DESC LIMIT 1
-         FOR UPDATE`,
-        [email]
-      );
+      const targetPurpose = userDetails.purpose || null;
+      let query = `SELECT id, otp_hash, purpose, expires_at, attempt_count, created_at 
+                   FROM identity.email_otps 
+                   WHERE email_normalized = $1 AND consumed_at IS NULL`;
+      const queryParams = [email];
+      if (targetPurpose) {
+        query += ` AND purpose = $2`;
+        queryParams.push(targetPurpose);
+      }
+      query += ` ORDER BY created_at DESC LIMIT 1 FOR UPDATE`;
+      const otpLookup = await client.query(query, queryParams);
 
       if (otpLookup.rows.length === 0) {
         await client.query('COMMIT');
@@ -208,6 +229,16 @@ class UserService {
         `SELECT user_id FROM identity.emails WHERE email_normalized = $1`,
         [email]
       );
+
+      // Enforce: login must only authenticate existing accounts, never auto-create
+      if ((otpRow.purpose === 'login' || targetPurpose === 'login') && emailLookup.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return {
+          success: false,
+          error: 'USER_NOT_FOUND',
+          message: 'No account found with this email address. Please sign up.'
+        };
+      }
 
       let userId;
       let isNewUser = false;
@@ -523,7 +554,7 @@ class UserService {
     }
   }
 
-  async authenticateWithPassword({ email: rawEmail, password, metadata = {} }) {
+  async authenticateWithPassword({ email: rawEmail, password, otp = null, requireOtp = false, metadata = {} }) {
     if (!rawEmail || typeof rawEmail !== 'string') {
       return { success: false, error: 'INVALID_CREDENTIALS', message: 'Invalid email or password.' };
     }
@@ -634,7 +665,28 @@ class UserService {
       };
     }
 
-    // Normal successful login: create session & access JWT
+    // A password verification alone must NEVER issue an authenticated session!
+    // When requireOtp is true and no OTP has been provided, dispatch a verification OTP to registered email
+    if (requireOtp && !otp) {
+      const otpSend = await this.requestEmailOtp(email, 'login');
+      if (!otpSend.success) {
+        return otpSend;
+      }
+      return {
+        success: true,
+        otpRequired: true,
+        email,
+        expiresInSeconds: otpSend.expiresInSeconds || 600,
+        message: 'Passcode sent to registered email'
+      };
+    }
+
+    // If OTP was provided, verify it bound to purpose 'login'
+    if (otp) {
+      return await this.verifyEmailOtp(email, otp, { purpose: 'login' }, metadata);
+    }
+
+    // Normal successful login (only when requireOtp is explicitly false)
     const session = await createSession(user.id, metadata);
     const profile = await profileService.getProfileByUserId(user.id);
     const preferences = await profileService.getPreferences(user.id);

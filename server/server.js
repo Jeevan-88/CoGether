@@ -764,12 +764,20 @@ app.get('/metrics', (_req, res) => {
 
 // Mint a guest session token
 app.post('/api/v1/auth/guest', async (req, res) => {
-  const validation = validateGuestSessionInput(req.body);
-  if (!validation.valid) {
-    return res.status(400).json({ error: { code: 'INVALID_INPUT', message: validation.error, requestId: req.id } });
+  try {
+    const validation = validateGuestSessionInput(req.body);
+    if (!validation.valid) {
+      return res.status(400).json({ error: { code: 'INVALID_INPUT', message: validation.error, requestId: req.id } });
+    }
+    const session = createGuestSession({ displayName: validation.data.displayName });
+    if (session.dbPromise) {
+      await session.dbPromise;
+    }
+    res.status(201).json(session);
+  } catch (err) {
+    logger.error('Failed to create guest session in database', { error: err.message });
+    res.status(500).json({ success: false, error: { code: 'GUEST_CREATION_FAILED', message: 'Unable to start guest session. Please try again.' } });
   }
-  const session = await createGuestSession({ displayName: validation.data.displayName });
-  res.status(201).json(session);
 });
 
 // Check guest session status & remaining seconds
@@ -896,7 +904,7 @@ app.post('/api/v1/auth/email/request-otp', async (req, res) => {
 // Verify email OTP and establish authenticated session
 app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
   try {
-    const { email, otp, password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences } = req.body || {};
+    const { email, otp, password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences, purpose } = req.body || {};
     const metadata = {
       userAgent: req.headers['user-agent'],
       ipAddress: req.ip || req.connection?.remoteAddress
@@ -905,7 +913,7 @@ app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
     const result = await userService.verifyEmailOtp(
       email,
       otp,
-      { password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences },
+      { password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences, purpose },
       metadata
     );
 
@@ -997,22 +1005,26 @@ app.post('/api/v1/auth/login', async (req, res) => {
       });
     }
 
-    const { email, password } = req.body || {};
+    const { email, password, otp } = req.body || {};
     const metadata = {
       userAgent: req.headers['user-agent'],
       ipAddress: req.ip || req.connection?.remoteAddress
     };
 
-    const result = await userService.authenticateWithPassword({ email, password, metadata });
+    const result = await userService.authenticateWithPassword({ email, password, otp, metadata, requireOtp: true });
 
     if (!result.success) {
-      const status = result.error === 'ACCOUNT_TEMPORARILY_LOCKED' ? 429 : 401;
+      const status = (result.error === 'ACCOUNT_TEMPORARILY_LOCKED' || result.error === 'RESEND_TOO_FREQUENT') ? 429 : 401;
       return res.status(status).json(result);
     }
 
     metrics.incrementCounter('cogether_auth_login_total', 1);
 
     if (result.mfaRequired) {
+      return res.status(200).json(result);
+    }
+
+    if (result.otpRequired) {
       return res.status(200).json(result);
     }
 

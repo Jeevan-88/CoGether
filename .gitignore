@@ -13,4 +13,5 @@ coverage/
 scratch/
 scripts/
 .vercel/
+.wsl_ip
 

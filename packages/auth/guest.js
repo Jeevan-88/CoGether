@@ -28,8 +28,9 @@ function createGuestSession({ displayName = 'Guest', expiresInSeconds = GUEST_SE
     `INSERT INTO identity.guest_sessions (id, guest_id, display_name, expires_at, created_at)
      VALUES (gen_random_uuid(), $1, $2, $3, NOW())`,
     [guestId, safeName, expiresAt]
-  ).catch((err) => {
-    logger.warn('Failed to insert guest session in database, proceeding with signed JWT fallback', { error: err.message });
+  );
+  dbPromise.catch((err) => {
+    logger.warn('Guest session database persistence notice', { error: err.message });
   });
 
   const claims = {

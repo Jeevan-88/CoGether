@@ -41,7 +41,7 @@ export default function AuthModal({
   onClose,
   onLoginSuccess,
   onSelectService,
-  initialMode = 'signup'
+  initialMode = 'signin'
 }) {
   const {
     user,
@@ -49,6 +49,7 @@ export default function AuthModal({
     requestOtp,
     verifyOtp,
     loginWithPassword,
+    startGuestSession,
     verifyMfaLogin,
     requestPasswordReset,
     resetPassword,
@@ -82,18 +83,19 @@ export default function AuthModal({
     try {
       setLoading(true);
       setError('');
-      if (startGuestSession) {
-        const res = await startGuestSession('Guest');
-        if (res && res.success !== false) {
-          if (onLoginSuccess) onLoginSuccess();
-          if (onClose) onClose();
-          return;
-        }
+      if (!startGuestSession) {
+        setError('Guest session service is currently unavailable.');
+        return;
       }
-      if (onLoginSuccess) onLoginSuccess();
-      if (onClose) onClose();
+      const res = await startGuestSession('Guest');
+      if (res && res.success && res.token) {
+        if (onLoginSuccess) onLoginSuccess(res);
+        if (onClose) onClose();
+        return;
+      }
+      setError(res?.error?.message || res?.message || 'Failed to start guest session.');
     } catch (err) {
-      setError(err?.message || 'Failed to start guest session');
+      setError(err?.message || 'Failed to start guest session.');
     } finally {
       setLoading(false);
     }
@@ -107,8 +109,8 @@ export default function AuthModal({
 
   const { manifest } = useAvatarManifest();
 
-  // Mode: 'signup' | 'signin'
-  const [mode, setMode] = useState(initialMode === 'signin' ? 'signin' : 'signup');
+  // Mode: 'signup' | 'signin' (Default: 'signin')
+  const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'signin');
 
   // Step index (1..7 for signup, 1..2 for signin)
   const [step, setStep] = useState(1);
@@ -302,7 +304,7 @@ export default function AuthModal({
     e.currentTarget.pause();
   };
 
-  // ── STEP 1: REQUEST EMAIL OTP ──
+  // ── STEP 1: REQUEST EMAIL OTP (PASSWORDLESS SIGN IN) ──
   const handleRequestOtpSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -339,13 +341,72 @@ export default function AuthModal({
     }, 120);
   };
 
+  // ── STEP 1: SIGN UP (EMAIL & PASSWORD VALIDATION + OTP REQUEST) ──
+  const handleSignupStep1Submit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setInfo('');
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (signupPassword.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (signupPassword.length > 128) {
+      setError('Password cannot exceed 128 characters.');
+      return;
+    }
+    if (!/[a-zA-Z]/.test(signupPassword) || !/[0-9]/.test(signupPassword)) {
+      setError('Password must contain at least one letter and one number.');
+      return;
+    }
+    if (signupPassword !== signupConfirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+    const result = await requestOtp(cleanEmail, 'signup');
+    setLoading(false);
+
+    if (!result.success) {
+      if (result.error === 'EMAIL_SERVICE_NOT_CONFIGURED') {
+        setError('Email delivery is not configured on this environment.');
+      } else {
+        setError(result.message || 'Unable to send verification code. Please try again.');
+      }
+      if (result.retryAfterSeconds) {
+        setResendCooldown(result.retryAfterSeconds);
+      }
+      return;
+    }
+
+    setResendCooldown(60);
+    setOtp('');
+    navigateToStep(2);
+    setTimeout(() => {
+      otpInputRef.current?.focus();
+    }, 120);
+  };
+
   // ── STEP 2: VERIFY EMAIL OTP ──
   const executeVerifyOtp = async (codeToVerify) => {
     setError('');
     setLoading(true);
 
     const cleanEmail = email.trim().toLowerCase();
-    const result = await verifyOtp(cleanEmail, codeToVerify);
+    const purpose = mode === 'signup' ? 'signup' : 'login';
+    const payload = {
+      purpose,
+      ...(mode === 'signup' && signupPassword ? { password: signupPassword } : {})
+    };
+
+    const result = await verifyOtp(cleanEmail, codeToVerify, payload);
     setLoading(false);
 
     if (!result.success) {
@@ -362,18 +423,11 @@ export default function AuthModal({
       setAvatarConfig(prof.avatarConfig || prof.avatar_config);
     }
 
-    // Returning users with an existing profile or existing username: complete login immediately!
-    const isExistingUser = !result.isNewUser || !!(result.profile && (result.profile.username || result.profile.first_name || result.profile.firstName));
-    if (isExistingUser || mode === 'signin') {
-      if (onLoginSuccess) {
-        onLoginSuccess(result);
-      }
-      onClose();
-      return;
+    // Direct entry into CoGether without blocking on multi-step avatar journey
+    if (onLoginSuccess) {
+      onLoginSuccess(result);
     }
-
-    // Otherwise proceed to Step 3 (Personal Details) in the multi-step signup journey for genuinely new accounts
-    navigateToStep(3);
+    onClose();
   };
 
   const handleVerifyFormSubmit = (e) => {
@@ -456,6 +510,16 @@ export default function AuthModal({
     if (result.mfaRequired) {
       setMfaTicket(result.mfaTicket);
       setView('mfa_challenge');
+      return;
+    }
+
+    if (result.otpRequired) {
+      setResendCooldown(60);
+      setOtp('');
+      navigateToStep(2);
+      setTimeout(() => {
+        otpInputRef.current?.focus();
+      }, 120);
       return;
     }
 
@@ -1231,8 +1295,54 @@ export default function AuthModal({
                       </button>
                     </div>
                   </form>
-                ) : (
+                ) : mode === 'signin' ? (
                   <form className="flow-interactive-form" onSubmit={handleRequestOtpSubmit}>
+                    <div className="flow-field-wrapper">
+                      <Mail className="flow-field-icon" size={18} />
+                      <input
+                        type="email"
+                        className="flow-input-control"
+                        placeholder="Email Address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="email"
+                        required
+                        disabled={loading}
+                        data-testid="signin-otp-email-input"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="flow-action-button"
+                      disabled={loading || !email.trim()}
+                      data-testid="signin-otp-continue-btn"
+                    >
+                      <span>
+                        {loading
+                          ? 'Sending Verification Code...'
+                          : 'Send Login Passcode'}
+                      </span>
+                      <ArrowRight size={17} />
+                    </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                      <button
+                        type="button"
+                        className="flow-switch-method-btn"
+                        onClick={() => {
+                          setError('');
+                          setInfo('');
+                          setSignInMethod('password');
+                        }}
+                        data-testid="toggle-password-signin-btn"
+                      >
+                        Sign in with password instead
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <form className="flow-interactive-form" onSubmit={handleSignupStep1Submit}>
                     <div className="flow-field-wrapper">
                       <Mail className="flow-field-icon" size={18} />
                       <input
@@ -1248,38 +1358,69 @@ export default function AuthModal({
                       />
                     </div>
 
+                    <div className="flow-field-wrapper" style={{ marginTop: '10px' }}>
+                      <Lock className="flow-field-icon" size={18} />
+                      <input
+                        type={showSignupPassword ? 'text' : 'password'}
+                        className="flow-input-control"
+                        placeholder="Password (min. 8 characters)"
+                        value={signupPassword}
+                        onChange={(e) => setSignupPassword(e.target.value)}
+                        autoComplete="new-password"
+                        maxLength={128}
+                        required
+                        disabled={loading}
+                        data-testid="signup-password-input"
+                      />
+                      <button
+                        type="button"
+                        className="flow-password-toggle-btn"
+                        onClick={() => setShowSignupPassword(!showSignupPassword)}
+                        aria-label={showSignupPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showSignupPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+
+                    <div className="flow-field-wrapper" style={{ marginTop: '10px' }}>
+                      <Lock className="flow-field-icon" size={18} />
+                      <input
+                        type={showSignupPassword ? 'text' : 'password'}
+                        className="flow-input-control"
+                        placeholder="Confirm Password"
+                        value={signupConfirmPassword}
+                        onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                        autoComplete="new-password"
+                        maxLength={128}
+                        required
+                        disabled={loading}
+                        data-testid="signup-confirm-password-input"
+                      />
+                    </div>
+
+                    <div className="flow-password-hints">
+                      <span className={`hint-item ${signupPassword.length >= 8 ? 'valid' : ''}`}>
+                        • At least 8 characters
+                      </span>
+                      <span className={`hint-item ${(/[a-zA-Z]/.test(signupPassword) && /[0-9]/.test(signupPassword)) ? 'valid' : ''}`}>
+                        • Letter & number
+                      </span>
+                      <span className={`hint-item ${signupPassword && signupPassword === signupConfirmPassword ? 'valid' : ''}`}>
+                        • Passwords match
+                      </span>
+                    </div>
+
                     <button
                       type="submit"
                       className="flow-action-button"
-                      disabled={loading}
+                      disabled={loading || !email.trim() || signupPassword.length < 8 || signupPassword !== signupConfirmPassword}
                       data-testid="signup-email-continue-btn"
                     >
                       <span>
-                        {loading
-                          ? 'Sending Verification Code...'
-                          : mode === 'signup'
-                          ? 'Continue'
-                          : 'Send Login Passcode'}
+                        {loading ? 'Sending Verification Code...' : 'Continue'}
                       </span>
                       <ArrowRight size={17} />
                     </button>
-
-                    {mode === 'signin' && (
-                      <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                        <button
-                          type="button"
-                          className="flow-switch-method-btn"
-                          onClick={() => {
-                            setError('');
-                            setInfo('');
-                            setSignInMethod('password');
-                          }}
-                          data-testid="toggle-password-signin-btn"
-                        >
-                          Sign in with password instead
-                        </button>
-                      </div>
-                    )}
                   </form>
                 )}
 

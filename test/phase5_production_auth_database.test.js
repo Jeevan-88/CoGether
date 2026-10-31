@@ -185,9 +185,33 @@ async function runVerification() {
       password: alicePassword
     });
     assert(loginRes.status === 200, `Login returns 200 (got: ${loginRes.status})`);
-    const resolvedUsername = loginRes.body.profile?.username || loginRes.body.user?.username;
+    assert(loginRes.body.otpRequired === true, 'Password authentication requires email OTP (otpRequired: true)');
+    assert(!loginRes.body.accessToken, 'Password alone never issues an authenticated session or access token');
+
+    // Retrieve dispatched login OTP from test delivery hook
+    const fs = require('fs');
+    const path = require('path');
+    const otpFile = path.join(__dirname, '../.test_last_otp.json');
+    let loginOtp = null;
+    if (fs.existsSync(otpFile)) {
+      try {
+        const data = JSON.parse(fs.readFileSync(otpFile, 'utf8'));
+        loginOtp = data[aliceEmail.toLowerCase()]?.otp || data._latest?.otp;
+      } catch (e) {}
+    }
+
+    assert(loginOtp && loginOtp.length === 6, 'Verification OTP was dispatched to registered email');
+
+    // Verify OTP to complete login
+    const verifyLoginRes = await request('POST', '/api/v1/auth/email/verify-otp', {
+      email: aliceEmail,
+      otp: loginOtp,
+      purpose: 'login'
+    });
+    assert(verifyLoginRes.status === 200, `OTP verification returns 200 (got: ${verifyLoginRes.status})`);
+    const resolvedUsername = verifyLoginRes.body.profile?.username || verifyLoginRes.body.user?.username;
     assert(resolvedUsername === aliceUsername, `Logged-in user username matches (${resolvedUsername})`);
-    assert(loginRes.body.accessToken, 'Login issued fresh access token');
+    assert(verifyLoginRes.body.accessToken, 'Login issued fresh access token upon OTP verification');
 
     // ----------------------------------------------------
     // TEST 5: Real Friendship Lifecycle in PostgreSQL

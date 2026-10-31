@@ -355,6 +355,10 @@ export function AuthProvider({ children }) {
         return { success: true, mfaRequired: true, mfaTicket: data.mfaTicket };
       }
 
+      if (data.otpRequired) {
+        return { success: true, otpRequired: true, email: data.email, expiresInSeconds: data.expiresInSeconds };
+      }
+
       localStorage.setItem('cogether_access_token', data.accessToken);
       if (data.refreshToken) {
         localStorage.setItem('cogether_refresh_token', data.refreshToken);
