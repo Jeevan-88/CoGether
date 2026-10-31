@@ -276,13 +276,13 @@ export function AuthProvider({ children }) {
   };
 
   // Request passwordless 6-digit OTP
-  const requestOtp = async (email, purpose = 'signup') => {
+  const requestOtp = async (email, purpose = 'signup', loginChallenge = null) => {
     setAuthError(null);
     try {
       const res = await fetch(`${API_BASE}/api/v1/auth/email/request-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, purpose })
+        body: JSON.stringify({ email, purpose, ...(loginChallenge ? { loginChallenge } : {}) })
       });
 
       const data = await res.json();
@@ -314,6 +314,10 @@ export function AuthProvider({ children }) {
       if (!res.ok || !data.success) {
         setAuthError(data.message || data.error || 'Invalid verification passcode');
         return { success: false, ...data };
+      }
+
+      if (data.mfaRequired) {
+        return { success: true, mfaRequired: true, mfaTicket: data.mfaTicket };
       }
 
       localStorage.setItem('cogether_access_token', data.accessToken);
@@ -356,7 +360,13 @@ export function AuthProvider({ children }) {
       }
 
       if (data.otpRequired) {
-        return { success: true, otpRequired: true, email: data.email, expiresInSeconds: data.expiresInSeconds };
+        return {
+          success: true,
+          otpRequired: true,
+          loginChallenge: data.loginChallenge,
+          email: data.email,
+          expiresInSeconds: data.expiresInSeconds
+        };
       }
 
       localStorage.setItem('cogether_access_token', data.accessToken);

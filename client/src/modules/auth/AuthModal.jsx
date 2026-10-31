@@ -60,7 +60,7 @@ export default function AuthModal({
   } = useAuth();
 
   // Secure Password & MFA states
-  const [signInMethod, setSignInMethod] = useState('password'); // 'password' | 'otp'
+  const [loginChallenge, setLoginChallenge] = useState(null);
   const [signInPassword, setSignInPassword] = useState('');
   const [showSignInPassword, setShowSignInPassword] = useState(false);
   const [view, setView] = useState('auth'); // 'auth' | 'forgot_password' | 'mfa_challenge'
@@ -403,6 +403,7 @@ export default function AuthModal({
     const purpose = mode === 'signup' ? 'signup' : 'login';
     const payload = {
       purpose,
+      ...(mode === 'signin' && loginChallenge ? { loginChallenge } : {}),
       ...(mode === 'signup' && signupPassword ? { password: signupPassword } : {})
     };
 
@@ -411,6 +412,12 @@ export default function AuthModal({
 
     if (!result.success) {
       setError(result.message || 'Invalid or expired verification code.');
+      return;
+    }
+
+    if (result.mfaRequired) {
+      setMfaTicket(result.mfaTicket);
+      setView('mfa_challenge');
       return;
     }
 
@@ -468,7 +475,7 @@ export default function AuthModal({
     setInfo('');
     setLoading(true);
     const purpose = mode === 'signup' ? 'signup' : 'login';
-    const result = await requestOtp(email.trim().toLowerCase(), purpose);
+    const result = await requestOtp(email.trim().toLowerCase(), purpose, loginChallenge);
     setLoading(false);
 
     if (result.success) {
@@ -514,6 +521,7 @@ export default function AuthModal({
     }
 
     if (result.otpRequired) {
+      setLoginChallenge(result.loginChallenge);
       setResendCooldown(60);
       setOtp('');
       navigateToStep(2);
@@ -1213,7 +1221,7 @@ export default function AuthModal({
                   </div>
                 )}
 
-                {mode === 'signin' && signInMethod === 'password' ? (
+                {mode === 'signin' ? (
                   <form className="flow-interactive-form" onSubmit={handlePasswordSignIn}>
                     <div className="flow-field-wrapper">
                       <Mail className="flow-field-icon" size={18} />
@@ -1279,67 +1287,6 @@ export default function AuthModal({
                       <span>{loading ? 'Signing in...' : 'Sign In'}</span>
                       <ArrowRight size={17} />
                     </button>
-
-                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                      <button
-                        type="button"
-                        className="flow-switch-method-btn"
-                        onClick={() => {
-                          setError('');
-                          setInfo('');
-                          setSignInMethod('otp');
-                        }}
-                        data-testid="toggle-otp-signin-btn"
-                      >
-                        Sign in with One-Time Passcode instead
-                      </button>
-                    </div>
-                  </form>
-                ) : mode === 'signin' ? (
-                  <form className="flow-interactive-form" onSubmit={handleRequestOtpSubmit}>
-                    <div className="flow-field-wrapper">
-                      <Mail className="flow-field-icon" size={18} />
-                      <input
-                        type="email"
-                        className="flow-input-control"
-                        placeholder="Email Address"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        autoComplete="email"
-                        required
-                        disabled={loading}
-                        data-testid="signin-otp-email-input"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="flow-action-button"
-                      disabled={loading || !email.trim()}
-                      data-testid="signin-otp-continue-btn"
-                    >
-                      <span>
-                        {loading
-                          ? 'Sending Verification Code...'
-                          : 'Send Login Passcode'}
-                      </span>
-                      <ArrowRight size={17} />
-                    </button>
-
-                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                      <button
-                        type="button"
-                        className="flow-switch-method-btn"
-                        onClick={() => {
-                          setError('');
-                          setInfo('');
-                          setSignInMethod('password');
-                        }}
-                        data-testid="toggle-password-signin-btn"
-                      >
-                        Sign in with password instead
-                      </button>
-                    </div>
                   </form>
                 ) : (
                   <form className="flow-interactive-form" onSubmit={handleSignupStep1Submit}>

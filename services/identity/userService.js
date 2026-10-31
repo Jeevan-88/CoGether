@@ -5,6 +5,7 @@
  * Google OAuth with safe account linking, profiles, and sessions.
  */
 
+const crypto = require('crypto');
 const { db } = require('../../packages/database');
 const { getConfig } = require('../../packages/config');
 const { 
@@ -20,7 +21,7 @@ const { emailService } = require('./emailService');
 const { logger } = require('../../packages/observability');
 
 class UserService {
-  async requestEmailOtp(rawEmail, requestedPurpose = 'signup') {
+  async requestEmailOtp(rawEmail, requestedPurpose = 'signup', loginChallenge = null) {
     const email = normalizeEmail(rawEmail);
     if (!email || !email.includes('@')) {
       return { success: false, error: 'INVALID_EMAIL', message: 'Valid email address is required' };
@@ -30,28 +31,7 @@ class UserService {
     const resendInterval = config.auth.otpResendIntervalSeconds || 60;
     const otpTtl = config.auth.otpExpiresInSeconds || 600; // 10 minutes
 
-    // 1. Enforce resend throttling: check if an unconsumed OTP was created recently for this email
-    const recentOtp = await db.query(
-      `SELECT created_at FROM identity.email_otps 
-       WHERE email_normalized = $1 
-         AND consumed_at IS NULL
-         AND created_at > NOW() - ($2 || ' seconds')::interval 
-       ORDER BY created_at DESC LIMIT 1`,
-      [email, resendInterval]
-    );
-
-    if (recentOtp.rows.length > 0) {
-      const elapsedMs = Date.now() - new Date(recentOtp.rows[0].created_at).getTime();
-      const retryAfter = Math.max(1, Math.ceil((resendInterval * 1000 - elapsedMs) / 1000));
-      return {
-        success: false,
-        error: 'RESEND_TOO_FREQUENT',
-        message: `Please wait ${retryAfter} seconds before requesting a new code`,
-        retryAfterSeconds: retryAfter
-      };
-    }
-
-    // 2. Determine accurate purpose & validate user existence for the purpose
+    // 1. Determine accurate purpose & validate user existence for the purpose
     const existingUser = await db.query(
       `SELECT user_id FROM identity.emails WHERE email_normalized = $1`,
       [email]
@@ -74,6 +54,79 @@ class UserService {
       };
     }
 
+    // A user must not be able to request a login OTP independently and use it to bypass password verification.
+    // If requesting login OTP, a valid server-side loginChallenge is strictly required.
+    let verifiedChallengeId = null;
+    if (requestedPurpose === 'login' || (hasAccount && requestedPurpose !== 'reset_password' && requestedPurpose !== 'email_verification')) {
+      if (!loginChallenge) {
+        return {
+          success: false,
+          error: 'PASSWORD_REQUIRED',
+          message: 'Password verification is mandatory before requesting a login passcode. Please sign in with email and password.'
+        };
+      }
+
+      const challengeCheck = await db.query(
+        `SELECT id, user_id, email_normalized, expires_at, consumed_at 
+         FROM identity.login_challenges 
+         WHERE challenge_token = $1`,
+        [loginChallenge]
+      );
+
+      if (challengeCheck.rows.length === 0) {
+        return {
+          success: false,
+          error: 'INVALID_CHALLENGE',
+          message: 'Invalid login challenge. Please sign in with your password again.'
+        };
+      }
+
+      const cRow = challengeCheck.rows[0];
+      if (cRow.consumed_at !== null) {
+        return {
+          success: false,
+          error: 'CHALLENGE_ALREADY_USED',
+          message: 'This login challenge has already been used. Please sign in again.'
+        };
+      }
+      if (new Date(cRow.expires_at) <= new Date()) {
+        return {
+          success: false,
+          error: 'CHALLENGE_EXPIRED',
+          message: 'Login challenge has expired. Please sign in again.'
+        };
+      }
+      if (cRow.email_normalized !== email) {
+        return {
+          success: false,
+          error: 'CHALLENGE_USER_MISMATCH',
+          message: 'Login challenge does not match this email address.'
+        };
+      }
+      verifiedChallengeId = cRow.id;
+    }
+
+    // 2. Enforce resend throttling: check if an unconsumed OTP was created recently for this email
+    const recentOtp = await db.query(
+      `SELECT created_at FROM identity.email_otps 
+       WHERE email_normalized = $1 
+         AND consumed_at IS NULL
+         AND created_at > NOW() - ($2 || ' seconds')::interval 
+       ORDER BY created_at DESC LIMIT 1`,
+      [email, resendInterval]
+    );
+
+    if (recentOtp.rows.length > 0) {
+      const elapsedMs = Date.now() - new Date(recentOtp.rows[0].created_at).getTime();
+      const retryAfter = Math.max(1, Math.ceil((resendInterval * 1000 - elapsedMs) / 1000));
+      return {
+        success: false,
+        error: 'RESEND_TOO_FREQUENT',
+        message: `Please wait ${retryAfter} seconds before requesting a new code`,
+        retryAfterSeconds: retryAfter
+      };
+    }
+
     const purpose = requestedPurpose === 'reset_password'
       ? 'reset_password'
       : (hasAccount ? 'login' : 'signup');
@@ -91,12 +144,21 @@ class UserService {
     ).catch(() => {});
 
     // 5. Store hashed OTP in PostgreSQL
-    await db.query(
+    const otpInsert = await db.query(
       `INSERT INTO identity.email_otps 
        (email_normalized, otp_hash, purpose, expires_at, attempt_count)
-       VALUES ($1, $2, $3, NOW() + ($4 || ' seconds')::interval, 0)`,
+       VALUES ($1, $2, $3, NOW() + ($4 || ' seconds')::interval, 0)
+       RETURNING id`,
       [email, otpHash, purpose, otpTtl]
     );
+    const otpId = otpInsert.rows[0]?.id;
+
+    if (verifiedChallengeId && otpId) {
+      await db.query(
+        `UPDATE identity.login_challenges SET otp_id = $1 WHERE id = $2`,
+        [otpId, verifiedChallengeId]
+      ).catch(() => {});
+    }
 
     // 6. Deliver through email provider
     const sendResult = await emailService.sendOtpEmail({ to: email, otp: rawOtp, purpose });
@@ -136,6 +198,35 @@ class UserService {
     const client = await db.pool.connect();
     try {
       await client.query('BEGIN');
+
+      // 0. Pre-validate login challenge if provided
+      const challengeToken = userDetails.loginChallenge || userDetails.challengeToken;
+      if (challengeToken) {
+        const challengePreCheck = await client.query(
+          `SELECT id, user_id, email_normalized, expires_at, consumed_at 
+           FROM identity.login_challenges 
+           WHERE challenge_token = $1 
+           FOR UPDATE`,
+          [challengeToken]
+        );
+        if (challengePreCheck.rows.length === 0) {
+          await client.query('COMMIT');
+          return { success: false, error: 'INVALID_CHALLENGE', message: 'Invalid login challenge. Please sign in again.' };
+        }
+        const cRow = challengePreCheck.rows[0];
+        if (cRow.consumed_at !== null) {
+          await client.query('COMMIT');
+          return { success: false, error: 'CHALLENGE_ALREADY_USED', message: 'This login challenge has already been used. Please sign in again.' };
+        }
+        if (new Date(cRow.expires_at) <= new Date()) {
+          await client.query('COMMIT');
+          return { success: false, error: 'CHALLENGE_EXPIRED', message: 'Login challenge has expired. Please sign in again.' };
+        }
+        if (cRow.email_normalized !== email) {
+          await client.query('COMMIT');
+          return { success: false, error: 'CHALLENGE_USER_MISMATCH', message: 'Login challenge does not match this user account.' };
+        }
+      }
 
       // 1. Fetch latest unconsumed OTP for this email with row lock to prevent race conditions
       const targetPurpose = userDetails.purpose || null;
@@ -246,6 +337,70 @@ class UserService {
       if (emailLookup.rows.length > 0) {
         userId = emailLookup.rows[0].user_id;
 
+        // Existing account authentication:
+        // A user must NOT be able to log in without a valid, unconsumed database-backed login challenge!
+        const challengeToken = userDetails.loginChallenge || userDetails.challengeToken;
+        if (!challengeToken) {
+          await client.query('ROLLBACK');
+          return {
+            success: false,
+            error: 'LOGIN_CHALLENGE_REQUIRED',
+            message: 'A valid password verification challenge is required to log in.'
+          };
+        }
+
+        const challengeRes = await client.query(
+          `SELECT id, user_id, email_normalized, otp_id, expires_at, consumed_at 
+           FROM identity.login_challenges 
+           WHERE challenge_token = $1 
+           FOR UPDATE`,
+          [challengeToken]
+        );
+
+        if (challengeRes.rows.length === 0) {
+          await client.query('ROLLBACK');
+          return {
+            success: false,
+            error: 'INVALID_CHALLENGE',
+            message: 'Invalid login challenge. Please sign in again.'
+          };
+        }
+
+        const challengeRow = challengeRes.rows[0];
+
+        if (challengeRow.consumed_at !== null) {
+          await client.query('ROLLBACK');
+          return {
+            success: false,
+            error: 'CHALLENGE_ALREADY_USED',
+            message: 'This login challenge has already been used. Please sign in again.'
+          };
+        }
+
+        if (new Date(challengeRow.expires_at) <= new Date()) {
+          await client.query('ROLLBACK');
+          return {
+            success: false,
+            error: 'CHALLENGE_EXPIRED',
+            message: 'Login challenge has expired. Please sign in again.'
+          };
+        }
+
+        if (challengeRow.email_normalized !== email || challengeRow.user_id !== userId) {
+          await client.query('ROLLBACK');
+          return {
+            success: false,
+            error: 'CHALLENGE_USER_MISMATCH',
+            message: 'Login challenge does not match this user account.'
+          };
+        }
+
+        // Atomically consume the login challenge
+        await client.query(
+          `UPDATE identity.login_challenges SET consumed_at = NOW() WHERE id = $1`,
+          [challengeRow.id]
+        );
+
         // If a password was provided, update password_hash as well
         if (passwordHash) {
           await client.query(
@@ -263,6 +418,25 @@ class UserService {
              WHERE id = $1`,
             [userId]
           );
+        }
+
+        // Check if MFA is enabled for this user
+        const userRow = await client.query(
+          `SELECT mfa_enabled FROM identity.users WHERE id = $1`,
+          [userId]
+        );
+        if (userRow.rows[0]?.mfa_enabled) {
+          await client.query('COMMIT');
+          const mfaTicket = signToken(
+            { sub: userId, email, type: 'mfa_challenge', emailVerified: true },
+            { expiresInSeconds: 300 }
+          );
+          return {
+            success: true,
+            mfaRequired: true,
+            mfaTicket,
+            message: 'Two-factor authentication code required.'
+          };
         }
       } else {
         isNewUser = true;
@@ -554,7 +728,7 @@ class UserService {
     }
   }
 
-  async authenticateWithPassword({ email: rawEmail, password, otp = null, requireOtp = false, metadata = {} }) {
+  async authenticateWithPassword({ email: rawEmail, password, otp = null, loginChallenge = null, requireOtp = false, metadata = {} }) {
     if (!rawEmail || typeof rawEmail !== 'string') {
       return { success: false, error: 'INVALID_CREDENTIALS', message: 'Invalid email or password.' };
     }
@@ -651,10 +825,90 @@ class UserService {
       [user.id]
     );
 
-    // If MFA is enabled, issue a short-lived MFA challenge ticket
+    // When requireOtp is true, password verification alone NEVER issues an authenticated session or cookie!
+    // Mandatory flow: Email + Password -> Server verifies password -> Server sends email OTP + binds single-use challenge -> User verifies OTP -> Session
+    // For MFA-enabled users, email OTP verification is mandatory FIRST before the TOTP factor is prompted.
+    if (requireOtp) {
+      if (otp && loginChallenge) {
+        return await this.verifyEmailOtp(email, otp, { purpose: 'login', loginChallenge }, metadata);
+      }
+      if (otp && !loginChallenge) {
+        return {
+          success: false,
+          error: 'LOGIN_CHALLENGE_REQUIRED',
+          message: 'A valid login challenge is required with the one-time passcode.'
+        };
+      }
+
+      const rawOtp = generateOtp();
+      const otpHash = hashOtp(rawOtp, email, 'login');
+      const otpTtl = 600; // 10 minutes
+
+      // Invalidate older unconsumed login OTPs for this email
+      await db.query(
+        `UPDATE identity.email_otps 
+         SET consumed_at = NOW() 
+         WHERE email_normalized = $1 AND purpose = 'login' AND consumed_at IS NULL`,
+        [email]
+      ).catch(() => {});
+
+      // Insert new OTP into identity.email_otps
+      const otpInsert = await db.query(
+        `INSERT INTO identity.email_otps 
+         (email_normalized, user_id, otp_hash, purpose, expires_at, attempt_count)
+         VALUES ($1, $2, $3, 'login', NOW() + ($4 || ' seconds')::interval, 0)
+         RETURNING id`,
+        [email, user.id, otpHash, otpTtl]
+      );
+      const otpId = otpInsert.rows[0]?.id;
+
+      // Invalidate older unconsumed login challenges for this user or email
+      await db.query(
+        `UPDATE identity.login_challenges 
+         SET consumed_at = NOW() 
+         WHERE (user_id = $1 OR email_normalized = $2) AND consumed_at IS NULL`,
+        [user.id, email]
+      ).catch(() => {});
+
+      // Generate single-use cryptographic challenge token
+      const challengeToken = 'lch_' + crypto.randomBytes(32).toString('hex');
+
+      // Insert challenge into identity.login_challenges
+      await db.query(
+        `INSERT INTO identity.login_challenges 
+         (challenge_token, user_id, email_normalized, otp_id, expires_at)
+         VALUES ($1, $2, $3, $4, NOW() + ($5 || ' seconds')::interval)`,
+        [challengeToken, user.id, email, otpId, otpTtl]
+      );
+
+      // Dispatch through email provider
+      const sendResult = await emailService.sendOtpEmail({ to: email, otp: rawOtp, purpose: 'login' });
+      if (!sendResult || !sendResult.success) {
+        // Clean up created OTP and challenge
+        await db.query(`DELETE FROM identity.email_otps WHERE id = $1`, [otpId]).catch(() => {});
+        await db.query(`DELETE FROM identity.login_challenges WHERE challenge_token = $1`, [challengeToken]).catch(() => {});
+
+        return {
+          success: false,
+          error: sendResult?.error || 'EMAIL_DELIVERY_FAILED',
+          message: sendResult?.message || 'Failed to dispatch verification passcode email.'
+        };
+      }
+
+      return {
+        success: true,
+        otpRequired: true,
+        loginChallenge: challengeToken,
+        email,
+        expiresInSeconds: otpTtl,
+        message: 'Passcode sent to registered email'
+      };
+    }
+
+    // Direct helper branch (only when requireOtp is explicitly false, e.g. internal unit tests)
     if (user.mfa_enabled) {
       const mfaTicket = signToken(
-        { sub: user.id, email, type: 'mfa_challenge' },
+        { sub: user.id, email, type: 'mfa_challenge', emailVerified: true },
         { expiresInSeconds: 300 }
       );
       return {
@@ -665,28 +919,6 @@ class UserService {
       };
     }
 
-    // A password verification alone must NEVER issue an authenticated session!
-    // When requireOtp is true and no OTP has been provided, dispatch a verification OTP to registered email
-    if (requireOtp && !otp) {
-      const otpSend = await this.requestEmailOtp(email, 'login');
-      if (!otpSend.success) {
-        return otpSend;
-      }
-      return {
-        success: true,
-        otpRequired: true,
-        email,
-        expiresInSeconds: otpSend.expiresInSeconds || 600,
-        message: 'Passcode sent to registered email'
-      };
-    }
-
-    // If OTP was provided, verify it bound to purpose 'login'
-    if (otp) {
-      return await this.verifyEmailOtp(email, otp, { purpose: 'login' }, metadata);
-    }
-
-    // Normal successful login (only when requireOtp is explicitly false)
     const session = await createSession(user.id, metadata);
     const profile = await profileService.getProfileByUserId(user.id);
     const preferences = await profileService.getPreferences(user.id);
@@ -1015,6 +1247,10 @@ class UserService {
     const ticketVerification = verifyToken(mfaTicket);
     if (!ticketVerification.valid || ticketVerification.claims?.type !== 'mfa_challenge') {
       return { success: false, error: 'INVALID_MFA_TICKET', message: 'MFA session has expired or is invalid. Please sign in again.' };
+    }
+
+    if (!ticketVerification.claims?.emailVerified) {
+      return { success: false, error: 'EMAIL_OTP_REQUIRED', message: 'Email verification is mandatory before MFA.' };
     }
 
     const userId = ticketVerification.claims.sub;

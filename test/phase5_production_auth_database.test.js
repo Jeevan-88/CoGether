@@ -186,6 +186,7 @@ async function runVerification() {
     });
     assert(loginRes.status === 200, `Login returns 200 (got: ${loginRes.status})`);
     assert(loginRes.body.otpRequired === true, 'Password authentication requires email OTP (otpRequired: true)');
+    assert(loginRes.body.loginChallenge, 'Password authentication issues a single-use login challenge');
     assert(!loginRes.body.accessToken, 'Password alone never issues an authenticated session or access token');
 
     // Retrieve dispatched login OTP from test delivery hook
@@ -206,7 +207,8 @@ async function runVerification() {
     const verifyLoginRes = await request('POST', '/api/v1/auth/email/verify-otp', {
       email: aliceEmail,
       otp: loginOtp,
-      purpose: 'login'
+      purpose: 'login',
+      loginChallenge: loginRes.body.loginChallenge
     });
     assert(verifyLoginRes.status === 200, `OTP verification returns 200 (got: ${verifyLoginRes.status})`);
     const resolvedUsername = verifyLoginRes.body.profile?.username || verifyLoginRes.body.user?.username;

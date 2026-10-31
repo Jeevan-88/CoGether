@@ -882,12 +882,14 @@ app.get('/api/v1/auth/check-username', async (req, res) => {
 // Request email OTP (passwordless signup or login)
 app.post('/api/v1/auth/email/request-otp', async (req, res) => {
   try {
-    const { email, purpose } = req.body || {};
-    const result = await userService.requestEmailOtp(email, purpose);
+    const { email, purpose, loginChallenge } = req.body || {};
+    const result = await userService.requestEmailOtp(email, purpose, loginChallenge);
     if (!result.success) {
       let status = 400;
-      if (result.error === 'RESEND_TOO_FREQUENT') {
+      if (result.error === 'RESEND_TOO_FREQUENT' || result.error === 'RATE_LIMIT_EXCEEDED') {
         status = 429;
+      } else if (result.error === 'PASSWORD_REQUIRED' || result.error === 'LOGIN_CHALLENGE_REQUIRED' || result.error === 'INVALID_CHALLENGE' || result.error === 'CHALLENGE_ALREADY_USED' || result.error === 'CHALLENGE_EXPIRED' || result.error === 'CHALLENGE_USER_MISMATCH') {
+        status = 401;
       } else if (result.error === 'EMAIL_SERVICE_NOT_CONFIGURED' || result.error === 'EMAIL_DELIVERY_FAILED') {
         status = 503;
       }
@@ -904,7 +906,7 @@ app.post('/api/v1/auth/email/request-otp', async (req, res) => {
 // Verify email OTP and establish authenticated session
 app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
   try {
-    const { email, otp, password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences, purpose } = req.body || {};
+    const { email, otp, password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences, purpose, loginChallenge } = req.body || {};
     const metadata = {
       userAgent: req.headers['user-agent'],
       ipAddress: req.ip || req.connection?.remoteAddress
@@ -913,19 +915,27 @@ app.post('/api/v1/auth/email/verify-otp', async (req, res) => {
     const result = await userService.verifyEmailOtp(
       email,
       otp,
-      { password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences, purpose },
+      { password, username, displayName, firstName, lastName, avatarUrl, avatarConfig, preferences, purpose, loginChallenge },
       metadata
     );
 
     if (!result.success) {
-      const status = result.error === 'MAX_ATTEMPTS_EXCEEDED' ? 429 : 400;
+      const status = (result.error === 'MAX_ATTEMPTS_EXCEEDED') ? 429 
+        : (result.error === 'LOGIN_CHALLENGE_REQUIRED' || result.error === 'INVALID_CHALLENGE' || result.error === 'CHALLENGE_ALREADY_USED' || result.error === 'CHALLENGE_EXPIRED' || result.error === 'CHALLENGE_USER_MISMATCH' || result.error === 'CHALLENGE_OTP_MISMATCH') ? 401 
+        : 400;
       return res.status(status).json(result);
     }
 
     metrics.incrementCounter('cogether_auth_otp_verified_total', 1);
 
+    if (result.mfaRequired) {
+      return res.status(200).json(result);
+    }
+
     // Set secure HTTP-only refresh cookie
-    res.cookie('cogether_refresh', result.refreshToken, getRefreshCookieOptions());
+    if (result.refreshToken) {
+      res.cookie('cogether_refresh', result.refreshToken, getRefreshCookieOptions());
+    }
 
     res.status(200).json(result);
   } catch (err) {
@@ -1005,13 +1015,13 @@ app.post('/api/v1/auth/login', async (req, res) => {
       });
     }
 
-    const { email, password, otp } = req.body || {};
+    const { email, password, otp, loginChallenge } = req.body || {};
     const metadata = {
       userAgent: req.headers['user-agent'],
       ipAddress: req.ip || req.connection?.remoteAddress
     };
 
-    const result = await userService.authenticateWithPassword({ email, password, otp, metadata, requireOtp: true });
+    const result = await userService.authenticateWithPassword({ email, password, otp, loginChallenge, metadata, requireOtp: true });
 
     if (!result.success) {
       const status = (result.error === 'ACCOUNT_TEMPORARILY_LOCKED' || result.error === 'RESEND_TOO_FREQUENT') ? 429 : 401;
