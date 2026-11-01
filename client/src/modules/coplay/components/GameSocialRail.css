@@ -23,15 +23,15 @@
    1. PARTY ROOM PANEL
    ══════════════════════════════════════════════════════════ */
 .party-room-panel {
-  background: #0B0C10;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e5e5ea;
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   box-sizing: border-box;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .party-room-header {
@@ -56,7 +56,7 @@
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1d1d1f;
 }
 
 .party-badge-count {
@@ -108,8 +108,8 @@
 
 .party-room-code-box {
   flex: 1;
-  background: #111318;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
   border-radius: 8px;
   padding: 6px 10px;
   display: flex;
@@ -120,8 +120,8 @@
 }
 
 .party-room-code-box:hover {
-  background: #161820;
-  border-color: rgba(255, 255, 255, 0.18);
+  background: #e6e6e8;
+  border-color: #d6d6d6;
 }
 
 .code-meta-col {
@@ -132,7 +132,7 @@
 .code-label {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 9.5px;
-  color: #8E95A5;
+  color: #707070;
   line-height: 1;
   margin-bottom: 2px;
 }
@@ -141,7 +141,7 @@
   font-family: 'Space Mono', monospace;
   font-size: 12px;
   font-weight: 700;
-  color: #F8FAFC;
+  color: #1d1d1f;
   line-height: 1.1;
 }
 
@@ -164,9 +164,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #FFE500;
-  border: none;
-  color: #000000;
+  background: #ffe500;
+  border: 1px solid #ffe500;
+  color: #111111;
   padding: 0 14px;
   height: 42px;
   border-radius: 8px;
@@ -185,8 +185,8 @@
 
 /* Connected Members Card */
 .party-members-card {
-  background: #111318;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
   border-radius: 10px;
   padding: 10px 12px;
   display: flex;
@@ -233,7 +233,7 @@
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 12px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1d1d1f;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -257,7 +257,7 @@
 
 .status-label {
   font-size: 10px;
-  color: #8E95A5;
+  color: #707070;
 }
 
 .member-crown-badge {
@@ -276,14 +276,14 @@
 .party-chat-panel {
   flex: 1;
   min-height: 0;
-  background: #0B0C10;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e5e5ea;
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .party-chat-header {
@@ -291,7 +291,7 @@
   align-items: center;
   justify-content: space-between;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid #e5e5ea;
   flex-shrink: 0;
 }
 
@@ -309,7 +309,7 @@
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 13.5px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1d1d1f;
 }
 
 .chat-more-btn {
@@ -393,17 +393,17 @@
 }
 
 .chat-bubble.incoming {
-  background: #1C1F28;
-  color: #F1F5F9;
+  background: #f5f5f7;
+  color: #1d1d1f;
   border-radius: 12px 12px 12px 3px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #e5e5ea;
 }
 
 .chat-bubble.outgoing {
-  background: #23251D; /* Subtle warm olive-charcoal tint matching reference */
-  color: #FFFFFF;
+  background: #ffe500;
+  color: #111111;
   border-radius: 12px 12px 3px 12px;
-  border: 1px solid rgba(255, 229, 0, 0.12);
+  border: 1px solid #e6ce00;
 }
 
 .bubble-sub-meta {
@@ -451,8 +451,8 @@
 /* Fully Rounded Pill Chat Input */
 .party-chat-input-pill {
   height: 42px;
-  background: #111318;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
   border-radius: 999px;
   padding: 3px 4px 3px 12px;
   display: flex;
@@ -488,13 +488,13 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #FFFFFF;
+  color: #1d1d1f;
   font-size: 12px;
   font-family: inherit;
 }
 
 .party-chat-textfield::placeholder {
-  color: #64748B;
+  color: #86868b;
 }
 
 /* Circular Solid Yellow Send Button */
@@ -609,8 +609,8 @@
   border-radius: 10px;
   overflow: hidden;
   position: relative;
-  background: #14141c;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
 }
 
 .rail-video-tile-container .video-tile {
@@ -636,15 +636,15 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: #181922;
+  background: #f5f5f7;
 }
 
 .rail-video-tile-container .avatar-circle-tile {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  color: #FFE500;
+  background: #e5e5ea;
+  color: #1d1d1f;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -654,7 +654,7 @@
 
 .rail-video-tile-container .avatar-name {
   font-size: 11px;
-  color: #94A3B8;
+  color: #1d1d1f;
   font-weight: 600;
 }
 
@@ -711,8 +711,9 @@
   justify-content: center;
   gap: 12px;
   padding: 8px 10px;
-  background: rgba(20, 22, 28, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e5e5ea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border-radius: 10px;
   box-sizing: border-box;
 }
@@ -721,9 +722,9 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #14151B;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #FFFFFF;
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
+  color: #1d1d1f;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -732,9 +733,9 @@
 }
 
 .control-circle-btn:hover {
-  border-color: #FFE500;
-  color: #FFE500;
-  background: #1F2029;
+  border-color: #ffe500;
+  color: #111111;
+  background: #ffe500;
   transform: translateY(-1px);
 }
 
@@ -760,4 +761,331 @@
   background: #EF4444;
   border-color: #EF4444;
   color: #FFFFFF;
+}
+
+/* ── Combined vs. Separate Video Layout Toggle Styles ── */
+.party-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.party-mode-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
+  border-radius: 6px;
+  color: #707070;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.party-mode-toggle-btn:hover {
+  background: #e6e6e8;
+  color: #1d1d1f;
+  border-color: #d6d6d6;
+}
+
+.separate-video-pill {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #22c55e;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.separate-video-pill:hover {
+  background: rgba(34, 197, 94, 0.18);
+}
+
+.party-chat-panel.is-collapsed {
+  flex: 0 0 auto;
+}
+
+.party-room-panel.is-collapsed {
+  flex: 0 0 auto;
+}
+
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-chevron-btn {
+  background: transparent;
+  border: none;
+  color: #8e95a5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+/* ── Compose Form Styling (Apple Light Pill) ── */
+.chat-compose-form {
+  height: 42px;
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
+  border-radius: 999px;
+  padding: 3px 4px 3px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+  margin-top: auto;
+}
+
+.chat-compose-form:focus-within {
+  border-color: #ffe500;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(255, 229, 0, 0.25);
+}
+
+.btn-emoji-toggle {
+  background: transparent;
+  border: none;
+  color: #707070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: color 0.15s ease;
+}
+
+.btn-emoji-toggle:hover,
+.btn-emoji-toggle.active {
+  color: #111111;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.chat-text-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #1d1d1f;
+  font-size: 12px;
+  font-family: inherit;
+  padding: 0;
+}
+
+.chat-text-input::placeholder {
+  color: #86868b;
+}
+
+.chat-badge-count {
+  display: inline-block;
+  background: #ffe500;
+  color: #111111;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   REFERENCE PARTY ROOM & CHAT PILL STYLES (IMAGE 1 EXACT)
+   ══════════════════════════════════════════════════════════ */
+.party-label-uppercase {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #707070;
+  text-transform: uppercase;
+}
+
+.party-badge-count-green {
+  font-size: 11px;
+  font-weight: 700;
+  color: #16a34a;
+  letter-spacing: 0.05em;
+}
+
+.party-room-code-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
+  border-radius: 12px;
+  padding: 6px 8px 6px 14px;
+}
+
+.room-code-display {
+  font-family: "Space Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d1d1f;
+  letter-spacing: 0.04em;
+}
+
+.btn-room-copy-pill {
+  background: #ffffff;
+  border: 1px solid #e5e5ea;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.btn-room-copy-pill:hover {
+  background: #f1f1f4;
+  border-color: #d6d6d6;
+}
+
+.party-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0;
+}
+
+.party-member-row-ref {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.member-avatar-circle-red {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  display: grid;
+  place-items: center;
+}
+
+.member-avatar-circle-blue {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  display: grid;
+  place-items: center;
+}
+
+.member-info-col-ref {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.member-name-bold {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.member-status-connected {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.member-status-connected .green-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16a34a;
+}
+
+.party-actions-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.party-pill-btn {
+  flex: 1;
+  height: 36px;
+  border-radius: 999px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.party-pill-btn.is-active-yellow {
+  background: #ffe500;
+  border: 1px solid #ffe500;
+  color: #111111;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.party-pill-btn.is-active-yellow:hover {
+  background: #ffea33;
+}
+
+.party-pill-btn.is-default-white {
+  background: #ffffff;
+  border: 1px solid #e5e5ea;
+  color: #1d1d1f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.party-pill-btn.is-default-white:hover {
+  background: #f5f5f7;
+  border-color: #d6d6d6;
+}
+
+.party-pill-btn.is-off {
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
+  color: #707070;
+}
+
+.chat-title-ref-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.chat-title-bold {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.chat-title-sub {
+  font-size: 11px;
+  color: #86868b;
 }

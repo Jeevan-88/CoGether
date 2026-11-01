@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Users, Copy, Check, Link, Crown, Lock, 
   MessageSquare, MoreVertical, Smile, Send, ChevronDown, ChevronRight,
-  Mic, MicOff, Video, VideoOff, Monitor, LogOut
+  Mic, MicOff, Video, VideoOff, Monitor, LogOut, ExternalLink, Layers
 } from 'lucide-react';
 import VideoTile from '../../videoroom/VideoTile.jsx';
 import CogetherAvatarRenderer from '../../auth/CogetherAvatarRenderer.jsx';
@@ -29,11 +29,14 @@ export default function GameSocialRail({
   onSendMessage,
   onLeaveSession,
   onOpenInviteFriend,
-  onOpenDirectMessages
+  onOpenDirectMessages,
+  videoLayoutMode = 'COMBINED', // 'COMBINED' | 'SEPARATE'
+  onToggleVideoLayout
 }) {
   const [chatInput, setChatInput] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isPartyCollapsed, setIsPartyCollapsed] = useState(false);
+  const [isChatCollapsed, setIsChatCollapsed] = useState(false);
   const [copied, setCopied] = useState(false);
   const chatMessagesEndRef = useRef(null);
 
@@ -81,330 +84,202 @@ export default function GameSocialRail({
           TOP SECTION: PARTY ROOM & VIDEO FEEDS
           ══════════════════════════════════════════════════════════ */}
       <section className="party-room-panel">
-        {/* Header Bar */}
-        <div 
-          className="party-room-header" 
-          onClick={() => setIsPartyCollapsed(!isPartyCollapsed)}
-        >
-          <div className="party-room-title-group">
-            <Users size={16} className="party-icon-yellow" />
-            <span className="party-title-text">Party Room</span>
-            <span className="party-badge-count">
-              <Users size={11} className="badge-user-icon" />
-              <span>{totalCount}/2</span>
-            </span>
-          </div>
-
-          <button 
-            type="button" 
-            className="party-chevron-btn" 
-            aria-label="Toggle party room"
-          >
-            {isPartyCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
-          </button>
+        {/* Header Bar: PARTY ROOM and 1/3 badge */}
+        <div className="party-room-header">
+          <span className="party-label-uppercase">PARTY ROOM</span>
+          <span className="party-badge-count-green">{totalCount}/3</span>
         </div>
 
-        {/* Party Body */}
-        {!isPartyCollapsed && (
-          <div className="party-room-content">
-            {/* Room Code & Invite Row */}
-            <div className="party-action-row">
-              <div 
-                className="party-room-code-box" 
-                onClick={handleCopyCode}
-                title="Click to copy Room Code"
-              >
-                <div className="code-meta-col">
-                  <span className="code-label">Room Code</span>
-                  <span className="code-string">{roomId}</span>
-                </div>
-                <button type="button" className="code-copy-btn" aria-label="Copy room code">
-                  {copied ? <Check size={14} className="copy-check" /> : <Copy size={14} />}
-                </button>
+        <div className="party-room-content">
+          {/* Room Code Pill with integrated Copy button */}
+          <div className="party-room-code-pill">
+            <span className="room-code-display">{roomId}</span>
+            <button type="button" className="btn-room-copy-pill" onClick={handleCopyCode}>
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+          </div>
+
+          {/* Connected Participants List */}
+          <div className="party-members-list">
+            {/* Member 1: Local User (You) */}
+            <div className="party-member-row-ref">
+              <div className="member-avatar-circle-red">
+                <span>{(displayName || 'J')[0].toUpperCase()}</span>
               </div>
 
-              {onOpenInviteFriend && (
-                <button
-                  type="button"
-                  className="btn-party-invite-yellow"
-                  onClick={onOpenInviteFriend}
-                  title="Invite a friend to this room"
-                >
-                  <Link size={14} />
-                  <span>Invite friend</span>
-                </button>
-              )}
-            </div>
-
-            {/* Connected Participants List */}
-            <div className="party-members-card">
-              {/* Member 1: Local User (You) */}
-              <div className="party-member-row">
-                <div className="member-avatar-wrap bg-red-user">
-                  {userProfile?.avatarConfig ? (
-                    <CogetherAvatarRenderer config={userProfile.avatarConfig} size={28} animated={false} />
-                  ) : (
-                    <span className="member-avatar-char">
-                      {(displayName || 'P')[0].toUpperCase()}
-                    </span>
-                  )}
-                </div>
-
-                <div className="member-info-col">
-                  <span className="member-name">{displayName} (You)</span>
-                  <div className="member-status-row">
-                    <span className="status-dot-green" />
-                    <span className="status-label">{connected ? 'Connected' : 'Online'}</span>
-                  </div>
-                </div>
-
-                <div className="member-crown-badge" title="Room Host">
-                  <Crown size={15} className="crown-icon-gold" />
+              <div className="member-info-col-ref">
+                <span className="member-name-bold">{displayName} (you)</span>
+                <div className="member-status-connected">
+                  <span className="green-dot" />
+                  <span>connected</span>
                 </div>
               </div>
-
-              {/* Member 2: Remote Peer or Open Invitation Slot */}
-              {hasRemotePeer ? (
-                <div className="party-member-row">
-                  <div className="member-avatar-wrap bg-blue-peer">
-                    <span className="member-avatar-char">
-                      {(remotePlayerName || 'P')[0].toUpperCase()}
-                    </span>
-                  </div>
-
-                  <div className="member-info-col">
-                    <span className="member-name">{remotePlayerName}</span>
-                    <div className="member-status-row">
-                      <span className="status-dot-green" />
-                      <span className="status-label">In Arena</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div 
-                  className="party-member-row party-member-empty" 
-                  onClick={onOpenInviteFriend} 
-                  style={{ cursor: 'pointer', opacity: 0.75 }}
-                  title="Click to invite friend"
-                >
-                  <div className="member-avatar-wrap member-avatar-waiting">
-                    <span className="member-avatar-char" style={{ color: '#8E95A5' }}>+</span>
-                  </div>
-
-                  <div className="member-info-col">
-                    <span className="member-name" style={{ color: '#8E95A5', fontStyle: 'italic' }}>Waiting for opponent...</span>
-                    <div className="member-status-row">
-                      <span className="status-dot-green" style={{ background: '#F59E0B' }} />
-                      <span className="status-label" style={{ color: '#8E95A5' }}>Ready to invite</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* ── Live WebRTC Video Calling Stage ── */}
-            {(cameraEnabled || localStream || hasRemotePeer) && (
-              <div className="rail-video-grid" style={{ marginTop: '10px' }}>
-                <div className="rail-video-tile-container">
-                  <VideoTile
-                    stream={localStream}
-                    label={displayName}
-                    isLocal={true}
-                    micEnabled={micEnabled}
-                    cameraEnabled={cameraEnabled}
-                  />
+            {/* Member 2: Remote Peer if connected */}
+            {hasRemotePeer && (
+              <div className="party-member-row-ref">
+                <div className="member-avatar-circle-blue">
+                  <span>{(remotePlayerName || 'P')[0].toUpperCase()}</span>
                 </div>
 
-                {remotePeerIds.map((peerId) => {
-                  const peerData = remoteStreams[peerId];
-                  return (
-                    <div key={peerId} className="rail-video-tile-container">
-                      <VideoTile
-                        stream={peerData?.stream || peerData}
-                        label={peerData?.username || 'Player 2'}
-                        isLocal={false}
-                        micEnabled={peerData?.micEnabled ?? true}
-                        cameraEnabled={peerData?.cameraEnabled ?? true}
-                      />
-                    </div>
-                  );
-                })}
+                <div className="member-info-col-ref">
+                  <span className="member-name-bold">{remotePlayerName}</span>
+                  <div className="member-status-connected">
+                    <span className="green-dot" />
+                    <span>connected</span>
+                  </div>
+                </div>
               </div>
             )}
-
-            {/* ── In-Call Controls Bar (Mic, Camera, Screen Share, Leave) ── */}
-            <div className="rail-controls-bar" style={{ marginTop: '8px' }}>
-              <button
-                type="button"
-                className={`control-circle-btn ${!micEnabled ? 'is-off' : ''}`}
-                onClick={onToggleMic}
-                title={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
-                aria-label={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
-              >
-                {micEnabled ? <Mic size={16} /> : <MicOff size={16} />}
-              </button>
-
-              <button
-                type="button"
-                className={`control-circle-btn ${!cameraEnabled ? 'is-off' : ''}`}
-                onClick={onToggleCamera}
-                title={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
-                aria-label={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
-              >
-                {cameraEnabled ? <Video size={16} /> : <VideoOff size={16} />}
-              </button>
-
-              <button
-                type="button"
-                className={`control-circle-btn ${isScreenSharing ? 'is-active' : ''}`}
-                onClick={onToggleScreenShare}
-                title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
-                aria-label={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
-              >
-                <Monitor size={16} />
-              </button>
-
-              {onLeaveSession && (
-                <button
-                  type="button"
-                  className="control-circle-btn btn-leave-room"
-                  onClick={onLeaveSession}
-                  title="Leave Room"
-                  aria-label="Leave Room"
-                >
-                  <LogOut size={16} />
-                </button>
-              )}
-            </div>
           </div>
-        )}
+
+          {/* ── Mic on / Cam / Exit Action Pills (Matches Reference Image 1) ── */}
+          <div className="party-actions-pills-row">
+            <button
+              type="button"
+              className={`party-pill-btn ${micEnabled ? 'is-active-yellow' : 'is-default-white'}`}
+              onClick={onToggleMic}
+            >
+              {micEnabled ? 'Mic on' : 'Mic off'}
+            </button>
+
+            <button
+              type="button"
+              className={`party-pill-btn ${cameraEnabled ? 'is-default-white' : 'is-off'}`}
+              onClick={onToggleCamera}
+            >
+              {cameraEnabled ? 'Cam' : 'Cam off'}
+            </button>
+
+            <button
+              type="button"
+              className="party-pill-btn is-default-white"
+              onClick={onLeaveSession || (() => window.history.back())}
+            >
+              Exit
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════════
           BOTTOM SECTION: REAL-TIME ROOM CHAT
           ══════════════════════════════════════════════════════════ */}
-      <section className="party-chat-panel">
+      <section className={`party-chat-panel ${isChatCollapsed ? 'is-collapsed' : ''}`}>
         {/* Chat Header */}
         <div className="party-chat-header">
-          <div className="chat-title-group">
+          <div 
+            className="chat-title-group"
+            onClick={() => setIsChatCollapsed(!isChatCollapsed)}
+            style={{ cursor: 'pointer' }}
+          >
             <MessageSquare size={15} className="chat-icon-muted" />
-            <span className="chat-title-text">Chat</span>
-          </div>
-
-          <button 
-            type="button" 
-            className="chat-more-btn"
-            onClick={onOpenDirectMessages}
-            title="Chat Options"
-            aria-label="Chat Options"
-          >
-            <MoreVertical size={16} />
-          </button>
-        </div>
-
-        {/* Chat Messages Stream */}
-        <div className="party-chat-stream">
-          {(!chatMessages || chatMessages.length === 0) ? (
-            <div className="telegram-chat-empty-state">
-              <div className="telegram-date-badge">TODAY</div>
-              <div className="telegram-encryption-notice">
-                <Lock size={14} className="notice-lock-icon" />
-                <span className="notice-heading">End-to-End Encrypted Room</span>
-                <p className="notice-sub">Messages are sent in real time directly to connected room members.</p>
-              </div>
+            <div className="chat-title-ref-group">
+              <span className="chat-title-bold">Party chat</span>
+              <span className="chat-title-sub">Aarav, Meera</span>
             </div>
-          ) : (
-            chatMessages.map((msg, index) => {
-              const sender = msg.senderName || msg.sender || 'Player';
-              const isMine = sender === currentUsername || sender === displayName || sender === 'You' || msg.senderId === 'local';
-              const text = msg.text || '';
-              const time = msg.timestamp || msg.time || '';
+            {chatMessages.length > 0 && (
+              <span className="chat-badge-count">{chatMessages.length}</span>
+            )}
+          </div>
 
-              if (isMine) {
-                return (
-                  <div key={msg.id || index} className="chat-message-row outgoing">
-                    <div className="chat-bubble outgoing">
-                      <span className="bubble-text-content">{text}</span>
-                    </div>
-                    <div className="bubble-sub-meta">
-                      <span className="bubble-timestamp">{time}</span>
-                      <span className="read-receipt-ticks">✓✓</span>
-                    </div>
-                  </div>
-                );
-              }
-
-              return (
-                <div key={msg.id || index} className="chat-message-row incoming">
-                  <div className="incoming-avatar-col">
-                    <div className="incoming-avatar" style={{ background: '#3B82F6' }}>
-                      {sender[0]?.toUpperCase() || 'P'}
-                    </div>
-                  </div>
-                  <div className="incoming-bubble-col">
-                    <div className="bubble-meta" style={{ fontSize: '10px', color: '#94a3b8', marginBottom: '2px' }}>
-                      <span>{sender}</span>
-                    </div>
-                    <div className="chat-bubble incoming">
-                      <span className="bubble-text-content">{text}</span>
-                    </div>
-                    <div className="bubble-sub-meta">
-                      <span className="bubble-timestamp">{time}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-          <div ref={chatMessagesEndRef} />
+          <div className="chat-header-actions">
+            <button 
+              type="button" 
+              className="chat-chevron-btn" 
+              onClick={() => setIsChatCollapsed(!isChatCollapsed)}
+              aria-label="Toggle chat"
+            >
+              {isChatCollapsed ? <ChevronRight size={15} /> : <ChevronDown size={15} />}
+            </button>
+          </div>
         </div>
 
-        {/* Emoji Quick Picker Popover */}
-        {showEmojiPicker && (
-          <div className="emoji-picker-dock fade-in">
-            {QUICK_EMOJIS.map((emoji) => (
+        {/* Chat Messages Body */}
+        {!isChatCollapsed && (
+          <>
+            <div className="chat-messages-container" tabIndex={0} aria-label="Party Messages">
+              {chatMessages.length === 0 ? (
+                <div className="chat-empty-state">
+                  <p>Party chat ready. Send a message or emoji to your squad!</p>
+                </div>
+              ) : (
+                chatMessages.map((msg, idx) => {
+                  const isOutgoing = msg.isLocal || msg.sender === currentUsername || msg.sender === displayName;
+                  return (
+                    <div 
+                      key={msg.id || idx} 
+                      className={`chat-bubble-row ${isOutgoing ? 'outgoing' : 'incoming'}`}
+                    >
+                      <div className="bubble-wrapper">
+                        {!isOutgoing && (
+                          <span className="bubble-sender-name">{msg.sender}</span>
+                        )}
+                        <p className="bubble-text">{msg.text}</p>
+                        <div className="bubble-meta">
+                          <span className="bubble-time">{msg.time || 'now'}</span>
+                          {isOutgoing && <Check size={11} className="read-tick" />}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={chatMessagesEndRef} />
+            </div>
+
+            {/* Quick Emoji Bar */}
+            {showEmojiPicker && (
+              <div className="chat-emoji-drawer fade-in">
+                <div className="emoji-grid">
+                  {QUICK_EMOJIS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      className="btn-emoji-item"
+                      onClick={() => handleSelectEmoji(emoji)}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Message Input Form */}
+            <form className="chat-compose-form" onSubmit={handleSendChat}>
               <button
-                key={emoji}
                 type="button"
-                className="emoji-dock-item"
-                onClick={() => handleSelectEmoji(emoji)}
+                className={`btn-emoji-toggle ${showEmojiPicker ? 'active' : ''}`}
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                title="Add Reaction Emoji"
+                aria-label="Add Reaction Emoji"
               >
-                {emoji}
+                <Smile size={18} />
               </button>
-            ))}
-          </div>
+
+              <input
+                type="text"
+                className="chat-text-input"
+                placeholder="Send party message..."
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                maxLength={280}
+              />
+
+              <button
+                type="submit"
+                className={`btn-chat-send-yellow ${chatInput.trim() ? 'has-content' : ''}`}
+                disabled={!chatInput.trim()}
+                title="Send message"
+                aria-label="Send message"
+              >
+                <Send size={15} />
+              </button>
+            </form>
+          </>
         )}
-
-        {/* Chat Input Pill */}
-        <form onSubmit={handleSendChat} className="party-chat-input-pill">
-          <button
-            type="button"
-            className="btn-chat-emoji"
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            title="Emoji"
-            aria-label="Add emoji"
-          >
-            <Smile size={18} />
-          </button>
-
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            className="party-chat-textfield"
-          />
-
-          <button
-            type="submit"
-            className="btn-chat-send-yellow"
-            disabled={!chatInput.trim()}
-            title="Send Message"
-            aria-label="Send Message"
-          >
-            <Send size={14} className="send-icon-black" />
-          </button>
-        </form>
       </section>
     </aside>
   );

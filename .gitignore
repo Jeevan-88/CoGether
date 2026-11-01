@@ -1,5 +1,6 @@
 node_modules/
 client/node_modules/
+server/node_modules/
 dist/
 client/dist/
 .DS_Store
@@ -9,9 +10,14 @@ client/dist/
 .playwright-mcp/
 coverage/
 .test_last_otp.json
-*.png
+/*.png
+!client/public/**/*.png
+/*.js
+!*.config.js
 scratch/
 scripts/
 .vercel/
 .wsl_ip
+
+*.blend*
 

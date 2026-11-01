@@ -40,34 +40,39 @@ export default function GameHeader({
   return (
     <>
       <header className="game-header-bar">
-        {/* ── Left Navigation & Title ── */}
+        {/* ── Left Navigation & Title (Matches Reference Design) ── */}
         <div className="header-left-cluster">
           <button
             type="button"
             className="btn-header-back"
             onClick={handleExitClick}
-            title="Back to Arcade"
-            aria-label="Back to Arcade"
+            title="Back to Overview"
+            aria-label="Back to Overview"
           >
-            <ArrowLeft size={15} />
-            <span className="back-text">BACK TO ARCADE</span>
+            <ArrowLeft size={14} />
+            <span className="back-text">Back to Overview</span>
           </button>
 
           <h1 className="header-game-title">{displayTitle}</h1>
         </div>
 
-        {/* ── Right Action Controls ── */}
+        {/* ── Right Action Controls (Matches Reference Image) ── */}
         <div className="header-right-cluster">
-          {/* Challenge Friend Action */}
+          <div className="header-mode-pills-row">
+            <button type="button" className="header-mode-pill active">Solo</button>
+            <button type="button" className="header-mode-pill">Race 2</button>
+            <button type="button" className="header-mode-pill">Race 3</button>
+          </div>
+
+          {/* Invite Friend Action */}
           {onOpenChallenge && (
             <button
               type="button"
-              className="btn-header-challenge-trigger game-header-challenge-btn"
+              className="btn-header-invite-yellow"
               onClick={onOpenChallenge}
-              title="Challenge a Friend with synchronized duel room"
+              title="Invite friend to game"
             >
-              <Users size={15} className="btn-challenge-icon" />
-              <span>CHALLENGE FRIEND</span>
+              <span>Invite friend</span>
             </button>
           )}
 
@@ -79,7 +84,7 @@ export default function GameHeader({
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
             aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           >
-            {isFullscreen ? <Minimize size={17} /> : <Maximize size={17} />}
+            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
           </button>
         </div>
       </header>

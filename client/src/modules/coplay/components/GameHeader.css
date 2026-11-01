@@ -7,8 +7,9 @@
 
 .game-header-bar {
   height: 52px;
-  background: #000000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5ea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   padding: 0 24px;
   display: flex;
   align-items: center;
@@ -30,26 +31,25 @@
 .btn-header-back {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: #111318;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #E2E8F0;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #e5e5ea;
+  color: #1d1d1f;
   padding: 6px 14px;
-  border-radius: 8px;
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  border-radius: 999px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.15s ease;
   white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .btn-header-back:hover {
-  background: #1A1D26;
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  background: #e6e6e8;
+  border-color: #d6d6d6;
+  color: #000000;
 }
 
 .header-game-title {
@@ -57,7 +57,7 @@
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 24px;
   font-weight: 700;
-  color: #ffffff;
+  color: #1d1d1f;
   letter-spacing: -0.5px;
   line-height: 1;
 }
@@ -74,9 +74,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #0B0C10;
-  border: 1.5px solid #FFE500;
-  color: #FFE500;
+  background: #ffe500;
+  border: 1.5px solid #ffe500;
+  color: #111111;
   padding: 7px 16px;
   border-radius: 8px;
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -90,12 +90,14 @@
 }
 
 .btn-header-challenge-trigger:hover {
-  background: #FFE500;
+  background: #ffea33;
   color: #000000;
+  transform: translateY(-1px);
 }
 
 .btn-header-challenge-trigger:hover .btn-challenge-icon {
-  color: #000000;
+  color: #111111;
+  transition: color 0.18s ease;
 }
 
 .btn-challenge-icon {
@@ -107,10 +109,10 @@
 .btn-header-fullscreen {
   width: 36px;
   height: 36px;
-  background: #111318;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
   border-radius: 8px;
-  color: #8E95A5;
+  color: #1d1d1f;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,9 +121,9 @@
 }
 
 .btn-header-fullscreen:hover {
-  background: #1A1D26;
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  background: #e6e6e8;
+  border-color: #d6d6d6;
+  color: #000000;
 }
 
 /* ── Exit Confirmation Modal ── */
@@ -203,4 +205,57 @@
   .btn-header-back span {
     display: none;
   }
+}
+
+
+/* ── Reference Header Mode Pills (Solo, Race 2, Race 3) & Invite Button ── */
+.header-mode-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-mode-pill {
+  background: #f5f5f7;
+  border: 1px solid #e5e5ea;
+  color: #707070;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.header-mode-pill:hover {
+  background: #e6e6e8;
+  color: #1d1d1f;
+}
+
+.header-mode-pill.active {
+  background: #ffe500;
+  border-color: #ffe500;
+  color: #111111;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.btn-header-invite-yellow {
+  background: #ffe500;
+  border: 1px solid #ffe500;
+  color: #111111;
+  padding: 6px 20px;
+  border-radius: 999px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.btn-header-invite-yellow:hover {
+  background: #ffea33;
+  transform: translateY(-1px);
 }

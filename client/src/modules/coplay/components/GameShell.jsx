@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { getGameProviderAdapter, GameLaunchError } from '../services/GameProviderAdapter.js';
 import { GameMode } from '../gameSchema.js';
 import { useWebRTC } from '../../../core/useWebRTC.js';
@@ -20,13 +21,15 @@ import './GameShell.css';
 const SIGNALING_URL = getSignalingUrl();
 
 /**
- * GameShell
- * The core production gameplay environment for CoGether.
- * Matches CoGether reference design:
- * 1. Global AppNavShell (CO-WATCH, CO-PLAY, CO-SHOP, CO-STUDY, Search, Bell, Profile)
- * 2. GameHeader (< BACK TO ARCADE | 2048 | CHALLENGE FRIEND | Fullscreen)
- * 3. Elevated Game Canvas with floating bottom-left info dock (2048, Puzzle, Heart, Leaderboard)
- * 4. Dedicated Right Social Rail (Party Room with Room Code, Invite Friend, Participant List with Host Crown, and Live Chat)
+ * Universal GameShell
+ * The shared production gameplay shell for EVERY game in CoGether.
+ * Features:
+ * 1. Physical 3D PC Monitor matching the CoGether landing page.
+ * 2. Strictly no-scroll layout (fits available viewport with 0 vertical scrolling).
+ * 3. Working edge-to-edge Fullscreen mode (hides stand, top nav, margins).
+ * 4. Collapsible right-side party & live chat sidebar with arrow control.
+ * 5. Combined & Separate modes for live video calling and chat.
+ * 6. Real WebRTC video, microphone, and Socket.IO party messaging.
  */
 export default function GameShell({
   game,
@@ -42,6 +45,8 @@ export default function GameShell({
   const [loading, setLoading] = useState(true);
   const [launchError, setLaunchError] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [videoLayoutMode, setVideoLayoutMode] = useState('COMBINED'); // 'COMBINED' | 'SEPARATE'
   const [showChallengeModal, setShowChallengeModal] = useState(false);
   const [showPlayWithFriendModal, setShowPlayWithFriendModal] = useState(false);
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
@@ -62,9 +67,49 @@ export default function GameShell({
   const adapterRef = useRef(null);
   const countdownTimerRef = useRef(null);
 
+  // Normalize game object properties (n -> title, thumb -> thumbnail) - Memoized to prevent infinite re-launch
+  const normalizedGame = React.useMemo(() => {
+    if (!game) return null;
+    let url = game.launchUrl || game.url || `/games/${game.id}/index.html`;
+    if (game.id === 'afterhours' && !url.includes('autoplay=true')) {
+      url += (url.includes('?') ? '&' : '?') + 'autoplay=true';
+    }
+    return {
+      ...game,
+      title: game.title || game.n || 'Arcade Game',
+      thumbnail: game.thumbnail || game.thumb || '',
+      category: game.category || game.cat || 'Arcade',
+      launchUrl: url,
+      distributionStatus: game.distributionStatus || 'AVAILABLE',
+      licenseStatus: game.licenseStatus || 'VERIFIED_OPEN_SOURCE'
+    };
+  }, [game?.id, game?.launchUrl, game?.title, game?.thumb, game?.thumbnail]);
+
   // WebRTC Connection for real-time duel, cameras, and data sync
   const isChallenge = activeMode === 'CHALLENGE';
   const webrtc = useWebRTC(roomId, currentUsername, SIGNALING_URL, { autoStartMedia: isChallenge });
+
+  // STRICT REQUIREMENT: Prevent game controls (Arrows, Space, WASD) from scrolling the webpage
+  useEffect(() => {
+    const handlePreventPageScroll = (e) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        if (e.target && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+          e.preventDefault();
+        }
+      }
+    };
+    window.addEventListener('keydown', handlePreventPageScroll, { passive: false });
+    return () => window.removeEventListener('keydown', handlePreventPageScroll);
+  }, []);
+
+  // Lock body overflow strictly while GameShell is mounted
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
 
   // Launch game session via sandboxed provider adapter
   const launchGame = useCallback(async () => {
@@ -76,14 +121,14 @@ export default function GameShell({
       adapterRef.current = null;
     }
 
-    if (!game) {
+    if (!normalizedGame) {
       setLaunchError(new GameLaunchError('No game metadata provided', 'ERR_NULL_GAME'));
       setLoading(false);
       return;
     }
 
     try {
-      const adapter = getGameProviderAdapter(game);
+      const adapter = getGameProviderAdapter(normalizedGame);
       adapterRef.current = adapter;
 
       if (!viewportRef.current) {
@@ -103,15 +148,7 @@ export default function GameShell({
       setLoading(false);
       setLaunchError(err instanceof GameLaunchError ? err : new GameLaunchError(err.message, 'ERR_UNEXPECTED'));
     }
-  }, [game]);
-
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
+  }, [normalizedGame]);
 
   useEffect(() => {
     launchGame();
@@ -131,16 +168,20 @@ export default function GameShell({
   const handleToggleFullscreen = () => {
     if (!containerRef.current) return;
 
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().catch((err) => {
-        console.warn('Native Fullscreen failed:', err);
-      });
+    if (!isFullscreen) {
       setIsFullscreen(true);
+      if (containerRef.current.requestFullscreen) {
+        containerRef.current.requestFullscreen().catch((err) => {
+          console.warn('Native requestFullscreen API skipped/blocked, utilizing CSS arcade fullscreen fallback.');
+        });
+      }
     } else {
-      document.exitFullscreen().catch((err) => {
-        console.warn('Exit Fullscreen failed:', err);
-      });
       setIsFullscreen(false);
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch((err) => {
+          console.warn('Exit Fullscreen caught:', err);
+        });
+      }
     }
   };
 
@@ -289,23 +330,9 @@ export default function GameShell({
 
   return (
     <div className={`game-shell-root fade-in ${isFullscreen ? 'is-fullscreen' : ''}`} ref={containerRef}>
-      {/* ── Top Unified App Navigation Shell (Matches Reference Design) ── */}
-      {!isFullscreen && (
-        <AppNavShell
-          activeService="coplay"
-          onSelectService={onSelectService}
-          onBackToHome={onBackToHome || onClose}
-          user={user}
-          profile={profile}
-          onOpenProfile={() => setShowProfileModal(true)}
-          onOpenSocial={() => setIsSocialModalOpen(true)}
-          unreadCount={unreadSummary?.totalUnread || 0}
-        />
-      )}
-
-      {/* ── Top Game Header Bar (Matches Reference Design) ── */}
+      {/* ── Top Game Header Bar (Matches Reference Design: Back to Overview | Afterhours | Solo | Invite friend) ── */}
       <GameHeader
-        game={game}
+        game={normalizedGame}
         mode={activeMode}
         isFullscreen={isFullscreen}
         onToggleFullscreen={handleToggleFullscreen}
@@ -315,11 +342,11 @@ export default function GameShell({
         hasActiveSession={activeMode === 'CHALLENGE'}
       />
 
-      {/* ── Main Gameplay Body (Game Stage + Right Social Rail) ── */}
-      <div className="game-shell-body">
+      {/* ── Main Gameplay Body (Universal Monitor Stage + Collapsible Right Social Rail) ── */}
+      <div className={`game-shell-body ${!isSidebarOpen ? 'sidebar-collapsed' : ''}`}>
         <div className="game-stage-column">
           <GameViewport
-            game={game}
+            game={normalizedGame}
             viewportRef={viewportRef}
             loading={loading}
             launchError={launchError}
@@ -340,34 +367,51 @@ export default function GameShell({
           />
         </div>
 
-        {/* ── Right-Side Social Rail (Matches Reference Image) ── */}
+        {/* ── Clean Arrow Collapse Control on the Right Edge of Gameplay Area ── */}
         {!isFullscreen && (
-          <GameSocialRail
-            roomId={roomId}
-            currentUsername={currentUsername}
-            userProfile={profile}
-            localStream={webrtc.localStream}
-            remoteStreams={webrtc.remoteStreams}
-            micEnabled={webrtc.micEnabled}
-            cameraEnabled={webrtc.cameraEnabled}
-            isScreenSharing={webrtc.isScreenSharing}
-            connected={webrtc.connected}
-            connectionState={webrtc.connectionState}
-            peerConnectionStates={webrtc.peerConnectionStates}
-            chatMessages={webrtc.chatMessages}
-            onToggleMic={webrtc.toggleMic}
-            onToggleCamera={webrtc.toggleCamera}
-            onToggleScreenShare={webrtc.toggleScreenShare}
-            onSendMessage={webrtc.sendChatMessage}
-            onLeaveSession={handleLeaveSession}
-            onOpenInviteFriend={() => setShowPlayWithFriendModal(true)}
-            onOpenDirectMessages={() => setIsSocialModalOpen(true)}
-          />
+          <button
+            type="button"
+            className={`btn-sidebar-collapse-tab ${isSidebarOpen ? 'is-open' : 'is-closed'}`}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            title={isSidebarOpen ? "Collapse Party & Chat Sidebar" : "Open Party & Chat Sidebar"}
+            aria-label={isSidebarOpen ? "Collapse Party & Chat Sidebar" : "Open Party & Chat Sidebar"}
+          >
+            <ChevronRight size={18} className={`collapse-chevron-icon ${!isSidebarOpen ? 'is-reversed' : ''}`} />
+          </button>
+        )}
+
+        {/* ── Right-Side Social Rail (Collapsible, Preserving Connection State) ── */}
+        {!isFullscreen && (
+          <div className={`game-social-rail-container ${!isSidebarOpen ? 'is-collapsed' : ''}`}>
+            <GameSocialRail
+              roomId={roomId}
+              currentUsername={currentUsername}
+              userProfile={profile}
+              localStream={webrtc.localStream}
+              remoteStreams={webrtc.remoteStreams}
+              micEnabled={webrtc.micEnabled}
+              cameraEnabled={webrtc.cameraEnabled}
+              isScreenSharing={webrtc.isScreenSharing}
+              connected={webrtc.connected}
+              connectionState={webrtc.connectionState}
+              peerConnectionStates={webrtc.peerConnectionStates}
+              chatMessages={webrtc.chatMessages}
+              onToggleMic={webrtc.toggleMic}
+              onToggleCamera={webrtc.toggleCamera}
+              onToggleScreenShare={webrtc.toggleScreenShare}
+              onSendMessage={webrtc.sendChatMessage}
+              onLeaveSession={handleLeaveSession}
+              onOpenInviteFriend={() => setShowPlayWithFriendModal(true)}
+              onOpenDirectMessages={() => setIsSocialModalOpen(true)}
+              videoLayoutMode={videoLayoutMode}
+              onToggleVideoLayout={() => setVideoLayoutMode(prev => prev === 'COMBINED' ? 'SEPARATE' : 'COMBINED')}
+            />
+          </div>
         )}
       </div>
 
-      {/* ── Floating Camera Overlay ── */}
-      {webrtc.cameraEnabled && (
+      {/* ── Floating Camera Overlay (Used in Separate Mode or when Sidebar is Collapsed) ── */}
+      {webrtc.cameraEnabled && (videoLayoutMode === 'SEPARATE' || !isSidebarOpen) && (
         <DraggableCameraOverlay
           localStream={webrtc.localStream}
           remoteStreams={webrtc.remoteStreams}
@@ -383,7 +427,7 @@ export default function GameShell({
       {/* ── Challenge Room Invitation Modal ── */}
       {showChallengeModal && (
         <ChallengeModal
-          game={game}
+          game={normalizedGame}
           roomId={roomId}
           onClose={() => setShowChallengeModal(false)}
           onStartDuel={handleEnterDuelArena}
@@ -394,38 +438,41 @@ export default function GameShell({
       {/* ── Play With Friend / Invite Modal ── */}
       {showPlayWithFriendModal && (
         <PlayWithFriendModal
-          game={game}
+          game={normalizedGame}
           onClose={() => setShowPlayWithFriendModal(false)}
           onJoinRoom={(newRoomCode) => {
             setShowPlayWithFriendModal(false);
             setRoomId(newRoomCode);
             setActiveMode('CHALLENGE');
+            setIsLocalReady(false);
           }}
+          currentRoomId={roomId}
+          connectedPeers={opponents}
         />
       )}
 
-      {/* ── Leaderboard & Stats Modal ── */}
+      {/* ── Leaderboard Modal ── */}
       {showLeaderboardModal && (
         <LeaderboardModal
-          game={game}
+          game={normalizedGame}
           onClose={() => setShowLeaderboardModal(false)}
+          currentScore={localScore}
         />
       )}
 
-      {/* ── Friends & Messaging Modal ── */}
+      {/* ── Profile & Social Overlays ── */}
+      {showProfileModal && (
+        <ProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+        />
+      )}
+
       {isSocialModalOpen && (
         <FriendsModal
+          isOpen={isSocialModalOpen}
           onClose={() => setIsSocialModalOpen(false)}
-          onLaunchGameDuel={() => {
-            setIsSocialModalOpen(false);
-            setShowPlayWithFriendModal(true);
-          }}
         />
-      )}
-
-      {/* ── Profile & Member Card Modal ── */}
-      {showProfileModal && (
-        <ProfileModal onClose={() => setShowProfileModal(false)} />
       )}
     </div>
   );

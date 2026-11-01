@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mythlings — Pixel Creature RPG</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0d131a;
+      font-family: "Press Start 2P", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", monospace;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #1b2838 0%, #0a0e14 100%);
+    }
+    canvas {
+      display: block;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,255,255,0.08);
+      border-radius: 8px;
+      max-width: 100vw;
+      max-height: 100vh;
+      aspect-ratio: 16 / 9;
+    }
+    /* Floating Header / Control HUD */
+    .hud-bar {
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 30;
+    }
+    .hud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      color: #f1f5f9;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      pointer-events: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .hud-badge-title {
+      color: #38bdf8;
+    }
+    .hud-actions {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .hud-btn {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      padding: 7px 14px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      font-family: inherit;
+    }
+    .hud-btn:hover {
+      background: rgba(255, 255, 255, 0.24);
+      transform: translateY(-1px);
+    }
+    .hud-btn.active-yellow {
+      background: #ffe500;
+      color: #000000;
+      border-color: #ffe500;
+    }
+
+    /* Dialogue Box (Overworld) */
+    #dialogue-modal {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(92%, 620px);
+      background: rgba(15, 23, 42, 0.94);
+      border: 2px solid #38bdf8;
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #ffffff;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.7);
+      display: none;
+      z-index: 50;
+      pointer-events: auto;
+      backdrop-filter: blur(10px);
+    }
+    #dialogue-speaker {
+      font-size: 12px;
+      color: #38bdf8;
+      font-weight: bold;
+      margin-bottom: 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    #dialogue-text {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      min-height: 42px;
+    }
+    #dialogue-prompt {
+      text-align: right;
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 8px;
+      animation: pulse 1s infinite alternate;
+    }
+
+    /* Starter Selection Modal */
+    #starter-modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 12, 18, 0.88);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      padding: 20px;
+    }
+    .starter-card-container {
+      background: #0f172a;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 680px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+    .starter-header {
+      font-size: 16px;
+      color: #ffffff;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+    .starter-subtitle {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+    .starter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .starter-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .starter-card:hover {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .starter-card.flame:hover { border-color: #f97316; background: rgba(249, 115, 22, 0.1); }
+    .starter-card.tide:hover { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
+    .starter-card.flora:hover { border-color: #4ade80; background: rgba(74, 222, 128, 0.1); }
+    .starter-avatar {
+      width: 72px;
+      height: 72px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+    .starter-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .starter-element {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .badge-flame { background: #f97316; color: #fff; }
+    .badge-tide { background: #0284c7; color: #fff; }
+    .badge-flora { background: #16a34a; color: #fff; }
+    .starter-desc {
+      font-size: 10px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    /* Menu & Bag Modal */
+    #menu-modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 15, 22, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 55;
+    }
+    .menu-panel {
+      width: min(92%, 560px);
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    }
+    .menu-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 12px;
+    }
+    .menu-tab {
+      padding: 6px 16px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .menu-tab.active {
+      background: #ffe500;
+      color: #000;
+    }
+    .party-slot-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+    }
+    .bag-item-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+    }
+    .item-count-badge {
+      background: #334155;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    /* On-screen Virtual Controller (Mobile / Touch) */
+    .touch-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 40;
+    }
+    .dpad {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      pointer-events: auto;
+    }
+    .dpad-btn {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .dpad-btn:active {
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0.92);
+    }
+    .dpad-up { top: 0; left: 44px; }
+    .dpad-down { bottom: 0; left: 44px; }
+    .dpad-left { top: 44px; left: 0; }
+    .dpad-right { top: 44px; right: 0; }
+    .action-pad {
+      display: flex;
+      gap: 14px;
+      pointer-events: auto;
+    }
+    .action-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .action-btn.btn-a {
+      background: #ffe500;
+      color: #000000;
+      border: 2px solid #ffffff;
+    }
+    .action-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Battle Victory / Level Up Overlay */
+    #battle-toast {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid #ffe500;
+      border-radius: 30px;
+      padding: 10px 24px;
+      color: #ffe500;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      display: none;
+      z-index: 70;
+      animation: toastBounce 0.4s ease;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    @keyframes toastBounce {
+      0% { transform: translate(-50%, -15px); opacity: 0; }
+      100% { transform: translate(-50%, 0); opacity: 1; }
+    }
+
+    /* Hide touch controls on desktop if no touch */
+    @media (hover: hover) and (pointer: fine) {
+      .touch-controls {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas" width="640" height="360"></canvas>
+
+    <!-- Top HUD Bar -->
+    <div class="hud-bar">
+      <div class="hud-badge">
+        <span class="hud-badge-title">MYTHLINGS</span>
+        <span id="location-badge">• Oakhaven Village</span>
+      </div>
+      <div class="hud-actions">
+        <button id="btn-save" class="hud-btn" title="Save game to local storage">💾 Save</button>
+        <button id="btn-menu" class="hud-btn" title="Open Party & Bag">🎒 Menu [M]</button>
+        <button id="btn-audio" class="hud-btn" title="Toggle Chiptune Audio">🔊 Sound</button>
+      </div>
+    </div>
+
+    <!-- Dialogue Box (Overworld NPCs & Signs) -->
+    <div id="dialogue-modal">
+      <div id="dialogue-speaker">ELDER ROWAN</div>
+      <div id="dialogue-text">Welcome, traveler. The wild Mythlings of Sunstone Grove are growing restless...</div>
+      <div id="dialogue-prompt">Press [E] or Space to continue ▾</div>
+    </div>
+
+    <!-- Starter Creature Selection Modal -->
+    <div id="starter-modal">
+      <div class="starter-card-container">
+        <div class="starter-header">CHOOSE YOUR COMPANION</div>
+        <div class="starter-subtitle">Elder Rowan offers you your first partner for the Sunstone Grove journey.</div>
+        <div class="starter-grid">
+          <div class="starter-card flame" onclick="selectStarter('ignifox')">
+            <div class="starter-avatar">🦊</div>
+            <div class="starter-name">Ignifox</div>
+            <div class="starter-element badge-flame">Flame / Solar</div>
+            <div class="starter-desc">Swift and fierce. Ignites the battlefield with scorching flame strikes.</div>
+          </div>
+          <div class="starter-card tide" onclick="selectStarter('tideling')">
+            <div class="starter-avatar">💧</div>
+            <div class="starter-name">Tideling</div>
+            <div class="starter-element badge-tide">Tide / River</div>
+            <div class="starter-desc">Enduring guardian of river currents. Powerful aquatic shields and torrents.</div>
+          </div>
+          <div class="starter-card flora" onclick="selectStarter('bramblebud')">
+            <div class="starter-avatar">🌿</div>
+            <div class="starter-name">Bramblebud</div>
+            <div class="starter-element badge-flora">Flora / Earth</div>
+            <div class="starter-desc">Hardy and loyal. Entangles opponents with thorny vines and healing spores.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Party & Bag Menu Modal -->
+    <div id="menu-modal">
+      <div class="menu-panel">
+        <div class="menu-tabs">
+          <button class="menu-tab active" id="tab-btn-party" onclick="switchMenuTab('party')">Team Party</button>
+          <button class="menu-tab" id="tab-btn-bag" onclick="switchMenuTab('bag')">Inventory Bag</button>
+          <div style="flex:1"></div>
+          <button class="hud-btn" onclick="closeMenuModal()">✕ Close</button>
+        </div>
+        <div id="menu-content-party"></div>
+        <div id="menu-content-bag" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Toast Banner -->
+    <div id="battle-toast">GOTCHA! MYTHLING CAPTURED!</div>
+
+    <!-- Virtual Touch Controls for Mobile / Tablets -->
+    <div class="touch-controls">
+      <div class="dpad">
+        <div class="dpad-btn dpad-up" id="dpad-up">▲</div>
+        <div class="dpad-btn dpad-left" id="dpad-left">◀</div>
+        <div class="dpad-btn dpad-right" id="dpad-right">▶</div>
+        <div class="dpad-btn dpad-down" id="dpad-down">▼</div>
+      </div>
+      <div class="action-pad">
+        <div class="action-btn" id="btn-touch-b">B</div>
+        <div class="action-btn btn-a" id="btn-touch-a">A</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       MYTHLINGS ENGINE — Turn-Based Creature RPG
+       Completely Original 2D Pixel Canvas + Web Audio API Synthesis
+       ===================================================================== */
+
+    // --- GAME SPECS & CREATURE DATABASE ---
+    const CREATURE_DEX = {
+      ignifox: {
+        id: 'ignifox',
+        name: 'Ignifox',
+        type: 'Flame',
+        color: '#f97316',
+        spriteIcon: '🦊',
+        baseHp: 46,
+        baseAtk: 19,
+        baseDef: 12,
+        baseSpd: 20,
+        moves: [
+          { name: 'Ember Dash', type: 'Flame', power: 15, maxPp: 25, pp: 25, desc: 'Swift burning tackle' },
+          { name: 'Solar Flare', type: 'Flame', power: 25, maxPp: 15, pp: 15, desc: 'Blinding heatwave' },
+          { name: 'Blaze Burst', type: 'Flame', power: 36, maxPp: 8, pp: 8, desc: 'Fiery blast explosion' }
+        ]
+      },
+      tideling: {
+        id: 'tideling',
+        name: 'Tideling',
+        type: 'Tide',
+        color: '#38bdf8',
+        spriteIcon: '💧',
+        baseHp: 54,
+        baseAtk: 14,
+        baseDef: 17,
+        baseSpd: 13,
+        moves: [
+          { name: 'Bubble Jet', type: 'Tide', power: 15, maxPp: 25, pp: 25, desc: 'Pressurized water stream' },
+          { name: 'Aqua Barrier', type: 'Tide', power: -20, maxPp: 12, pp: 12, desc: 'Restores 20 HP water shield' },
+          { name: 'Torrent', type: 'Tide', power: 34, maxPp: 8, pp: 8, desc: 'Crashing river surge' }
+        ]
+      },
+      bramblebud: {
+        id: 'bramblebud',
+        name: 'Bramblebud',
+        type: 'Flora',
+        color: '#4ade80',
+        spriteIcon: '🌿',
+        baseHp: 50,
+        baseAtk: 16,
+        baseDef: 18,
+        baseSpd: 12,
+        moves: [
+          { name: 'Vine Whip', type: 'Flora', power: 16, maxPp: 25, pp: 25, desc: 'Lashing thorny vines' },
+          { name: 'Pollen Guard', type: 'Flora', power: -22, maxPp: 12, pp: 12, desc: 'Healing flower spores' },
+          { name: 'Verdant Pulse', type: 'Flora', power: 32, maxPp: 8, pp: 8, desc: 'Radiant nature strike' }
+        ]
+      }
+    };
+
+    // --- AUDIO SYNTHESIZER (Polyphonic Web Audio API) ---
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+        this.musicTimer = null;
+        this.currentMode = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playTone(freq, duration = 0.1, type = 'square', gainVal = 0.08) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e) {}
+      }
+      playSelect() {
+        this.playTone(587.33, 0.06, 'triangle', 0.1);
+      }
+      playHit() {
+        this.playTone(180, 0.14, 'sawtooth', 0.15);
+      }
+      playSuperEffective() {
+        this.playTone(523.25, 0.08, 'square', 0.12);
+        setTimeout(() => this.playTone(783.99, 0.14, 'square', 0.14), 70);
+      }
+      playCatchWobble() {
+        this.playTone(320, 0.1, 'sine', 0.12);
+      }
+      playCatchSuccess() {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((n, i) => {
+          setTimeout(() => this.playTone(n, 0.22, 'triangle', 0.15), i * 110);
+        });
+      }
+      playLevelUp() {
+        const notes = [440, 554.37, 659.25, 880];
+        notes.forEach((n, i) => {
+          setTimeout(() => this.playTone(n, 0.2, 'square', 0.12), i * 90);
+        });
+      }
+      playHeal() {
+        const notes = [392, 523.25, 659.25];
+        notes.forEach((n, i) => {
+          setTimeout(() => this.playTone(n, 0.18, 'sine', 0.14), i * 100);
+        });
+      }
+      startMusic(mode) {
+        if (!this.enabled || this.currentMode === mode) return;
+        this.stopMusic();
+        this.currentMode = mode;
+        this.init();
+
+        let step = 0;
+        const tempo = mode === 'battle' ? 140 : 260; // ms per beat
+
+        const overworldMelody = [
+          261.63, 0, 329.63, 0, 392.00, 0, 523.25, 392.00,
+          349.23, 0, 440.00, 0, 523.25, 0, 659.25, 0,
+          293.66, 0, 392.00, 0, 493.88, 0, 587.33, 0,
+          261.63, 0, 329.63, 392.00, 523.25, 0, 0, 0
+        ];
+
+        const battleBass = [
+          130.81, 130.81, 146.83, 130.81, 164.81, 130.81, 174.61, 196.00,
+          110.00, 110.00, 130.81, 110.00, 146.83, 110.00, 164.81, 146.83
+        ];
+
+        this.musicTimer = setInterval(() => {
+          if (!this.enabled) return;
+          if (mode === 'battle') {
+            const freq = battleBass[step % battleBass.length];
+            if (freq) this.playTone(freq, 0.1, 'sawtooth', 0.05);
+          } else {
+            const freq = overworldMelody[step % overworldMelody.length];
+            if (freq) this.playTone(freq, 0.18, 'sine', 0.04);
+          }
+          step++;
+        }, tempo);
+      }
+      stopMusic() {
+        if (this.musicTimer) {
+          clearInterval(this.musicTimer);
+          this.musicTimer = null;
+        }
+        this.currentMode = null;
+      }
+      toggle() {
+        this.enabled = !this.enabled;
+        if (!this.enabled) this.stopMusic();
+        else if (window.game) this.startMusic(window.game.state === 'battle' ? 'battle' : 'overworld');
+        return this.enabled;
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    // --- GAME ENGINE & STATE ---
+    class MythlingsGame {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.state = 'overworld'; // 'overworld' | 'dialogue' | 'battle' | 'menu'
+        
+        // World Map (Tiles: 40 x 30 tiles, 24px each = 960 x 720 px world)
+        this.tileSize = 24;
+        this.mapCols = 40;
+        this.mapRows = 30;
+        this.worldWidth = this.mapCols * this.tileSize;
+        this.worldHeight = this.mapRows * this.tileSize;
+
+        // Player & Overworld
+        this.player = {
+          x: 260,
+          y: 380,
+          w: 18,
+          h: 22,
+          speed: 2.6,
+          dir: 'down',
+          animFrame: 0,
+          isMoving: false,
+          stepsInGrass: 0
+        };
+
+        this.camera = { x: 0, y: 0 };
+        this.keys = {};
+
+        // NPCs
+        this.npcs = [
+          {
+            id: 'elder',
+            name: 'Elder Rowan',
+            x: 280,
+            y: 330,
+            w: 20,
+            h: 24,
+            sprite: '🧙',
+            dialogue: [
+              "Greetings, traveler. Welcome to Oakhaven Village.",
+              "Beyond the eastern gate lies the ancient Sunstone Grove.",
+              "Wild Mythlings dwell in the tall waving grass. Take care and stay vigilant!"
+            ]
+          },
+          {
+            id: 'scout',
+            name: 'Scout Lyra',
+            x: 520,
+            y: 280,
+            w: 20,
+            h: 24,
+            sprite: '🏹',
+            dialogue: [
+              "Heading into Sunstone Grove? Remember elemental affinities!",
+              "Flame scorches Flora. Flora absorbs Tide. Tide douses Flame!",
+              "Weaken wild Mythlings before throwing Sunstone Orbs to capture them!"
+            ]
+          }
+        ];
+
+        // Player Party & Bag
+        this.party = [];
+        this.bag = {
+          orbs: 6,
+          berries: 4,
+          tonics: 2
+        };
+        this.badges = 1;
+        this.hasStarter = false;
+
+        // Battle State
+        this.battle = null;
+        this.particles = [];
+        this.battleAnimations = [];
+
+        // Generate procedural map layout
+        this.initWorldMap();
+
+        // Load saved state or default
+        this.loadGame();
+
+        // Event Listeners
+        this.bindEvents();
+
+        // Start render loop
+        this.lastTime = performance.now();
+        requestAnimationFrame((t) => this.gameLoop(t));
+      }
+
+      initWorldMap() {
+        this.map = [];
+        for (let r = 0; r < this.mapRows; r++) {
+          const row = [];
+          for (let c = 0; c < this.mapCols; c++) {
+            // Zone division: 
+            // c < 20: Oakhaven Village
+            // c >= 20: Sunstone Grove
+            let tile = 'grass';
+
+            if (r === 0 || r === this.mapRows - 1 || c === 0 || c === this.mapCols - 1) {
+              tile = 'tree'; // Border trees
+            } else if (c < 20) {
+              // Village paths and buildings
+              if ((r >= 14 && r <= 16) || (c >= 10 && c <= 12 && r >= 10 && r <= 22)) {
+                tile = 'path'; // Cobblestone path
+              } else if (r >= 8 && r <= 11 && c >= 5 && c <= 8) {
+                tile = 'house1'; // Elder house
+              } else if (r >= 8 && r <= 11 && c >= 14 && c <= 17) {
+                tile = 'house2'; // Village shop
+              } else if (r >= 20 && r <= 23 && c >= 5 && c <= 8) {
+                tile = 'pond'; // Town pond
+              } else if (r >= 18 && r <= 20 && c >= 13 && c <= 16) {
+                tile = 'flowers';
+              }
+            } else {
+              // Grove: Wild grass, ruins, ancient monoliths
+              if (r >= 14 && r <= 16 && c <= 23) {
+                tile = 'path'; // Bridge path from village
+              } else if (r >= 5 && r <= 12 && c >= 24 && c <= 35) {
+                tile = 'wild_grass'; // Primary tall grass area
+              } else if (r >= 18 && r <= 25 && c >= 23 && c <= 36) {
+                tile = 'wild_grass'; // Secondary tall grass area
+              } else if ((r === 10 && c === 28) || (r === 22 && c === 30)) {
+                tile = 'monolith'; // Sunstone ruins
+              } else if (Math.random() < 0.08) {
+                tile = 'tree';
+              }
+            }
+            row.push(tile);
+          }
+          this.map.push(row);
+        }
+      }
+
+      bindEvents() {
+        window.addEventListener('keydown', (e) => {
+          this.keys[e.key.toLowerCase()] = true;
+          this.keys[e.code] = true;
+
+          // Sound unlock
+          sound.init();
+
+          if (this.state === 'overworld') {
+            if (e.key === 'e' || e.key === 'E' || e.code === 'Space' || e.key === 'Enter') {
+              this.interactWithFacing();
+            } else if (e.key === 'm' || e.key === 'M') {
+              this.openMenuModal('party');
+            }
+          } else if (this.state === 'dialogue') {
+            if (e.key === 'e' || e.key === 'E' || e.code === 'Space' || e.key === 'Enter') {
+              this.advanceDialogue();
+            }
+          } else if (this.state === 'battle') {
+            this.handleBattleKeyboard(e);
+          }
+        });
+
+        window.addEventListener('keyup', (e) => {
+          this.keys[e.key.toLowerCase()] = false;
+          this.keys[e.code] = false;
+        });
+
+        // HUD Buttons
+        document.getElementById('btn-save').addEventListener('click', () => this.saveGame(true));
+        document.getElementById('btn-menu').addEventListener('click', () => this.openMenuModal('party'));
+        document.getElementById('btn-audio').addEventListener('click', () => {
+          const on = sound.toggle();
+          document.getElementById('btn-audio').textContent = on ? '🔊 Sound' : '🔇 Muted';
+        });
+
+        // Touch Controls
+        const bindTouch = (id, keyName) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            sound.init();
+            this.keys[keyName] = true;
+          });
+          el.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.keys[keyName] = false;
+          });
+        };
+        bindTouch('dpad-up', 'arrowup');
+        bindTouch('dpad-down', 'arrowdown');
+        bindTouch('dpad-left', 'arrowleft');
+        bindTouch('dpad-right', 'arrowright');
+
+        const btnA = document.getElementById('btn-touch-a');
+        if (btnA) {
+          btnA.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            sound.init();
+            if (this.state === 'overworld') this.interactWithFacing();
+            else if (this.state === 'dialogue') this.advanceDialogue();
+          });
+        }
+        const btnB = document.getElementById('btn-touch-b');
+        if (btnB) {
+          btnB.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            sound.init();
+            if (this.state === 'overworld') this.openMenuModal('party');
+            else if (this.state === 'menu') closeMenuModal();
+          });
+        }
+      }
+
+      saveGame(showToast = false) {
+        try {
+          const data = {
+            player: { x: this.player.x, y: this.player.y },
+            party: this.party,
+            bag: this.bag,
+            badges: this.badges,
+            hasStarter: this.hasStarter
+          };
+          localStorage.setItem('mythlings_save', JSON.stringify(data));
+          if (showToast) {
+            this.showToast('PROGRESS SAVED TO SYSTEM');
+            sound.playSelect();
+          }
+        } catch (e) {}
+      }
+
+      loadGame() {
+        try {
+          const raw = localStorage.getItem('mythlings_save');
+          if (raw) {
+            const data = JSON.parse(raw);
+            if (data.party && data.party.length > 0) {
+              this.party = data.party;
+              this.bag = data.bag || this.bag;
+              this.badges = data.badges || 1;
+              this.hasStarter = data.hasStarter || true;
+              if (data.player) {
+                this.player.x = data.player.x;
+                this.player.y = data.player.y;
+              }
+              return;
+            }
+          }
+        } catch(e) {}
+
+        // Default: If no starter yet, trigger starter prompt
+        setTimeout(() => {
+          if (!this.hasStarter) {
+            document.getElementById('starter-modal').style.display = 'flex';
+          }
+        }, 400);
+      }
+
+      chooseStarter(speciesId) {
+        const spec = CREATURE_DEX[speciesId];
+        if (!spec) return;
+        const starter = {
+          id: spec.id,
+          name: spec.name,
+          species: spec.id,
+          type: spec.type,
+          color: spec.color,
+          spriteIcon: spec.spriteIcon,
+          level: 5,
+          exp: 0,
+          expNext: 100,
+          maxHp: spec.baseHp,
+          hp: spec.baseHp,
+          atk: spec.baseAtk,
+          def: spec.baseDef,
+          spd: spec.baseSpd,
+          moves: JSON.parse(JSON.stringify(spec.moves))
+        };
+        this.party = [starter];
+        this.hasStarter = true;
+        document.getElementById('starter-modal').style.display = 'none';
+        sound.playCatchSuccess();
+        this.showToast(`RECEIVED STARTER: ${starter.name.toUpperCase()}!`);
+        this.saveGame();
+      }
+
+      showToast(text) {
+        const t = document.getElementById('battle-toast');
+        t.textContent = text;
+        t.style.display = 'block';
+        clearTimeout(this.toastTimer);
+        this.toastTimer = setTimeout(() => {
+          t.style.display = 'none';
+        }, 2200);
+      }
+
+      // --- OVERWORLD LOGIC ---
+      updateOverworld(dt) {
+        let dx = 0;
+        let dy = 0;
+
+        if (this.keys['arrowup'] || this.keys['w']) { dy -= 1; this.player.dir = 'up'; }
+        if (this.keys['arrowdown'] || this.keys['s']) { dy += 1; this.player.dir = 'down'; }
+        if (this.keys['arrowleft'] || this.keys['a']) { dx -= 1; this.player.dir = 'left'; }
+        if (this.keys['arrowright'] || this.keys['d']) { dx += 1; this.player.dir = 'right'; }
+
+        if (dx !== 0 || dy !== 0) {
+          // Normalize diagonal
+          const len = Math.hypot(dx, dy);
+          const moveDist = this.player.speed * (dt / 16.6);
+          const nextX = this.player.x + (dx / len) * moveDist;
+          const nextY = this.player.y + (dy / len) * moveDist;
+
+          // Collision check against tiles & map bounds
+          if (!this.checkCollision(nextX, this.player.y)) {
+            this.player.x = nextX;
+          }
+          if (!this.checkCollision(this.player.x, nextY)) {
+            this.player.y = nextY;
+          }
+
+          this.player.isMoving = true;
+          this.player.animFrame += dt * 0.01;
+
+          // Grass encounter check
+          const currentTile = this.getTileAt(this.player.x + this.player.w / 2, this.player.y + this.player.h / 2);
+          if (currentTile === 'wild_grass') {
+            this.player.stepsInGrass += dt * 0.05;
+            if (this.player.stepsInGrass > 10 && Math.random() < 0.02) {
+              this.player.stepsInGrass = 0;
+              this.triggerWildBattle();
+            }
+          } else {
+            this.player.stepsInGrass = 0;
+          }
+        } else {
+          this.player.isMoving = false;
+        }
+
+        // Camera follow
+        const targetCamX = this.player.x - this.canvas.width / 2;
+        const targetCamY = this.player.y - this.canvas.height / 2;
+        this.camera.x += (targetCamX - this.camera.x) * 0.1;
+        this.camera.y += (targetCamY - this.camera.y) * 0.1;
+
+        // Clamp camera
+        this.camera.x = Math.max(0, Math.min(this.worldWidth - this.canvas.width, this.camera.x));
+        this.camera.y = Math.max(0, Math.min(this.worldHeight - this.canvas.height, this.camera.y));
+
+        // Location badge update
+        const locBadge = document.getElementById('location-badge');
+        if (this.player.x > 480) {
+          locBadge.textContent = '• Sunstone Grove';
+        } else {
+          locBadge.textContent = '• Oakhaven Village';
+        }
+      }
+
+      getTileAt(worldX, worldY) {
+        const col = Math.floor(worldX / this.tileSize);
+        const row = Math.floor(worldY / this.tileSize);
+        if (row < 0 || row >= this.mapRows || col < 0 || col >= this.mapCols) return 'tree';
+        return this.map[row][col];
+      }
+
+      checkCollision(x, y) {
+        const pad = 4;
+        const left = Math.floor((x + pad) / this.tileSize);
+        const right = Math.floor((x + this.player.w - pad) / this.tileSize);
+        const top = Math.floor((y + pad + 10) / this.tileSize);
+        const bottom = Math.floor((y + this.player.h) / this.tileSize);
+
+        for (let r = top; r <= bottom; r++) {
+          for (let c = left; c <= right; c++) {
+            if (r < 0 || r >= this.mapRows || c < 0 || c >= this.mapCols) return true;
+            const tile = this.map[r][c];
+            if (tile === 'tree' || tile === 'house1' || tile === 'house2' || tile === 'pond' || tile === 'monolith') {
+              return true;
+            }
+          }
+        }
+
+        // NPC collision
+        for (const npc of this.npcs) {
+          if (
+            x < npc.x + npc.w &&
+            x + this.player.w > npc.x &&
+            y < npc.y + npc.h &&
+            y + this.player.h > npc.y
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      interactWithFacing() {
+        let checkX = this.player.x + this.player.w / 2;
+        let checkY = this.player.y + this.player.h / 2;
+        const reach = 26;
+
+        if (this.player.dir === 'up') checkY -= reach;
+        if (this.player.dir === 'down') checkY += reach;
+        if (this.player.dir === 'left') checkX -= reach;
+        if (this.player.dir === 'right') checkX += reach;
+
+        // Check NPCs
+        for (const npc of this.npcs) {
+          const dist = Math.hypot(checkX - (npc.x + npc.w / 2), checkY - (npc.y + npc.h / 2));
+          if (dist < 32) {
+            this.startDialogue(npc.name, npc.dialogue);
+            return;
+          }
+        }
+      }
+
+      startDialogue(speaker, lines) {
+        this.state = 'dialogue';
+        this.currentDialogue = {
+          speaker,
+          lines: [...lines],
+          index: 0
+        };
+        const modal = document.getElementById('dialogue-modal');
+        document.getElementById('dialogue-speaker').textContent = speaker;
+        document.getElementById('dialogue-text').textContent = this.currentDialogue.lines[0];
+        modal.style.display = 'block';
+        sound.playSelect();
+      }
+
+      advanceDialogue() {
+        if (!this.currentDialogue) return;
+        this.currentDialogue.index++;
+        if (this.currentDialogue.index < this.currentDialogue.lines.length) {
+          document.getElementById('dialogue-text').textContent = this.currentDialogue.lines[this.currentDialogue.index];
+          sound.playSelect();
+        } else {
+          document.getElementById('dialogue-modal').style.display = 'none';
+          this.state = 'overworld';
+          this.currentDialogue = null;
+          sound.playSelect();
+        }
+      }
+
+      // --- BATTLE LOGIC ---
+      triggerWildBattle() {
+        if (this.party.length === 0) return;
+        this.state = 'battle';
+        sound.startMusic('battle');
+
+        // Pick random wild creature
+        const speciesKeys = Object.keys(CREATURE_DEX);
+        const wildKey = speciesKeys[Math.floor(Math.random() * speciesKeys.length)];
+        const spec = CREATURE_DEX[wildKey];
+        const wildLevel = Math.floor(Math.random() * 3) + 3; // Lvl 3 - 5
+
+        const wildCreature = {
+          id: spec.id,
+          name: `Wild ${spec.name}`,
+          species: spec.id,
+          type: spec.type,
+          color: spec.color,
+          spriteIcon: spec.spriteIcon,
+          level: wildLevel,
+          maxHp: Math.floor(spec.baseHp * (1 + wildLevel * 0.15)),
+          hp: Math.floor(spec.baseHp * (1 + wildLevel * 0.15)),
+          atk: Math.floor(spec.baseAtk * (1 + wildLevel * 0.1)),
+          def: Math.floor(spec.baseDef * (1 + wildLevel * 0.1)),
+          spd: spec.baseSpd,
+          moves: JSON.parse(JSON.stringify(spec.moves))
+        };
+
+        // Player active creature (first non-fainted)
+        let playerCreature = this.party.find(c => c.hp > 0);
+        if (!playerCreature) {
+          // revive first with 10 hp
+          this.party[0].hp = 10;
+          playerCreature = this.party[0];
+        }
+
+        this.battle = {
+          player: playerCreature,
+          enemy: wildCreature,
+          phase: 'menu', // 'menu' | 'moves' | 'bag' | 'action_anim' | 'win' | 'flee'
+          log: `A wild ${spec.name} emerged from the Sunstone Grove!`,
+          selectedAction: 0, // 0: ATTACK, 1: CAPTURE, 2: BAG, 3: RUN
+          selectedMove: 0,
+          captureWobbles: 0,
+          turnLocked: false
+        };
+
+        sound.playTone(300, 0.2, 'square');
+      }
+
+      handleBattleKeyboard(e) {
+        if (!this.battle || this.battle.turnLocked) return;
+
+        if (this.battle.phase === 'menu') {
+          if (e.key === 'ArrowRight' || e.key === 'd') {
+            this.battle.selectedAction = (this.battle.selectedAction + 1) % 4;
+            sound.playSelect();
+          } else if (e.key === 'ArrowLeft' || e.key === 'a') {
+            this.battle.selectedAction = (this.battle.selectedAction + 3) % 4;
+            sound.playSelect();
+          } else if (e.key === 'ArrowDown' || e.key === 's') {
+            if (this.battle.selectedAction < 2) this.battle.selectedAction += 2;
+            sound.playSelect();
+          } else if (e.key === 'ArrowUp' || e.key === 'w') {
+            if (this.battle.selectedAction >= 2) this.battle.selectedAction -= 2;
+            sound.playSelect();
+          } else if (e.key === 'Enter' || e.code === 'Space' || e.key === 'e') {
+            this.executeBattleMenuSelection();
+          }
+        } else if (this.battle.phase === 'moves') {
+          if (e.key === 'ArrowDown' || e.key === 's') {
+            this.battle.selectedMove = (this.battle.selectedMove + 1) % this.battle.player.moves.length;
+            sound.playSelect();
+          } else if (e.key === 'ArrowUp' || e.key === 'w') {
+            this.battle.selectedMove = (this.battle.selectedMove + this.battle.player.moves.length - 1) % this.battle.player.moves.length;
+            sound.playSelect();
+          } else if (e.key === 'Enter' || e.code === 'Space' || e.key === 'e') {
+            this.executePlayerMove(this.battle.selectedMove);
+          } else if (e.key === 'Escape' || e.key === 'b') {
+            this.battle.phase = 'menu';
+            sound.playSelect();
+          }
+        } else if (this.battle.phase === 'win' || this.battle.phase === 'flee') {
+          if (e.key === 'Enter' || e.code === 'Space' || e.key === 'e') {
+            this.endBattle();
+          }
+        }
+      }
+
+      executeBattleMenuSelection() {
+        const action = this.battle.selectedAction;
+        if (action === 0) {
+          // ATTACK -> Show moves
+          this.battle.phase = 'moves';
+          this.battle.selectedMove = 0;
+          sound.playSelect();
+        } else if (action === 1) {
+          // CAPTURE -> Throw Sunstone Orb
+          this.attemptCapture();
+        } else if (action === 2) {
+          // BAG -> Use Healing Berry
+          this.useItemInBattle('berries');
+        } else if (action === 3) {
+          // RUN -> Escape
+          this.attemptFlee();
+        }
+      }
+
+      executePlayerMove(moveIndex) {
+        const move = this.battle.player.moves[moveIndex];
+        if (!move) return;
+        if (move.pp <= 0) {
+          this.battle.log = `No PP left for ${move.name}!`;
+          return;
+        }
+
+        move.pp--;
+        this.battle.turnLocked = true;
+        this.battle.phase = 'action_anim';
+
+        // Check if move is a heal or damage
+        if (move.power < 0) {
+          // Healing move
+          const healAmount = Math.abs(move.power);
+          this.battle.player.hp = Math.min(this.battle.player.maxHp, this.battle.player.hp + healAmount);
+          this.battle.log = `${this.battle.player.name} used ${move.name}! Recovered ${healAmount} HP!`;
+          sound.playHeal();
+          this.spawnHealParticles(160, 240);
+
+          setTimeout(() => {
+            this.executeEnemyTurn();
+          }, 1200);
+          return;
+        }
+
+        // Damage calculation
+        let multiplier = 1.0;
+        const playerType = move.type;
+        const enemyType = this.battle.enemy.type;
+
+        if (
+          (playerType === 'Flame' && enemyType === 'Flora') ||
+          (playerType === 'Flora' && enemyType === 'Tide') ||
+          (playerType === 'Tide' && enemyType === 'Flame')
+        ) {
+          multiplier = 1.6;
+        } else if (
+          (playerType === 'Flame' && enemyType === 'Tide') ||
+          (playerType === 'Flora' && enemyType === 'Flame') ||
+          (playerType === 'Tide' && enemyType === 'Flora')
+        ) {
+          multiplier = 0.65;
+        }
+
+        const rawDmg = Math.max(5, Math.floor(((this.battle.player.atk / this.battle.enemy.def) * move.power * 0.75 + 4) * multiplier));
+        this.battle.enemy.hp = Math.max(0, this.battle.enemy.hp - rawDmg);
+
+        if (multiplier > 1.2) {
+          this.battle.log = `${this.battle.player.name} used ${move.name}! Super effective! dealt ${rawDmg} DMG!`;
+          sound.playSuperEffective();
+        } else {
+          this.battle.log = `${this.battle.player.name} used ${move.name}! Dealt ${rawDmg} DMG!`;
+          sound.playHit();
+        }
+
+        // Spawn hit visual effect
+        this.spawnAttackParticles(470, 110, move.type);
+
+        setTimeout(() => {
+          if (this.battle.enemy.hp <= 0) {
+            // Victory
+            this.battle.phase = 'win';
+            const expGained = 45 + this.battle.enemy.level * 15;
+            this.battle.player.exp += expGained;
+            this.battle.log = `${this.battle.enemy.name} fainted! Gained ${expGained} EXP!`;
+            sound.playLevelUp();
+
+            // Check level up
+            if (this.battle.player.exp >= this.battle.player.expNext) {
+              this.battle.player.level++;
+              this.battle.player.exp -= this.battle.player.expNext;
+              this.battle.player.expNext = Math.floor(this.battle.player.expNext * 1.5);
+              this.battle.player.maxHp += 6;
+              this.battle.player.hp = this.battle.player.maxHp;
+              this.battle.player.atk += 3;
+              this.battle.player.def += 2;
+              this.battle.log += ` Level Up! ${this.battle.player.name} is now Lvl ${this.battle.player.level}!`;
+            }
+            this.battle.turnLocked = false;
+            this.saveGame();
+          } else {
+            // Enemy counter-attack
+            this.executeEnemyTurn();
+          }
+        }, 1200);
+      }
+
+      executeEnemyTurn() {
+        const enemyMoves = this.battle.enemy.moves;
+        const enemyMove = enemyMoves[Math.floor(Math.random() * enemyMoves.length)];
+        const dmg = Math.max(4, Math.floor((this.battle.enemy.atk / this.battle.player.def) * 10 * 0.7));
+
+        this.battle.player.hp = Math.max(0, this.battle.player.hp - dmg);
+        this.battle.log = `${this.battle.enemy.name} used ${enemyMove.name}! Dealt ${dmg} DMG!`;
+        sound.playHit();
+        this.spawnAttackParticles(160, 240, this.battle.enemy.type);
+
+        setTimeout(() => {
+          if (this.battle.player.hp <= 0) {
+            this.battle.log = `${this.battle.player.name} fainted! Returning safely to Oakhaven...`;
+            setTimeout(() => {
+              this.player.x = 260;
+              this.player.y = 380;
+              this.battle.player.hp = Math.floor(this.battle.player.maxHp * 0.5);
+              this.endBattle();
+            }, 1800);
+          } else {
+            this.battle.phase = 'menu';
+            this.battle.turnLocked = false;
+          }
+        }, 1000);
+      }
+
+      attemptCapture() {
+        if (this.bag.orbs <= 0) {
+          this.battle.log = "You have no Sunstone Orbs left in your Bag!";
+          return;
+        }
+
+        this.bag.orbs--;
+        this.battle.turnLocked = true;
+        this.battle.phase = 'action_anim';
+        this.battle.log = `You threw a Sunstone Orb at ${this.battle.enemy.name}!`;
+        sound.playTone(600, 0.15, 'sine');
+
+        // Capture formula based on remaining enemy HP
+        const hpPercent = this.battle.enemy.hp / this.battle.enemy.maxHp;
+        const catchChance = 0.85 - hpPercent * 0.5; // 85% at low hp, 35% at full hp
+
+        // Wobble sequence
+        setTimeout(() => {
+          sound.playCatchWobble();
+          this.battle.log = "The Sunstone Orb is shaking...";
+        }, 600);
+
+        setTimeout(() => {
+          sound.playCatchWobble();
+          this.battle.log = "It's rocking back and forth...";
+        }, 1200);
+
+        setTimeout(() => {
+          if (Math.random() < catchChance) {
+            // Captured!
+            sound.playCatchSuccess();
+            this.battle.phase = 'win';
+            this.battle.log = `Gotcha! ${this.battle.enemy.name} was successfully captured!`;
+            this.showToast(`CAPTURED ${this.battle.enemy.name.toUpperCase()}!`);
+
+            // Add to party if space (<3)
+            if (this.party.length < 3) {
+              const newAlly = {
+                id: this.battle.enemy.species,
+                name: this.battle.enemy.name.replace('Wild ', ''),
+                species: this.battle.enemy.species,
+                type: this.battle.enemy.type,
+                color: this.battle.enemy.color,
+                spriteIcon: this.battle.enemy.spriteIcon,
+                level: this.battle.enemy.level,
+                exp: 0,
+                expNext: 100,
+                maxHp: this.battle.enemy.maxHp,
+                hp: Math.max(10, this.battle.enemy.hp),
+                atk: this.battle.enemy.atk,
+                def: this.battle.enemy.def,
+                spd: this.battle.enemy.spd,
+                moves: JSON.parse(JSON.stringify(this.battle.enemy.moves))
+              };
+              this.party.push(newAlly);
+              this.battle.log += " Added to active party!";
+            }
+            this.battle.turnLocked = false;
+            this.saveGame();
+          } else {
+            // Broke free!
+            sound.playHit();
+            this.battle.log = `Oh no! The wild ${this.battle.enemy.name} broke free!`;
+            setTimeout(() => {
+              this.executeEnemyTurn();
+            }, 1000);
+          }
+        }, 1900);
+      }
+
+      useItemInBattle(itemKey) {
+        if (itemKey === 'berries') {
+          if (this.bag.berries <= 0) {
+            this.battle.log = "No Healing Berries remaining!";
+            return;
+          }
+          this.bag.berries--;
+          this.battle.player.hp = Math.min(this.battle.player.maxHp, this.battle.player.hp + 24);
+          this.battle.log = `Used Healing Berry! ${this.battle.player.name} restored 24 HP!`;
+          sound.playHeal();
+          this.spawnHealParticles(160, 240);
+          this.battle.turnLocked = true;
+          setTimeout(() => {
+            this.executeEnemyTurn();
+          }, 1100);
+        }
+      }
+
+      attemptFlee() {
+        sound.playSelect();
+        if (Math.random() < 0.8) {
+          this.battle.phase = 'flee';
+          this.battle.log = "Got away safely!";
+          setTimeout(() => this.endBattle(), 1000);
+        } else {
+          this.battle.log = "Couldn't escape!";
+          this.battle.turnLocked = true;
+          setTimeout(() => this.executeEnemyTurn(), 1000);
+        }
+      }
+
+      endBattle() {
+        this.battle = null;
+        this.state = 'overworld';
+        sound.startMusic('overworld');
+      }
+
+      spawnAttackParticles(x, y, element) {
+        const colors = {
+          Flame: ['#f97316', '#ef4444', '#fde047'],
+          Tide: ['#38bdf8', '#0284c7', '#ffffff'],
+          Flora: ['#4ade80', '#22c55e', '#a3e635']
+        }[element] || ['#ffffff'];
+
+        for (let i = 0; i < 24; i++) {
+          this.particles.push({
+            x: x + (Math.random() - 0.5) * 30,
+            y: y + (Math.random() - 0.5) * 30,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            size: Math.random() * 5 + 3,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            life: 1.0
+          });
+        }
+      }
+
+      spawnHealParticles(x, y) {
+        for (let i = 0; i < 18; i++) {
+          this.particles.push({
+            x: x + (Math.random() - 0.5) * 40,
+            y: y + (Math.random() - 0.5) * 30,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -Math.random() * 3 - 1,
+            size: Math.random() * 4 + 2,
+            color: '#4ade80',
+            life: 1.0
+          });
+        }
+      }
+
+      // --- RENDER PIPELINE ---
+      gameLoop(time) {
+        const dt = Math.min(60, time - this.lastTime);
+        this.lastTime = time;
+
+        if (this.state === 'overworld') {
+          this.updateOverworld(dt);
+        }
+
+        // Clear canvas
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        if (this.state === 'battle') {
+          this.renderBattle();
+        } else {
+          this.renderOverworld();
+        }
+
+        // Render visual FX particles
+        this.updateAndRenderParticles(dt);
+
+        requestAnimationFrame((t) => this.gameLoop(t));
+      }
+
+      renderOverworld() {
+        this.ctx.save();
+        this.ctx.translate(-Math.floor(this.camera.x), -Math.floor(this.camera.y));
+
+        // 1. Draw Map Tiles
+        const startCol = Math.floor(this.camera.x / this.tileSize);
+        const endCol = Math.min(this.mapCols - 1, startCol + Math.ceil(this.canvas.width / this.tileSize) + 1);
+        const startRow = Math.floor(this.camera.y / this.tileSize);
+        const endRow = Math.min(this.mapRows - 1, startRow + Math.ceil(this.canvas.height / this.tileSize) + 1);
+
+        for (let r = startRow; r <= endRow; r++) {
+          for (let c = startCol; c <= endCol; c++) {
+            const tile = this.map[r][c];
+            const px = c * this.tileSize;
+            const py = r * this.tileSize;
+
+            if (tile === 'grass') {
+              this.ctx.fillStyle = (c + r) % 2 === 0 ? '#3f6212' : '#365314';
+              this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
+            } else if (tile === 'wild_grass') {
+              this.ctx.fillStyle = '#1e3a18';
+              this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
+              // Tall grass blades
+              this.ctx.fillStyle = '#4ade80';
+              this.ctx.fillRect(px + 4, py + 4, 3, 16);
+              this.ctx.fillRect(px + 12, py + 6, 3, 14);
+              this.ctx.fillRect(px + 18, py + 2, 3, 18);
+            } else if (tile === 'path') {
+              this.ctx.fillStyle = '#ca8a04';
+              this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
+              this.ctx.fillStyle = '#a16207';
+              this.ctx.fillRect(px + 2, py + 2, 6, 4);
+              this.ctx.fillRect(px + 12, py + 10, 8, 5);
+            } else if (tile === 'tree') {
+              this.ctx.fillStyle = '#14532d';
+              this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
+              this.ctx.fillStyle = '#166534';
+              this.ctx.beginPath();
+              this.ctx.arc(px + 12, py + 12, 10, 0, Math.PI * 2);
+              this.ctx.fill();
+            } else if (tile === 'house1' || tile === 'house2') {
+              this.ctx.fillStyle = tile === 'house1' ? '#b45309' : '#0369a1';
+              this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
+              this.ctx.fillStyle = '#451a03';
+              this.ctx.fillRect(px + 6, py + 12, 12, 12);
+            } else if (tile === 'pond') {
+              this.ctx.fillStyle = '#0284c7';
+              this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
+              this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
+              this.ctx.fillRect(px + 4, py + 8, 8, 3);
+            } else if (tile === 'monolith') {
+              this.ctx.fillStyle = '#64748b';
+              this.ctx.fillRect(px + 4, py + 2, 16, 20);
+              this.ctx.fillStyle = '#fde047';
+              this.ctx.fillRect(px + 10, py + 8, 4, 8); // Golden rune glow
+            } else if (tile === 'flowers') {
+              this.ctx.fillStyle = '#365314';
+              this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
+              this.ctx.fillStyle = '#f43f5e';
+              this.ctx.beginPath();
+              this.ctx.arc(px + 8, py + 8, 3, 0, Math.PI * 2);
+              this.ctx.fill();
+              this.ctx.fillStyle = '#facc15';
+              this.ctx.beginPath();
+              this.ctx.arc(px + 16, py + 14, 3, 0, Math.PI * 2);
+              this.ctx.fill();
+            }
+          }
+        }
+
+        // 2. Draw NPCs
+        for (const npc of this.npcs) {
+          this.ctx.font = '18px monospace';
+          this.ctx.fillText(npc.sprite, npc.x, npc.y + 18);
+          // Label above
+          this.ctx.font = '8px monospace';
+          this.ctx.fillStyle = '#ffffff';
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(npc.name, npc.x + 10, npc.y - 4);
+        }
+
+        // 3. Draw Player
+        const px = this.player.x;
+        const py = this.player.y;
+
+        // Shadow
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(px + 9, py + 20, 8, 4, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Player Body (Classic red adventurer with cap)
+        this.ctx.fillStyle = '#e11d48'; // Red tunic
+        this.ctx.fillRect(px + 3, py + 6, 12, 12);
+        this.ctx.fillStyle = '#f8fafc'; // Face
+        this.ctx.fillRect(px + 4, py + 2, 10, 6);
+        this.ctx.fillStyle = '#0284c7'; // Blue cap
+        this.ctx.fillRect(px + 3, py, 12, 3);
+        this.ctx.fillStyle = '#1e293b'; // Boots
+        this.ctx.fillRect(px + 4, py + 18, 4, 4);
+        this.ctx.fillRect(px + 10, py + 18, 4, 4);
+
+        // Directional facing indicator
+        this.ctx.fillStyle = '#ffffff';
+        if (this.player.dir === 'down') {
+          this.ctx.fillRect(px + 5, py + 4, 2, 2);
+          this.ctx.fillRect(px + 11, py + 4, 2, 2);
+        } else if (this.player.dir === 'up') {
+          this.ctx.fillStyle = '#0284c7';
+          this.ctx.fillRect(px + 4, py + 1, 10, 5);
+        } else if (this.player.dir === 'left') {
+          this.ctx.fillRect(px + 4, py + 4, 2, 2);
+        } else if (this.player.dir === 'right') {
+          this.ctx.fillRect(px + 12, py + 4, 2, 2);
+        }
+
+        this.ctx.restore();
+      }
+
+      renderBattle() {
+        const b = this.battle;
+        if (!b) return;
+
+        // Sky & Meadow Backdrop
+        const grad = this.ctx.createLinearGradient(0, 0, 0, 240);
+        grad.addColorStop(0, '#1e293b');
+        grad.addColorStop(1, '#065f46');
+        this.ctx.fillStyle = grad;
+        this.ctx.fillRect(0, 0, this.canvas.width, 240);
+
+        // Ground Pedestals (Player & Enemy)
+        // Enemy pedestal (Top-Right)
+        this.ctx.fillStyle = '#047857';
+        this.ctx.beginPath();
+        this.ctx.ellipse(470, 130, 80, 24, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Player pedestal (Bottom-Left)
+        this.ctx.beginPath();
+        this.ctx.ellipse(160, 220, 90, 26, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Enemy Creature Sprite
+        this.ctx.font = '54px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(b.enemy.spriteIcon, 470, 120);
+
+        // Player Creature Sprite
+        this.ctx.fillText(b.player.spriteIcon, 160, 210);
+
+        // Enemy HUD Card (Top-Left)
+        this.renderCreatureHud(b.enemy, 30, 24, false);
+
+        // Player HUD Card (Bottom-Right)
+        this.renderCreatureHud(b.player, 370, 150, true);
+
+        // Bottom Action Dock (Y: 240 -> 360)
+        this.ctx.fillStyle = '#090d16';
+        this.ctx.fillRect(0, 240, this.canvas.width, 120);
+        this.ctx.strokeStyle = '#38bdf8';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(4, 242, this.canvas.width - 8, 114);
+
+        if (b.phase === 'menu') {
+          // Battle Log (Left side)
+          this.ctx.fillStyle = '#f8fafc';
+          this.ctx.font = '11px monospace';
+          this.ctx.textAlign = 'left';
+          this.wrapText(b.log, 20, 270, 310, 18);
+
+          // Menu Commands (Right side 2x2 grid)
+          const actions = [
+            { id: 0, label: '⚔ ATTACK' },
+            { id: 1, label: '⚡ CAPTURE' },
+            { id: 2, label: '🎒 BAG' },
+            { id: 3, label: '🏃 RUN' }
+          ];
+
+          actions.forEach((act, idx) => {
+            const col = idx % 2;
+            const row = Math.floor(idx / 2);
+            const bx = 360 + col * 130;
+            const by = 260 + row * 40;
+            const isSelected = b.selectedAction === act.id;
+
+            this.ctx.fillStyle = isSelected ? '#ffe500' : 'rgba(255,255,255,0.08)';
+            this.ctx.fillRect(bx, by, 118, 32);
+            this.ctx.fillStyle = isSelected ? '#000000' : '#ffffff';
+            this.ctx.font = 'bold 11px monospace';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(act.label, bx + 59, by + 20);
+          });
+        } else if (b.phase === 'moves') {
+          // Attack Submenu
+          b.player.moves.forEach((m, idx) => {
+            const mx = 24 + idx * 196;
+            const my = 258;
+            const isSelected = b.selectedMove === idx;
+
+            this.ctx.fillStyle = isSelected ? '#ffe500' : 'rgba(255,255,255,0.08)';
+            this.ctx.fillRect(mx, my, 184, 76);
+
+            this.ctx.fillStyle = isSelected ? '#000' : '#fff';
+            this.ctx.font = 'bold 12px monospace';
+            this.ctx.textAlign = 'left';
+            this.ctx.fillText(m.name, mx + 12, my + 24);
+
+            this.ctx.font = '9px monospace';
+            this.ctx.fillStyle = isSelected ? '#333' : '#94a3b8';
+            this.ctx.fillText(`TYPE: ${m.type} | PWR: ${Math.abs(m.power)}`, mx + 12, my + 44);
+            this.ctx.fillText(`PP: ${m.pp}/${m.maxPp}`, mx + 12, my + 60);
+          });
+        } else {
+          // Action Log View
+          this.ctx.fillStyle = '#f8fafc';
+          this.ctx.font = '13px monospace';
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(b.log, this.canvas.width / 2, 290);
+
+          if (b.phase === 'win' || b.phase === 'flee') {
+            this.ctx.fillStyle = '#ffe500';
+            this.ctx.font = '11px monospace';
+            this.ctx.fillText("Press [ENTER] or [SPACE] to continue ▾", this.canvas.width / 2, 324);
+          }
+        }
+      }
+
+      renderCreatureHud(creature, x, y, isPlayer) {
+        // Background card
+        this.ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        this.ctx.strokeStyle = creature.color;
+        this.ctx.lineWidth = 1.5;
+        this.ctx.fillRect(x, y, 220, 64);
+        this.ctx.strokeRect(x, y, 220, 64);
+
+        // Name & Level
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = 'bold 11px monospace';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText(creature.name, x + 10, y + 20);
+
+        this.ctx.fillStyle = '#38bdf8';
+        this.ctx.textAlign = 'right';
+        this.ctx.fillText(`Lv.${creature.level}`, x + 210, y + 20);
+
+        // HP Bar
+        const hpPct = Math.max(0, creature.hp / creature.maxHp);
+        this.ctx.fillStyle = '#334155';
+        this.ctx.fillRect(x + 10, y + 30, 200, 10);
+
+        this.ctx.fillStyle = hpPct > 0.5 ? '#22c55e' : (hpPct > 0.2 ? '#facc15' : '#ef4444');
+        this.ctx.fillRect(x + 10, y + 30, Math.floor(200 * hpPct), 10);
+
+        // Numeric HP
+        this.ctx.fillStyle = '#e2e8f0';
+        this.ctx.font = '9px monospace';
+        this.ctx.textAlign = 'right';
+        this.ctx.fillText(`${creature.hp}/${creature.maxHp} HP`, x + 210, y + 54);
+
+        // EXP Bar (Player only)
+        if (isPlayer && creature.expNext) {
+          const expPct = Math.min(1, creature.exp / creature.expNext);
+          this.ctx.fillStyle = '#38bdf8';
+          this.ctx.fillRect(x + 10, y + 50, Math.floor(100 * expPct), 3);
+        }
+      }
+
+      updateAndRenderParticles(dt) {
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const p = this.particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= dt * 0.002;
+
+          if (p.life <= 0) {
+            this.particles.splice(i, 1);
+            continue;
+          }
+
+          this.ctx.fillStyle = p.color;
+          this.ctx.globalAlpha = p.life;
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.globalAlpha = 1.0;
+        }
+      }
+
+      wrapText(text, x, y, maxWidth, lineHeight) {
+        const words = text.split(' ');
+        let line = '';
+
+        for (let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = this.ctx.measureText(testLine);
+          const testWidth = metrics.width;
+          if (testWidth > maxWidth && n > 0) {
+            this.ctx.fillText(line, x, y);
+            line = words[n] + ' ';
+            y += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        this.ctx.fillText(line, x, y);
+      }
+
+      // --- MENU & MODAL UI ---
+      openMenuModal(tab = 'party') {
+        const modal = document.getElementById('menu-modal');
+        modal.style.display = 'flex';
+        this.renderMenuTabs(tab);
+        sound.playSelect();
+      }
+
+      renderMenuTabs(activeTab) {
+        document.getElementById('tab-btn-party').className = `menu-tab ${activeTab === 'party' ? 'active' : ''}`;
+        document.getElementById('tab-btn-bag').className = `menu-tab ${activeTab === 'bag' ? 'active' : ''}`;
+
+        const partyContainer = document.getElementById('menu-content-party');
+        const bagContainer = document.getElementById('menu-content-bag');
+
+        if (activeTab === 'party') {
+          partyContainer.style.display = 'block';
+          bagContainer.style.display = 'none';
+
+          partyContainer.innerHTML = this.party.map((c, i) => `
+            <div class="party-slot-card">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:28px">${c.spriteIcon}</span>
+                <div>
+                  <div style="font-size:13px; font-weight:800; color:#fff">${c.name} <span style="color:#38bdf8; font-size:11px">Lv.${c.level}</span></div>
+                  <div style="font-size:10px; color:#94a3b8">HP: ${c.hp}/${c.maxHp} | ATK: ${c.atk} | DEF: ${c.def}</div>
+                </div>
+              </div>
+              <div style="font-size:11px; font-weight:bold; color:${c.color}">${c.type}</div>
+            </div>
+          `).join('');
+        } else {
+          partyContainer.style.display = 'none';
+          bagContainer.style.display = 'block';
+
+          bagContainer.innerHTML = `
+            <div class="bag-item-card">
+              <div>
+                <div style="font-size:12px; font-weight:800; color:#fff">⚡ Sunstone Orbs</div>
+                <div style="font-size:10px; color:#94a3b8">Used to capture wild Mythlings in battle.</div>
+              </div>
+              <div class="item-count-badge">x${this.bag.orbs}</div>
+            </div>
+            <div class="bag-item-card">
+              <div>
+                <div style="font-size:12px; font-weight:800; color:#fff">🍓 Healing Berries</div>
+                <div style="font-size:10px; color:#94a3b8">Restores 24 HP to an active creature.</div>
+              </div>
+              <div class="item-count-badge">x${this.bag.berries}</div>
+            </div>
+            <div class="bag-item-card">
+              <div>
+                <div style="font-size:12px; font-weight:800; color:#fff">🧪 Vitality Tonic</div>
+                <div style="font-size:10px; color:#94a3b8">Revives a fainted creature with full vitality.</div>
+              </div>
+              <div class="item-count-badge">x${this.bag.tonics}</div>
+            </div>
+          `;
+        }
+      }
+    }
+
+    // Global hooks
+    function selectStarter(species) {
+      if (window.game) window.game.chooseStarter(species);
+    }
+    function switchMenuTab(tab) {
+      if (window.game) window.game.renderMenuTabs(tab);
+    }
+    function closeMenuModal() {
+      document.getElementById('menu-modal').style.display = 'none';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      window.game = new MythlingsGame();
+    });
+  </script>
+</body>
+</html>

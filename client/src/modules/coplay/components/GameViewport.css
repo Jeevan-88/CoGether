@@ -1,9 +1,9 @@
-/* ══════════════════════════════════════════════════════════════════════
-   DARK THEATER GAME STAGE
-   Matches reference image:
-   Clean dark layout, elevated cream game canvas for 2048,
-   floating bottom-left game metadata pill dock.
-   ══════════════════════════════════════════════════════════════════════ */
+/* ═════════════════════════════════════════════════════════════════════════════
+   COGETHER UNIVERSAL GAME MONITOR PLAYER STAGE
+   Reuses the physical 3D PC monitor design from the CoGether landing page.
+   Enforces strict 100% no-scroll viewport fitting and responsive edge-to-edge
+   fullscreen expansion.
+   ═════════════════════════════════════════════════════════════════════════════ */
 
 .game-viewport-stage {
   flex: 1;
@@ -14,127 +14,211 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #000000;
-  padding: 8px 16px;
+  background: #f5f5f7;
+  padding: 6px 12px;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .game-viewport-stage.stage-fullscreen {
-  padding: 0;
-  background: #000000;
+  padding: 0 !important;
+  background: #000000 !important;
 }
 
-/* ── Dark Theater Stage Container ── */
-.dark-theater-stage {
+/* ── Universal Monitor Center Stage ── */
+.universal-monitor-stage {
   height: 100%;
   max-height: 100%;
   width: 100%;
-  max-width: 960px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
 }
 
-/* ── Center Stage Game Canvas Frame (Elevated Canvas) ── */
-.dark-game-frame {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
+/* ── CoGether Universal Monitor Frame ── */
+.cogether-universal-monitor {
   position: relative;
-  background: #FAF8EF;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cogether-universal-monitor.is-fullscreen {
+  max-width: 100vw;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #000000;
+}
+
+/* ── Physical Monitor Chassis Assembly (Straight-Facing 1200x900 Aspect 4:3) ── */
+.cogether-monitor-chassis {
+  position: relative;
+  height: min(calc(100dvh - 76px), 680px);
+  width: calc(min(calc(100dvh - 76px), 680px) * (1200 / 900));
+  max-width: 98%;
+  aspect-ratio: 1200 / 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  margin: 0 auto;
 }
 
-/* Standard Square / 1:1 or 4:3 (2048, Hextris, Block Puzzle) */
-.dark-game-frame.frame-aspect-standard {
-  max-height: calc(100dvh - 120px);
-  width: 100%;
-}
-
-/* Portrait (Clumsy Bird, Flappy Runners) */
-.dark-game-frame.frame-aspect-portrait {
-  aspect-ratio: 9 / 16;
-  max-height: calc(100dvh - 120px);
-  max-width: calc((100dvh - 120px) * (9 / 16));
-}
-
-/* Fullscreen override: Maximize area while keeping aspect ratio */
-.game-viewport-stage.stage-fullscreen .dark-theater-stage {
+.cogether-universal-monitor.is-fullscreen .cogether-monitor-chassis {
+  aspect-ratio: auto;
+  max-height: 100vh;
   width: 100vw;
   height: 100vh;
-  gap: 0;
+  margin: 0;
 }
 
-.game-viewport-stage.stage-fullscreen .dark-game-frame {
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
+.cogether-monitor-chassis-art {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 1;
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.35));
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-.game-viewport-stage.stage-fullscreen .dark-game-frame.frame-aspect-standard {
-  max-height: 100vh;
-  max-width: 100vh;
+/* ── Active Display Screen (Nested precisely within the monitor bezel) ── */
+.cogether-monitor-screen-bezel {
+  position: absolute;
+  top: 10.82%;
+  left: 4.14%;
+  width: 91.72%;
+  height: 71.03%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000000;
+  z-index: 2;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.95);
+  box-sizing: border-box;
 }
 
-.game-viewport-stage.stage-fullscreen .dark-game-frame.frame-aspect-portrait {
-  max-height: 100vh;
-  max-width: calc(100vh * (9 / 16));
+.cogether-universal-monitor.is-fullscreen .cogether-monitor-screen-bezel {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  border-radius: 0 !important;
+  z-index: 99999 !important;
+  box-shadow: none !important;
 }
 
-.game-viewport-stage.stage-fullscreen .game-floating-meta-dock {
-  display: none;
+/* ── Floating Translucent Screen Controls (Icon-only, slightly opaque, no text) ── */
+.btn-screen-fullscreen-pill {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  opacity: 0.75;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  padding: 0;
 }
 
-/* ── Sandboxed Game Iframe Mount Slot ── */
+.btn-screen-fullscreen-pill:hover {
+  opacity: 1;
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: scale(1.08);
+}
+
+.btn-screen-camera-pill {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  opacity: 0.75;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  padding: 0;
+}
+
+.btn-screen-camera-pill:hover {
+  opacity: 1;
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: scale(1.08);
+}
+
+/* ── Sandboxed Game Mount Point ── */
 .game-iframe-mount-point {
   width: 100%;
   height: 100%;
+  background: #000000;
   position: relative;
-  background: #FAF8EF;
-  display: flex;
+  overflow: hidden;
 }
 
-.game-iframe-mount-point.has-error {
-  display: none;
+.game-iframe-mount-point iframe,
+.game-iframe-mount-point canvas {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  display: block !important;
+  outline: none !important;
 }
 
-.game-embedded-viewport-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-  outline: none;
-  display: block;
-}
-
-/* ── Floating Bottom-Left Metadata Dock (Matches Reference Image) ── */
-.game-floating-meta-dock {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  background: #111318;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 6px 14px 6px 8px;
+/* ── Docked Monitor Controls Bar (Bottom Base of Monitor) ── */
+.cogether-monitor-dock-bar {
+  margin-top: 8px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  z-index: 20;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 18px;
+  border-radius: 9999px;
+  background: rgba(18, 20, 26, 0.88);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  width: fit-content;
+  max-width: 96%;
+  z-index: 10;
+  box-sizing: border-box;
 }
 
 .dock-left-group {
@@ -144,15 +228,15 @@
 }
 
 .dock-thumbnail {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
   overflow: hidden;
-  background: #EDC22E;
+  background: #232733;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
 }
 
 .dock-thumb-img {
@@ -162,10 +246,9 @@
 }
 
 .dock-thumb-text {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  color: #FAF8EF;
+  color: #ffe500;
 }
 
 .dock-titles {
@@ -174,88 +257,158 @@
 }
 
 .dock-title {
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #FFFFFF;
-  line-height: 1.15;
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .dock-category {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 11px;
-  color: #8E95A5;
-  line-height: 1.1;
+  font-size: 10px;
+  font-weight: 600;
+  color: #8e95a5;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.dock-divider {
-  width: 1px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.dock-actions {
+.dock-actions-cluster {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.btn-dock-action {
+.btn-monitor-dock-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-monitor-dock-action:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-camera-toggle-action {
+  background: rgba(0, 113, 227, 0.25);
+  border-color: rgba(56, 152, 236, 0.4);
+  color: #64b5f6;
+}
+
+.btn-camera-toggle-action:hover {
+  background: rgba(0, 113, 227, 0.45);
+  color: #ffffff;
+}
+
+.btn-fullscreen-action {
+  background: #ffe500;
+  border-color: #ffd60a;
+  color: #111111;
+  box-shadow: 0 2px 10px rgba(255, 229, 0, 0.35);
+}
+
+.btn-fullscreen-action:hover {
+  background: #ffd60a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(255, 229, 0, 0.5);
+}
+
+.dock-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 4px;
+}
+
+.btn-dock-action-icon {
   width: 28px;
   height: 28px;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8E95A5;
-  transition: all 0.15s ease;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.btn-dock-action:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #FFFFFF;
+.btn-dock-action-icon:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
 }
 
-.btn-dock-action.is-liked svg {
-  color: #E11D48 !important;
+.btn-dock-action-icon.is-liked {
+  background: rgba(225, 29, 72, 0.2);
+  border-color: rgba(225, 29, 72, 0.4);
 }
 
-/* ── Clean Loading Progress ── */
+/* ── Floating Exit Fullscreen Control ── */
+.btn-floating-exit-fullscreen {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: rgba(20, 22, 28, 0.88);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s ease;
+}
+
+.btn-floating-exit-fullscreen:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: scale(1.04);
+}
+
+/* ── Arcade Loading Scrim ── */
 .game-loading-scrim {
   position: absolute;
   inset: 0;
-  background: #09090c;
+  background: #090a0d;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 25;
-  padding: 24px;
+  z-index: 10;
 }
 
 .loading-card-arcade {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 320px;
-  width: 100%;
   text-align: center;
   gap: 12px;
+  padding: 24px;
 }
 
 .loading-thumbnail-wrap {
-  width: 68px;
-  height: 68px;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   overflow: hidden;
-  background: #141418;
-  border: 1.5px solid rgba(255, 229, 0, 0.4);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }
 
 .loading-thumbnail-img {
@@ -264,32 +417,25 @@
   object-fit: cover;
 }
 
-.loading-meta-info {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
 .loading-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
   color: #ffffff;
+  letter-spacing: -0.02em;
 }
 
 .loading-sub {
-  font-family: 'Space Mono', monospace;
   font-size: 10px;
   font-weight: 700;
-  color: #94a3b8;
-  letter-spacing: 0.05em;
+  color: #8e95a5;
+  letter-spacing: 0.08em;
 }
 
 .loading-bar-track {
-  width: 100%;
-  height: 6px;
-  background: #1c1c24;
-  border-radius: 999px;
+  width: 140px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
   overflow: hidden;
   position: relative;
 }
@@ -297,149 +443,111 @@
 .loading-bar-fill {
   position: absolute;
   top: 0;
-  left: 0;
   bottom: 0;
-  width: 45%;
-  background: #FFE500;
-  border-radius: 999px;
-  box-shadow: 0 0 10px rgba(255, 229, 0, 0.7);
-  animation: arcadeProgressSweep 1.6s ease-in-out infinite alternate;
+  left: 0;
+  width: 40%;
+  background: #ffe500;
+  border-radius: 9999px;
+  animation: loadingSlide 1.2s infinite ease-in-out;
 }
 
-@keyframes arcadeProgressSweep {
-  0% { left: 0%; width: 30%; }
-  100% { left: 70%; width: 30%; }
+@keyframes loadingSlide {
+  0% { left: -40%; width: 40%; }
+  50% { width: 60%; }
+  100% { left: 100%; width: 40%; }
 }
 
 .loading-badge-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-family: 'Space Mono', monospace;
-  font-size: 9.5px;
+  gap: 5px;
+  font-size: 10px;
   font-weight: 700;
-  color: #64748b;
-  letter-spacing: 0.05em;
+  color: #34c759;
 }
 
-.loading-badge-row .shield-icon {
-  color: #FFE500;
-}
-
-/* ── Synchronized Countdown (3-2-1-GO) ── */
+/* ── Synchronized Challenge Countdown ── */
 .game-countdown-scrim {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 30;
+  z-index: 20;
 }
 
 .countdown-number-bounce {
-  font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 96px;
+  font-size: 72px;
   font-weight: 900;
-  color: #FFE500;
-  text-shadow: 0 0 30px rgba(255, 229, 0, 0.8), 0 0 60px rgba(255, 229, 0, 0.4);
-  animation: countdownPulse 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  line-height: 1;
+  color: #ffe500;
+  text-shadow: 0 4px 30px rgba(255, 229, 0, 0.6);
+  animation: numPop 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes countdownPulse {
+@keyframes numPop {
   0% { transform: scale(0.4); opacity: 0; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
 }
 
 .countdown-subtext {
-  font-family: 'Space Mono', monospace;
   font-size: 13px;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: 0.1em;
-  margin-top: 6px;
 }
 
-/* ── Launch Error Recovery Deck ── */
+/* ── Error Recovery Card ── */
 .game-unavailable-error-card {
   position: absolute;
   inset: 0;
-  background: #09090c;
+  background: #0d0f14;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 32px;
   text-align: center;
-  z-index: 28;
-}
-
-.error-icon-shield {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(225, 29, 72, 0.12);
-  border: 1.5px solid #e11d48;
-  color: #e11d48;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
+  z-index: 15;
 }
 
 .error-headline {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 18px;
-  font-weight: 900;
+  font-size: 20px;
+  font-weight: 800;
   color: #ffffff;
-  margin: 0 0 4px 0;
+  margin-top: 10px;
 }
 
 .error-subtext {
-  font-size: 12px;
-  color: #94a3b8;
-  margin: 0 0 14px 0;
+  font-size: 13px;
+  color: #8e95a5;
+  margin-bottom: 14px;
 }
 
 .error-reason-box {
-  background: #141418;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border-radius: 12px;
   margin-bottom: 20px;
-  max-width: 400px;
 }
 
 .error-code-badge {
-  font-family: 'Space Mono', monospace;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 800;
-  color: #e11d48;
-  display: block;
-  margin-bottom: 3px;
+  color: #ef4444;
 }
 
 .error-message {
-  font-size: 11.5px;
-  color: #cbd5e1;
-  margin: 0;
-  line-height: 1.4;
+  font-size: 12px;
+  color: #d1d5db;
+  margin-top: 4px;
 }
 
 .error-actions-deck {
   display: flex;
-  align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-@media (max-width: 640px) {
-  .game-viewport-stage {
-    padding: 4px 6px;
-  }
 }
