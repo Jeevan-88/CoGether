@@ -47,6 +47,18 @@ export default function GameShell({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [videoLayoutMode, setVideoLayoutMode] = useState('COMBINED'); // 'COMBINED' | 'SEPARATE'
+  const [isMicActive, setIsMicActive] = useState(true);
+  const [isCamActive, setIsCamActive] = useState(false);
+
+  const handleToggleMic = () => {
+    setIsMicActive(prev => !prev);
+    if (webrtc.toggleMic) webrtc.toggleMic();
+  };
+
+  const handleToggleCamera = () => {
+    setIsCamActive(prev => !prev);
+    if (webrtc.toggleCamera) webrtc.toggleCamera();
+  };
   const [showChallengeModal, setShowChallengeModal] = useState(false);
   const [showPlayWithFriendModal, setShowPlayWithFriendModal] = useState(false);
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
@@ -343,7 +355,7 @@ export default function GameShell({
       />
 
       {/* ── Main Gameplay Body (Universal Monitor Stage + Collapsible Right Social Rail) ── */}
-      <div className={`game-shell-body ${!isSidebarOpen ? 'sidebar-collapsed' : ''}`}>
+      <div className="game-shell-body">
         <div className="game-stage-column">
           <GameViewport
             game={normalizedGame}
@@ -367,37 +379,26 @@ export default function GameShell({
           />
         </div>
 
-        {/* ── Clean Arrow Collapse Control on the Right Edge of Gameplay Area ── */}
-        {!isFullscreen && (
-          <button
-            type="button"
-            className={`btn-sidebar-collapse-tab ${isSidebarOpen ? 'is-open' : 'is-closed'}`}
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            title={isSidebarOpen ? "Collapse Party & Chat Sidebar" : "Open Party & Chat Sidebar"}
-            aria-label={isSidebarOpen ? "Collapse Party & Chat Sidebar" : "Open Party & Chat Sidebar"}
-          >
-            <ChevronRight size={18} className={`collapse-chevron-icon ${!isSidebarOpen ? 'is-reversed' : ''}`} />
-          </button>
-        )}
+        
 
         {/* ── Right-Side Social Rail (Collapsible, Preserving Connection State) ── */}
         {!isFullscreen && (
-          <div className={`game-social-rail-container ${!isSidebarOpen ? 'is-collapsed' : ''}`}>
+          <div className="game-social-rail-container">
             <GameSocialRail
               roomId={roomId}
               currentUsername={currentUsername}
               userProfile={profile}
               localStream={webrtc.localStream}
               remoteStreams={webrtc.remoteStreams}
-              micEnabled={webrtc.micEnabled}
-              cameraEnabled={webrtc.cameraEnabled}
+              micEnabled={isMicActive}
+              cameraEnabled={isCamActive}
               isScreenSharing={webrtc.isScreenSharing}
               connected={webrtc.connected}
               connectionState={webrtc.connectionState}
               peerConnectionStates={webrtc.peerConnectionStates}
               chatMessages={webrtc.chatMessages}
-              onToggleMic={webrtc.toggleMic}
-              onToggleCamera={webrtc.toggleCamera}
+              onToggleMic={handleToggleMic}
+              onToggleCamera={handleToggleCamera}
               onToggleScreenShare={webrtc.toggleScreenShare}
               onSendMessage={webrtc.sendChatMessage}
               onLeaveSession={handleLeaveSession}

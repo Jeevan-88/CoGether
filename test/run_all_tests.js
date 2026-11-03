@@ -19,7 +19,11 @@ const SUITES = [
   'test/phase3_cowatch_architecture.test.js',
   'test/phase4_costudy_architecture.test.js',
   'test/phase5_production_auth_database.test.js',
-  'test/authentication_strict_ui_flows.test.js'
+  'test/authentication_strict_ui_flows.test.js',
+  'test/production_multiaccount_e2e.test.js',
+  'test/webrtc_turn_management.test.js',
+  'test/crypto_double_ratchet.test.js',
+  'test/avatar_studio_multiaccount_persistence.test.js'
 ];
 
 console.log('═══════════════════════════════════════════════════════════');

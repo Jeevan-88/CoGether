@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Heart, ExternalLink, Share2, Sparkles, ShoppingBag } from 'lucide-react';
+import { Star, Heart, Share2, Sparkles } from 'lucide-react';
 import './ProductCard.css';
 
 export default function ProductCard({
@@ -21,112 +21,129 @@ export default function ProductCard({
     rating,
     reviewCount,
     thumbnail,
+    images = [],
     retailerName,
     retailerId,
-    offers = [],
-    hasComparison,
-    comparisonHeadline
+    offers = []
   } = product;
 
-  const isAmazon = retailerId === 'amazon';
-  const isMyntra = retailerId === 'myntra';
-  const isFlipkart = retailerId === 'flipkart';
-  const isAjio = retailerId === 'ajio';
-
   const storeCount = offers.length;
+  // Swatches: up to 3 thumbnails
+  const swatches = (images && images.length > 1) ? images.slice(0, 3) : [];
 
   return (
-    <div className="coshop-product-card" onClick={() => onSelect?.(product)}>
-      {/* Top Image Box */}
-      <div className="product-image-frame">
-        <img src={thumbnail} alt={title} className="product-card-img" loading="lazy" />
+    <div className="shop-product-card" onClick={() => onSelect?.(product)}>
+      {/* 20px inner radius product image frame */}
+      <div className="shop-card-image-frame">
+        <img
+          src={thumbnail}
+          alt={title}
+          className="shop-card-img"
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&auto=format&fit=crop&q=80';
+          }}
+        />
 
-        {/* Discount Badge */}
+        {/* Discount badge */}
         {discount > 0 && (
-          <span className="product-discount-pill">
-            {discount}% OFF
+          <span className="shop-discount-pill">
+            {discount}% off
           </span>
         )}
 
-        {/* Retailer Identity Tag */}
-        <span className={`product-retailer-tag retailer-${retailerId}`}>
+        {/* Retailer identity pill */}
+        <span className={`shop-retailer-pill ret-${retailerId || 'store'}`}>
           {retailerName}
         </span>
 
-        {/* Wishlist Toggle Button */}
+        {/* Wishlist button */}
         <button
           type="button"
-          className={`btn-wishlist-action ${isWishlisted ? 'active' : ''}`}
+          className={`shop-card-wishlist-btn ${isWishlisted ? 'active' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             onToggleWishlist?.(product);
           }}
-          title={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
         >
-          <Heart size={15} fill={isWishlisted ? '#FF3F6C' : 'none'} color={isWishlisted ? '#FF3F6C' : '#ffffff'} />
+          <Heart size={14} fill={isWishlisted ? '#739F20' : 'none'} color={isWishlisted ? '#739F20' : '#000000'} />
         </button>
 
         {/* Room Mode: Send to Friend Action */}
         {inRoomMode && onSendToFriend && (
           <button
             type="button"
-            className="btn-send-friend-action"
+            className="shop-card-send-btn"
             onClick={(e) => {
               e.stopPropagation();
               onSendToFriend(product);
             }}
-            title="Send product to room discussion"
+            title="Share to room"
           >
-            <Share2 size={13} />
+            <Share2 size={12} />
             <span>Send</span>
           </button>
         )}
       </div>
 
-      {/* Product Content Info */}
-      <div className="product-card-body">
-        <div className="product-brand-row">
-          <span className="product-brand-name">{brand}</span>
-          <div className="product-rating-badge">
-            <Star size={11} fill="#FFE500" color="#FFE500" />
-            <span>{rating.toFixed(1)}</span>
-            {reviewCount > 0 && <span className="review-count">({reviewCount})</span>}
+      {/* Mini Swatches Strip */}
+      {swatches.length > 0 && (
+        <div className="shop-swatches-strip">
+          {swatches.map((img, idx) => (
+            <div key={idx} className="shop-swatch-thumb">
+              <img src={img} alt="" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Product Body */}
+      <div className="shop-card-body">
+        {/* Brand & Star Rating Row */}
+        <div className="shop-card-meta-row">
+          <span className="shop-brand-name">{brand}</span>
+          <div className="shop-rating-row">
+            <Star size={10} fill="#000000" color="#000000" />
+            <span className="shop-rating-val">{rating.toFixed(1)}</span>
+            {reviewCount > 0 && <span className="shop-review-count">({reviewCount})</span>}
           </div>
         </div>
 
-        <h3 className="product-title" title={title}>{title}</h3>
+        {/* Title */}
+        <h3 className="shop-card-title" title={title}>{title}</h3>
 
-        {/* Multi-Store Comparison Indicator */}
+        {/* Multi-Store Comparison Pill */}
         {storeCount > 1 ? (
-          <div className="product-comparison-pill">
-            <Sparkles size={11} className="compare-icon" />
-            <span>LOWEST IN {storeCount} STORES</span>
+          <div className="shop-store-compare-pill">
+            <Sparkles size={11} className="compare-sparkle" />
+            <span>Best verified in {storeCount} stores</span>
           </div>
         ) : (
-          <div className="product-single-store-note">
+          <div className="shop-store-single-pill">
             <span>Verified Partner Offer</span>
           </div>
         )}
 
         {/* Price & Action Row */}
-        <div className="product-price-action-row">
-          <div className="price-block">
-            <span className="currency-symbol">₹</span>
-            <span className="current-price">{price.toLocaleString('en-IN')}</span>
+        <div className="shop-price-row">
+          <div className="shop-price-group">
+            <span className="shop-current-price">₹{price.toLocaleString('en-IN')}</span>
             {originalPrice > price && (
-              <span className="original-price">₹{originalPrice.toLocaleString('en-IN')}</span>
+              <span className="shop-original-price">₹{originalPrice.toLocaleString('en-IN')}</span>
             )}
           </div>
 
           <button
             type="button"
-            className="btn-view-deal"
+            className="shop-btn-pill-action"
             onClick={(e) => {
               e.stopPropagation();
               onSelect?.(product);
             }}
           >
-            {storeCount > 1 ? 'COMPARE' : 'VIEW DEAL'}
+            {storeCount > 1 ? 'Compare' : 'View'}
           </button>
         </div>
       </div>

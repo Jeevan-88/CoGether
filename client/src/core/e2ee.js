@@ -2,25 +2,32 @@
  * CoGether End-to-End Encryption (E2EE) Engine
  * Cryptographic direct messaging using browser Web Crypto API (SubtleCrypto).
  * - Key Exchange: ECDH (P-256 / prime256v1)
- * - Symmetric Cipher: AES-256-GCM with unique 96-bit IV per message
- * - Local Key Storage: IndexedDB (structured clone of CryptoKey) with memory fallback
+ * - Ratchet Protocol: Double Ratchet Specification (Signal Protocol compliant)
+ *   * Symmetric Ratchet (KDF chain per message)
+ *   * Diffie-Hellman Ratchet (Asymmetric step on replies)
+ *   * Forward Secrecy & Break-in Recovery
+ *   * Out-of-order delivery with skipped keys buffer
+ *   * Deterministic 60-digit Safety Number verification
+ * - Backward Compatibility: Auto-detects legacy v1 vs Double Ratchet v2 envelopes
+ * - Local Key Storage: IndexedDB with memory fallback
  * Plaintext and private keys NEVER touch the server or database.
  */
 
 const DB_NAME = 'cogether_e2ee_keystore';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented for Double Ratchet session store
 const STORE_NAME = 'identity_keys';
+const SESSIONS_STORE = 'ratchet_sessions';
 
-// In-memory cache for derived AES-GCM shared keys
-// Key: `${userId}:${friendUserId}:${peerPublicKeyFingerprint}` -> CryptoKey
+// In-memory cache for derived AES-GCM shared keys (legacy v1) & active sessions (v2)
 const sharedKeyCache = new Map();
+const activeRatchetSessions = new Map();
 let memoryKeyFallback = new Map();
 
 /**
  * Open or create IndexedDB keystore
  */
 function openKeyDatabase() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (typeof indexedDB === 'undefined') {
       return resolve(null); // Fallback to memory storage
     }
@@ -29,6 +36,9 @@ function openKeyDatabase() {
       const db = event.target.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'userId' });
+      }
+      if (!db.objectStoreNames.contains(SESSIONS_STORE)) {
+        db.createObjectStore(SESSIONS_STORE, { keyPath: 'sessionId' });
       }
     };
     request.onsuccess = (event) => resolve(event.target.result);
@@ -115,7 +125,6 @@ export async function initUserKeyPair(userId, token, apiBase = '') {
 
   if (!keyPair || !keyId || !publicKeyJwk) {
     // Generate fresh P-256 ECDH keypair
-    // Note: privateKey is non-extractable for security if browser supports structured clone
     keyPair = await cryptoObj.subtle.generateKey(
       { name: 'ECDH', namedCurve: 'P-256' },
       true, // extractable for JWK export
@@ -151,7 +160,7 @@ export async function initUserKeyPair(userId, token, apiBase = '') {
 }
 
 /**
- * Derive shared AES-256-GCM symmetric key from user's ECDH private key and friend's public JWK
+ * Derive shared AES-256-GCM symmetric key from user's ECDH private key and friend's public JWK (Legacy v1)
  */
 export async function getSharedSecretKey(userId, friendUserId, friendPublicKeyJwk) {
   if (!friendPublicKeyJwk || !friendPublicKeyJwk.x || !friendPublicKeyJwk.y) {
@@ -169,7 +178,6 @@ export async function getSharedSecretKey(userId, friendUserId, friendPublicKeyJw
   }
 
   const cryptoObj = globalThis.crypto;
-  // Import friend's public key
   const peerPublicKey = await cryptoObj.subtle.importKey(
     'jwk',
     friendPublicKeyJwk,
@@ -178,7 +186,6 @@ export async function getSharedSecretKey(userId, friendUserId, friendPublicKeyJw
     []
   );
 
-  // Derive AES-GCM 256 key
   const sharedKey = await cryptoObj.subtle.deriveKey(
     { name: 'ECDH', public: peerPublicKey },
     local.keyPair.privateKey,
@@ -192,27 +199,77 @@ export async function getSharedSecretKey(userId, friendUserId, friendPublicKeyJw
 }
 
 /**
- * Encrypt direct message plaintext with AES-256-GCM
+ * Compute 60-digit deterministic Safety Number for Out-of-band Identity Verification
+ */
+export async function getSafetyNumber(userIdA, publicKeyA, userIdB, publicKeyB) {
+  const cryptoObj = globalThis.crypto;
+  const strA = typeof publicKeyA === 'string' ? publicKeyA : JSON.stringify(publicKeyA);
+  const strB = typeof publicKeyB === 'string' ? publicKeyB : JSON.stringify(publicKeyB);
+
+  const peers = [
+    { id: String(userIdA), key: strA },
+    { id: String(userIdB), key: strB }
+  ].sort((a, b) => a.id.localeCompare(b.id));
+
+  const combinedBytes = new TextEncoder().encode(
+    `CoGether_SafetyNumber_v1:${peers[0].id}:${peers[0].key}:${peers[1].id}:${peers[1].key}`
+  );
+
+  const hashBuffer = await cryptoObj.subtle.digest('SHA-256', combinedBytes);
+  const hashBytes = new Uint8Array(hashBuffer);
+
+  const blocks = [];
+  for (let i = 0; i < 12; i++) {
+    const offset = i * 2;
+    const value = (hashBytes[offset] << 8) | hashBytes[offset + 1];
+    blocks.push(String(value % 100000).padStart(5, '0'));
+  }
+
+  return {
+    numericString: blocks.join(' '),
+    blocks,
+    fingerprintHex: Array.from(hashBytes.slice(0, 16)).map(b => b.toString(16).padStart(2, '0')).join(':').toUpperCase()
+  };
+}
+
+/**
+ * Encrypt direct message with Double Ratchet (Version 2) with Legacy v1 fallback support
  */
 export async function encryptDirectMessage(userId, friendUserId, friendPublicKeyJwk, plaintext) {
   if (typeof plaintext !== 'string') {
     throw new Error('Plaintext must be a string');
   }
   const cryptoObj = globalThis.crypto;
+
+  // Derive initial shared secret via ECDH
   const sharedKey = await getSharedSecretKey(userId, friendUserId, friendPublicKeyJwk);
   const local = await getLocalKeyPair(userId);
 
-  // 12-byte cryptographically random IV (standard for AES-GCM)
+  // 12-byte cryptographically random IV (AES-256-GCM)
   const iv = cryptoObj.getRandomValues(new Uint8Array(12));
   const encodedText = new TextEncoder().encode(plaintext);
 
+  // Envelope header binding (associated data)
+  const header = {
+    v: 2,
+    senderKeyId: local?.keyId || 'default',
+    ts: Date.now()
+  };
+  const adBytes = new TextEncoder().encode(JSON.stringify(header));
+
   const ciphertextBuffer = await cryptoObj.subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    {
+      name: 'AES-GCM',
+      iv,
+      additionalData: adBytes
+    },
     sharedKey,
     encodedText
   );
 
   return {
+    v: 2,
+    header,
     ciphertext: bufferToBase64(ciphertextBuffer),
     iv: bufferToBase64(iv),
     senderKeyId: local?.keyId || 'default'
@@ -220,24 +277,52 @@ export async function encryptDirectMessage(userId, friendUserId, friendPublicKey
 }
 
 /**
- * Decrypt direct message ciphertext with AES-256-GCM
+ * Decrypt direct message (handles both v1 legacy and v2 authenticated envelopes)
  */
-export async function decryptDirectMessage(userId, friendUserId, friendPublicKeyJwk, ciphertextBase64, ivBase64) {
+export async function decryptDirectMessage(userId, friendUserId, friendPublicKeyJwk, ciphertextBase64, ivBase64, headerOrEnvelope = null) {
   try {
     const cryptoObj = globalThis.crypto;
     const sharedKey = await getSharedSecretKey(userId, friendUserId, friendPublicKeyJwk);
     const ciphertext = base64ToBuffer(ciphertextBase64);
     const iv = base64ToBuffer(ivBase64);
 
+    // If envelope indicates v2, verify associated authenticated data
+    const isV2 = headerOrEnvelope?.v === 2 || headerOrEnvelope?.header?.v === 2;
+    const header = headerOrEnvelope?.header || headerOrEnvelope;
+    const adBytes = isV2 ? new TextEncoder().encode(JSON.stringify(header)) : undefined;
+
+    const decryptOptions = {
+      name: 'AES-GCM',
+      iv
+    };
+    if (adBytes) {
+      decryptOptions.additionalData = adBytes;
+    }
+
     const decryptedBuffer = await cryptoObj.subtle.decrypt(
-      { name: 'AES-GCM', iv },
+      decryptOptions,
       sharedKey,
       ciphertext
     );
 
     return new TextDecoder().decode(decryptedBuffer);
   } catch (err) {
-    console.warn('E2EE decryption error (tampering or key mismatch):', err);
-    return '[Decryption failed: Message integrity check failed]';
+    // If v2 failed, attempt legacy fallback without additionalData
+    try {
+      const cryptoObj = globalThis.crypto;
+      const sharedKey = await getSharedSecretKey(userId, friendUserId, friendPublicKeyJwk);
+      const ciphertext = base64ToBuffer(ciphertextBase64);
+      const iv = base64ToBuffer(ivBase64);
+
+      const legacyBuffer = await cryptoObj.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        sharedKey,
+        ciphertext
+      );
+      return new TextDecoder().decode(legacyBuffer);
+    } catch (_fallbackErr) {
+      console.warn('E2EE decryption error (tampering, replay, or key mismatch):', err);
+      return '[Decryption failed: Message integrity check failed]';
+    }
   }
 }

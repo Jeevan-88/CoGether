@@ -38,7 +38,7 @@
   gap: 12px;
 }
 
-.btn-header-back {
+.cowatch-header-left .btn-header-back {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -55,7 +55,7 @@
   transition: all 0.15s ease;
 }
 
-.btn-header-back:hover {
+.cowatch-header-left .btn-header-back:hover {
   background: #FFE500;
   color: #0e0e13;
   border-color: #FFE500;

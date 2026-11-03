@@ -42,31 +42,20 @@ function loadConfig(env = process.env) {
   }
 
   let defaultHost = '127.0.0.1';
+  let defaultPgPort = 5432;
+  let defaultRedisPort = 6379;
+
   if (process.platform === 'win32' && !env.DATABASE_URL && !env.CI) {
-    const fs = require('fs');
-    const path = require('path');
-    const ipFile = path.join(__dirname, '../../.wsl_ip');
-    if (fs.existsSync(ipFile)) {
-      try {
-        const saved = fs.readFileSync(ipFile, 'utf8').trim();
-        if (/^\d+\.\d+\.\d+\.\d+$/.test(saved)) {
-          defaultHost = saved;
-        }
-      } catch (_e) {}
-    } else {
-      try {
-        const { execSync } = require('child_process');
-        const wslIp = execSync('wsl hostname -I', { encoding: 'utf8', timeout: 6000 }).trim().split(/\s+/)[0];
-        if (wslIp && /^\d+\.\d+\.\d+\.\d+$/.test(wslIp)) {
-          defaultHost = wslIp;
-          try { fs.writeFileSync(ipFile, defaultHost, 'utf8'); } catch (_e) {}
-        }
-      } catch (_e) {}
-    }
+    try {
+      const { ensureWslBridge } = require('./wslBridge');
+      const bridge = ensureWslBridge();
+      defaultPgPort = bridge.pgPort;
+      defaultRedisPort = bridge.redisPort;
+    } catch (_e) {}
   }
 
-  const databaseUrl = env.DATABASE_URL || `postgresql://cogether_user:cogether_secret_dev_pass@${defaultHost}:5432/cogether_db`;
-  const redisUrl = env.REDIS_URL || `redis://${defaultHost}:6379`;
+  const databaseUrl = env.DATABASE_URL || `postgresql://cogether_user:cogether_secret_dev_pass@${defaultHost}:${defaultPgPort}/cogether_db`;
+  const redisUrl = env.REDIS_URL || `redis://${defaultHost}:${defaultRedisPort}`;
 
   const config = {
     env: nodeEnv,

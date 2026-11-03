@@ -6,8 +6,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../core/AuthContext.jsx';
 import { useSocial } from '../../core/SocialContext.jsx';
+import { API_URL } from '../../config/api.js';
 import AuthModal from '../auth/AuthModal.jsx';
 import ProfileModal from '../auth/ProfileModal.jsx';
+import LeaderboardModal from './components/LeaderboardModal.jsx';
 import AppleGameDetail from './components/AppleGameDetail.jsx';
 import GamePlayer from './components/GamePlayer.jsx';
 import './CoPlayGamesHub.css';
@@ -296,7 +298,7 @@ const TILE_COLORS = {
 };
 
 export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
-  const { user, profile, isAuthenticated } = useAuth();
+  const { user, profile, isAuthenticated, accessToken } = useAuth();
   const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary } = useSocial();
 
   // Navigation State
@@ -323,6 +325,58 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
   // Global Modals
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [leaderboardGame, setLeaderboardGame] = useState(null);
+
+  // PostgreSQL Favorites Synchronization
+  const [favorites, setFavorites] = useState([]);
+  useEffect(() => {
+    if (!accessToken) {
+      setFavorites([]);
+      return;
+    }
+    let isMounted = true;
+    fetch(`${API_URL}/api/v1/coplay/favorites`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    })
+      .then((res) => (res.ok ? res.json() : { favorites: [] }))
+      .then((data) => {
+        if (isMounted && Array.isArray(data.favorites)) {
+          setFavorites(data.favorites.map((f) => f.game_id || f));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, [accessToken]);
+
+  const toggleFavorite = useCallback(async (gameId, e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (!accessToken) {
+      setShowAuthModal(true);
+      return;
+    }
+    const isFav = favorites.includes(gameId);
+    try {
+      if (isFav) {
+        setFavorites((prev) => prev.filter((id) => id !== gameId));
+        await fetch(`${API_URL}/api/v1/coplay/favorites/${gameId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        showToast('Removed from favorites');
+      } else {
+        setFavorites((prev) => [...prev, gameId]);
+        await fetch(`${API_URL}/api/v1/coplay/favorites/${gameId}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        showToast('Added to favorites');
+      }
+    } catch (err) {
+      console.warn('Failed to update favorite', err);
+    }
+  }, [accessToken, favorites]);
 
   // Toast State
   const [toastMessage, setToastMessage] = useState('');
@@ -1368,6 +1422,12 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
       )}
       {showProfileModal && (
         <ProfileModal onClose={() => setShowProfileModal(false)} />
+      )}
+      {leaderboardGame && (
+        <LeaderboardModal 
+          game={leaderboardGame} 
+          onClose={() => setLeaderboardGame(null)} 
+        />
       )}
     </div>
   );

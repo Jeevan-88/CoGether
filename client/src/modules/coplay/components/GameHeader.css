@@ -1,16 +1,16 @@
 /* ══════════════════════════════════════════════════════════════════════
-   COMPACT TOP GAME HEADER
-   Matches reference image:
-   Height 52px, deep pitch black, Left: < BACK TO ARCADE | 2048
-   Right: [icon] CHALLENGE FRIEND | Fullscreen toggle
+   TOP GAME NAVIGATION BAR
+   Matches exact reference design (Image 1):
+   Left: < Back to Overview | Afterhours
+   Right: Solo (yellow pill) | Race 2 | Race 3 | Invite friend (yellow pill button)
    ══════════════════════════════════════════════════════════════════════ */
 
 .game-header-bar {
-  height: 52px;
+  height: 58px;
   background: #ffffff;
-  border-bottom: 1px solid #e5e5ea;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  padding: 0 24px;
+  border-bottom: 1px solid #ebebeb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,41 +24,42 @@
 .header-left-cluster {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
   min-width: 0;
 }
 
-.btn-header-back {
+.game-header-bar .btn-header-back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #ffffff;
-  border: 1px solid #e5e5ea;
-  color: #1d1d1f;
-  padding: 6px 14px;
-  border-radius: 999px;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+  padding: 6px 16px !important;
+  border-radius: 9999px !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-.btn-header-back:hover {
-  background: #e6e6e8;
-  border-color: #d6d6d6;
-  color: #000000;
+.game-header-bar .btn-header-back:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }
 
 .header-game-title {
   margin: 0;
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1d1d1f;
-  letter-spacing: -0.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Space Grotesk", sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #000000;
+  letter-spacing: -0.6px;
   line-height: 1;
 }
 
@@ -66,64 +67,59 @@
 .header-right-cluster {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-shrink: 0;
 }
 
-.btn-header-challenge-trigger {
-  display: inline-flex;
+.header-mode-pills-row {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  background: #ffe500;
-  border: 1.5px solid #ffe500;
-  color: #111111;
-  padding: 7px 16px;
-  border-radius: 8px;
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  gap: 4px;
+}
+
+.header-mode-pill {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #64748b;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.15s ease;
+}
+
+.header-mode-pill:hover {
+  color: #0f172a;
+}
+
+.header-mode-pill.active {
+  background: #ffe500 !important;
+  border-color: #ffe500 !important;
+  color: #111111 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.btn-header-invite-yellow {
+  background: #ffe500;
+  border: 1px solid #ffe500;
+  color: #111111;
+  padding: 7px 22px;
+  border-radius: 9999px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   white-space: nowrap;
 }
 
-.btn-header-challenge-trigger:hover {
+.btn-header-invite-yellow:hover {
   background: #ffea33;
-  color: #000000;
   transform: translateY(-1px);
-}
-
-.btn-header-challenge-trigger:hover .btn-challenge-icon {
-  color: #111111;
-  transition: color 0.18s ease;
-}
-
-.btn-challenge-icon {
-  color: #FFE500;
-  transition: color 0.18s ease;
-}
-
-/* Fullscreen Toggle Button */
-.btn-header-fullscreen {
-  width: 36px;
-  height: 36px;
-  background: #f5f5f7;
-  border: 1px solid #e5e5ea;
-  border-radius: 8px;
-  color: #1d1d1f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.btn-header-fullscreen:hover {
-  background: #e6e6e8;
-  border-color: #d6d6d6;
-  color: #000000;
 }
 
 /* ── Exit Confirmation Modal ── */
@@ -142,12 +138,12 @@
 .exit-confirm-card {
   width: 100%;
   max-width: 420px;
-  background: #0e0e14;
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-  border-radius: 14px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
   padding: 28px 24px;
   text-align: center;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
 }
 
 .exit-confirm-icon-wrap {
@@ -167,13 +163,13 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 18px;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   margin: 0 0 8px 0;
 }
 
 .exit-confirm-text {
   font-size: 13px;
-  color: #94a3b8;
+  color: #64748b;
   line-height: 1.5;
   margin: 0 0 24px 0;
 }
@@ -185,77 +181,39 @@
   gap: 12px;
 }
 
+.btn-exit-cancel {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-exit-confirm {
+  background: #dc2626;
+  border: 1px solid #dc2626;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .game-header-bar {
     padding: 0 12px;
   }
-
   .header-left-cluster {
     gap: 10px;
   }
-
   .header-game-title {
     font-size: 18px;
   }
-
-  .btn-header-challenge-trigger span {
+  .header-mode-pills-row {
     display: none;
   }
-
-  .btn-header-back span {
-    display: none;
-  }
-}
-
-
-/* ── Reference Header Mode Pills (Solo, Race 2, Race 3) & Invite Button ── */
-.header-mode-pills-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.header-mode-pill {
-  background: #f5f5f7;
-  border: 1px solid #e5e5ea;
-  color: #707070;
-  padding: 6px 16px;
-  border-radius: 999px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
-  font-size: 11.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.header-mode-pill:hover {
-  background: #e6e6e8;
-  color: #1d1d1f;
-}
-
-.header-mode-pill.active {
-  background: #ffe500;
-  border-color: #ffe500;
-  color: #111111;
-  font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.btn-header-invite-yellow {
-  background: #ffe500;
-  border: 1px solid #ffe500;
-  color: #111111;
-  padding: 6px 20px;
-  border-radius: 999px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
-  font-size: 11.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.btn-header-invite-yellow:hover {
-  background: #ffea33;
-  transform: translateY(-1px);
 }

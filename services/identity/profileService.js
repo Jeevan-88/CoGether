@@ -34,6 +34,7 @@ class ProfileService {
       return null;
     }
     const clean = {};
+    const safeIdRegex = /^[a-zA-Z0-9_\-\.]+$/;
     const stringFields = [
       'headId',
       'skinToneId',
@@ -46,25 +47,34 @@ class ProfileService {
       'backgroundId'
     ];
     for (const key of stringFields) {
-      if (typeof rawConfig[key] === 'string' && rawConfig[key].trim().length > 0 && rawConfig[key].length <= 80) {
-        clean[key] = rawConfig[key].trim();
+      if (typeof rawConfig[key] === 'string') {
+        const val = rawConfig[key].trim().replace(/[<>'"\/;&]/g, '');
+        if (val.length > 0 && val.length <= 80 && safeIdRegex.test(val)) {
+          clean[key] = val;
+        }
       }
     }
     if (Array.isArray(rawConfig.accessoryIds)) {
       clean.accessoryIds = rawConfig.accessoryIds
-        .filter((id) => typeof id === 'string' && id.trim().length > 0 && id.length <= 80)
+        .map((id) => (typeof id === 'string' ? id.trim().replace(/[<>'"\/;&]/g, '') : ''))
+        .filter((id) => id.length > 0 && id.length <= 80 && safeIdRegex.test(id))
         .slice(0, 10);
     } else {
       clean.accessoryIds = [];
     }
-    if (Array.isArray(rawConfig.effectsIds)) {
-      clean.effectsIds = rawConfig.effectsIds
-        .filter((id) => typeof id === 'string' && id.trim().length > 0 && id.length <= 80)
-        .slice(0, 10);
-    } else {
-      clean.effectsIds = [];
-    }
+    const rawEffects = Array.isArray(rawConfig.effectsIds)
+      ? rawConfig.effectsIds
+      : (typeof rawConfig.effectId === 'string' && rawConfig.effectId ? [rawConfig.effectId] : []);
+    clean.effectsIds = rawEffects
+      .map((id) => (typeof id === 'string' ? id.trim().replace(/[<>'"\/;&]/g, '') : ''))
+      .filter((id) => id.length > 0 && id.length <= 80 && safeIdRegex.test(id))
+      .slice(0, 10);
+
     return Object.keys(clean).length > 0 ? clean : null;
+  }
+
+  async getProfile(userId, client = db) {
+    return this.getProfileByUserId(userId, client);
   }
 
   formatProfileRow(row) {

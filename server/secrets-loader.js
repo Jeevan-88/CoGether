@@ -3,13 +3,10 @@ const {
   GetSecretValueCommand
 } = require('@aws-sdk/client-secrets-manager');
 
-const REGION = process.env.AWS_REGION || 'ap-south-2';
-const APP_SECRET_ID = 'cogether/stage/app';
-const RDS_SECRET_ID = 'rds!db-64711d1e-0eea-4860-81ff-3384900bba32';
-
-const RDS_HOST = 'cogether-stage-db.c78q88msuvhi.ap-south-2.rds.amazonaws.com';
-const RDS_PORT = 5432;
-const RDS_DATABASE = 'postgres';
+const REGION = process.env.AWS_REGION || 'ap-south-1';
+const PRIMARY_APP_SECRET_ID = 'cogether/staging/app';
+const FALLBACK_APP_SECRET_ID = 'cogether/stage/app';
+const RDS_SECRET_ID = process.env.RDS_SECRET_ID || 'rds!db-64711d1e-0eea-4860-81ff-3384900bba32';
 
 async function getSecret(client, secretId) {
   const response = await client.send(
@@ -28,35 +25,54 @@ async function loadStagingSecrets() {
 
   const client = new SecretsManagerClient({ region: REGION });
 
-  const appSecret = await getSecret(client, APP_SECRET_ID);
-  const rdsSecret = await getSecret(client, RDS_SECRET_ID);
-
-  if (!appSecret.REDIS_URL || !appSecret.JWT_SECRET) {
-    throw new Error('Staging app secret is missing REDIS_URL or JWT_SECRET');
+  let appSecret = null;
+  try {
+    appSecret = await getSecret(client, PRIMARY_APP_SECRET_ID);
+  } catch (err) {
+    console.warn(`[Secrets] Primary secret ${PRIMARY_APP_SECRET_ID} not found, trying fallback ${FALLBACK_APP_SECRET_ID}:`, err.message);
+    try {
+      appSecret = await getSecret(client, FALLBACK_APP_SECRET_ID);
+    } catch (fallbackErr) {
+      throw new Error(`Failed to load staging secrets from ${PRIMARY_APP_SECRET_ID} and ${FALLBACK_APP_SECRET_ID}: ${fallbackErr.message}`);
+    }
   }
 
-  if (!rdsSecret.username || !rdsSecret.password) {
-    throw new Error('RDS secret is missing username or password');
-  }
-
-  const username = encodeURIComponent(rdsSecret.username);
-  const password = encodeURIComponent(rdsSecret.password);
-
-  process.env.REDIS_URL = appSecret.REDIS_URL;
-  process.env.JWT_SECRET = appSecret.JWT_SECRET;
-  process.env.RESEND_API_KEY = appSecret.RESEND_API_KEY;
-  if (appSecret.FROM_EMAIL) {
-    process.env.FROM_EMAIL = appSecret.FROM_EMAIL;
-  }
+  // Populate environment variables safely without printing values
+  if (appSecret.REDIS_URL) process.env.REDIS_URL = appSecret.REDIS_URL;
+  if (appSecret.JWT_SECRET) process.env.JWT_SECRET = appSecret.JWT_SECRET;
+  if (appSecret.RESEND_API_KEY) process.env.RESEND_API_KEY = appSecret.RESEND_API_KEY;
+  if (appSecret.FROM_EMAIL) process.env.FROM_EMAIL = appSecret.FROM_EMAIL;
   if (appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET) {
     process.env.OTP_HMAC_KEY = appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET;
   }
-  if (appSecret.MFA_ENCRYPTION_KEY) {
-    process.env.MFA_ENCRYPTION_KEY = appSecret.MFA_ENCRYPTION_KEY;
+  if (appSecret.MFA_ENCRYPTION_KEY) process.env.MFA_ENCRYPTION_KEY = appSecret.MFA_ENCRYPTION_KEY;
+
+  // Twilio credentials (prefer API Key + Secret over root Auth Token)
+  if (appSecret.TWILIO_ACCOUNT_SID) process.env.TWILIO_ACCOUNT_SID = appSecret.TWILIO_ACCOUNT_SID;
+  if (appSecret.TWILIO_API_KEY) process.env.TWILIO_API_KEY = appSecret.TWILIO_API_KEY;
+  if (appSecret.TWILIO_API_SECRET) process.env.TWILIO_API_SECRET = appSecret.TWILIO_API_SECRET;
+  if (appSecret.TWILIO_AUTH_TOKEN) process.env.TWILIO_AUTH_TOKEN = appSecret.TWILIO_AUTH_TOKEN;
+
+  // Direct DATABASE_URL or RDS Secret resolution
+  if (appSecret.DATABASE_URL) {
+    process.env.DATABASE_URL = appSecret.DATABASE_URL;
+    process.env.DATABASE_SSL = 'true';
+  } else {
+    try {
+      const rdsSecret = await getSecret(client, RDS_SECRET_ID);
+      if (rdsSecret.username && rdsSecret.password) {
+        const username = encodeURIComponent(rdsSecret.username);
+        const password = encodeURIComponent(rdsSecret.password);
+        const rdsHost = process.env.RDS_HOST || 'cogether-stage-db.c78q88msuvhi.ap-south-2.rds.amazonaws.com';
+        const rdsPort = process.env.RDS_PORT || 5432;
+        const rdsDb = process.env.RDS_DATABASE || 'postgres';
+        process.env.DATABASE_URL = `postgresql://${username}:${password}@${rdsHost}:${rdsPort}/${rdsDb}`;
+        process.env.DATABASE_SSL = 'true';
+      }
+    } catch (rdsErr) {
+      console.warn('[Secrets] Could not resolve standalone RDS secret:', rdsErr.message);
+    }
   }
-  process.env.DATABASE_URL =
-    `postgresql://${username}:${password}@${RDS_HOST}:${RDS_PORT}/${RDS_DATABASE}`;
-  process.env.DATABASE_SSL = 'true';
 }
 
 module.exports = { loadStagingSecrets };

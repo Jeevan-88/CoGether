@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Maximize2, Minimize2, RotateCw, 
-  Heart, AlertOctagon, ArrowLeft, ShieldCheck, BarChart2, Eye, Video
+  AlertOctagon, ArrowLeft, ShieldCheck
 } from 'lucide-react';
 import CoGetherButton from './CoGetherButton.jsx';
 import GameSplitArena from './GameSplitArena.jsx';
@@ -9,10 +9,15 @@ import './GameViewport.css';
 
 /**
  * Universal Game Monitor Player (GameViewport)
- * Reuses the CoGether 3D PC monitor design from the homepage landing page.
- * Keeps the physical monitor appearance, proportions, frame, bezel, and stand.
- * In fullscreen mode, the screen display expands to fill the entire laptop display,
- * removing the monitor stand and webpage margins edge-to-edge.
+ * Hardware-accelerated, high-fidelity straight-facing PC/TV monitor.
+ * Matches exact reference design (Image 1 + Image 2):
+ * - Widescreen (16:10 / 16:9) aspect ratio, wide and tall, fills available stage space
+ * - Sleek curved outer chassis corners (border-radius: 24px)
+ * - Display screen with smoothly curved bottom-left and bottom-right corners (border-radius: 16px)
+ * - Micro-millimeter perfect edge-to-edge game iframe fitting with zero black bars or sharp lines
+ * - Centered stand neck and pedestal base with soft drop shadow
+ * - Translucent cyan fullscreen icon button at bottom right (no text)
+ * - Seamless edge-to-edge full window expansion in fullscreen mode
  */
 export default function GameViewport({
   game,
@@ -35,35 +40,7 @@ export default function GameViewport({
   opponents = [],
   onPlayAgain
 }) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [inGameCameraMode, setInGameCameraMode] = useState('THIRD'); // 'THIRD' | 'FIRST'
-
   const displayTitle = game?.title?.replace(/\(Official Open-Source\)/i, '').replace(/— Open Source/i, '').trim() || game?.n || 'Arcade Game';
-  const displayCategory = game?.category 
-    ? (game.category.charAt(0).toUpperCase() + game.category.slice(1).toLowerCase()) 
-    : (game?.cat || 'Action & 3D Escapes');
-
-  // Only games that support 3D camera modes (like Afterhours) show the in-game camera toggle
-  const supportsCameraMode = game?.id === 'afterhours' || game?.has3DCamera || game?.features?.includes?.('camera');
-
-  // Listen to camera mode change messages from game iframe
-  useEffect(() => {
-    const handleMsg = (e) => {
-      if (e.data && e.data.type === 'COPLAY_CAMERA_MODE_CHANGED') {
-        if (e.data.mode) setInGameCameraMode(e.data.mode);
-      }
-    };
-    window.addEventListener('message', handleMsg);
-    return () => window.removeEventListener('message', handleMsg);
-  }, []);
-
-  const handleToggleCameraMode = () => {
-    const iframe = viewportRef?.current?.querySelector('iframe');
-    if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'COPLAY_TOGGLE_CAMERA_MODE' }, '*');
-    }
-    setInGameCameraMode(prev => prev === 'THIRD' ? 'FIRST' : 'THIRD');
-  };
 
   return (
     <div className={`game-viewport-stage ${isFullscreen ? 'stage-fullscreen' : ''}`}>
@@ -81,126 +58,115 @@ export default function GameViewport({
         />
       ) : (
         <div className="universal-monitor-stage">
-          {/* ── CoGether Universal 3D PC Monitor Frame ── */}
+          {/* ── CoGether Universal PC Monitor Assembly ── */}
           <div className={`cogether-universal-monitor ${isFullscreen ? 'is-fullscreen' : ''}`}>
             
-            {/* Physical Monitor Chassis Assembly (Artwork with Frame & Stand) */}
-            <div className="cogether-monitor-chassis">
-              {!isFullscreen && (
-                <img
-                  src="/pc_monitor_straight_transparent.png"
-                  alt="CoGether Physical Straight 3D Monitor"
-                  className="cogether-monitor-chassis-art"
-                  draggable={false}
-                />
-              )}
+            {/* Physical Monitor Assembly (Frame, Display Screen, Stand Neck & Base) */}
+            <div className="pc-monitor-assembly">
+              {/* Outer Monitor Chassis Bezel Frame (Curved corners on all sides) */}
+              <div className="pc-monitor-bezel-frame">
+                
+                {/* The Active Display Screen (Nested precisely with curved corners matching bezel) */}
+                <div className={`pc-monitor-screen-display ${isFullscreen ? 'is-fullscreen-mount' : ''}`}>
+                  {/* Actual Sandboxed Game Iframe Mount Slot */}
+                  <div
+                    ref={viewportRef}
+                    className={`game-iframe-mount-point ${launchError ? 'has-error' : ''}`}
+                  />
 
-              {/* The Active Display Screen (Nested precisely within the monitor bezel) */}
-              <div className="cogether-monitor-screen-bezel">
-                {/* Actual Sandboxed Game Iframe Mount Slot */}
-                <div
-                  ref={viewportRef}
-                  className={`game-iframe-mount-point ${launchError ? 'has-error' : ''}`}
-                />
-
-                {/* Arcade Loading Scrim */}
-                {loading && !launchError && (
-                  <div className="game-loading-scrim fade-in">
-                    <div className="loading-card-arcade">
-                      {(game?.thumbnail || game?.thumb) && (
-                        <div className="loading-thumbnail-wrap">
-                          <img
-                            src={game.thumbnail || game.thumb}
-                            alt={displayTitle}
-                            className="loading-thumbnail-img"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
+                  {/* Arcade Loading Scrim */}
+                  {loading && !launchError && (
+                    <div className="game-loading-scrim fade-in">
+                      <div className="loading-card-arcade">
+                        {(game?.thumbnail || game?.thumb) && (
+                          <div className="loading-thumbnail-wrap">
+                            <img
+                              src={game.thumbnail || game.thumb}
+                              alt={displayTitle}
+                              className="loading-thumbnail-img"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          </div>
+                        )}
+                        <div className="loading-meta-info">
+                          <span className="loading-title">{displayTitle}</span>
+                          <span className="loading-sub">INITIALIZING SECURE SANDBOX...</span>
                         </div>
-                      )}
-                      <div className="loading-meta-info">
-                        <span className="loading-title">{displayTitle}</span>
-                        <span className="loading-sub">INITIALIZING SECURE SANDBOX...</span>
-                      </div>
-                      <div className="loading-bar-track">
-                        <div className="loading-bar-fill" />
-                      </div>
-                      <div className="loading-badge-row">
-                        <ShieldCheck size={13} className="shield-icon" />
-                        <span>ISOLATED COGETHER RUNTIME</span>
+                        <div className="loading-bar-track">
+                          <div className="loading-bar-fill" />
+                        </div>
+                        <div className="loading-badge-row">
+                          <ShieldCheck size={13} className="shield-icon" />
+                          <span>ISOLATED COGETHER RUNTIME</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Synchronized Challenge Countdown (3-2-1-GO) */}
-                {countdown !== null && (
-                  <div className="game-countdown-scrim fade-in">
-                    <div className="countdown-number-bounce" key={countdown}>
-                      {countdown}
+                  {/* Synchronized Challenge Countdown (3-2-1-GO) */}
+                  {countdown !== null && (
+                    <div className="game-countdown-scrim fade-in">
+                      <div className="countdown-number-bounce" key={countdown}>
+                        {countdown}
+                      </div>
+                      <span className="countdown-subtext">GET READY!</span>
                     </div>
-                    <span className="countdown-subtext">GET READY!</span>
-                  </div>
-                )}
+                  )}
 
-                {/* Game Result / Game Over Overlay */}
-                {resultOverlay}
+                  {/* Game Result / Game Over Overlay */}
+                  {resultOverlay}
 
-                {/* Launch Error Recovery Deck */}
-                {launchError && (
-                  <div className="game-unavailable-error-card fade-in">
-                    <div className="error-icon-shield">
-                      <AlertOctagon size={42} />
+                  {/* Launch Error Recovery Deck */}
+                  {launchError && (
+                    <div className="game-unavailable-error-card fade-in">
+                      <div className="error-icon-shield">
+                        <AlertOctagon size={42} />
+                      </div>
+                      <h2 className="error-headline">GAME UNAVAILABLE</h2>
+                      <p className="error-subtext">We couldn't launch this game right now.</p>
+
+                      <div className="error-reason-box">
+                        <span className="error-code-badge">{launchError.code || 'ERR_LAUNCH_FAILED'}</span>
+                        <p className="error-message">{launchError.message}</p>
+                      </div>
+
+                      <div className="error-actions-deck">
+                        <CoGetherButton
+                          variant="primary"
+                          onClick={onRetry}
+                          icon={RotateCw}
+                        >
+                          RETRY LAUNCH
+                        </CoGetherButton>
+                        <CoGetherButton
+                          variant="secondary"
+                          onClick={onBack}
+                          icon={ArrowLeft}
+                        >
+                          BACK TO ARCADE
+                        </CoGetherButton>
+                      </div>
                     </div>
-                    <h2 className="error-headline">GAME UNAVAILABLE</h2>
-                    <p className="error-subtext">We couldn't launch this game right now.</p>
+                  )}
 
-                    <div className="error-reason-box">
-                      <span className="error-code-badge">{launchError.code || 'ERR_LAUNCH_FAILED'}</span>
-                      <p className="error-message">{launchError.message}</p>
-                    </div>
-
-                    <div className="error-actions-deck">
-                      <CoGetherButton
-                        variant="primary"
-                        onClick={onRetry}
-                        icon={RotateCw}
-                      >
-                        RETRY LAUNCH
-                      </CoGetherButton>
-                      <CoGetherButton
-                        variant="secondary"
-                        onClick={onBack}
-                        icon={ArrowLeft}
-                      >
-                        BACK TO ARCADE
-                      </CoGetherButton>
-                    </div>
-                  </div>
-                )}
-                {/* Floating Translucent Fullscreen Icon Button (Opaque on screen, icon only, no text) */}
-                <button
-                  type="button"
-                  className="btn-screen-fullscreen-pill"
-                  onClick={onToggleFullscreen}
-                  title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                  aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                >
-                  {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-                </button>
-
-                {/* Floating Camera Mode Toggle Pill (3D Games like Afterhours only) */}
-                {supportsCameraMode && (
+                  {/* Floating Translucent Fullscreen Icon Button (Image 2 style: rounded cyan square with arrows) */}
                   <button
                     type="button"
-                    className="btn-screen-camera-pill"
-                    onClick={handleToggleCameraMode}
-                    title={inGameCameraMode === 'FIRST' ? "Switch to 3rd-Person Chase Cam" : "Switch to 1st-Person Eye Cam"}
-                    aria-label="Switch Camera Mode"
+                    className="btn-screen-fullscreen-pill"
+                    onClick={onToggleFullscreen}
+                    title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                    aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
                   >
-                    {inGameCameraMode === 'FIRST' ? <Eye size={17} /> : <Video size={17} />}
+                    {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                   </button>
-                )}
+                </div>
               </div>
+
+              {/* Monitor Stand Neck */}
+              {!isFullscreen && <div className="pc-monitor-stand-neck" />}
+
+              {/* Monitor Stand Base (Curved corners, bevel highlight, drop shadow) */}
+              {!isFullscreen && <div className="pc-monitor-stand-base" />}
             </div>
 
             {/* ── Floating Exit Fullscreen Control (Fullscreen Mode Only) ── */}

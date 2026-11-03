@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Phase 2C.3: CoPlay Production Hardening & Netcode Standardization Integration Test Suite
  * 
  * Verifies:
@@ -348,6 +348,7 @@ async function runPhase2C3Tests() {
   if (failed > 0) {
     process.exit(1);
   }
+  process.exit(0);
 }
 
 runPhase2C3Tests().catch((err) => {

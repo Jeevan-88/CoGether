@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Maximize, Minimize, Users, AlertTriangle } from 'lucide-react';
-import CoGetherButton from './CoGetherButton.jsx';
+import { ArrowLeft, AlertTriangle } from 'lucide-react';
 import './GameHeader.css';
 
 /**
  * GameHeader
- * Compact fixed top header bar for the CoGether gameplay environment.
+ * Top navigation bar for the CoGether universal gameplay environment.
  * Matches exact reference design:
- * Left: < BACK TO ARCADE | 2048
- * Right: [icon] CHALLENGE FRIEND | Fullscreen toggle
+ * Left: < Back to Overview | Afterhours
+ * Right: Solo (yellow pill) | Race 2 | Race 3 | Invite friend (yellow button)
  */
 export default function GameHeader({
   game,
-  mode = 'SINGLE_PLAYER', // 'SINGLE_PLAYER' | 'CHALLENGE' | 'LOCAL_COOP'
+  mode = 'SINGLE_PLAYER',
   roomId = null,
-  isFullscreen = false,
-  onToggleFullscreen,
   onClose,
   onOpenChallenge,
   hasActiveSession = false
@@ -35,12 +32,12 @@ export default function GameHeader({
     onClose();
   };
 
-  const displayTitle = game?.title?.replace(/\(Official Open-Source\)/i, '').replace(/— Open Source/i, '').trim() || '2048';
+  const displayTitle = game?.title?.replace(/\(Official Open-Source\)/i, '').replace(/— Open Source/i, '').trim() || game?.n || 'Afterhours';
 
   return (
     <>
       <header className="game-header-bar">
-        {/* ── Left Navigation & Title (Matches Reference Design) ── */}
+        {/* ── Left Navigation & Title (Matches Reference Image) ── */}
         <div className="header-left-cluster">
           <button
             type="button"
@@ -56,35 +53,22 @@ export default function GameHeader({
           <h1 className="header-game-title">{displayTitle}</h1>
         </div>
 
-        {/* ── Right Action Controls (Matches Reference Image) ── */}
+        {/* ── Right Action Controls (Matches Reference Image: Solo | Race 2 | Race 3 | Invite friend) ── */}
         <div className="header-right-cluster">
           <div className="header-mode-pills-row">
-            <button type="button" className="header-mode-pill active">Solo</button>
-            <button type="button" className="header-mode-pill">Race 2</button>
-            <button type="button" className="header-mode-pill">Race 3</button>
+            <button type="button" className={`header-mode-pill ${mode === 'SINGLE_PLAYER' ? 'active' : ''}`}>Solo</button>
+            <button type="button" className="header-mode-pill" onClick={onOpenChallenge}>Race 2</button>
+            <button type="button" className="header-mode-pill" onClick={onOpenChallenge}>Race 3</button>
           </div>
 
-          {/* Invite Friend Action */}
-          {onOpenChallenge && (
-            <button
-              type="button"
-              className="btn-header-invite-yellow"
-              onClick={onOpenChallenge}
-              title="Invite friend to game"
-            >
-              <span>Invite friend</span>
-            </button>
-          )}
-
-          {/* Fullscreen Toggle */}
+          {/* Invite Friend Action (Yellow Rounded Button) */}
           <button
             type="button"
-            className="btn-header-fullscreen"
-            onClick={onToggleFullscreen}
-            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-            aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+            className="btn-header-invite-yellow"
+            onClick={onOpenChallenge}
+            title="Invite friend to game"
           >
-            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+            <span>Invite friend</span>
           </button>
         </div>
       </header>
@@ -98,21 +82,23 @@ export default function GameHeader({
             </div>
             <h3 className="exit-confirm-title">LEAVE GAME?</h3>
             <p className="exit-confirm-text">
-              You are currently in an active multiplayer room. Leaving will disconnect you from the session.
+              You are currently connected to an active room. Leaving will end your session with other squad members.
             </p>
             <div className="exit-confirm-actions">
-              <CoGetherButton
-                variant="secondary"
+              <button
+                type="button"
+                className="btn-exit-cancel"
                 onClick={() => setShowExitConfirm(false)}
               >
                 STAY IN GAME
-              </CoGetherButton>
-              <CoGetherButton
-                variant="danger"
+              </button>
+              <button
+                type="button"
+                className="btn-exit-confirm"
                 onClick={confirmExit}
               >
                 LEAVE ROOM
-              </CoGetherButton>
+              </button>
             </div>
           </div>
         </div>

@@ -17,7 +17,7 @@ const { gameRepository } = require('../services/coplay/gameRepository');
 const { gameSessionManager, SessionState } = require('../services/coplay/gameSessionManager');
 const { favoriteService } = require('../services/coplay/favoriteService');
 const { leaderboardService } = require('../services/coplay/leaderboardService');
-const { getIceConfiguration } = require('../packages/webrtc');
+const { getIceConfiguration, getIceConfigurationAsync } = require('../packages/webrtc');
 const { userService, profileService, inviteService } = require('../services/identity');
 const cowatchContentRepo = require('../services/cowatch/contentRepository');
 const cowatchRoomService = require('../services/cowatch/roomService');
@@ -27,6 +27,13 @@ const { submissionService } = require('../services/costudy/submissionService');
 const { interviewService } = require('../services/costudy/interviewService');
 const { friendService, messagingService } = require('../services/social');
 const { privateRoomService } = require('../services/coplay/privateRoomService');
+const { r2Service } = require('./services/r2Service');
+let movieCatalogData = [];
+try {
+  movieCatalogData = require('./data/movieCatalog.json');
+} catch (e) {
+  movieCatalogData = [];
+}
 
 const path = require('path');
 
@@ -212,6 +219,63 @@ app.delete('/api/v1/coplay/favorites/:gameId', authenticateToken, async (req, re
 // CO-WATCH REST APIS (PHASE 3.0)
 // ══════════════════════════════════════════════════════════════════════
 
+// Cloudflare R2 Safe Health Check & Config Validation (Non-destructive)
+app.get(['/api/v1/cowatch/r2/health', '/api/cowatch/r2/health'], async (req, res) => {
+  try {
+    const health = await r2Service.checkHealth();
+    res.json({ success: true, ...health });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// CoWatch 40-Title Verified Movie Catalog API
+app.get(['/api/v1/cowatch/movies', '/api/cowatch/movies'], (req, res) => {
+  try {
+    const { genre, search, playableOnly } = req.query;
+    let list = Array.isArray(movieCatalogData) ? [...movieCatalogData] : [];
+
+    if (genre && genre !== 'All' && genre !== 'All Movies') {
+      const gLower = genre.toLowerCase();
+      list = list.filter(m => (m.genres || []).some(g => g.toLowerCase() === gLower));
+    }
+
+    if (playableOnly === 'true') {
+      list = list.filter(m => m.playableStatus === 'verified_playable');
+    }
+
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(m => 
+        (m.title && m.title.toLowerCase().includes(q)) ||
+        (m.synopsis && m.synopsis.toLowerCase().includes(q)) ||
+        (m.genres && m.genres.some(g => g.toLowerCase().includes(q)))
+      );
+    }
+
+    res.json({
+      success: true,
+      total: list.length,
+      catalogTotal: movieCatalogData.length,
+      verifiedPlayableCount: movieCatalogData.filter(m => m.playableStatus === 'verified_playable').length,
+      requiresLicensingCount: movieCatalogData.filter(m => m.playableStatus === 'requires_licensed_direct_source').length,
+      movies: list
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get(['/api/v1/cowatch/movies/:id', '/api/cowatch/movies/:id'], (req, res) => {
+  const { id } = req.params;
+  const movie = movieCatalogData.find(m => m.id === id || m.slug === id);
+  if (!movie) {
+    return res.status(404).json({ success: false, error: 'Movie not found in catalog' });
+  }
+  const delivery = r2Service.resolveMediaDelivery(movie);
+  res.json({ success: true, movie, delivery });
+});
+
 // 1. Content Catalog Query
 app.get('/api/v1/cowatch/content', async (req, res) => {
   try {
@@ -281,7 +345,7 @@ app.post('/api/v1/cowatch/rooms', async (req, res) => {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const decoded = verifyToken(authHeader.split(' ')[1]);
-        hostUserId = decoded?.id || decoded?.sub;
+        hostUserId = decoded?.claims?.sub || decoded?.claims?.id || decoded?.id || decoded?.sub;
       } catch (e) {}
     }
 
@@ -1495,13 +1559,14 @@ app.post('/api/v1/invites/:token/redeem', authenticateToken, async (req, res) =>
 });
 
 // Dynamic WebRTC ICE/TURN Configuration Endpoint
-app.get('/api/v1/webrtc/ice-servers', (req, res) => {
+app.get('/api/v1/webrtc/ice-servers', async (req, res) => {
   try {
-    const config = getIceConfiguration();
+    const userId = req.user?.id || req.headers['x-user-id'] || 'anonymous';
+    const config = await getIceConfigurationAsync(process.env, { userId });
     res.json(config);
   } catch (err) {
-    logger.error('Failed to resolve ICE configuration', { error: err });
-    res.status(500).json({ error: 'Failed to resolve ICE configuration' });
+    logger.error('Failed to resolve ICE configuration', { error: err.message });
+    res.json(getIceConfiguration(process.env));
   }
 });
 
@@ -1808,7 +1873,8 @@ app.post('/api/v1/coplay/invitations/:token/accept', authenticateToken, async (r
   try {
     const result = await privateRoomService.acceptInvitation(req.params.token, userId);
     if (!result.success) {
-      return res.status(400).json(result);
+      const statusCode = result.error === 'UNAUTHORIZED_INVITEE' ? 403 : 400;
+      return res.status(statusCode).json(result);
     }
     // Realtime notification to inviter that the friend accepted
     if (result.invitation?.inviter_user_id) {
@@ -2330,6 +2396,16 @@ io.on('connection', (socket) => {
       playbackRate,
       serverTimeMs: Date.now(),
       triggeredBy: socket.username || 'Host'
+    });
+  });
+
+  socket.on('cowatch:change-movie', ({ roomCode, movie }) => {
+    const code = roomCode || socket.cowatchRoom;
+    if (!code || !movie) return;
+    io.to("cowatch:" + code).emit('cowatch:movie-changed', {
+      movie,
+      triggeredBy: socket.username || 'Host',
+      timestamp: Date.now()
     });
   });
 

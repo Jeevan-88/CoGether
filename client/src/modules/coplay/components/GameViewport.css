@@ -1,8 +1,13 @@
 /* ═════════════════════════════════════════════════════════════════════════════
    COGETHER UNIVERSAL GAME MONITOR PLAYER STAGE
-   Reuses the physical 3D PC monitor design from the CoGether landing page.
-   Enforces strict 100% no-scroll viewport fitting and responsive edge-to-edge
-   fullscreen expansion.
+   Matches exact reference design (Image 1 & Image 2):
+   - Wide, tall straight-facing PC/TV monitor (16:10 / 16:9 widescreen)
+   - Smooth curved outer chassis corners (border-radius: 26px)
+   - Display screen with smoothly curved bottom-left & bottom-right corners (border-radius: 18px)
+   - Zero sharp black lines or protruding boxes
+   - Sandboxed game iframe fits micro-millimeter edge-to-edge
+   - Translucent cyan fullscreen icon button at bottom right
+   - Stand neck and rounded pedestal base with soft drop shadow
    ═════════════════════════════════════════════════════════════════════════════ */
 
 .game-viewport-stage {
@@ -14,8 +19,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f7;
-  padding: 6px 12px;
+  background: #ffffff;
+  padding: 4px 10px 8px 10px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -39,7 +44,7 @@
   position: relative;
 }
 
-/* ── CoGether Universal Monitor Frame ── */
+/* ── CoGether Universal Monitor Master Container ── */
 .cogether-universal-monitor {
   position: relative;
   width: 100%;
@@ -62,56 +67,60 @@
   background: #000000;
 }
 
-/* ── Physical Monitor Chassis Assembly (Straight-Facing 1200x900 Aspect 4:3) ── */
-.cogether-monitor-chassis {
+/* ── PC Monitor Physical Assembly (Widescreen, Taller, Commanding Presence) ── */
+.pc-monitor-assembly {
   position: relative;
-  height: min(calc(100dvh - 76px), 680px);
-  width: calc(min(calc(100dvh - 76px), 680px) * (1200 / 900));
-  max-width: 98%;
-  aspect-ratio: 1200 / 900;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
-}
-
-.cogether-universal-monitor.is-fullscreen .cogether-monitor-chassis {
-  aspect-ratio: auto;
-  max-height: 100vh;
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-}
-
-.cogether-monitor-chassis-art {
-  position: absolute;
-  inset: 0;
   width: 100%;
+  max-width: 1060px;
   height: 100%;
-  object-fit: fill;
-  pointer-events: none;
-  z-index: 1;
-  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.35));
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* ── Active Display Screen (Nested precisely within the monitor bezel) ── */
-.cogether-monitor-screen-bezel {
-  position: absolute;
-  top: 10.82%;
-  left: 4.14%;
-  width: 91.72%;
-  height: 71.03%;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000000;
-  z-index: 2;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.95);
+  max-height: calc(100dvh - 80px);
   box-sizing: border-box;
 }
 
-.cogether-universal-monitor.is-fullscreen .cogether-monitor-screen-bezel {
+/* ── Outer Monitor Chassis Bezel Frame ── */
+.pc-monitor-bezel-frame {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  max-height: calc(100% - 36px);
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(180deg, #1c1d22 0%, #0d0e11 100%);
+  border-radius: 26px; /* Smooth curved corners on all 4 corners! */
+  padding: 10px 12px 14px 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    0 22px 50px rgba(0, 0, 0, 0.28),
+    0 6px 16px rgba(0, 0, 0, 0.16),
+    inset 0 1px 1px rgba(255, 255, 255, 0.22),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.85);
+  transition: all 0.2s ease;
+}
+
+/* ── Active Display Screen (Nested precisely within bezel) ── */
+.pc-monitor-screen-display {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  border-radius: 18px; /* Smooth curves on bottom-left and bottom-right matching bezel! */
+  overflow: hidden;
+  background: #000000;
+  box-shadow: 
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 2px 5px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+}
+
+/* Fullscreen Mode Display Screen Expansion */
+.pc-monitor-screen-display.is-fullscreen-mount {
   position: fixed !important;
   inset: 0 !important;
   top: 0 !important;
@@ -121,67 +130,34 @@
   border-radius: 0 !important;
   z-index: 99999 !important;
   box-shadow: none !important;
+  background: #000000 !important;
 }
 
-/* ── Floating Translucent Screen Controls (Icon-only, slightly opaque, no text) ── */
-.btn-screen-fullscreen-pill {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: rgba(15, 23, 42, 0.68);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 25;
-  opacity: 0.75;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  padding: 0;
+/* ── Monitor Stand Neck ── */
+.pc-monitor-stand-neck {
+  width: 68px;
+  height: 20px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #15161a 0%, #0c0d10 100%);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    0 3px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 2px 2px 0 0;
+  z-index: 1;
 }
 
-.btn-screen-fullscreen-pill:hover {
-  opacity: 1;
-  background: rgba(15, 23, 42, 0.92);
-  border-color: rgba(255, 255, 255, 0.45);
-  transform: scale(1.08);
-}
-
-.btn-screen-camera-pill {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: rgba(15, 23, 42, 0.68);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 25;
-  opacity: 0.75;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  padding: 0;
-}
-
-.btn-screen-camera-pill:hover {
-  opacity: 1;
-  background: rgba(15, 23, 42, 0.92);
-  border-color: rgba(255, 255, 255, 0.45);
-  transform: scale(1.08);
+/* ── Monitor Stand Base (Smooth curved pedestal with soft shadow onto white desk) ── */
+.pc-monitor-stand-base {
+  width: 260px;
+  height: 16px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #22242a 0%, #111215 100%);
+  border-radius: 8px 8px 10px 10px; /* Smooth curves, NO sharp edges! */
+  box-shadow: 
+    0 12px 28px rgba(0, 0, 0, 0.28),
+    0 2px 6px rgba(0, 0, 0, 0.16),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.24);
+  z-index: 2;
 }
 
 /* ── Sandboxed Game Mount Point ── */
@@ -191,6 +167,7 @@
   background: #000000;
   position: relative;
   overflow: hidden;
+  border-radius: inherit;
 }
 
 .game-iframe-mount-point iframe,
@@ -200,158 +177,37 @@
   border: none !important;
   display: block !important;
   outline: none !important;
+  border-radius: inherit !important;
 }
 
-/* ── Docked Monitor Controls Bar (Bottom Base of Monitor) ── */
-.cogether-monitor-dock-bar {
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 6px 18px;
-  border-radius: 9999px;
-  background: rgba(18, 20, 26, 0.88);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  width: fit-content;
-  max-width: 96%;
-  z-index: 10;
-  box-sizing: border-box;
-}
-
-.dock-left-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.dock-thumbnail {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  overflow: hidden;
-  background: #232733;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.dock-thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.dock-thumb-text {
-  font-size: 10px;
-  font-weight: 800;
-  color: #ffe500;
-}
-
-.dock-titles {
-  display: flex;
-  flex-direction: column;
-}
-
-.dock-title {
-  font-size: 13px;
-  font-weight: 800;
+/* ── Floating Translucent Screen Fullscreen Control (Image 2 style) ── */
+.btn-screen-fullscreen-pill {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #0284c7;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   color: #ffffff;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-}
-
-.dock-category {
-  font-size: 10px;
-  font-weight: 600;
-  color: #8e95a5;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.dock-actions-cluster {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-monitor-dock-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-monitor-dock-action:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
-}
-
-.btn-camera-toggle-action {
-  background: rgba(0, 113, 227, 0.25);
-  border-color: rgba(56, 152, 236, 0.4);
-  color: #64b5f6;
-}
-
-.btn-camera-toggle-action:hover {
-  background: rgba(0, 113, 227, 0.45);
-  color: #ffffff;
-}
-
-.btn-fullscreen-action {
-  background: #ffe500;
-  border-color: #ffd60a;
-  color: #111111;
-  box-shadow: 0 2px 10px rgba(255, 229, 0, 0.35);
-}
-
-.btn-fullscreen-action:hover {
-  background: #ffd60a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(255, 229, 0, 0.5);
-}
-
-.dock-divider {
-  width: 1px;
-  height: 16px;
-  background: rgba(255, 255, 255, 0.15);
-  margin: 0 4px;
-}
-
-.btn-dock-action-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  z-index: 25;
+  opacity: 0.9;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  padding: 0;
 }
 
-.btn-dock-action-icon:hover {
-  background: rgba(255, 255, 255, 0.16);
-  transform: translateY(-1px);
-}
-
-.btn-dock-action-icon.is-liked {
-  background: rgba(225, 29, 72, 0.2);
-  border-color: rgba(225, 29, 72, 0.4);
+.btn-screen-fullscreen-pill:hover {
+  opacity: 1;
+  background: #0369a1;
+  transform: scale(1.06);
 }
 
 /* ── Floating Exit Fullscreen Control ── */
@@ -392,6 +248,7 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
+  border-radius: inherit;
 }
 
 .loading-card-arcade {
@@ -477,6 +334,7 @@
   align-items: center;
   justify-content: center;
   z-index: 20;
+  border-radius: inherit;
 }
 
 .countdown-number-bounce {
@@ -512,6 +370,7 @@
   padding: 32px;
   text-align: center;
   z-index: 15;
+  border-radius: inherit;
 }
 
 .error-headline {

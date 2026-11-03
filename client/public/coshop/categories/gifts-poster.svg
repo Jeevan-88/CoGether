@@ -1,0 +1,40 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="giftBg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#739F20"/>
+      <stop offset="100%" stop-color="#4E7012"/>
+    </linearGradient>
+    <linearGradient id="boxGrad" x1="0" y1="0" x2="160" y2="160" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E8F2D5"/>
+    </linearGradient>
+    <linearGradient id="ribbonGrad" x1="0" y1="0" x2="160" y2="160" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="128" cy="128" r="124" fill="url(#giftBg)" stroke="#8DB835" stroke-width="4"/>
+
+  <!-- 3D Gift Box -->
+  <!-- Box Base -->
+  <rect x="64" y="104" width="128" height="96" rx="12" fill="url(#boxGrad)"/>
+  
+  <!-- Vertical Ribbon -->
+  <rect x="114" y="104" width="28" height="96" fill="url(#ribbonGrad)"/>
+  <!-- Horizontal Ribbon -->
+  <rect x="64" y="142" width="128" height="20" fill="url(#ribbonGrad)"/>
+
+  <!-- Box Lid -->
+  <rect x="56" y="88" width="144" height="24" rx="8" fill="#F4F9EB"/>
+  <rect x="112" y="88" width="32" height="24" fill="url(#ribbonGrad)"/>
+
+  <!-- Bow on Top -->
+  <!-- Left Loop -->
+  <path d="M128 90 C108 50, 70 56, 88 84 C100 98, 122 92, 128 90 Z" fill="url(#ribbonGrad)"/>
+  <!-- Right Loop -->
+  <path d="M128 90 C148 50, 186 56, 168 84 C156 98, 134 92, 128 90 Z" fill="url(#ribbonGrad)"/>
+  <!-- Center Knot -->
+  <circle cx="128" cy="89" r="11" fill="#FEF08A"/>
+</svg>

@@ -1,42 +1,37 @@
 /* ══════════════════════════════════════════════════════════════════════
-   FILTERSIDEBAR.CSS
-   Dynamic Facet Filter Sidebar for CoShop
+   FILTERSIDEBAR.CSS — CoShop Filter Sidebar
+   Slide-out Pure White Drawer with 28px Radius & 9999px Pills
    ══════════════════════════════════════════════════════════════════════ */
 
 .coshop-filter-sidebar {
-  width: 250px;
-  background: #0d0d14;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  position: fixed;
+  top: 60px;
+  right: -360px;
+  bottom: 24px;
+  width: 320px;
+  background-color: #ffffff;
+  border-radius: 28px 0 0 28px;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 4px 24px 0px;
+  border: 1px solid #ebebeb;
+  border-right: none;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  user-select: none;
+  z-index: 1000;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'GT Standard', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
 }
 
-/* Mobile drawer behavior */
-@media (max-width: 900px) {
-  .coshop-filter-sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: -100%;
-    width: 280px;
-    z-index: 9999;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
-    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .coshop-filter-sidebar.is-open-mobile {
-    left: 0;
-  }
+.coshop-filter-sidebar.is-open-mobile {
+  right: 0;
 }
 
 /* Header */
 .filter-header-row {
-  height: 44px;
-  padding: 0 14px;
-  background: #13131c;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  height: 56px;
+  padding: 0 20px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ebebeb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -45,12 +40,15 @@
 .filter-title-group {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-family: 'Barlow', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: #FFE500;
-  letter-spacing: 0.8px;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  letter-spacing: -0.014em;
+}
+
+.filter-title-group .filter-icon {
+  color: #739f20;
 }
 
 .filter-actions-right {
@@ -61,85 +59,85 @@
 
 .btn-reset-filters {
   background: transparent;
-  border: none;
-  color: #94a3b8;
-  font-family: 'Barlow', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
+  border: 1px solid #ebebeb;
+  color: #787574;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.017em;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 3px;
-  padding: 2px 6px;
-  border-radius: 3px;
-  transition: all 0.15s ease;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  transition: all 0.16s ease;
 }
 
 .btn-reset-filters:hover {
-  color: #FFE500;
-  background: rgba(255, 229, 0, 0.1);
+  color: #000000;
+  border-color: #000000;
 }
 
 .btn-close-filter-mobile {
-  display: none;
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: #787574;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.15s ease;
 }
 
-@media (max-width: 900px) {
-  .btn-close-filter-mobile {
-    display: flex;
-  }
+.btn-close-filter-mobile:hover {
+  background-color: #f2f4f5;
+  color: #000000;
 }
 
-/* Sections */
+/* Scrollable Content */
 .filter-scrollable-sections {
   flex: 1;
   overflow-y: auto;
-  padding: 14px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
 }
 
 .filter-group-block {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .filter-group-title {
-  font-family: 'Barlow', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  color: #000000;
+  letter-spacing: -0.017em;
+  text-transform: capitalize;
 }
 
 /* Checkboxes */
 .filter-checkbox-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .filter-checkbox-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
-  font-family: 'Barlow', sans-serif;
-  font-size: 12px;
-  color: #cbd5e1;
-  padding: 3px 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: #000000;
+  letter-spacing: -0.017em;
+  padding: 2px 0;
   transition: color 0.15s ease;
-}
-
-.filter-checkbox-item:hover {
-  color: #ffffff;
 }
 
 .filter-checkbox-item input {
@@ -147,21 +145,21 @@
 }
 
 .custom-check-box {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: #1a1a24;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #000000;
+  color: #ffffff;
   transition: all 0.15s ease;
 }
 
 .filter-checkbox-item input:checked + .custom-check-box {
-  background: #FFE500;
-  border-color: #FFE500;
+  background: #739f20;
+  border-color: #739f20;
 }
 
 .checkbox-label-text {
@@ -170,114 +168,114 @@
 
 .facet-count-badge {
   font-size: 10px;
-  color: #64748b;
-  background: rgba(255, 255, 255, 0.04);
-  padding: 1px 5px;
-  border-radius: 10px;
+  color: #787574;
+  background: #f2f4f5;
+  padding: 2px 6px;
+  border-radius: 9999px;
 }
 
-/* Price Presets */
+/* Price Presets (9999px pills) */
 .filter-radio-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .price-preset-pill {
-  background: #14141e;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-  font-family: 'Barlow', sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 5px 10px;
-  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  color: #000000;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.017em;
+  padding: 8px 14px;
+  border-radius: 9999px;
   text-align: left;
   cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 2px 4px 0px;
   transition: all 0.15s ease;
 }
 
 .price-preset-pill:hover {
-  border-color: rgba(255, 229, 0, 0.4);
-  color: #ffffff;
+  border-color: #000000;
 }
 
 .price-preset-pill.active {
-  background: rgba(255, 229, 0, 0.15);
-  border-color: #FFE500;
-  color: #FFE500;
-  font-weight: 700;
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+  font-weight: 500;
 }
 
-/* Brands */
+/* Brands (9999px pills) */
 .filter-brands-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .brand-chip-btn {
-  background: #14141e;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
-  font-family: 'Barlow', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 3px;
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  color: #000000;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.017em;
+  padding: 5px 12px;
+  border-radius: 9999px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 2px 4px 0px;
   transition: all 0.15s ease;
 }
 
 .brand-chip-btn:hover {
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: #000000;
 }
 
 .brand-chip-btn.active {
-  background: #FFE500;
-  color: #000000;
-  border-color: #FFE500;
-  font-weight: 700;
+  background: #739f20;
+  color: #ffffff;
+  border-color: #739f20;
 }
 
 .brand-count {
   font-size: 9px;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 /* Ratings */
 .rating-filter-options {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .btn-rating-filter {
-  background: #14141e;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-  font-family: 'Barlow', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  color: #000000;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.017em;
+  padding: 8px 14px;
+  border-radius: 9999px;
   display: flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 2px 4px 0px;
   transition: all 0.15s ease;
 }
 
 .btn-rating-filter:hover {
-  border-color: rgba(255, 229, 0, 0.4);
+  border-color: #000000;
 }
 
 .btn-rating-filter.active {
-  background: rgba(255, 229, 0, 0.15);
-  border-color: #FFE500;
-  color: #FFE500;
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
 }

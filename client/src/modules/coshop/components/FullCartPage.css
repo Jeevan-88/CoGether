@@ -1,0 +1,382 @@
+/* ══════════════════════════════════════════════════════════════════════
+   FULLCARTPAGE.CSS — Pixel-Accurate Multi-Store Cart Page Matching Screenshot 5
+   - Heading: "Your cart"
+   - Left Column: Store Grouped Cart Cards (LSKD, Unbound Merino) with Green Buttons
+   - Right Column: "You might also like" Recommendation Card
+   ══════════════════════════════════════════════════════════════════════ */
+
+.coshop-full-cart-page {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 32px 24px 140px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.coshop-cart-main-heading {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111111;
+  margin: 0;
+  text-align: center;
+}
+
+.coshop-cart-grid-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .coshop-cart-grid-layout {
+    flex-direction: column;
+  }
+}
+
+/* ── LEFT COLUMN: STORE CARDS ── */
+.coshop-cart-stores-col {
+  flex: 1.45;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.coshop-store-cart-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px 28px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Store Header */
+.coshop-store-cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f2f4;
+}
+
+.coshop-store-brand-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.coshop-store-badge-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #111111;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coshop-store-badge-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.coshop-store-title-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.coshop-store-rating-text {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.coshop-store-menu-btn {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Item Row */
+.coshop-store-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.coshop-cart-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.coshop-cart-item-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: #f1f2f4;
+  flex-shrink: 0;
+}
+
+.coshop-cart-item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coshop-cart-item-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.coshop-cart-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.coshop-cart-item-unit-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+  white-space: nowrap;
+}
+
+.coshop-cart-item-variant {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.coshop-cart-item-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.coshop-cart-qty-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #f1f2f4;
+  border-radius: 9999px;
+  padding: 4px 10px;
+}
+
+.coshop-cart-counter-btn {
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111111;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
+}
+
+.coshop-cart-counter-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111111;
+  min-width: 14px;
+  text-align: center;
+}
+
+.coshop-cart-save-later-btn {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  text-decoration: underline;
+}
+
+.coshop-cart-save-later-btn:hover {
+  color: #111111;
+}
+
+/* Card Footer: Subtotal & Green Checkout */
+.coshop-store-cart-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f2f4;
+}
+
+.coshop-store-subtotal-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.coshop-store-subtotal-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111111;
+}
+
+.coshop-store-subtotal-price {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111111;
+}
+
+.coshop-store-checkout-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 9999px;
+  background: var(--color-brand-green, #739f20);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(115, 159, 32, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.coshop-store-checkout-btn:hover {
+  background: var(--color-green-hover, #5f8616);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(115, 159, 32, 0.45);
+}
+
+/* ── RIGHT COLUMN: "YOU MIGHT ALSO LIKE" ── */
+.coshop-cart-recom-col {
+  flex: 1;
+}
+
+.coshop-recom-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px 28px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.coshop-recom-card-title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #111111;
+  margin: 0;
+}
+
+.coshop-recom-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.coshop-recom-item-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.coshop-recom-thumb-img {
+  width: 44px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f1f2f4;
+  flex-shrink: 0;
+}
+
+.coshop-recom-meta-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.coshop-recom-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coshop-recom-variant-label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.coshop-recom-action-row {
+  margin-top: 4px;
+}
+
+.coshop-recom-add-btn {
+  background: #f1f2f4;
+  border: none;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #111111;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.coshop-recom-add-btn:hover {
+  background: #e2e8f0;
+}
+
+.coshop-recom-add-btn.added {
+  background: var(--color-green-soft, #f1f7e6);
+  color: var(--color-brand-green, #739f20);
+}
+
+.coshop-recom-price-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.coshop-recom-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.coshop-recom-orig-price {
+  font-size: 11px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}

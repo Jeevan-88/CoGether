@@ -52,9 +52,11 @@ export function parseCurrentRoute() {
   const pathname = window.location.pathname;
 
   let tab = 'home';
-  const modeParam = params.get('mode');
+  const modeParam = params.get('mode') || params.get('tab');
   if (modeParam && MODE_TO_TAB[modeParam.toLowerCase()]) {
     tab = MODE_TO_TAB[modeParam.toLowerCase()];
+  } else if (modeParam && ['cinemaHub', 'gamesHub', 'coshop', 'studyHub', 'home'].includes(modeParam)) {
+    tab = modeParam;
   }
 
   // Invite token in path /invite/<token>

@@ -21,3 +21,30 @@ scripts/
 
 *.blend*
 
+# Terraform Local State & Binary Plugins
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+*.plan
+*.tfplan
+*.tfplan.*
+*plan_output.txt
+*show_plan.txt
+crash.log
+
+# Scratch Data & Root Test Helpers
+archive_resolved.json
+archive_tested.json
+test_*.cjs
+gen_badge.py
+
+# Secrets, Keys & Certificates
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+

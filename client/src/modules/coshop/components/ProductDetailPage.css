@@ -1,0 +1,684 @@
+/* ══════════════════════════════════════════════════════════════════════
+   PRODUCTDETAILPAGE.CSS — Pixel-Accurate PDP Matching Screenshot 1 & 2
+   - Vertical Thumbs Left | Large Center Hero Image | Right Details Column
+   - Curved Square Fly-To-Cart Animation
+   - Below Product: Editorial Catalog Grid with Discounts & Cards
+   ══════════════════════════════════════════════════════════════════════ */
+
+.coshop-pdp-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 24px 120px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  position: relative;
+}
+
+/* ── FLYING CURVED SQUARE ANIMATION TO LEFT SIDEBAR CART (SCREENSHOT 3) ── */
+.coshop-fly-curved-square {
+  position: fixed;
+  top: 42%;
+  left: 38%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  border-radius: 22px;
+  background: #d6d9dc;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  padding: 6px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+  animation: flyCurvedSquareToCart 0.82s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.coshop-fly-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+@keyframes flyCurvedSquareToCart {
+  0% {
+    top: 42%;
+    left: 38%;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+    border-radius: 22px;
+  }
+  30% {
+    top: 32%;
+    left: 25%;
+    transform: translate(-50%, -50%) scale(0.75) rotate(-3deg);
+    opacity: 0.95;
+    border-radius: 20px;
+  }
+  70% {
+    top: 24%;
+    left: 10%;
+    transform: translate(-50%, -50%) scale(0.4) rotate(-6deg);
+    opacity: 0.88;
+    border-radius: 16px;
+  }
+  100% {
+    top: 250px;
+    left: 48px;
+    transform: translate(-50%, -50%) scale(0.18) rotate(-10deg);
+    opacity: 0;
+    border-radius: 50%;
+  }
+}
+
+/* ── TOP PRODUCT SECTION ── */
+.coshop-pdp-main-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .coshop-pdp-main-row {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* 1. Left Vertical Thumbnails Strip */
+.coshop-pdp-thumbs-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .coshop-pdp-thumbs-strip {
+    flex-direction: row;
+    order: 2;
+  }
+}
+
+.coshop-pdp-thumb-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: #f1f2f4;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coshop-pdp-thumb-btn:hover {
+  border-color: #94a3b8;
+  transform: scale(1.04);
+}
+
+.coshop-pdp-thumb-btn.active {
+  border-color: #111111;
+  box-shadow: 0 0 0 1px #111111;
+}
+
+.coshop-pdp-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 2. Center Large Hero Image */
+.coshop-pdp-hero-image-wrap {
+  width: 440px;
+  height: 540px;
+  border-radius: 28px;
+  background: #eef0f2;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 768px) {
+  .coshop-pdp-hero-image-wrap {
+    width: 100%;
+    max-width: 360px;
+    height: 440px;
+  }
+}
+
+.coshop-pdp-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.2s ease;
+}
+
+.coshop-pdp-arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111111;
+  transition: transform 0.18s ease, background 0.18s ease;
+  z-index: 10;
+}
+
+.coshop-pdp-arrow-btn:hover {
+  background: #ffffff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.coshop-pdp-arrow-btn.prev {
+  left: 14px;
+}
+
+.coshop-pdp-arrow-btn.next {
+  right: 14px;
+}
+
+/* 3. Right Details Column */
+.coshop-pdp-details-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding-left: 20px;
+}
+
+@media (max-width: 1024px) {
+  .coshop-pdp-details-col {
+    padding-left: 0;
+    width: 100%;
+    max-width: 480px;
+  }
+}
+
+/* Store Badge Row */
+.coshop-pdp-store-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coshop-pdp-store-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coshop-pdp-store-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #111111;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -0.02em;
+}
+
+.coshop-pdp-store-info {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.coshop-pdp-store-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.coshop-pdp-store-rating {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.coshop-pdp-more-btn {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Product Title */
+.coshop-pdp-title {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: #111111;
+  margin: 0;
+}
+
+/* Reviews Row */
+.coshop-pdp-ratings-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coshop-pdp-stars {
+  color: #111111;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+.coshop-pdp-rating-count {
+  font-size: 12px;
+  color: #6b7280;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Price Row */
+.coshop-pdp-price-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.coshop-pdp-current-price {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111111;
+}
+
+.coshop-pdp-original-price {
+  font-size: 15px;
+  color: #9ca3af;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.coshop-pdp-discount-badge {
+  background: #111111;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  letter-spacing: -0.01em;
+}
+
+/* Option Block (Colour, Size, Qty) */
+.coshop-pdp-option-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coshop-pdp-option-label {
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.coshop-pdp-option-label strong {
+  color: #111111;
+}
+
+.coshop-pdp-swatch-ring {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid #111111;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.coshop-pdp-swatch-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Size Pills Row */
+.coshop-pdp-size-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.coshop-pdp-size-pill {
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f1f2f4;
+  border: 1px solid transparent;
+  color: #111111;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coshop-pdp-size-pill:hover {
+  background: #e2e8f0;
+}
+
+.coshop-pdp-size-pill.active {
+  background: #111111;
+  color: #ffffff;
+}
+
+/* Quantity Pill */
+.coshop-pdp-qty-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: #f1f2f4;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  width: fit-content;
+}
+
+.coshop-pdp-qty-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111111;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.coshop-pdp-qty-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* Primary Actions: Green Add To Cart & Black Buy Now */
+.coshop-pdp-actions-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.coshop-pdp-add-cart-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 9999px;
+  background: var(--color-brand-green, #739f20);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(115, 159, 32, 0.38);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.coshop-pdp-add-cart-btn:hover {
+  background: var(--color-green-hover, #5f8616);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(115, 159, 32, 0.45);
+}
+
+.coshop-pdp-add-cart-btn.is-added {
+  background: #466710;
+  box-shadow: 0 4px 14px rgba(70, 103, 16, 0.4);
+}
+
+.coshop-pdp-buy-now-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 9999px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.coshop-pdp-buy-now-btn:hover {
+  background: #000000;
+  transform: translateY(-1px);
+}
+
+/* Secondary Save & Share */
+.coshop-pdp-share-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.coshop-pdp-tool-btn {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  padding: 8px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111111;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.coshop-pdp-tool-btn:hover {
+  border-color: #111111;
+}
+
+.coshop-pdp-tool-btn.active {
+  color: var(--color-brand-green, #739f20);
+  border-color: var(--color-brand-green, #739f20);
+}
+
+/* ── BELOW PRODUCT: EDITORIAL CATALOG GRID (SCREENSHOT 2) ── */
+.coshop-pdp-catalog-section {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.coshop-pdp-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .coshop-pdp-catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .coshop-pdp-catalog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Editorial Hero Card */
+.coshop-pdp-ed-card {
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  height: 280px;
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.coshop-pdp-ed-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.coshop-pdp-ed-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coshop-pdp-ed-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
+  color: #ffffff;
+}
+
+.coshop-pdp-ed-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.015em;
+}
+
+.coshop-pdp-ed-subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Product Card in Catalog */
+.coshop-pdp-product-card {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+}
+
+.coshop-pdp-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.coshop-pdp-card-img-wrap {
+  width: 100%;
+  height: 200px;
+  background: #f1f2f4;
+  position: relative;
+  overflow: hidden;
+}
+
+.coshop-pdp-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #df3b34;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  z-index: 5;
+}
+
+.coshop-pdp-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.coshop-pdp-product-card:hover .coshop-pdp-card-img {
+  transform: scale(1.05);
+}
+
+.coshop-pdp-card-info {
+  padding: 12px 14px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coshop-pdp-card-brand {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.coshop-pdp-card-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coshop-pdp-card-stars {
+  font-size: 11px;
+  color: #111111;
+}
+
+.coshop-pdp-card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.coshop-pdp-card-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.coshop-pdp-card-orig {
+  font-size: 12px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}

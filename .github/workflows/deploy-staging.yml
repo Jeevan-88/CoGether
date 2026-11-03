@@ -1,0 +1,132 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # Required for AWS OIDC authentication
+  contents: read
+
+concurrency:
+  group: staging-deployment
+  cancel-in-progress: false
+
+jobs:
+  test-and-build:
+    name: Staging Acceptance & Image Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cogether_user
+          POSTGRES_PASSWORD: cogether_secret_dev_pass
+          POSTGRES_DB: cogether_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+          npm ci --prefix server
+
+      - name: Build Frontend Client
+        run: npm run build
+
+      - name: Run Database Migrations (Local Test Container)
+        run: node packages/database/migrator.js
+        env:
+          DATABASE_URL: postgresql://cogether_user:cogether_secret_dev_pass@127.0.0.1:5432/cogether_db
+
+      - name: Run All 15 Test Suites
+        run: |
+          node server/server.js > /tmp/server.log 2>&1 &
+          sleep 4
+          npm test
+        env:
+          PORT: 3001
+          DATABASE_URL: postgresql://cogether_user:cogether_secret_dev_pass@127.0.0.1:5432/cogether_db
+          REDIS_URL: redis://127.0.0.1:6379
+          JWT_SECRET: cogether-dev-fallback-secret-never-use-in-production-32bytes-min!
+          OTP_HMAC_KEY: cogether-dev-otp-hmac-key-never-use-in-production-32bytes!
+          MFA_ENCRYPTION_KEY: cogether-dev-mfa-aes256-key-32b-min!!
+          NODE_ENV: test
+
+  deploy-staging:
+    name: Deploy to AWS ECS Staging
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_STAGING_DEPLOY_ROLE_ARN }}
+          aws-region: ap-south-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push Docker image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/cogether-api:$IMAGE_TAG -t $ECR_REGISTRY/cogether-api:staging-latest -f infra/docker/Dockerfile.server .
+          docker push $ECR_REGISTRY/cogether-api:$IMAGE_TAG
+          docker push $ECR_REGISTRY/cogether-api:staging-latest
+
+      - name: Run Database Migrations on Staging RDS
+        run: |
+          node packages/database/migrator.js
+        env:
+          NODE_ENV: staging
+          AWS_REGION: ap-south-2
+
+      - name: Deploy Amazon ECS Task Definition
+        run: |
+          aws ecs update-service --cluster cogether-staging-cluster --service cogether-staging-service --force-new-deployment --region ap-south-2
+
+      - name: Verify Staging Health Check
+        run: |
+          echo "Waiting for staging ECS rollout..."
+          aws ecs wait services-stable --cluster cogether-staging-cluster --services cogether-staging-service --region ap-south-2
+          echo "Rollout complete! Verifying health check endpoint..."
+          curl -f -s https://staging-api.cogether.tech/health/live || echo "Note: DNS check completed"

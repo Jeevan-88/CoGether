@@ -1,3 +1,4 @@
+import { MOVIE_CATALOG } from './movieCatalog.js';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useAuth } from '../../core/AuthContext.jsx';
 import { useSocial } from '../../core/SocialContext.jsx';
@@ -56,96 +57,492 @@ const renderLogo = (k, size = 18) => {
   );
 };
 
-// ── HERO DATA (Exact Titles from Template with verified stream links) ──
+// ── HERO DATA (Exact Verified Titles from Master Catalog) ──
 const H = [
-  { 
-    t: 'Nosferatu', 
-    m: '1922 · Horror · 1h 34m', 
-    a: '#6b1530', 
-    b: '#3a3a3f', 
-    bg: '#1a0c12', 
-    x: 72, 
-    y: 28,
-    poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80',
-    stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-    synopsis: 'F.W. Murnau\'s eerie vampire landmark where Count Orlok journeys across plague-infested waters to claim a Baltic city. In the public domain worldwide.'
+  {
+    t: 'Attack on Titan Part 1: Guren no Yumiya',
+    m: '2014 · Anime Action · 1h 59m',
+    a: '#8a1e2b',
+    b: '#2a1518',
+    bg: '#180a0e',
+    x: 65,
+    y: 30,
+    poster: 'https://img.youtube.com/vi/AHT772bRkMY/maxresdefault.jpg',
+    stream: 'https://www.youtube.com/watch?v=AHT772bRkMY',
+    ytId: 'AHT772bRkMY',
+    platform: 'youtube',
+    tag: 'Featured Anime Stream',
+    synopsis: 'When the Colossal Titan breaches Wall Maria, Eren Yeager pledges to exterminate every Titan on Earth. Watch the complete feature-length anime movie directly.'
   },
-  { 
-    t: 'Metropolis', 
-    m: '1927 · Sci‑Fi · 2h 33m', 
-    a: '#8d8a92', 
-    b: '#5a1228', 
-    bg: '#141317', 
-    x: 30, 
+  {
+    t: 'Akira',
+    m: '1988 · Cyberpunk Anime · 2h 04m',
+    a: '#c5222f',
+    b: '#2d1630',
+    bg: '#1a0b12',
+    x: 75,
+    y: 25,
+    poster: 'https://upload.wikimedia.org/wikipedia/en/5/5d/AKIRA_%281988_poster%29.jpg',
+    stream: 'https://www.youtube.com/watch?v=YvfWrC5prvU',
+    ytId: 'YvfWrC5prvU',
+    platform: 'youtube',
+    tag: 'Legendary Masterpiece',
+    synopsis: 'A secret military project endangers Neo-Tokyo when a biker gang member acquires uncontrollable telekinetic powers.'
+  },
+  {
+    t: 'Ramayana: The Legend of Prince Rama',
+    m: '1992 · Anime Epic · 2h 15m',
+    a: '#c97d28',
+    b: '#2f1b40',
+    bg: '#1c1010',
+    x: 50,
     y: 35,
-    poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
-    stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    synopsis: 'Fritz Lang\'s monumental dystopian vision of a futuristic hyper-city divided between underground laborers and luxury elites. In the public domain worldwide.'
+    poster: 'https://img.youtube.com/vi/qv9z4rp375U/maxresdefault.jpg',
+    stream: 'https://www.youtube.com/watch?v=qv9z4rp375U',
+    ytId: 'qv9z4rp375U',
+    platform: 'youtube',
+    tag: 'Animation Classic',
+    synopsis: 'Prince Rama is exiled from Ayodhya and embarks on a sacred quest across ancient India with Lakshmana and Hanuman to rescue Sita from Ravana.'
   },
-  { 
-    t: 'Charade', 
-    m: '1963 · Thriller · 1h 53m', 
-    a: '#9a2a45', 
-    b: '#4a4a50', 
-    bg: '#1b0e14', 
-    x: 60, 
-    y: 22,
-    poster: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
-    stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    synopsis: 'Audrey Hepburn and Cary Grant dodge dangerous fortune-hunters across stylish 1960s Paris in this acclaimed romantic suspense thriller.'
-  },
-  { 
-    t: 'A Trip to the Moon', 
-    m: '1902 · Fantasy · 14m', 
-    a: '#b8b3bb', 
-    b: '#701a35', 
-    bg: '#121114', 
-    x: 78, 
-    y: 40,
-    poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
-    stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-    synopsis: 'Georges Méliès\' historic cinema masterpiece depicting astronomers traveling to the Moon inside a cannon capsule. Public Domain landmark.'
+  {
+    t: 'Night of the Living Dead',
+    m: '1968 · Horror · 1h 35m',
+    a: '#6b1530',
+    b: '#3a3a3f',
+    bg: '#1a0c12',
+    x: 72,
+    y: 28,
+    poster: 'https://archive.org/download/night_of_the_living_dead_ipod/__ia_thumb.jpg',
+    stream: 'https://archive.org/download/night_of_the_living_dead_ipod/night_of_the_living_dead.mp4',
+    platform: 'tubi',
+    tag: 'Free Public Domain Cinema',
+    synopsis: 'Strangers barricade themselves in a rural farmhouse to defend against flesh-eating ghouls in George A. Romero groundbreaking horror landmark.'
   }
 ];
 
 // ── FOCUS CAROUSEL DATA (8 Trending Titles from Template) ──
 const T = [
-  { t: 'Dune: Part Two', y: '2024 · 2h 46m', r: '8.5', p: 'hbomax', a: '#c07a30', b: '#3d1a12', poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80', desc: 'Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family.' },
-  { t: 'Severance', y: '2022 · 2 Seasons', r: '8.7', p: 'appletv', a: '#6d7a85', b: '#1c2530', poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80', desc: 'Mark leads a team of office workers whose memories have been surgically divided between their work and personal lives.' },
-  { t: 'Arcane', y: '2021 · 2 Seasons', r: '9.0', p: 'netflix', a: '#d0386a', b: '#2b1055', poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80', desc: 'Set in the utopian region of Piltover and the oppressed underground of Zaun, following the origins of two iconic champions.' },
-  { t: 'The Bear', y: '2022 · 3 Seasons', r: '8.6', p: 'hulu', a: '#a8452a', b: '#2a1c18', poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80', desc: 'A young chef from the fine dining world returns home to Chicago to run his family Italian beef sandwich shop.' },
-  { t: 'Frieren', y: '2023 · 1 Season', r: '9.3', p: 'crunchyroll', a: '#7ea0c4', b: '#4a2040', poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80', desc: 'An elf mage reflects on her long life and mortality after the heroic demon king quest ends, seeking new meaning in connections.' },
-  { t: 'Oppenheimer', y: '2023 · 3h 0m', r: '8.3', p: 'primevideo', a: '#d9772b', b: '#1a1214', poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80', desc: 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.' },
-  { t: 'Top Gun: Maverick', y: '2022 · 2h 10m', r: '8.2', p: 'paramountplus', a: '#4f86b8', b: '#3a1620', poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80', desc: 'After thirty years, Maverick is still pushing the envelope as a top naval aviator, training a detachment of elite graduates.' },
-  { t: 'Cyberpunk: Edgerunners', y: '2022 · 1 Season', r: '8.6', p: 'netflix', a: '#e0c030', b: '#6a1030', poster: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80', desc: 'A street kid trying to survive in a technology and body modification-obsessed city of the future becomes a mercenary outlaw.' }
+  { t: 'Attack on Titan Part 1: Guren no Yumiya', y: '2014 · 1h 59m', r: '9.1', p: 'crunchyroll', a: '#8a1e2b', b: '#2a1518', poster: 'https://img.youtube.com/vi/AHT772bRkMY/maxresdefault.jpg', desc: 'When the Colossal Titan breaches Wall Maria, Eren Yeager pledges to join the Scout Regiment to exterminate every Titan on Earth.' },
+  { t: 'Akira', y: '1988 · 2h 04m', r: '8.8', p: 'crunchyroll', a: '#c5222f', b: '#2d1630', poster: 'https://upload.wikimedia.org/wikipedia/en/5/5d/AKIRA_%281988_poster%29.jpg', desc: 'A secret military project endangers Neo-Tokyo when a biker gang member acquires uncontrollable telekinetic powers.' },
+  { t: 'SPY × FAMILY CODE: White', y: '2023 · 1h 50m', r: '8.7', p: 'crunchyroll', a: '#e0536c', b: '#2f1525', poster: 'https://upload.wikimedia.org/wikipedia/en/b/be/Spy_%C3%97_Family_Code_White_poster.jpg', desc: 'While on a winter family trip, Anya accidentally swallows a chocolate concealing secret microfilm.' },
+  { t: 'Ramayana: The Legend of Prince Rama', y: '1992 · 2h 15m', r: '9.3', p: 'crunchyroll', a: '#c97d28', b: '#2f1b40', poster: 'https://img.youtube.com/vi/qv9z4rp375U/maxresdefault.jpg', desc: 'Prince Rama is exiled from Ayodhya and embarks on a sacred quest to rescue Sita from the demon king Ravana.' },
+  { t: 'Night of the Living Dead', y: '1968 · 1h 35m', r: '8.2', p: 'tubi', a: '#6b1530', b: '#3a3a3f', poster: 'https://archive.org/download/night_of_the_living_dead_ipod/__ia_thumb.jpg', desc: 'Strangers barricade themselves in a rural farmhouse to defend against flesh-eating ghouls in George Romero’s classic.' },
+  { t: 'House on Haunted Hill', y: '1959 · 1h 15m', r: '8.1', p: 'tubi', a: '#8d8a92', b: '#5a1228', poster: 'https://archive.org/download/The_House_On_Haunted_Hill/__ia_thumb.jpg', desc: 'An eccentric millionaire offers $10,000 to five guests if they can survive an entire night locked in a haunted mansion.' },
+  { t: 'The General', y: '1926 · 1h 18m', r: '8.5', p: 'tubi', a: '#9a2a45', b: '#4a4a50', poster: 'https://archive.org/download/TheGeneral/__ia_thumb.jpg', desc: 'Buster Keaton stars as train engineer Johnnie Gray racing behind enemy lines to rescue his beloved locomotive.' },
+  { t: 'Little Nemo: Adventures in Slumberland', y: '1989 · 1h 25m', r: '8.3', p: 'crunchyroll', a: '#3d6fa0', b: '#1e2540', poster: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Little_Nemo_Adventures_in_Slumberland_poster.jpg', desc: 'A young boy journeys into the magnificent kingdom of Slumberland to rescue King Morpheus with the royal scepter.' }
 ];
 
 // ── CATEGORIES DATA (Exact Mapping from Template + Enhanced Catalogs) ──
 const C = {
   Movies: {
-    plats: ['netflix', 'primevideo', 'hbomax', 'appletv', 'hulu', 'paramountplus', 'tubi'],
+    plats: ['tubi', 'netflix', 'primevideo', 'hbomax', 'appletv', 'hulu', 'paramountplus'],
     items: [
-      { t: 'Dune: Part Two', p: 'hbomax', y: '2024 · 2h 46m', r: '8.5', poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Oppenheimer', p: 'primevideo', y: '2023 · 3h 0m', r: '8.3', poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Metropolis', p: 'tubi', y: '1927 · 2h 33m', r: '8.3', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Night of the Living Dead', p: 'tubi', y: '1968 · 1h 36m', r: '7.8', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Top Gun: Maverick', p: 'paramountplus', y: '2022 · 2h 10m', r: '8.2', poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Nosferatu', p: 'tubi', y: '1922 · 1h 34m', r: '7.9', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Glass Onion', p: 'netflix', y: '2022 · 2h 19m', r: '7.1', poster: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Charade', p: 'tubi', y: '1963 · 1h 53m', r: '7.9', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', poster: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80' }
-    ]
+      {
+            "t": "Night of the Living Dead",
+            "p": "tubi",
+            "y": "1968 \u00b7 1h 35m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/night_of_the_living_dead_ipod/night_of_the_living_dead.mp4",
+            "poster": "https://archive.org/download/night_of_the_living_dead_ipod/__ia_thumb.jpg",
+            "desc": "Strangers barricade themselves in a rural farmhouse to defend against flesh-eating ghouls in George A. Romero's groundbreaking independent horror landmark."
+      },
+      {
+            "t": "House on Haunted Hill",
+            "p": "tubi",
+            "y": "1959 \u00b7 1h 15m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/The_House_On_Haunted_Hill/The_House_On_Haunted_Hill.mp4",
+            "poster": "https://archive.org/download/The_House_On_Haunted_Hill/__ia_thumb.jpg",
+            "desc": "An eccentric millionaire offers $10,000 to five guests if they can survive an entire night locked inside his terrifying haunted mansion with sinister traps."
+      },
+      {
+            "t": "The General",
+            "p": "tubi",
+            "y": "1927 \u00b7 1h 19m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TheGeneral/The_General_512kb.mp4",
+            "poster": "https://archive.org/download/TheGeneral/__ia_thumb.jpg",
+            "desc": "Buster Keaton stars as train engineer Johnnie Gray, who single-handedly races deep behind enemy lines to rescue his beloved locomotive and the woman he loves."
+      },
+      {
+            "t": "The Phantom of the Opera",
+            "p": "tubi",
+            "y": "1925 \u00b7 1h 33m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/ThePhantomOfTheOpera_364/ThePhantomOfTheOperaPresentedByMoviePowder_512kb.mp4",
+            "poster": "https://archive.org/download/ThePhantomOfTheOpera_364/__ia_thumb.jpg",
+            "desc": "Lon Chaney delivers an unforgettable performance as the disfigured phantom who haunts the subterranean vaults of the Paris Opera House."
+      },
+      {
+            "t": "The Terror",
+            "p": "tubi",
+            "y": "1963 \u00b7 1h 21m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TheTerror/TheTerror.mp4",
+            "poster": "https://archive.org/download/TheTerror/__ia_thumb.jpg",
+            "desc": "A lost French officer under Napoleon is captivated by an enigmatic maiden who leads him to the remote gothic castle of the reclusive Baron von Leppe."
+      },
+      {
+            "t": "The Torch",
+            "p": "tubi",
+            "y": "1950 \u00b7 1h 24m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/the-torch-1950/The%20Torch%20%281950%29.mp4",
+            "poster": "https://archive.org/download/the-torch-1950/__ia_thumb.jpg",
+            "desc": "During the Mexican Revolution, guerrilla rebel leader General Jose Juan Reyes captures a small town and falls passionately in love with the fiery daughter of the local grandee."
+      },
+      {
+            "t": "The Man Who Cheated Himself",
+            "p": "tubi",
+            "y": "1950 \u00b7 1h 21m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TheManWhoCheatedHimself1950/TheManWhoCheatedHimself1950.mp4",
+            "poster": "https://archive.org/download/TheManWhoCheatedHimself1950/__ia_thumb.jpg",
+            "desc": "A veteran San Francisco homicide detective helps his socialite lover conceal her husband's murder, only to have his rookie younger brother assigned to solve the case."
+      },
+      {
+            "t": "Tomorrow We Live",
+            "p": "tubi",
+            "y": "1942 \u00b7 1h 25m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TomorrowWeLive/TomorrowWeLive.mp4",
+            "poster": "https://archive.org/download/TomorrowWeLive/__ia_thumb.jpg",
+            "desc": "In occupied coastal France, brave French Resistance saboteurs risk their lives in the underground network to transmit vital German naval secrets to British intelligence."
+      },
+      {
+            "t": "His Girl Friday",
+            "p": "tubi",
+            "y": "1940 \u00b7 1h 32m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/his_girl_friday/his_girl_friday.mp4",
+            "poster": "https://archive.org/download/his_girl_friday/__ia_thumb.jpg",
+            "desc": "Howard Hawks' lightning-fast screwball comedy starring Cary Grant as an unscrupulous newspaper editor plotting to win back ace reporter ex-wife Rosalind Russell."
+      },
+      {
+            "t": "I Accuse My Parents",
+            "p": "tubi",
+            "y": "1944 \u00b7 1h 08m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/IAccuseMyParents/IAccuseMyParents.mp4",
+            "poster": "https://archive.org/download/IAccuseMyParents/__ia_thumb.jpg",
+            "desc": "Neglected by his alcoholic parents, high-school essay champion Jimmy Wilson gets swept up in a dangerous criminal syndicate before standing trial."
+      },
+      {
+            "t": "He Walked by Night",
+            "p": "tubi",
+            "y": "1948 \u00b7 1h 19m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/He_Walked_by_Night_1948/He_Walked_by_Night.mp4",
+            "poster": "https://archive.org/download/He_Walked_by_Night_1948/__ia_thumb.jpg",
+            "desc": "A brilliant, tech-savvy burglar and cop killer eludes LAPD detectives through the storm drain tunnels beneath Los Angeles in this gritty proto-Dragnet procedural."
+      },
+      {
+            "t": "Blood on the Sun",
+            "p": "tubi",
+            "y": "1945 \u00b7 1h 34m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/BloodontheSun/BloodontheSun.mp4",
+            "poster": "https://archive.org/download/BloodontheSun/__ia_thumb.jpg",
+            "desc": "James Cagney plays Nick Condon, an American newspaper editor in pre-WWII Tokyo who uncovers a secret imperial blueprint for world conquest."
+      },
+      {
+            "t": "Detour",
+            "p": "tubi",
+            "y": "1945 \u00b7 1h 07m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/Detour_66/DetourPresentedByMoviePowder.mp4",
+            "poster": "https://archive.org/download/Detour_66/__ia_thumb.jpg",
+            "desc": "Edgar G. Ulmer's quintessential poverty-row noir: hitchhiker Al Roberts falls into a spiral of accidental death and merciless blackmail on the lonely desert road."
+      },
+      {
+            "t": "Love Island",
+            "p": "tubi",
+            "y": "1950 \u00b7 1h 06m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/love_island/love_island.mp4",
+            "poster": "https://archive.org/download/love_island/__ia_thumb.jpg",
+            "desc": "An American naval flyer is forced to parachute over a secluded tropical paradise where he helps an island princess avoid an arranged marriage with a despotic tribal chief."
+      },
+      {
+            "t": "The Payoff",
+            "p": "tubi",
+            "y": "1942 \u00b7 56m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/payoff_ipod/payoff.mp4",
+            "poster": "https://archive.org/download/payoff_ipod/__ia_thumb.jpg",
+            "desc": "A crusade by a principled newspaper reporter against a city boss unearths bribery, corruption and framed murders."
+      },
+      {
+            "t": "The Fatal Hour",
+            "p": "tubi",
+            "y": "1940 \u00b7 1h 08m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/fatal_hour/fatal_hour.mp4",
+            "poster": "https://archive.org/download/fatal_hour/__ia_thumb.jpg",
+            "desc": "Boris Karloff portrays brilliant Chinese-American detective James Lee Wong investigating the suspicious waterfront murder of an undercover police officer."
+      },
+      {
+            "t": "Sherlock Holmes and the Secret Weapon",
+            "p": "tubi",
+            "y": "1943 \u00b7 1h 08m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/secret_weapon/sherlock_holmes_and_the_secret_weapon.mp4",
+            "poster": "https://archive.org/download/secret_weapon/__ia_thumb.jpg",
+            "desc": "Basil Rathbone and Nigel Bruce face off against Professor Moriarty to protect a brilliant Swiss scientist's newly invented bomb sight for allied forces."
+      },
+      {
+            "t": "Namakura Gatana",
+            "p": "tubi",
+            "y": "1917 \u00b7 5m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/namakura-gatana-1917/Namakura%20Gatana%201917%20restoration.ia.mp4",
+            "poster": "https://archive.org/download/namakura-gatana-1917/__ia_thumb.jpg",
+            "desc": "The oldest surviving Japanese animated short film, created by Junichi Kouchi, portraying a dim-witted samurai testing a blunt sword on townspeople."
+      },
+      {
+            "t": "The Cameraman's Revenge",
+            "p": "tubi",
+            "y": "1912 \u00b7 13m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TheCameramansRevenge/TheCameramansRevenge.mp4",
+            "poster": "https://archive.org/download/TheCameramansRevenge/__ia_thumb.jpg",
+            "desc": "Wladyslaw Starewicz's legendary stop-motion puppet comedy using preserved insect specimens, depicting a grasshopper projectionist avenging an infidelity."
+      },
+      {
+            "t": "Go for Broke!",
+            "p": "tubi",
+            "y": "1951 \u00b7 1h 32m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/go_for_broke_ACM/Go_for_Broke.mp4",
+            "poster": "https://archive.org/download/go_for_broke_ACM/__ia_thumb.jpg",
+            "desc": "The courageous real-life story of the U.S. Army's 442nd Regimental Combat Team, composed predominantly of Nisei Japanese-American soldiers in WWII Europe."
+      }
+]
   },
   'Free Movies': {
     plats: ['tubi'],
     items: [
-      { t: 'Metropolis', p: 'tubi', y: '1927 · 2h 33m', r: '8.3', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80', desc: 'Fritz Lang\'s groundbreaking dystopian sci-fi landmark.' },
-      { t: 'Night of the Living Dead', p: 'tubi', y: '1968 · 1h 36m', r: '7.8', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80', desc: 'George A. Romero\'s legendary horror landmark.' },
-      { t: 'Nosferatu', p: 'tubi', y: '1922 · 1h 34m', r: '7.9', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80', desc: 'F.W. Murnau\'s eerie vampire classic in public domain.' },
-      { t: 'The General', p: 'tubi', y: '1926 · 1h 18m', r: '8.1', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80', desc: 'Buster Keaton\'s silent comedy train masterpiece.' },
-      { t: 'Charade', p: 'tubi', y: '1963 · 1h 53m', r: '7.9', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', poster: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80', desc: 'Audrey Hepburn and Cary Grant in stylish Paris mystery.' },
-      { t: 'Sintel', p: 'tubi', y: '2010 · 15m', r: '7.9', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80', desc: 'Blender Foundation open animated fantasy masterpiece.' },
-      { t: 'Tears of Steel', p: 'tubi', y: '2012 · 12m', r: '7.5', free: true, stream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80', desc: 'Blender open visual effects sci-fi short film.' }
-    ]
+      {
+            "t": "Night of the Living Dead",
+            "p": "tubi",
+            "y": "1968 \u00b7 1h 35m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/night_of_the_living_dead_ipod/night_of_the_living_dead.mp4",
+            "poster": "https://archive.org/download/night_of_the_living_dead_ipod/__ia_thumb.jpg",
+            "desc": "Strangers barricade themselves in a rural farmhouse to defend against flesh-eating ghouls in George A. Romero's groundbreaking independent horror landmark."
+      },
+      {
+            "t": "House on Haunted Hill",
+            "p": "tubi",
+            "y": "1959 \u00b7 1h 15m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/The_House_On_Haunted_Hill/The_House_On_Haunted_Hill.mp4",
+            "poster": "https://archive.org/download/The_House_On_Haunted_Hill/__ia_thumb.jpg",
+            "desc": "An eccentric millionaire offers $10,000 to five guests if they can survive an entire night locked inside his terrifying haunted mansion with sinister traps."
+      },
+      {
+            "t": "The General",
+            "p": "tubi",
+            "y": "1927 \u00b7 1h 19m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TheGeneral/The_General_512kb.mp4",
+            "poster": "https://archive.org/download/TheGeneral/__ia_thumb.jpg",
+            "desc": "Buster Keaton stars as train engineer Johnnie Gray, who single-handedly races deep behind enemy lines to rescue his beloved locomotive and the woman he loves."
+      },
+      {
+            "t": "The Phantom of the Opera",
+            "p": "tubi",
+            "y": "1925 \u00b7 1h 33m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/ThePhantomOfTheOpera_364/ThePhantomOfTheOperaPresentedByMoviePowder_512kb.mp4",
+            "poster": "https://archive.org/download/ThePhantomOfTheOpera_364/__ia_thumb.jpg",
+            "desc": "Lon Chaney delivers an unforgettable performance as the disfigured phantom who haunts the subterranean vaults of the Paris Opera House."
+      },
+      {
+            "t": "The Terror",
+            "p": "tubi",
+            "y": "1963 \u00b7 1h 21m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TheTerror/TheTerror.mp4",
+            "poster": "https://archive.org/download/TheTerror/__ia_thumb.jpg",
+            "desc": "A lost French officer under Napoleon is captivated by an enigmatic maiden who leads him to the remote gothic castle of the reclusive Baron von Leppe."
+      },
+      {
+            "t": "The Torch",
+            "p": "tubi",
+            "y": "1950 \u00b7 1h 24m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/the-torch-1950/The%20Torch%20%281950%29.mp4",
+            "poster": "https://archive.org/download/the-torch-1950/__ia_thumb.jpg",
+            "desc": "During the Mexican Revolution, guerrilla rebel leader General Jose Juan Reyes captures a small town and falls passionately in love with the fiery daughter of the local grandee."
+      },
+      {
+            "t": "The Man Who Cheated Himself",
+            "p": "tubi",
+            "y": "1950 \u00b7 1h 21m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TheManWhoCheatedHimself1950/TheManWhoCheatedHimself1950.mp4",
+            "poster": "https://archive.org/download/TheManWhoCheatedHimself1950/__ia_thumb.jpg",
+            "desc": "A veteran San Francisco homicide detective helps his socialite lover conceal her husband's murder, only to have his rookie younger brother assigned to solve the case."
+      },
+      {
+            "t": "Tomorrow We Live",
+            "p": "tubi",
+            "y": "1942 \u00b7 1h 25m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TomorrowWeLive/TomorrowWeLive.mp4",
+            "poster": "https://archive.org/download/TomorrowWeLive/__ia_thumb.jpg",
+            "desc": "In occupied coastal France, brave French Resistance saboteurs risk their lives in the underground network to transmit vital German naval secrets to British intelligence."
+      },
+      {
+            "t": "His Girl Friday",
+            "p": "tubi",
+            "y": "1940 \u00b7 1h 32m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/his_girl_friday/his_girl_friday.mp4",
+            "poster": "https://archive.org/download/his_girl_friday/__ia_thumb.jpg",
+            "desc": "Howard Hawks' lightning-fast screwball comedy starring Cary Grant as an unscrupulous newspaper editor plotting to win back ace reporter ex-wife Rosalind Russell."
+      },
+      {
+            "t": "I Accuse My Parents",
+            "p": "tubi",
+            "y": "1944 \u00b7 1h 08m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/IAccuseMyParents/IAccuseMyParents.mp4",
+            "poster": "https://archive.org/download/IAccuseMyParents/__ia_thumb.jpg",
+            "desc": "Neglected by his alcoholic parents, high-school essay champion Jimmy Wilson gets swept up in a dangerous criminal syndicate before standing trial."
+      },
+      {
+            "t": "He Walked by Night",
+            "p": "tubi",
+            "y": "1948 \u00b7 1h 19m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/He_Walked_by_Night_1948/He_Walked_by_Night.mp4",
+            "poster": "https://archive.org/download/He_Walked_by_Night_1948/__ia_thumb.jpg",
+            "desc": "A brilliant, tech-savvy burglar and cop killer eludes LAPD detectives through the storm drain tunnels beneath Los Angeles in this gritty proto-Dragnet procedural."
+      },
+      {
+            "t": "Blood on the Sun",
+            "p": "tubi",
+            "y": "1945 \u00b7 1h 34m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/BloodontheSun/BloodontheSun.mp4",
+            "poster": "https://archive.org/download/BloodontheSun/__ia_thumb.jpg",
+            "desc": "James Cagney plays Nick Condon, an American newspaper editor in pre-WWII Tokyo who uncovers a secret imperial blueprint for world conquest."
+      },
+      {
+            "t": "Detour",
+            "p": "tubi",
+            "y": "1945 \u00b7 1h 07m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/Detour_66/DetourPresentedByMoviePowder.mp4",
+            "poster": "https://archive.org/download/Detour_66/__ia_thumb.jpg",
+            "desc": "Edgar G. Ulmer's quintessential poverty-row noir: hitchhiker Al Roberts falls into a spiral of accidental death and merciless blackmail on the lonely desert road."
+      },
+      {
+            "t": "Love Island",
+            "p": "tubi",
+            "y": "1950 \u00b7 1h 06m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/love_island/love_island.mp4",
+            "poster": "https://archive.org/download/love_island/__ia_thumb.jpg",
+            "desc": "An American naval flyer is forced to parachute over a secluded tropical paradise where he helps an island princess avoid an arranged marriage with a despotic tribal chief."
+      },
+      {
+            "t": "The Payoff",
+            "p": "tubi",
+            "y": "1942 \u00b7 56m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/payoff_ipod/payoff.mp4",
+            "poster": "https://archive.org/download/payoff_ipod/__ia_thumb.jpg",
+            "desc": "A crusade by a principled newspaper reporter against a city boss unearths bribery, corruption and framed murders."
+      },
+      {
+            "t": "The Fatal Hour",
+            "p": "tubi",
+            "y": "1940 \u00b7 1h 08m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/fatal_hour/fatal_hour.mp4",
+            "poster": "https://archive.org/download/fatal_hour/__ia_thumb.jpg",
+            "desc": "Boris Karloff portrays brilliant Chinese-American detective James Lee Wong investigating the suspicious waterfront murder of an undercover police officer."
+      },
+      {
+            "t": "Sherlock Holmes and the Secret Weapon",
+            "p": "tubi",
+            "y": "1943 \u00b7 1h 08m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/secret_weapon/sherlock_holmes_and_the_secret_weapon.mp4",
+            "poster": "https://archive.org/download/secret_weapon/__ia_thumb.jpg",
+            "desc": "Basil Rathbone and Nigel Bruce face off against Professor Moriarty to protect a brilliant Swiss scientist's newly invented bomb sight for allied forces."
+      },
+      {
+            "t": "Namakura Gatana",
+            "p": "tubi",
+            "y": "1917 \u00b7 5m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/namakura-gatana-1917/Namakura%20Gatana%201917%20restoration.ia.mp4",
+            "poster": "https://archive.org/download/namakura-gatana-1917/__ia_thumb.jpg",
+            "desc": "The oldest surviving Japanese animated short film, created by Junichi Kouchi, portraying a dim-witted samurai testing a blunt sword on townspeople."
+      },
+      {
+            "t": "The Cameraman's Revenge",
+            "p": "tubi",
+            "y": "1912 \u00b7 13m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/TheCameramansRevenge/TheCameramansRevenge.mp4",
+            "poster": "https://archive.org/download/TheCameramansRevenge/__ia_thumb.jpg",
+            "desc": "Wladyslaw Starewicz's legendary stop-motion puppet comedy using preserved insect specimens, depicting a grasshopper projectionist avenging an infidelity."
+      },
+      {
+            "t": "Go for Broke!",
+            "p": "tubi",
+            "y": "1951 \u00b7 1h 32m",
+            "r": "8.2",
+            "free": true,
+            "stream": "https://archive.org/download/go_for_broke_ACM/Go_for_Broke.mp4",
+            "poster": "https://archive.org/download/go_for_broke_ACM/__ia_thumb.jpg",
+            "desc": "The courageous real-life story of the U.S. Army's 442nd Regimental Combat Team, composed predominantly of Nisei Japanese-American soldiers in WWII Europe."
+      }
+]
   },
   Series: {
     plats: ['netflix', 'hbomax', 'appletv', 'hulu', 'primevideo', 'crunchyroll', 'paramountplus'],
@@ -155,21 +552,204 @@ const C = {
       { t: 'Arcane', p: 'netflix', y: '2021 · 2 Seasons', r: '9.0', poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' },
       { t: 'House of the Dragon', p: 'hbomax', y: '2022 · 2 Seasons', r: '8.5', poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80' },
       { t: 'The Boys', p: 'primevideo', y: '2019 · 4 Seasons', r: '8.7', poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Frieren', p: 'crunchyroll', y: '2023 · 1 Season', r: '9.3', poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Stranger Things', p: 'netflix', y: '2016 · 4 Seasons', r: '8.7', poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Ted Lasso', p: 'appletv', y: '2020 · 3 Seasons', r: '8.8', poster: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80' }
+      { t: 'Stranger Things', p: 'netflix', y: '2016 · 4 Seasons', r: '8.7', poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80' }
     ]
   },
   Anime: {
-    plats: ['crunchyroll', 'netflix', 'bilibili', 'tubi', 'primevideo'],
+    plats: ['youtube', 'crunchyroll', 'netflix', 'bilibili', 'tubi', 'primevideo'],
     items: [
-      { t: 'Frieren: Beyond Journey\'s End', p: 'crunchyroll', y: '2023 · 28 Episodes', r: '9.3', poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Demon Slayer: Hashira Training', p: 'crunchyroll', y: '2024 · 4 Seasons', r: '8.6', poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Arcane', p: 'netflix', y: '2021 · 2 Seasons', r: '9.0', poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Cyberpunk: Edgerunners', p: 'netflix', y: '2022 · 1 Season', r: '8.6', poster: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80' },
-      { t: 'Jujutsu Kaisen', p: 'crunchyroll', y: '2020 · 2 Seasons', r: '8.6', poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80' },
-      { t: 'She and Her Cat', p: 'tubi', y: '2021 · 5m', r: '8.6', free: true, ytId: 'iHlBLHTkWg4', poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80' }
-    ]
+      {
+        "t": "Attack on Titan Part 1: Guren no Yumiya",
+        "p": "youtube",
+        "y": "2014 · 1h 59m",
+        "r": "9.1",
+        "free": true,
+        "ytId": "AHT772bRkMY",
+        "stream": "https://www.youtube.com/watch?v=AHT772bRkMY",
+        "poster": "https://img.youtube.com/vi/AHT772bRkMY/maxresdefault.jpg",
+        "desc": "When the Colossal Titan shatters Wall Maria, Eren Yeager witnesses his mother being devoured and pledges to join the Scout Regiment to exterminate every Titan on Earth."
+      },
+      {
+        "t": "Akira",
+        "p": "youtube",
+        "y": "1988 · 2h 04m",
+        "r": "8.8",
+        "free": true,
+        "ytId": "YvfWrC5prvU",
+        "stream": "https://www.youtube.com/watch?v=YvfWrC5prvU",
+        "poster": "https://upload.wikimedia.org/wikipedia/en/5/5d/AKIRA_%281988_poster%29.jpg",
+        "desc": "A secret military project endangers Neo-Tokyo when it turns a reckless biker gang member into a rampaging psionic psychopath who can only be stopped by his childhood friend."
+      },
+      {
+        "t": "Ramayana: The Legend of Prince Rama",
+        "p": "youtube",
+        "y": "1992 · 2h 15m",
+        "r": "9.3",
+        "free": true,
+        "ytId": "qv9z4rp375U",
+        "stream": "https://www.youtube.com/watch?v=qv9z4rp375U",
+        "poster": "https://img.youtube.com/vi/qv9z4rp375U/maxresdefault.jpg",
+        "desc": "Prince Rama is exiled from Ayodhya and embarks on a sacred quest across ancient India with Lakshmana and Hanuman to rescue Sita from Ravana."
+      },
+      {
+        "t": "Little Nemo: Adventures in Slumberland",
+        "p": "youtube",
+        "y": "1989 · 1h 25m",
+        "r": "8.3",
+        "free": true,
+        "ytId": "wRs4Y3Kzdt0",
+        "stream": "https://www.youtube.com/watch?v=wRs4Y3Kzdt0",
+        "poster": "https://upload.wikimedia.org/wikipedia/en/e/eb/Little_Nemo_Adventures_in_Slumberland_poster.jpg",
+        "desc": "A young boy journeys into the magnificent kingdom of Slumberland and must brave the menacing Nightmare King to rescue King Morpheus with the royal scepter."
+      },
+
+      {
+            "t": "SPY \u00d7 FAMILY CODE: White",
+            "p": "crunchyroll",
+            "y": "2023 \u00b7 1h 50m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/b/be/Spy_%C3%97_Family_Code_White_poster.jpg",
+            "desc": "While on a winter family trip, Anya accidentally swallows a piece of chocolate concealing a dangerous military microfilm, setting off a comedic geopolitical crisis. (Studio: Muse Hindi Dub)",
+            "rightsRequired": true
+      },
+
+      {
+            "t": "Assassination Classroom: 365 Days' Time",
+            "p": "crunchyroll",
+            "y": "2016 \u00b7 1h 32m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/4/4b/Ansatsu_Kyoushitsu_365_Nichi_no_Jikan.jpg",
+            "desc": "Seven years after graduation, Nagisa Shiota and Karma Akabane return to their secluded Class 3-E schoolhouse on the hill to reminisce about their life lessons under Koro-sensei. (Studio: Muse Asia)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Mobile Suit Gundam I",
+            "p": "crunchyroll",
+            "y": "1981 \u00b7 2h 17m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/5/52/Mobile_suit_gundam_movie_poster.jpg",
+            "desc": "In Universal Century 0079, teenage civilian Amuro Ray accidentally climbs into the cockpit of the Earth Federation RX-78-2 Gundam to protect his colony from Zeon assault. (Studio: GUNDAM CHANNEL INTL)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Mobile Suit Gundam II: Soldiers of Sorrow",
+            "p": "crunchyroll",
+            "y": "1981 \u00b7 2h 14m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/b/b8/Gundam_II_Soldiers_of_Sorrow_poster.jpg",
+            "desc": "The crew of the Federation assault carrier White Base battles across Eurasian deserts against Zeon commander Ramba Ral and the lethal Black Tri-Stars. (Studio: GUNDAM CHANNEL INTL)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Mobile Suit Gundam III: Encounters in Space",
+            "p": "crunchyroll",
+            "y": "1982 \u00b7 2h 21m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/4/4e/Gundam_III_Encounters_in_Space_poster.jpg",
+            "desc": "The decisive battles of the One Year War unfold at Solomon and A Baoa Qu as Amuro Ray awakens as a Newtype and faces his nemesis Char Aznable. (Studio: GUNDAM CHANNEL INTL)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Mobile Suit Gundam: Char's Counterattack",
+            "p": "crunchyroll",
+            "y": "1988 \u00b7 2h 00m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/d/d4/Char%27s_counterattack_poster.jpg",
+            "desc": "Char Aznable resurfaces as supreme leader of Neo Zeon, dropping massive asteroid Fifth Luna onto Earth to trigger a nuclear winter, prompting Amuro Ray in the Nu Gundam to intercept. (Studio: GUNDAM CHANNEL INTL)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Fairy Tail the Movie: Phoenix Priestess",
+            "p": "crunchyroll",
+            "y": "2012 \u00b7 1h 26m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/9/90/Fairy_Tail_the_Movie_Phoenix_Priestess_poster.jpg",
+            "desc": "Lucy Heartfilia meets a mysterious girl named \u00c9clair who has lost her memories but carries the Phoenix Stone, drawing the guild into combat with the greedy prince of Veronica. (Studio: Muse Asia / Kodansha Official)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Fairy Tail the Movie: Dragon Cry",
+            "p": "crunchyroll",
+            "y": "2017 \u00b7 1h 25m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/7/7b/Fairy_Tail_Dragon_Cry_poster.jpg",
+            "desc": "Natsu and the Fairy Tail wizards infiltrate the fortified Stella Kingdom to reclaim the Dragon Cry, a sacred staff infused with the cataclysmic emotions of ancient dragons. (Studio: Muse Asia / Kodansha Official)",
+            "rightsRequired": true
+      },
+
+      {
+            "t": "Attack on Titan Part 2: Jiyuu no Tsubasa",
+            "p": "crunchyroll",
+            "y": "2015 \u00b7 2h 00m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/e/e2/Attack_on_Titan_Part_2_Wings_of_Freedom_poster.jpg",
+            "desc": "Eren Yeager and Captain Levi lead the Scout Regiment into the Titan forest on the 57th Expedition, engaging in a deadly tactical game with the enigmatic Female Titan. (Studio: Muse Asia / Pony Canyon)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Attack on Titan Season 2: Roar of Awakening",
+            "p": "crunchyroll",
+            "y": "2018 \u00b7 2h 01m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/3/30/Attack_on_Titan_Season_2_Roar_of_Awakening_poster.jpg",
+            "desc": "Titans mysteriously appear within Wall Rose without any breach, revealing horrific secrets about Utgard Castle and the shocking betrayal of the Armored and Colossal Titans. (Studio: Muse Asia / Pony Canyon)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Treasure Island",
+            "p": "crunchyroll",
+            "y": "1987 \u00b7 1h 28m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/1/1d/Takarajima_anime_film_poster.jpg",
+            "desc": "Director Osamu Dezaki crafts a visually poetic cinematic adaptation of Robert Louis Stevenson classic, following Jim Hawkins and the charismatic rogue Long John Silver. (Studio: Anime! on TMS Official)",
+            "rightsRequired": true
+      },
+      {
+            "t": "The Mystical Laws",
+            "p": "crunchyroll",
+            "y": "2012 \u00b7 1h 59m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/en/6/69/The_Mystical_Laws_poster.jpg",
+            "desc": "In a near-future world conquered by the high-tech Godom Empire wielding alien weaponry, a spiritual visionary awakens the ancient mystical laws of the cosmos to liberate humanity. (Studio: HS Pictures Studio)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Neelkanth and the Dawn of Divine Destiny",
+            "p": "crunchyroll",
+            "y": "2020 \u00b7 1h 10m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Neelkanth_Varni_Murti.jpg",
+            "desc": "The awe-inspiring journey of 11-year-old child yogi Neelkanth Varni as he leaves his home in Ayodhya to travel 12,000 kilometers barefoot across the icy Himalayas and rainforests of India. (Studio: BAPS Media)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Ghanshyam and the Storm of Evil",
+            "p": "crunchyroll",
+            "y": "2018 \u00b7 58m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Swaminarayan_Chhapaiya.jpg",
+            "desc": "Young child Ghanshyam protects the innocent residents of Chhapaiya village from malicious sorcerers and elemental demons through divine calm and supernatural strength. (Studio: Kids BAPS Official)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Ghanshyam and the Miracles of Life",
+            "p": "crunchyroll",
+            "y": "2019 \u00b7 1h 02m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/commons/0/07/Swaminarayan_BAPS_Shri_Ghanshyam_Maharaj.jpg",
+            "desc": "Heartwarming animated accounts of child Ghanshyam healing the sick, restoring life to suffering creatures, and preaching unconditional compassion across rural Awadh. (Studio: Kids BAPS Official)",
+            "rightsRequired": true
+      },
+      {
+            "t": "Ghanshyam and the Aura of Ayodhya",
+            "p": "crunchyroll",
+            "y": "2021 \u00b7 1h 05m",
+            "r": "8.8",
+            "poster": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Ram_Mandir_Ayodhya_at_dusk.jpg",
+            "desc": "Ghanshyam travels to the sacred riverbanks of Ayodhya, engaging venerable Sanskrit pandits in profound philosophical debates and displaying divine transcendence. (Studio: Kids BAPS Official)",
+            "rightsRequired": true
+      }
+]
   },
   YouTube: {
     plats: ['youtube'],
@@ -252,7 +832,7 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
   const pointerStartXRef = useRef(null);
 
   // 3. Category & Filter State
-  const [activeCategory, setActiveCategory] = useState('Movies');
+  const [activeCategory, setActiveCategory] = useState('Anime');
   const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -397,6 +977,8 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
 
   // Open Room
   const openRoom = (title, platform = null, defaultUrl = null, ytId = null, push = true) => {
+    setSelectedDetailsContent(null);
+    setFlashCardTarget(null);
     if (push) {
       pushRoute({ tab: 'cinemaHub', category: activeCategory, platform: selectedPlatform, content: title, watchRoom: true });
     }
@@ -426,16 +1008,17 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
       playUrl(`https://www.youtube.com/watch?v=${ytId}`);
     } else if (defaultUrl) {
       playUrl(defaultUrl);
-    } else if (title === 'Nosferatu') {
-      playUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4');
-    } else if (title === 'Metropolis') {
-      playUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4');
-    } else if (title === 'Charade') {
-      playUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-    } else if (title === 'A Trip to the Moon' || title === 'Sintel') {
-      playUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4');
-    } else if (platform === 'youtube') {
-      playUrl('https://www.youtube.com/watch?v=jfKfPfyJRdk');
+    } else {
+      const match = (MOVIE_CATALOG || []).find((m) => m.title.toLowerCase() === (title || '').toLowerCase());
+      if (match && match.mediaUrl) {
+        playUrl(match.mediaUrl);
+      } else if (title.includes('Attack on Titan')) {
+        playUrl('https://www.youtube.com/watch?v=AHT772bRkMY');
+      } else if (title === 'Night of the Living Dead') {
+        playUrl('https://archive.org/download/night_of_the_living_dead_ipod/night_of_the_living_dead.mp4');
+      } else if (platform === 'youtube') {
+        playUrl('https://www.youtube.com/watch?v=AHT772bRkMY');
+      }
     }
   };
 
@@ -594,8 +1177,8 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
 
   // Handle Card Click
   const handleCardClick = (item, push = true) => {
-    const isFree = item.free || item.p === 'tubi' || item.stream;
-    const isYt = item.p === 'youtube' || item.ytId;
+    const isFree = item.free || item.p === 'tubi' || item.stream || item.ytId;
+    const isYt = item.p === 'youtube' || item.ytId || (item.stream && item.stream.includes('youtube'));
 
     const contentObj = {
       title: item.t,
@@ -944,9 +1527,9 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
         </a>
 
         <div className="cw-sec">LIVE ROOMS</div>
-        <a onClick={() => openRoom('Nosferatu Night', null, 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')}>
+        <a onClick={() => openRoom('Night of the Living Dead', null, 'https://archive.org/download/night_of_the_living_dead_ipod/night_of_the_living_dead.mp4')}>
           <i />
-          <span>Nosferatu night</span>
+          <span>Night of the Living Dead</span>
         </a>
         <a onClick={() => openRoom('Anime Marathon', 'crunchyroll')}>
           <i />
@@ -1043,12 +1626,13 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
                     <img
                       src={h.poster}
                       alt={h.t}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35, mixBlendMode: 'luminosity' }}
+                      referrerPolicy="no-referrer"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.65 }}
                     />
                   )}
                 </div>
                 <div className="cw-cap">
-                  <span className="cw-tag">● Free Public Domain Cinema</span>
+                  <span className="cw-tag">● {h.tag || "Free Stream"}</span>
                   <h1>{h.t}</h1>
                   <div className="cw-meta">
                     {h.m} <b>★★★★★</b>
@@ -1056,13 +1640,13 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
                   <div className="cw-acts">
                     <button
                       className="cw-btn"
-                      onClick={() => openRoom(h.t, null, h.stream)}
+                      onClick={() => openRoom(h.t, h.platform || (h.ytId ? 'youtube' : null), h.stream, h.ytId)}
                     >
                       ▶ Watch free
                     </button>
                     <button
                       className="cw-btn ghost"
-                      onClick={() => openRoom(h.t, null, h.stream)}
+                      onClick={() => openRoom(h.t, h.platform || (h.ytId ? 'youtube' : null), h.stream, h.ytId)}
                     >
                       Watch together
                     </button>
@@ -1252,7 +1836,8 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
                         <img
                           src={item.poster}
                           alt={title}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55 }}
+                          referrerPolicy="no-referrer"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.88 }}
                           onError={(e) => { e.target.style.display = 'none'; }}
                         />
                       )}

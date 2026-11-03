@@ -1,0 +1,29 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path id="textCircle" d="M 128, 128 m -88, 0 a 88,88 0 1,1 176,0 a 88,88 0 1,1 -176,0" />
+    <linearGradient id="saleGrad" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#9E1B2E"/>
+      <stop offset="100%" stop-color="#730E1D"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer Festive Red Circle -->
+  <circle cx="128" cy="128" r="124" fill="url(#saleGrad)" stroke="#B82C40" stroke-width="4"/>
+  <circle cx="128" cy="128" r="110" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-dasharray="6 6"/>
+  
+  <!-- Curved Text -->
+  <text fill="#FFFFFF" font-family="'GT Standard', Arial, sans-serif" font-size="16" font-weight="800" letter-spacing="3">
+    <textPath href="#textCircle" startOffset="50%" text-anchor="middle">
+      COSHOP HOLIDAY SALE • DEC 15-20 •
+    </textPath>
+  </text>
+  
+  <!-- Central CoShop Star & Sparkle -->
+  <g transform="translate(128, 128)">
+    <!-- 8-point Festive Star -->
+    <path d="M0 -34 L7 -10 L31 -10 L12 4 L19 28 L0 14 L-19 28 L-12 4 L-31 -10 L-7 -10 Z" fill="#FFFFFF"/>
+    <!-- Center Green Gem -->
+    <circle cx="0" cy="0" r="9" fill="#739F20"/>
+    <circle cx="0" cy="0" r="4" fill="#FFFFFF"/>
+  </g>
+</svg>

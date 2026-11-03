@@ -1089,3 +1089,84 @@
   font-size: 11px;
   color: #86868b;
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   PARTY CHAT BUBBLE STYLING (Matches Reference Image 1)
+   ══════════════════════════════════════════════════════════════════════ */
+.party-chat-panel .chat-messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #ffffff;
+}
+
+.party-chat-panel .chat-bubble-row {
+  display: flex;
+  width: 100%;
+}
+
+.party-chat-panel .chat-bubble-row.incoming {
+  justify-content: flex-start;
+}
+
+.party-chat-panel .chat-bubble-row.outgoing {
+  justify-content: flex-end;
+}
+
+.party-chat-panel .bubble-wrapper {
+  max-width: 84%;
+  background: #f1f5f9 !important;
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.party-chat-panel .bubble-sender-name {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #dc2626 !important;
+  margin-bottom: 2px !important;
+  line-height: 1.2 !important;
+}
+
+.party-chat-panel .bubble-text {
+  margin: 0 !important;
+  font-size: 12.5px !important;
+  color: #0f172a !important;
+  line-height: 1.35 !important;
+  font-weight: 500 !important;
+  word-break: break-word !important;
+}
+
+.party-chat-panel .bubble-meta {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 4px;
+  margin-top: 2px !important;
+}
+
+.party-chat-panel .bubble-time {
+  font-size: 9.5px !important;
+  color: #94a3b8 !important;
+  line-height: 1;
+}
+
+.party-chat-panel .chat-bubble-row.outgoing .bubble-wrapper {
+  background: #ffe500 !important;
+}
+
+.party-chat-panel .chat-bubble-row.outgoing .bubble-text {
+  color: #111111 !important;
+  font-weight: 600 !important;
+}
+
+.party-chat-panel .chat-bubble-row.outgoing .bubble-time {
+  color: #713f12 !important;
+}
