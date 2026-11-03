@@ -17,15 +17,18 @@ async function getSecret(client, secretId) {
     throw new Error(`Secret ${secretId} has no SecretString`);
   }
 
-  return JSON.parse(response.SecretString);
+  try {
+    return JSON.parse(response.SecretString);
+  } catch (_parseErr) {
+    throw new Error(`Secret ${secretId} does not contain valid JSON payload`);
+  }
 }
 
 async function loadStagingSecrets() {
   if (process.env.NODE_ENV !== 'staging') return;
 
   if (!PRIMARY_APP_SECRET_ID) {
-    console.warn('[Secrets] APP_SECRET_ID is not configured; skipping Secrets Manager lookup');
-    return;
+    throw new Error('FATAL: APP_SECRET_ID environment variable is required in staging environment');
   }
 
   const client = new SecretsManagerClient({ region: REGION });
@@ -35,26 +38,40 @@ async function loadStagingSecrets() {
     appSecret = await getSecret(client, PRIMARY_APP_SECRET_ID);
   } catch (err) {
     if (FALLBACK_APP_SECRET_ID) {
-      console.warn(`[Secrets] Primary secret ${PRIMARY_APP_SECRET_ID} not found, trying fallback ${FALLBACK_APP_SECRET_ID}:`, err.message);
+      console.warn(`[Secrets] Primary secret ${PRIMARY_APP_SECRET_ID} unavailable, attempting fallback ${FALLBACK_APP_SECRET_ID}`);
       try {
         appSecret = await getSecret(client, FALLBACK_APP_SECRET_ID);
       } catch (fallbackErr) {
-        throw new Error(`Failed to load staging secrets from ${PRIMARY_APP_SECRET_ID} and ${FALLBACK_APP_SECRET_ID}: ${fallbackErr.message}`);
+        throw new Error(`FATAL: Failed to load staging secrets from ${PRIMARY_APP_SECRET_ID} and ${FALLBACK_APP_SECRET_ID}: ${fallbackErr.name || 'LookupError'}`);
       }
     } else {
-      throw new Error(`Failed to load staging secrets from ${PRIMARY_APP_SECRET_ID}: ${err.message}`);
+      throw new Error(`FATAL: Failed to load staging secrets from ${PRIMARY_APP_SECRET_ID}: ${err.name || 'LookupError'}`);
     }
   }
 
+  if (!appSecret || typeof appSecret !== 'object') {
+    throw new Error('FATAL: Staging secret payload is empty or not an object');
+  }
+
+  // Validate critical authentication and token secrets - fail closed if missing
+  if (!appSecret.JWT_SECRET) {
+    throw new Error('FATAL: Critical secret JWT_SECRET missing from staging Secrets Manager payload');
+  }
+  if (!appSecret.OTP_HMAC_KEY && !appSecret.OTP_SECRET) {
+    throw new Error('FATAL: Critical secret OTP_HMAC_KEY (or OTP_SECRET) missing from staging Secrets Manager payload');
+  }
+  if (!appSecret.MFA_ENCRYPTION_KEY) {
+    throw new Error('FATAL: Critical secret MFA_ENCRYPTION_KEY missing from staging Secrets Manager payload');
+  }
+
   // Populate environment variables safely without printing values
+  process.env.JWT_SECRET = appSecret.JWT_SECRET;
+  process.env.OTP_HMAC_KEY = appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET;
+  process.env.MFA_ENCRYPTION_KEY = appSecret.MFA_ENCRYPTION_KEY;
+
   if (appSecret.REDIS_URL) process.env.REDIS_URL = appSecret.REDIS_URL;
-  if (appSecret.JWT_SECRET) process.env.JWT_SECRET = appSecret.JWT_SECRET;
   if (appSecret.RESEND_API_KEY) process.env.RESEND_API_KEY = appSecret.RESEND_API_KEY;
   if (appSecret.FROM_EMAIL) process.env.FROM_EMAIL = appSecret.FROM_EMAIL;
-  if (appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET) {
-    process.env.OTP_HMAC_KEY = appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET;
-  }
-  if (appSecret.MFA_ENCRYPTION_KEY) process.env.MFA_ENCRYPTION_KEY = appSecret.MFA_ENCRYPTION_KEY;
 
   // Twilio credentials (prefer API Key + Secret over root Auth Token)
   if (appSecret.TWILIO_ACCOUNT_SID) process.env.TWILIO_ACCOUNT_SID = appSecret.TWILIO_ACCOUNT_SID;
@@ -62,7 +79,7 @@ async function loadStagingSecrets() {
   if (appSecret.TWILIO_API_SECRET) process.env.TWILIO_API_SECRET = appSecret.TWILIO_API_SECRET;
   if (appSecret.TWILIO_AUTH_TOKEN) process.env.TWILIO_AUTH_TOKEN = appSecret.TWILIO_AUTH_TOKEN;
 
-  // Direct DATABASE_URL or RDS Secret resolution
+  // Database URL or RDS Secret resolution - must succeed in staging
   if (appSecret.DATABASE_URL) {
     process.env.DATABASE_URL = appSecret.DATABASE_URL;
     process.env.DATABASE_SSL = 'true';
@@ -77,12 +94,14 @@ async function loadStagingSecrets() {
         const rdsDb = process.env.RDS_DATABASE || 'postgres';
         process.env.DATABASE_URL = `postgresql://${username}:${password}@${rdsHost}:${rdsPort}/${rdsDb}`;
         process.env.DATABASE_SSL = 'true';
+      } else {
+        throw new Error('RDS secret missing username or password');
       }
     } catch (rdsErr) {
-      console.warn('[Secrets] Could not resolve standalone RDS secret:', rdsErr.message);
+      throw new Error(`FATAL: Failed to resolve standalone RDS secret: ${rdsErr.name || 'RDSError'}`);
     }
   } else {
-    console.warn('[Secrets] Neither DATABASE_URL nor (RDS_SECRET_ID + RDS_HOST) configured; skipping database URL resolution');
+    throw new Error('FATAL: Neither DATABASE_URL nor (RDS_SECRET_ID + RDS_HOST) configured; cannot initialize database in staging');
   }
 }
 
