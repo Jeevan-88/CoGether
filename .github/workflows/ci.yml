@@ -24,9 +24,9 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: cogether_user
-          POSTGRES_PASSWORD: cogether_secret_dev_pass
-          POSTGRES_DB: cogether_db
+          POSTGRES_USER: ci_test_user
+          POSTGRES_PASSWORD: ci_test_password_strictly_ephemeral_only
+          POSTGRES_DB: ci_test_db
         ports:
           - 5432:5432
         options: >-
@@ -70,7 +70,7 @@ jobs:
       - name: Run database migrations
         run: node packages/database/migrator.js
         env:
-          DATABASE_URL: postgresql://cogether_user:cogether_secret_dev_pass@127.0.0.1:5432/cogether_db
+          DATABASE_URL: postgresql://ci_test_user:ci_test_password_strictly_ephemeral_only@127.0.0.1:5432/ci_test_db
 
       - name: Start backend server and run automated test suites
         run: |
@@ -106,9 +106,9 @@ jobs:
           fi
         env:
           PORT: 3001
-          DATABASE_URL: postgresql://cogether_user:cogether_secret_dev_pass@127.0.0.1:5432/cogether_db
+          DATABASE_URL: postgresql://ci_test_user:ci_test_password_strictly_ephemeral_only@127.0.0.1:5432/ci_test_db
           REDIS_URL: redis://127.0.0.1:6379
-          JWT_SECRET: cogether-dev-fallback-secret-never-use-in-production-32bytes-min!
-          OTP_HMAC_KEY: cogether-dev-otp-hmac-key-never-use-in-production-32bytes!
-          MFA_ENCRYPTION_KEY: cogether-dev-mfa-aes256-key-32b-min!!
+          JWT_SECRET: ci_test_jwt_secret_strictly_ephemeral_min_32_bytes!
+          OTP_HMAC_KEY: ci_test_otp_hmac_key_strictly_ephemeral_32_bytes!
+          MFA_ENCRYPTION_KEY: ci_test_mfa_aes256_key_32b_min!!
           NODE_ENV: test

@@ -61,7 +61,14 @@ function loadConfig(env = process.env) {
     }
     databaseUrl = `postgresql://cogether_user:cogether_secret_dev_pass@${defaultHost}:${defaultPgPort}/cogether_db`;
   }
-  const redisUrl = env.REDIS_URL || `redis://${defaultHost}:${defaultRedisPort}`;
+
+  let redisUrl = env.REDIS_URL;
+  if (!redisUrl) {
+    if (isProdOrStaging && env.REDIS_ENABLED !== 'false') {
+      throw new Error('FATAL: REDIS_URL environment variable is required in production/staging when Redis is enabled');
+    }
+    redisUrl = `redis://${defaultHost}:${defaultRedisPort}`;
+  }
 
   let corsOrigin = env.CORS_ORIGIN;
   if (!corsOrigin) {
@@ -198,11 +205,11 @@ function getSanitizedConfig(cfg = getConfig()) {
     },
     database: {
       ...cfg.database,
-      url: cfg.database.url.replace(/:([^:@]+)@/, ':***REDACTED***@')
+      url: cfg.database?.url ? cfg.database.url.replace(/:([^:@]+)@/, ':***REDACTED***@') : null
     },
     redis: {
       ...cfg.redis,
-      url: cfg.redis.url.replace(/:([^:@]+)@/, ':***REDACTED***@')
+      url: cfg.redis?.url ? cfg.redis.url.replace(/:([^:@]+)@/, ':***REDACTED***@') : null
     }
   };
 }
