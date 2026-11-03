@@ -4,9 +4,9 @@ const {
 } = require('@aws-sdk/client-secrets-manager');
 
 const REGION = process.env.AWS_REGION || 'ap-south-1';
-const PRIMARY_APP_SECRET_ID = 'cogether/staging/app';
-const FALLBACK_APP_SECRET_ID = 'cogether/stage/app';
-const RDS_SECRET_ID = process.env.RDS_SECRET_ID || 'rds!db-64711d1e-0eea-4860-81ff-3384900bba32';
+const PRIMARY_APP_SECRET_ID = process.env.APP_SECRET_ID || 'cogether/staging/app';
+const FALLBACK_APP_SECRET_ID = process.env.APP_SECRET_FALLBACK_ID || null;
+const RDS_SECRET_ID = process.env.RDS_SECRET_ID || null;
 
 async function getSecret(client, secretId) {
   const response = await client.send(
@@ -23,17 +23,26 @@ async function getSecret(client, secretId) {
 async function loadStagingSecrets() {
   if (process.env.NODE_ENV !== 'staging') return;
 
+  if (!PRIMARY_APP_SECRET_ID) {
+    console.warn('[Secrets] APP_SECRET_ID is not configured; skipping Secrets Manager lookup');
+    return;
+  }
+
   const client = new SecretsManagerClient({ region: REGION });
 
   let appSecret = null;
   try {
     appSecret = await getSecret(client, PRIMARY_APP_SECRET_ID);
   } catch (err) {
-    console.warn(`[Secrets] Primary secret ${PRIMARY_APP_SECRET_ID} not found, trying fallback ${FALLBACK_APP_SECRET_ID}:`, err.message);
-    try {
-      appSecret = await getSecret(client, FALLBACK_APP_SECRET_ID);
-    } catch (fallbackErr) {
-      throw new Error(`Failed to load staging secrets from ${PRIMARY_APP_SECRET_ID} and ${FALLBACK_APP_SECRET_ID}: ${fallbackErr.message}`);
+    if (FALLBACK_APP_SECRET_ID) {
+      console.warn(`[Secrets] Primary secret ${PRIMARY_APP_SECRET_ID} not found, trying fallback ${FALLBACK_APP_SECRET_ID}:`, err.message);
+      try {
+        appSecret = await getSecret(client, FALLBACK_APP_SECRET_ID);
+      } catch (fallbackErr) {
+        throw new Error(`Failed to load staging secrets from ${PRIMARY_APP_SECRET_ID} and ${FALLBACK_APP_SECRET_ID}: ${fallbackErr.message}`);
+      }
+    } else {
+      throw new Error(`Failed to load staging secrets from ${PRIMARY_APP_SECRET_ID}: ${err.message}`);
     }
   }
 
@@ -57,13 +66,13 @@ async function loadStagingSecrets() {
   if (appSecret.DATABASE_URL) {
     process.env.DATABASE_URL = appSecret.DATABASE_URL;
     process.env.DATABASE_SSL = 'true';
-  } else {
+  } else if (RDS_SECRET_ID && process.env.RDS_HOST) {
     try {
       const rdsSecret = await getSecret(client, RDS_SECRET_ID);
       if (rdsSecret.username && rdsSecret.password) {
         const username = encodeURIComponent(rdsSecret.username);
         const password = encodeURIComponent(rdsSecret.password);
-        const rdsHost = process.env.RDS_HOST || 'cogether-stage-db.c78q88msuvhi.ap-south-2.rds.amazonaws.com';
+        const rdsHost = process.env.RDS_HOST;
         const rdsPort = process.env.RDS_PORT || 5432;
         const rdsDb = process.env.RDS_DATABASE || 'postgres';
         process.env.DATABASE_URL = `postgresql://${username}:${password}@${rdsHost}:${rdsPort}/${rdsDb}`;
@@ -72,6 +81,8 @@ async function loadStagingSecrets() {
     } catch (rdsErr) {
       console.warn('[Secrets] Could not resolve standalone RDS secret:', rdsErr.message);
     }
+  } else {
+    console.warn('[Secrets] Neither DATABASE_URL nor (RDS_SECRET_ID + RDS_HOST) configured; skipping database URL resolution');
   }
 }
 

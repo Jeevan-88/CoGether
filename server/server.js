@@ -52,7 +52,8 @@ function isOriginAllowed(origin) {
   if (allowedOriginRegexes.some((re) => re.test(origin))) return true;
   if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) return true;
   if (process.env.CORS_ORIGIN) {
-    if (process.env.CORS_ORIGIN === '*' || origin === process.env.CORS_ORIGIN) return true;
+    const configuredOrigins = process.env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);
+    if (configuredOrigins.includes(origin)) return true;
   }
   return false;
 }

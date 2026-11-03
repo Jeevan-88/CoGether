@@ -54,8 +54,24 @@ function loadConfig(env = process.env) {
     } catch (_e) {}
   }
 
-  const databaseUrl = env.DATABASE_URL || `postgresql://cogether_user:cogether_secret_dev_pass@${defaultHost}:${defaultPgPort}/cogether_db`;
+  let databaseUrl = env.DATABASE_URL;
+  if (!databaseUrl) {
+    if (isProdOrStaging) {
+      throw new Error('FATAL: DATABASE_URL environment variable is required in production/staging');
+    }
+    databaseUrl = `postgresql://cogether_user:cogether_secret_dev_pass@${defaultHost}:${defaultPgPort}/cogether_db`;
+  }
   const redisUrl = env.REDIS_URL || `redis://${defaultHost}:${defaultRedisPort}`;
+
+  let corsOrigin = env.CORS_ORIGIN;
+  if (!corsOrigin) {
+    if (isProdOrStaging) {
+      throw new Error('FATAL: CORS_ORIGIN environment variable with explicit origin(s) is required in production/staging');
+    }
+    corsOrigin = 'http://localhost:5173';
+  } else if (isProdOrStaging && (corsOrigin === '*' || corsOrigin.split(',').map((s) => s.trim()).includes('*'))) {
+    throw new Error('FATAL: Wildcard CORS_ORIGIN (*) is strictly prohibited in production/staging');
+  }
 
   const config = {
     env: nodeEnv,
@@ -65,7 +81,7 @@ function loadConfig(env = process.env) {
     server: {
       port,
       host: env.HOST || '0.0.0.0',
-      corsOrigin: env.CORS_ORIGIN || '*'
+      corsOrigin
     },
     auth: {
       jwtSecret,
