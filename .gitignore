@@ -6,7 +6,7 @@ client/dist/
 .DS_Store
 *.log
 .env*
-!.env.example
+!**/.env.example
 .playwright-mcp/
 coverage/
 .test_last_otp.json
@@ -45,6 +45,18 @@ gen_badge.py
 *.key
 *.p12
 *.pfx
+*.crt
+*.cer
+*.der
 credentials.json
 service-account*.json
 
+# Database Dumps & Local State
+*.dump
+*.tar
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+!packages/database/migrations/*.sql
