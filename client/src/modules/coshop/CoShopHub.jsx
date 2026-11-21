@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Sparkles, ShoppingBag, Heart, Users, Filter, 
   ArrowRight, Check, Star, ChevronRight, X, Compass, LayoutGrid, SlidersHorizontal, RotateCcw,
-  Tag, Play, Camera, Home, ShoppingCart, Gift, Flame, Package, ExternalLink
+  Tag, Play, Camera, Home, ShoppingCart, Gift, Flame, Package, PackagePlus, ExternalLink
 } from 'lucide-react';
 import ProductCard from './components/ProductCard.jsx';
 import ProductDetailModal from './components/ProductDetailModal.jsx';
