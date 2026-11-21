@@ -16,6 +16,7 @@ import CogetherAvatarRenderer from '../auth/CogetherAvatarRenderer.jsx';
 import { useAuth } from '../../core/AuthContext.jsx';
 import { API_URL } from '../../config/api.js';
 import { curatedCategoryData } from './curatedData.js';
+import HologramModelCanvas from './components/HologramModelCanvas.jsx';
 import './CoShopHub.css';
 
 const BASE_CURATION_CATEGORIES = [
@@ -553,7 +554,11 @@ export default function CoShopHub({
                           )}
                         </div>
                       </div>
-                      {cat.video && (
+                      {cat.id === 'Men' ? (
+                        <div className="coshop-pill-artwork-video" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <HologramModelCanvas enableRays={false} interactive={false} />
+                        </div>
+                      ) : cat.video ? (
                         <video
                           data-testid="category-pill-video"
                           className="coshop-pill-artwork-video"
@@ -564,7 +569,7 @@ export default function CoShopHub({
                         >
                           <source src={cat.video} type="video/webm" />
                         </video>
-                      )}
+                      ) : null}
                     </div>
                     <span className="coshop-cat-label">{cat.label}</span>
                   </button>
@@ -1101,15 +1106,21 @@ export default function CoShopHub({
                       className="coshop-cat-art-poster"
                       loading="lazy"
                     />
-                    <video
-                      className="coshop-cat-art-video"
-                      muted
-                      playsInline
-                      loop
-                      preload="auto"
-                    >
-                      <source src={`/coshop/videos/${cat.id}-hover.webm`} type="video/webm" />
-                    </video>
+                    {cat.id === 'men' ? (
+                      <div className="coshop-cat-art-video" style={{ width: '100%', height: '100%' }}>
+                        <HologramModelCanvas enableRays={true} interactive={true} />
+                      </div>
+                    ) : (
+                      <video
+                        className="coshop-cat-art-video"
+                        muted
+                        playsInline
+                        loop
+                        preload="auto"
+                      >
+                        <source src={`/coshop/videos/${cat.id}-hover.webm`} type="video/webm" />
+                      </video>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1143,7 +1154,11 @@ export default function CoShopHub({
                     <span className="coshop-curation-word-text">{cat.name}</span>
                     {isSelected && (
                       <div className="coshop-curation-3d-center-anchor">
-                        {catData.video ? (
+                        {cat.id === 'men' ? (
+                          <div style={{ width: '220px', height: '220px', position: 'relative' }}>
+                            <HologramModelCanvas enableRays={true} interactive={true} />
+                          </div>
+                        ) : catData.video ? (
                           <video
                             className="coshop-curation-floating-3d-video"
                             autoPlay
