@@ -411,17 +411,17 @@ export default function GameShell({
         )}
       </div>
 
-      {/* ── Floating Camera Overlay (Used in Separate Mode or when Sidebar is Collapsed) ── */}
-      {webrtc.cameraEnabled && (videoLayoutMode === 'SEPARATE' || !isSidebarOpen) && (
+      {/* ── Floating Camera Overlay (Supports Merge, Custom Move, and Curved Dock) ── */}
+      {(isCamActive || webrtc.cameraEnabled) && (
         <DraggableCameraOverlay
           localStream={webrtc.localStream}
           remoteStreams={webrtc.remoteStreams}
           currentUsername={currentUsername}
-          micEnabled={webrtc.micEnabled}
-          cameraEnabled={webrtc.cameraEnabled}
-          onToggleMic={webrtc.toggleMic}
-          onToggleCamera={webrtc.toggleCamera}
-          onClose={webrtc.toggleCamera}
+          micEnabled={isMicActive}
+          cameraEnabled={true}
+          onToggleMic={handleToggleMic}
+          onToggleCamera={handleToggleCamera}
+          onClose={handleToggleCamera}
         />
       )}
 

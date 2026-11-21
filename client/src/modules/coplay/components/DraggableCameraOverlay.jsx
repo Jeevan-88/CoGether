@@ -89,7 +89,7 @@ export default function DraggableCameraOverlay({
   onClose
 }) {
   // Layout mode: 'GROUPED' | 'SEPARATE' | 'MERGED'
-  const [layoutMode, setLayoutMode] = useState('GROUPED');
+  const [layoutMode, setLayoutMode] = useState('MERGED');
   // Sizing mode: 'S' | 'M' | 'L'
   const [sizePreset, setSizePreset] = useState('M');
   const [customSize, setCustomSize] = useState(null); // { width, height }
@@ -328,17 +328,17 @@ export default function DraggableCameraOverlay({
             type="button"
             className={`btn-mode-tab ${layoutMode === 'GROUPED' ? 'active' : ''}`}
             onClick={() => setLayoutMode('GROUPED')}
-            title="Grouped Cameras"
+            title="Curved Dock Sizing"
           >
-            Group
+            Curved Dock
           </button>
           <button
             type="button"
             className={`btn-mode-tab ${layoutMode === 'SEPARATE' ? 'active' : ''}`}
             onClick={() => setLayoutMode('SEPARATE')}
-            title="Separate Draggable Tiles"
+            title="Custom Move Draggable Tiles"
           >
-            Separate
+            Custom Move
           </button>
           <button
             type="button"

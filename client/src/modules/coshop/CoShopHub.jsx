@@ -1241,25 +1241,7 @@ export default function CoShopHub({
         {/* ── 5. FOOTER ── */}
         <footer className="coshop-footer" data-testid="footer-next">
           <div className="coshop-footer-inner">
-            {/* Left QR Column */}
-            <div className="coshop-footer-left">
-              <div className="coshop-footer-qr-card">
-                <div className="coshop-qr-box" data-testid="download-qr-code">
-                  <img src="/coshop/images/get-shop-app-qr-code-large-d6PnrfXS.png" alt="QR Code" data-testid="qr-image" />
-                </div>
-                <div className="coshop-qr-info">
-                  <h4>Scan to shop on mobile</h4>
-                  <p>Real-time alerts, party rooms & deals</p>
-                </div>
-              </div>
-
-              <div className="coshop-footer-badges">
-                <img src="/coshop/images/apple-badge-light-nl.svg" alt="App Store" data-testid="download-apple-store-link" />
-                <img src="/coshop/images/google-badge-light-nl.svg" alt="Google Play" data-testid="download-play-store-link" />
-              </div>
-            </div>
-
-            {/* Right Link Columns */}
+            {/* Quick Link Columns */}
             <div className="coshop-footer-cols">
               <div className="coshop-footer-col">
                 <span className="coshop-footer-col-title">Features</span>
@@ -1301,7 +1283,7 @@ export default function CoShopHub({
           <div className="coshop-sub-footer" data-testid="sub-footer-next">
             <span>© 2026 CoGether Universal Commerce. All rights reserved.</span>
             <span>
-              CoShop is an independent universal comparison engine. Store names, trademarks, and logos belong to their respective owners.
+              Real-time shared cart and collaborative live shopping experience.
             </span>
           </div>
         </footer>

@@ -157,20 +157,13 @@ export default function Navbar({
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <button
                 type="button"
                 className="btn-login-rect"
                 onClick={onOpenAuth}
               >
                 Log In
-              </button>
-              <button
-                type="button"
-                className="btn-signup-rect"
-                onClick={onOpenSignup || (() => { window.location.href = '/signup'; })}
-              >
-                Sign Up
               </button>
             </div>
           )}

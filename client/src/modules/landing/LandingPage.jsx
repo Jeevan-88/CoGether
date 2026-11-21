@@ -1205,7 +1205,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                           <div className="friend-video-avatar avatar-left">
                             <div className="avatar-video-box">
                               <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Jeevan (You)" />
-                              <span className="live-cam-badge">Jeevan (You)</span>
+                              <span className="live-cam-badge">You</span>
                             </div>
                             <div className="reaction-bubble-pop">😍 "Love the brass finish!"</div>
                           </div>

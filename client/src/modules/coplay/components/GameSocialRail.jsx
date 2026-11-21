@@ -8,7 +8,7 @@ const DEFAULT_SQUAD_MESSAGES = [];
 
 export default function GameSocialRail({
   roomId = 'duel-6643',
-  currentUsername = 'Jeevan',
+  currentUsername = 'Guest',
   userProfile = null,
   localStream,
   remoteStreams = {},
@@ -77,7 +77,7 @@ export default function GameSocialRail({
     setShowEmojiPicker(false);
   };
 
-  const displayName = currentUsername?.replace(/\s*\(You\)$/i, '') || 'Jeevan';
+  const displayName = currentUsername?.replace(/\s*\(You\)$/i, '') || (userProfile?.displayName || userProfile?.username || 'Guest');
 
   const allDisplayMessages = [...localMessages, ...(chatMessages || [])];
 
@@ -107,7 +107,7 @@ export default function GameSocialRail({
             {/* Member 1: Local User (You) with Red 'J' Avatar */}
             <div className="party-member-row-ref">
               <div className="member-avatar-circle-red">
-                <span>{(displayName || 'J')[0].toUpperCase()}</span>
+                <span>{(displayName || 'G')[0].toUpperCase()}</span>
               </div>
 
               <div className="member-info-col-ref">

@@ -400,11 +400,11 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
 
   // Player Stats & State
   const [playerState, setPlayerState] = useState(() => {
-    const fallbackName = profile?.displayName || profile?.username || (user?.email ? user.email.split('@')[0] : 'Jeevan');
+    const fallbackName = profile?.displayName || profile?.username || user?.name || (user?.email ? user.email.split('@')[0] : 'Guest');
     try {
       const saved = JSON.parse(localStorage.getItem('cogether_coplay_player') || '{}');
       return {
-        name: saved.name || fallbackName,
+        name: (saved.name && saved.name !== 'Jeevan') ? saved.name : fallbackName,
         xp: saved.xp || 140,
         games: saved.games || 12,
         wins: saved.wins || 7,
@@ -834,10 +834,10 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
           }}
         >
           <div className="coplay-user-av">
-            {playerState.name ? playerState.name[0].toUpperCase() : 'J'}
+            {(playerState.name || 'G')[0].toUpperCase()}
           </div>
           <div className="coplay-user-info">
-            <span className="coplay-user-name">{playerState.name}</span>
+            <span className="coplay-user-name">{isAuthenticated ? playerState.name : 'Guest'}</span>
             <span className="coplay-user-sub">
               {isAuthenticated && !user?.isGuest ? `Level ${1 + Math.floor(playerState.xp / 200)} Member` : 'Tap to Sign In'}
             </span>
@@ -979,7 +979,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
             {/* 1. Hero Title Banner with Rising Staggered Letters & Yellow Underline */}
             <section className="coplay-hero-banner">
               <span className="coplay-hero-kicker">
-                <Flame size={14} /> VERIFIED GAMING ARCADE
+                <Flame size={14} /> MULTIPLAYER GAMING ARCADE
               </span>
               <h1 className="coplay-hero-title">
                 {Array.from('COPLAY').map((char, idx) => (
@@ -1149,7 +1149,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
                           ) : (
                             <>
                               <RenderGameSvg game={g} className="coplay-slide-artwork" />
-                              <span className="coplay-badge-pill">Opens in verified room</span>
+                              <span className="coplay-badge-pill">Opens in live room</span>
                             </>
                           )}
                         </div>
@@ -1240,7 +1240,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
                         >
                           <RenderGameSvg game={game} />
                           <span className="card-mode">{getModeLabel(game)}</span>
-                          {game.ok && <span className="card-verified-tag">VERIFIED</span>}
+                          
                           <span className="card-category">{getCategoryLabel(game)}</span>
                           <b>{game.n}</b>
                         </div>
