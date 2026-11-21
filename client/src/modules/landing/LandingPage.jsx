@@ -1506,7 +1506,6 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <span className="creator-tag">COGETHER // DIRECTED BY JEEVAN YADAV</span>
             <div className="footer-links">
               <a href="mailto:jeevan@cogether.app">EMAIL</a>
-              <a href="https://github.com/Jeevan-88/CoGether.git" target="_blank" rel="noreferrer">REPOSITORY</a>
               <a href="#privacy">TERMS & PRIVACY</a>
             </div>
           </div>

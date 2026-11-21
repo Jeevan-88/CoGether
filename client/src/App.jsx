@@ -15,6 +15,11 @@ import ProfileModal from './modules/auth/ProfileModal.jsx';
 import CogetherAvatarRenderer from './modules/auth/CogetherAvatarRenderer.jsx';
 import InviteLandingView from './modules/invites/InviteLandingView.jsx';
 import PricingModal from './modules/pricing/PricingModal.jsx';
+import SignupPage from './pages/SignupPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
 import { SocialProvider, useSocial } from './core/SocialContext.jsx';
 import FriendsModal from './modules/social/FriendsModal.jsx';
 import IncomingGameInviteBanner from './modules/social/IncomingGameInviteBanner.jsx';
@@ -38,6 +43,16 @@ function MainApp() {
   const [showPricing, setShowPricing] = useState(false);
   const [isCoshopActive, setIsCoshopActive] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [currentPath, setCurrentPath] = useState(() => (typeof window !== 'undefined' ? window.location.pathname : '/'));
+
+  const handleNavigate = (path) => {
+    window.history.pushState({}, '', path);
+    setCurrentPath(path.split('?')[0]);
+    try {
+      const r = parseCurrentRoute();
+      setActiveTab(r.tab || 'home');
+    } catch (e) {}
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -103,8 +118,15 @@ function MainApp() {
     const initialRoute = parseCurrentRoute();
     handleRouteChange(initialRoute);
 
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handleLocationChange);
     const unsubscribe = subscribeToRoute(handleRouteChange);
-    return () => unsubscribe();
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      unsubscribe();
+    };
   }, [profile, restoreSession]);
 
   const handleStartRoom = (roomId, username, mode) => {
@@ -202,6 +224,38 @@ function MainApp() {
 
   // Render active view content while keeping global modals (AuthModal, ProfileModal, PricingModal) mounted
   const renderMainContent = () => {
+    // ── DEDICATED AUTH & DASHBOARD PAGES ──
+    if (currentPath === '/signup') {
+      return <SignupPage onNavigate={handleNavigate} />;
+    }
+    if (currentPath === '/login') {
+      return (
+        <LoginPage
+          onNavigate={handleNavigate}
+          onLoginSuccess={() => {
+            restoreSession();
+            handleNavigate('/dashboard');
+          }}
+        />
+      );
+    }
+    if (currentPath === '/forgot-password') {
+      return <ForgotPasswordPage onNavigate={handleNavigate} />;
+    }
+    if (currentPath === '/reset-password') {
+      return <ResetPasswordPage onNavigate={handleNavigate} />;
+    }
+    if (currentPath === '/dashboard') {
+      return (
+        <DashboardPage
+          onNavigate={handleNavigate}
+          onSelectService={(service) => {
+            handleNavigate('/');
+            handleSelectCogetherService(service);
+          }}
+        />
+      );
+    }
     // ── INVITE LANDING SCREEN ──
     if (activeInviteToken) {
       return (
@@ -332,7 +386,7 @@ function MainApp() {
           }}
           user={user}
           profile={profile}
-          onOpenAuth={() => setShowAuth(true)}
+          onOpenAuth={() => handleNavigate('/login')}
           onOpenProfile={() => setShowProfile(true)}
           onOpenSocial={() => setIsSocialModalOpen(true)}
           unreadCount={unreadSummary?.totalUnread || 0}

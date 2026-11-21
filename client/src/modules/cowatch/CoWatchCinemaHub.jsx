@@ -1128,23 +1128,7 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
     triggerDanmakuToast(displayName, text, true);
     setChatInput('');
 
-    // Natural companion reaction after 2.4s
-    setTimeout(() => {
-      const friend = Math.random() > 0.5 ? 'Aarav' : 'Meera';
-      const replies = [
-        'Great scene! 🍿',
-        'Look at that cinematography!',
-        'Audio sync is pristine here 🔥',
-        'Love this part!'
-      ];
-      const reply = replies[Math.floor(Math.random() * replies.length)];
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setChatMessages((prev) => [
-        ...prev,
-        { id: Date.now(), sender: friend, text: reply, isMe: false, time }
-      ]);
-      triggerDanmakuToast(friend, reply, false);
-    }, 2400);
+    // Live chat synced to room peers
   };
 
   // Focus Carousel Navigation

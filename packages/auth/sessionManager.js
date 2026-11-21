@@ -93,6 +93,34 @@ async function validateAndRotateSession(rawRefreshToken, metadata = {}) {
   const newRawRefreshToken = generateRefreshToken();
   const newTokenHash = hashRefreshToken(newRawRefreshToken);
 
+  if (db.isSimulated || !db.pool) {
+    await db.query(
+      `UPDATE identity.sessions SET revoked_at = NOW() WHERE id = $1`,
+      [session.id]
+    );
+
+    const newSessionRes = await db.query(
+      `INSERT INTO identity.sessions 
+       (user_id, refresh_token_hash, user_agent, ip_address, expires_at)
+       VALUES ($1, $2, $3, $4, NOW() + ($5 || ' seconds')::interval)
+       RETURNING id, user_id, expires_at`,
+      [
+        session.user_id,
+        newTokenHash,
+        metadata.userAgent ? String(metadata.userAgent).substring(0, 500) : null,
+        metadata.ipAddress || null,
+        ttlSeconds
+      ]
+    );
+
+    return {
+      valid: true,
+      userId: session.user_id,
+      newRefreshToken: newRawRefreshToken,
+      expiresAt: (newSessionRes.rows && newSessionRes.rows[0]?.expires_at) || new Date(Date.now() + ttlSeconds * 1000)
+    };
+  }
+
   const client = await db.pool.connect();
   try {
     await client.query('BEGIN');

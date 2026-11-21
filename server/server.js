@@ -112,6 +112,9 @@ app.use((req, res, next) => {
 
 app.use(correlationMiddleware);
 
+const { authRouter } = require('./routes/auth');
+app.use('/api/v1/auth', authRouter);
+
 
 // CoPlay Game Catalog Synchronizer (Seeds PostgreSQL coplay.games table)
 gameRepository.syncCatalogFromFeed().catch((err) => {

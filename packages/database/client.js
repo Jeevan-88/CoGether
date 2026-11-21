@@ -3,6 +3,7 @@
  * Manages PostgreSQL connection pool, health checks, and fallback simulation for offline dev.
  */
 
+const crypto = require('crypto');
 const { getConfig } = require('../config');
 const { logger } = require('../observability');
 
@@ -11,6 +12,14 @@ class DatabaseClient {
     this.pool = null;
     this.isConnected = false;
     this.isSimulated = false;
+
+    // In-memory relational tables for local dev / sandbox simulation
+    this._simulatedTables = {
+      users: new Map(),
+      verification_tokens: new Map(),
+      sessions: new Map()
+    };
+
     this._init();
   }
 
@@ -57,6 +66,7 @@ class DatabaseClient {
   }
 
   async query(text, params = []) {
+    const config = getConfig();
     if (this.pool && !this.isSimulated) {
       const start = Date.now();
       try {
@@ -65,17 +75,197 @@ class DatabaseClient {
         logger.debug('Executed DB query', { text, duration, rows: res.rowCount });
         return res;
       } catch (err) {
+        if (config.env !== 'production' && process.env.NODE_ENV !== 'production' && !process.env.CI) {
+          logger.warn('PostgreSQL query connection failed; switching to simulated dev store', { error: err.message });
+          this.isSimulated = true;
+          return this._handleSimulatedQuery(text, params);
+        }
         logger.error('DB query error', { text, error: err });
         throw err;
       }
     }
 
     // Fallback simulation mode
-    const config = getConfig();
     if (config.env === 'production' || process.env.NODE_ENV === 'production') {
       throw new Error('FATAL: Database queries cannot run in simulated fallback mode in production environment.');
     }
-    logger.debug('[Simulated DB] query execution', { text, params });
+    return this._handleSimulatedQuery(text, params);
+  }
+
+  _handleSimulatedQuery(text, params = []) {
+    const cleanSql = text.trim();
+    logger.debug('[Simulated DB] query execution', { sql: cleanSql.slice(0, 80), params });
+
+    // ── USERS TABLE ──
+    if (cleanSql.includes('identity.users')) {
+      // 1. SELECT by email or id
+      if (cleanSql.startsWith('SELECT') && cleanSql.includes('WHERE email = $1')) {
+        const email = String(params[0] || '').toLowerCase();
+        const user = Array.from(this._simulatedTables.users.values()).find(
+          (u) => u.email.toLowerCase() === email
+        );
+        return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+      }
+      if (cleanSql.startsWith('SELECT') && cleanSql.includes('WHERE id = $1')) {
+        const userId = params[0];
+        const user = this._simulatedTables.users.get(userId);
+        return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+      }
+
+      // 2. INSERT user
+      if (cleanSql.startsWith('INSERT INTO identity.users')) {
+        const email = String(params[0] || '').toLowerCase();
+        const name = params[1];
+        const displayName = params[2];
+        const passwordHash = params[3];
+        const role = params[4] || 'USER';
+
+        const record = {
+          id: crypto.randomUUID(),
+          email,
+          name,
+          display_name: displayName,
+          password_hash: passwordHash,
+          is_verified: false,
+          role,
+          failed_login_attempts: 0,
+          lock_until: null,
+          created_at: new Date(),
+          updated_at: new Date()
+        };
+        this._simulatedTables.users.set(record.id, record);
+        return { rows: [record], rowCount: 1 };
+      }
+
+      // 3. UPDATE user (lockout, reset attempts, verify, reset password)
+      if (cleanSql.startsWith('UPDATE identity.users')) {
+        let email = null;
+        for (const p of params) {
+          if (typeof p === 'string' && p.includes('@')) {
+            email = p.toLowerCase();
+          }
+        }
+        const user = Array.from(this._simulatedTables.users.values()).find(
+          (u) => u.email.toLowerCase() === email
+        );
+        if (user) {
+          if (cleanSql.includes('failed_login_attempts = failed_login_attempts + 1')) {
+            user.failed_login_attempts = (user.failed_login_attempts || 0) + 1;
+          }
+          if (cleanSql.includes('lock_until = $1')) {
+            user.lock_until = params[0];
+          }
+          if (cleanSql.includes('failed_login_attempts = 0')) {
+            user.failed_login_attempts = 0;
+            user.lock_until = null;
+          }
+          if (cleanSql.includes('is_verified = TRUE')) {
+            user.is_verified = true;
+          }
+          if (cleanSql.includes('password_hash = $1')) {
+            user.password_hash = params[0];
+          }
+          user.updated_at = new Date();
+          return { rows: [user], rowCount: 1 };
+        }
+      }
+    }
+
+    // ── VERIFICATION TOKENS TABLE ──
+    if (cleanSql.includes('identity.verification_tokens')) {
+      // 1. INSERT token
+      if (cleanSql.startsWith('INSERT INTO identity.verification_tokens')) {
+        const identifier = String(params[0] || '').toLowerCase();
+        const token = params[1];
+        const type = cleanSql.includes('PASSWORD_RESET') ? 'PASSWORD_RESET' : 'EMAIL_VERIFY';
+        const id = crypto.randomUUID();
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const record = { id, identifier, token, type, expires_at: expiresAt, created_at: new Date() };
+        this._simulatedTables.verification_tokens.set(id, record);
+        return { rows: [record], rowCount: 1 };
+      }
+
+      // 2. SELECT token
+      if (cleanSql.startsWith('SELECT')) {
+        const identifier = String(params[0] || '').toLowerCase();
+        const token = params[1];
+        const found = Array.from(this._simulatedTables.verification_tokens.values()).find(
+          (t) => t.identifier === identifier && t.token === token
+        );
+        return { rows: found ? [found] : [], rowCount: found ? 1 : 0 };
+      }
+
+      // 3. DELETE token
+      if (cleanSql.startsWith('DELETE')) {
+        const id = params[0];
+        this._simulatedTables.verification_tokens.delete(id);
+        return { rows: [], rowCount: 1 };
+      }
+    }
+
+    // ── SESSIONS TABLE ──
+    if (cleanSql.includes('identity.sessions')) {
+      // 1. INSERT session
+      if (cleanSql.startsWith('INSERT INTO identity.sessions')) {
+        const userId = params[0];
+        const tokenHash = params[1];
+        const userAgent = params[2];
+        const ipAddress = params[3];
+        const id = crypto.randomUUID();
+        const record = {
+          id,
+          user_id: userId,
+          token_hash: tokenHash,
+          user_agent: userAgent,
+          ip_address: ipAddress,
+          revoked_at: null,
+          created_at: new Date(),
+          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        };
+        this._simulatedTables.sessions.set(tokenHash, record);
+        return { rows: [record], rowCount: 1 };
+      }
+
+      // 2. SELECT session by token_hash or refresh_token_hash
+      if (cleanSql.startsWith('SELECT') && (cleanSql.includes('token_hash = $1') || cleanSql.includes('refresh_token_hash = $1'))) {
+        const tokenHash = params[0];
+        const session = this._simulatedTables.sessions.get(tokenHash);
+        if (session && !session.revoked_at && new Date(session.expires_at) > new Date()) {
+          const user = this._simulatedTables.users.get(session.user_id) || {
+            id: session.user_id,
+            email: 'user@cogether.tech',
+            role: 'USER'
+          };
+          return {
+            rows: [{
+              id: session.id,
+              session_id: session.id,
+              user_id: session.user_id,
+              email: user.email,
+              role: user.role,
+              refresh_token_hash: session.token_hash,
+              token_hash: session.token_hash,
+              revoked_at: session.revoked_at,
+              expires_at: session.expires_at
+            }],
+            rowCount: 1
+          };
+        }
+        return { rows: [], rowCount: 0 };
+      }
+
+      // 3. UPDATE session (revoke by token hash or session id)
+      if (cleanSql.startsWith('UPDATE identity.sessions')) {
+        const identifier = params[0];
+        for (const session of this._simulatedTables.sessions.values()) {
+          if (session.id === identifier || session.token_hash === identifier) {
+            session.revoked_at = new Date();
+          }
+        }
+        return { rows: [], rowCount: 1 };
+      }
+    }
+
     return { rows: [], rowCount: 0 };
   }
 

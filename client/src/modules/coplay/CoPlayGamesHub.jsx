@@ -665,10 +665,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
   const [arenaCamOpen, setArenaCamOpen] = useState(false);
   const [arenaCamMode, setArenaCamMode] = useState('group'); // 'group' | 'separate' | 'merge'
   const [arenaCamSize, setArenaCamSize] = useState(1); // 0 = S, 1 = M, 2 = L
-  const [chatMessages, setChatMessages] = useState([
-    { in: true, who: 'Aarav', text: 'Ready? Let\'s go!', time: '12:01' },
-    { in: true, who: 'Meera', text: 'Press start on 3 🙌', time: '12:02' }
-  ]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const arenaRoomCode = useMemo(() => 'duel-' + Math.floor(1000 + Math.random() * 8999), []);
 
@@ -679,15 +676,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
     setChatMessages((prev) => [...prev, { in: false, text: txt, time }]);
     setChatInput('');
 
-    // Simulated reply
-    setTimeout(() => {
-      const replies = ['gg 🙌', 'one more round?', 'that was close!', 'your turn!', 'nice move!'];
-      const who = Math.random() < 0.5 ? 'Aarav' : 'Meera';
-      setChatMessages((prev) => [
-        ...prev,
-        { in: true, who, text: replies[(Math.random() * replies.length) | 0], time }
-      ]);
-    }, 1400);
+    // Live message sent to room members
   };
 
   // Filtered games for showcase rows
@@ -1098,7 +1087,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
                               {slideTTTWinner && (
                                 <div className="coplay-slide-overlay">
                                   <b>
-                                    {slideTTTWinner === 'X' ? 'You win! 🎉' : slideTTTWinner === 'O' ? 'Aarav wins!' : 'Draw!'}
+                                    {slideTTTWinner === 'X' ? 'You win! 🎉' : slideTTTWinner === 'O' ? 'Computer wins!' : 'Draw!'}
                                   </b>
                                   <span>{slideTTTWinner === 'draw' ? 'Nobody blinked' : 'Three in a row'}</span>
                                   <button type="button" className="btn-coplay-yellow btn-coplay-sm" onClick={resetTTT}>

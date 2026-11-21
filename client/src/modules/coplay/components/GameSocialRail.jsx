@@ -4,10 +4,7 @@ import './GameSocialRail.css';
 
 const QUICK_EMOJIS = ['🎮', '🔥', '🏆', '👏', '😂', '🚀', '👍', '⚡', '🕹️', '🎯', '😊', '🙌'];
 
-const DEFAULT_SQUAD_MESSAGES = [
-  { id: 'msg-aarav-1', sender: 'Aarav', text: "Ready? Let's go!", time: '12:01', isLocal: false },
-  { id: 'msg-meera-1', sender: 'Meera', text: "Press start on 3 🥳", time: '12:02', isLocal: false }
-];
+const DEFAULT_SQUAD_MESSAGES = [];
 
 export default function GameSocialRail({
   roomId = 'duel-6643',
@@ -177,7 +174,7 @@ export default function GameSocialRail({
         <div className="party-chat-header">
           <div className="chat-title-ref-group">
             <span className="chat-title-bold">Party chat</span>
-            <span className="chat-title-sub">Aarav, Meera</span>
+            <span className="chat-title-sub">Live Room</span>
           </div>
         </div>
 
