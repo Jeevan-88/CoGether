@@ -1396,7 +1396,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
                 }}
               >
                 <div className="coplay-profile-big-av">
-                  {playerState.name ? playerState.name[0].toUpperCase() : 'J'}
+                  {(playerState.name || 'G')[0].toUpperCase()}
                 </div>
                 <div className="coplay-profile-details">
                   <h2 

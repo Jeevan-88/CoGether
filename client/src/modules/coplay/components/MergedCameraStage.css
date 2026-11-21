@@ -303,3 +303,51 @@
   text-overflow: ellipsis;
   max-width: 100%;
 }
+
+/* ── Fallback Placeholder Overlay ── */
+.merged-stage-placeholder-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(10, 10, 15, 0.45);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.merged-user-avatar-disc {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #E3262E;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(227, 38, 46, 0.5), 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.merged-placeholder-title {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.merged-placeholder-hint {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  color: #FFE500;
+  letter-spacing: 0.5px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 8px;
+  border-radius: 9999px;
+}

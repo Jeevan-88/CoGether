@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import './GameHeader.css';
 
 /**
  * GameHeader
  * Top navigation bar for the CoGether universal gameplay environment.
  * Matches exact reference design:
- * Left: < Back to Overview | Afterhours
- * Right: Solo (yellow pill) | Race 2 | Race 3 | Invite friend (yellow button)
+ * Left: < Back to Overview | Game Title
+ * Right: Cam & Mic Quick Toggles | Solo (yellow pill) | Race 2 | Race 3 | Invite friend (yellow button)
  */
 export default function GameHeader({
   game,
@@ -15,7 +15,11 @@ export default function GameHeader({
   roomId = null,
   onClose,
   onOpenChallenge,
-  hasActiveSession = false
+  hasActiveSession = false,
+  isCamActive = true,
+  isMicActive = true,
+  onToggleCamera,
+  onToggleMic
 }) {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
@@ -37,7 +41,7 @@ export default function GameHeader({
   return (
     <>
       <header className="game-header-bar">
-        {/* ── Left Navigation & Title (Matches Reference Image) ── */}
+        {/* ── Left Navigation & Title ── */}
         <div className="header-left-cluster">
           <button
             type="button"
@@ -53,8 +57,35 @@ export default function GameHeader({
           <h1 className="header-game-title">{displayTitle}</h1>
         </div>
 
-        {/* ── Right Action Controls (Matches Reference Image: Solo | Race 2 | Race 3 | Invite friend) ── */}
+        {/* ── Right Action Controls ── */}
         <div className="header-right-cluster">
+          {/* Quick Mic and Camera Toggles */}
+          <div className="header-av-controls-row">
+            {onToggleMic && (
+              <button
+                type="button"
+                className={`header-av-pill ${isMicActive ? 'is-active-yellow' : 'is-muted'}`}
+                onClick={onToggleMic}
+                title={isMicActive ? 'Microphone is ON (Click to Mute)' : 'Microphone is OFF (Click to Unmute)'}
+              >
+                {isMicActive ? <Mic size={13} /> : <MicOff size={13} />}
+                <span>{isMicActive ? 'Mic on' : 'Mic off'}</span>
+              </button>
+            )}
+
+            {onToggleCamera && (
+              <button
+                type="button"
+                className={`header-av-pill ${isCamActive ? 'is-active-yellow' : 'is-off'}`}
+                onClick={onToggleCamera}
+                title={isCamActive ? 'Camera is ON (Click to Hide)' : 'Camera is OFF (Click to Show)'}
+              >
+                {isCamActive ? <Video size={13} /> : <VideoOff size={13} />}
+                <span>{isCamActive ? 'Cam' : 'Cam off'}</span>
+              </button>
+            )}
+          </div>
+
           <div className="header-mode-pills-row">
             <button type="button" className={`header-mode-pill ${mode === 'SINGLE_PLAYER' ? 'active' : ''}`}>Solo</button>
             <button type="button" className="header-mode-pill" onClick={onOpenChallenge}>Race 2</button>

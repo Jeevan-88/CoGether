@@ -1065,18 +1065,9 @@
   text-transform: uppercase;
 }
 
-.coplay-game-card .card-verified-tag {
-  position: absolute;
-  right: 18px;
-  top: 18px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  background: var(--color-vivid-yellow);
-  color: var(--color-ink);
-  padding: 3px 8px;
-  border-radius: var(--radius-pill);
-  text-transform: uppercase;
+.coplay-game-card .card-verified-tag,
+.card-verified-tag {
+  display: none !important;
 }
 
 /* ──────────────────────────────────────────────────────────────────────────

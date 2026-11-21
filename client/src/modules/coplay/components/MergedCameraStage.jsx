@@ -339,6 +339,17 @@ export default function MergedCameraStage({
         </div>
       )}
 
+      {/* Fallback avatar preview when camera is pending or off */}
+      {(!localStream || !cameraEnabled) && status === 'ready' && (
+        <div className="merged-stage-placeholder-overlay">
+          <div className="merged-user-avatar-disc">
+            {(currentUsername || 'G')[0].toUpperCase()}
+          </div>
+          <span className="merged-placeholder-title">{currentUsername}</span>
+          <span className="merged-placeholder-hint">Shared Virtual Room Preview</span>
+        </div>
+      )}
+
       {/* Top Floating Controls Bar */}
       <div className="merged-stage-top-controls">
         <div className="top-ctrl-left">

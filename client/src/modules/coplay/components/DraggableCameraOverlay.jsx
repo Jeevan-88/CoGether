@@ -353,6 +353,30 @@ export default function DraggableCameraOverlay({
 
         {/* Right: Sizing Presets & Actions */}
         <div className="handle-right-actions">
+          {onToggleMic && (
+            <button
+              type="button"
+              className={`btn-overlay-action ${micEnabled ? 'is-mic-active' : 'is-mic-muted'}`}
+              onClick={onToggleMic}
+              title={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
+              aria-label={micEnabled ? 'Mute Microphone' : 'Unmute Microphone'}
+            >
+              {micEnabled ? <Mic size={12} /> : <MicOff size={12} color="#f87171" />}
+            </button>
+          )}
+
+          {onToggleCamera && (
+            <button
+              type="button"
+              className={`btn-overlay-action ${cameraEnabled ? 'is-cam-active' : 'is-cam-off'}`}
+              onClick={onToggleCamera}
+              title={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
+              aria-label={cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
+            >
+              {cameraEnabled ? <Video size={12} /> : <VideoOff size={12} color="#f87171" />}
+            </button>
+          )}
+
           <div className="overlay-size-selector">
             <button
               type="button"

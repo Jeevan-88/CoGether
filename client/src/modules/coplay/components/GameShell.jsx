@@ -48,7 +48,7 @@ export default function GameShell({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [videoLayoutMode, setVideoLayoutMode] = useState('COMBINED'); // 'COMBINED' | 'SEPARATE'
   const [isMicActive, setIsMicActive] = useState(true);
-  const [isCamActive, setIsCamActive] = useState(false);
+  const [isCamActive, setIsCamActive] = useState(true);
 
   const handleToggleMic = () => {
     setIsMicActive(prev => !prev);
@@ -352,6 +352,10 @@ export default function GameShell({
         roomId={roomId}
         onOpenChallenge={() => setShowPlayWithFriendModal(true)}
         hasActiveSession={activeMode === 'CHALLENGE'}
+        isCamActive={isCamActive}
+        isMicActive={isMicActive}
+        onToggleCamera={handleToggleCamera}
+        onToggleMic={handleToggleMic}
       />
 
       {/* ── Main Gameplay Body (Universal Monitor Stage + Collapsible Right Social Rail) ── */}
@@ -418,10 +422,15 @@ export default function GameShell({
           remoteStreams={webrtc.remoteStreams}
           currentUsername={currentUsername}
           micEnabled={isMicActive}
-          cameraEnabled={true}
+          cameraEnabled={isCamActive}
           onToggleMic={handleToggleMic}
           onToggleCamera={handleToggleCamera}
-          onClose={handleToggleCamera}
+          onClose={() => {
+            setIsCamActive(false);
+            if (webrtc.cameraEnabled && webrtc.toggleCamera) {
+              webrtc.toggleCamera();
+            }
+          }}
         />
       )}
 

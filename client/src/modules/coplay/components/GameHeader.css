@@ -71,6 +71,52 @@
   flex-shrink: 0;
 }
 
+.header-av-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-av-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.header-av-pill:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.header-av-pill.is-active-yellow {
+  background: #ffe500 !important;
+  border-color: #ffe500 !important;
+  color: #111111 !important;
+  font-weight: 700 !important;
+}
+
+.header-av-pill.is-muted {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #ef4444 !important;
+}
+
+.header-av-pill.is-off {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
 .header-mode-pills-row {
   display: flex;
   align-items: center;
