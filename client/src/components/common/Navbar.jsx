@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users } from 'lucide-react';
+import { Users, LogOut, LayoutDashboard } from 'lucide-react';
 import CogetherAvatarRenderer from '../../modules/auth/CogetherAvatarRenderer.jsx';
 import './Navbar.css';
 
@@ -9,8 +9,11 @@ export default function Navbar({
   user,
   profile,
   onOpenAuth,
+  onOpenSignup,
   onOpenProfile,
+  onOpenDashboard,
   onOpenSocial,
+  onLogout,
   unreadCount = 0,
   isScrolled,
   scrollProgress = 0,
@@ -45,8 +48,8 @@ export default function Navbar({
   const heroInitialWidth = Math.min(winW * 0.85, 1150);
   const heroInitialHeight = heroInitialWidth * logoAspect;
 
-  // Scale interpolation
-  const targetScale = navLogoTargetWidth / heroInitialWidth;
+  // Scale factor: scales down from 1 to targetScale
+  const targetScale = navLogoTargetHeight / heroInitialHeight;
   const currentScale = 1 - (logoProgress * (1 - targetScale));
 
   const currentW = heroInitialWidth * currentScale;
@@ -56,15 +59,16 @@ export default function Navbar({
   const posY = currentCenterY - (currentH / 2);
 
   const isAuthenticated = Boolean(user || profile);
+  const isGuest = Boolean(user?.isGuest);
   const displayName =
     profile?.displayName ||
     profile?.display_name ||
     [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') ||
     profile?.username ||
+    user?.name ||
     user?.email?.split('@')[0] ||
-    'Member';
+    (isGuest ? 'Guest' : 'Member');
 
-  const avatar = profile?.avatarUrl || profile?.avatar_url || user?.avatarUrl || '';
   const avatarConfig = profile?.avatarConfig || profile?.avatar_config;
 
   return (
@@ -129,23 +133,46 @@ export default function Navbar({
 
         {/* Right actions: strictly authentication-aware */}
         <div className="nav-right-actions">
-          {isAuthenticated ? (
-            <button
-              type="button"
-              className="btn-login-rect"
-              onClick={() => onTabChange('games')}
-              title="Launch CoGether App"
-            >
-              Launch App
-            </button>
+          {isAuthenticated && !isGuest ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                className="btn-dashboard-pill"
+                onClick={onOpenDashboard || (() => { window.location.href = '/dashboard'; })}
+                title="Go to Account Dashboard & Member Pass"
+              >
+                <div className="nav-avatar-circle">
+                  {(displayName || 'U')[0].toUpperCase()}
+                </div>
+                <span className="nav-display-name">{displayName}</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn-signout-rect"
+                onClick={onLogout}
+                title="Sign out of your account"
+              >
+                Sign Out
+              </button>
+            </div>
           ) : (
-            <button
-              type="button"
-              className="btn-login-rect"
-              onClick={onOpenAuth}
-            >
-              Log In
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                className="btn-login-rect"
+                onClick={onOpenAuth}
+              >
+                Log In
+              </button>
+              <button
+                type="button"
+                className="btn-signup-rect"
+                onClick={onOpenSignup || (() => { window.location.href = '/signup'; })}
+              >
+                Sign Up
+              </button>
+            </div>
           )}
         </div>
       </div>

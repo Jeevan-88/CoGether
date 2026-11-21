@@ -44,7 +44,8 @@ export default function CoShopHub({
   onBackToHome,
   onSelectService
 }) {
-  const { profile } = useAuth();
+  const { profile, user, logout } = useAuth();
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   // Navigation & View Mode: 'discovery' | 'product' | 'cart' | 'room'
   const [activeView, setActiveView] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -702,11 +703,80 @@ export default function CoShopHub({
           </button>
 
           {/* Real User Profile Avatar (CoTogether User - No "YM" Text) */}
+          <div style={{ position: 'relative' }}>
+          {showUserDropdown && (
+            <div style={{
+              position: 'absolute',
+              bottom: '52px',
+              left: '0',
+              zIndex: 9999,
+              background: 'rgba(18, 18, 24, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '16px',
+              padding: '16px',
+              width: '220px',
+              boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
+              backdropFilter: 'blur(20px)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              color: '#ffffff'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
+                  {(currentUsername || 'U')[0].toUpperCase()}
+                </div>
+                <div style={{ overflow: 'hidden' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentUsername}</div>
+                  <div style={{ fontSize: '11px', color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email || 'Commerce Member'}</div>
+                </div>
+              </div>
+              <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '4px 0' }} />
+              {user && !user.isGuest ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => { window.location.href = '/dashboard'; }}
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}
+                  >
+                    Account Dashboard
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (logout) await logout();
+                      window.location.href = '/login';
+                    }}
+                    style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.35)', color: '#f87171', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => { window.location.href = '/login'; }}
+                    style={{ background: '#10b981', border: 'none', color: '#ffffff', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    Log In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { window.location.href = '/signup'; }}
+                    style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#ffffff', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    Sign Up
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           <button
             type="button"
             className="coshop-rail-avatar-btn"
             title={`Account: ${currentUsername}`}
-            onClick={() => alert(`Signed in as ${currentUsername}. CoTogether Universal Commerce Account active.`)}
+            onClick={() => setShowUserDropdown(!showUserDropdown)}
             data-testid="sign-in-button"
           >
             {profile?.avatarConfig ? (
@@ -720,6 +790,7 @@ export default function CoShopHub({
             )}
             <span className="coshop-avatar-online-dot" />
           </button>
+          </div>
         </div>
       </aside>
 

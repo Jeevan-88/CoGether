@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   ArrowLeft, Home, Film, PlaySquare, Tv, Video, Star, Flame, 
   MonitorPlay, Laptop, Link2, Trophy, Radio, Clock, Bookmark, 
-  Plus, KeyRound, Settings 
+  Plus, KeyRound, Settings, LogOut 
 } from 'lucide-react';
 import { useAuth } from '../../../core/AuthContext.jsx';
 import CogetherAvatarRenderer from '../../auth/CogetherAvatarRenderer.jsx';
@@ -16,7 +16,7 @@ export default function CoWatchSidebar({
   onCreateRoom,
   onJoinRoom
 }) {
-  const { profile, user } = useAuth();
+  const { profile, user, logout } = useAuth();
   const displayName = profile?.displayName || profile?.display_name || profile?.username || (user?.isGuest ? 'Guest' : (user ? 'Member' : 'Guest'));
   const avatarConfig = profile?.avatarConfig || profile?.avatar_config;
 
@@ -238,6 +238,34 @@ export default function CoWatchSidebar({
         >
           <Settings size={15} />
         </button>
+        {user && !user.isGuest ? (
+          <button
+            type="button"
+            className="cowatch-profile-settings-btn"
+            title="Sign Out"
+            style={{ color: '#f87171', marginLeft: '4px' }}
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (logout) await logout();
+              window.location.href = '/login';
+            }}
+          >
+            <LogOut size={15} />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="cowatch-profile-settings-btn"
+            title="Sign In"
+            style={{ color: '#10b981', marginLeft: '4px' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = '/login';
+            }}
+          >
+            <KeyRound size={15} />
+          </button>
+        )}
       </div>
     </aside>
   );

@@ -76,6 +76,29 @@ export default function ProfileModal({ onClose }) {
         <button className="modal-close" onClick={onClose} aria-label="Close modal">
           <X size={18} />
         </button>
+        <button
+          type="button"
+          onClick={handleLogout}
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '54px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.35)',
+            color: '#f87171',
+            borderRadius: '8px',
+            padding: '5px 12px',
+            fontSize: '12px',
+            fontWeight: 700,
+            cursor: 'pointer'
+          }}
+          title="Sign out of CoGether"
+        >
+          <LogOut size={14} /> Sign Out
+        </button>
 
         <div className="auth-header" style={{ marginBottom: '14px' }}>
           <div className="id-card-top-tag">

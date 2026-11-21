@@ -2044,7 +2044,7 @@ export default function CoWatchCinemaHub({ onBackToHome }) {
               return (
                 <div key={m.id} className={`cw-m ${m.isMe ? 'me' : ''}`}>
                   {!m.isMe && (
-                    <small style={{ color: m.sender === 'Aarav' ? '#6ea8d8' : '#d89a6e' }}>
+                    <small style={{ color: '#6ea8d8' }}>
                       {m.sender}
                     </small>
                   )}

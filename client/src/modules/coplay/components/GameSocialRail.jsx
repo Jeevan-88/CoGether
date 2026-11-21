@@ -170,7 +170,7 @@ export default function GameSocialRail({
           BOTTOM SECTION: REAL-TIME ROOM CHAT (Matches Reference Image 1)
           ══════════════════════════════════════════════════════════ */}
       <section className="party-chat-panel">
-        {/* Chat Header: Party chat Aarav, Meera */}
+        {/* Chat Header: Live Room */}
         <div className="party-chat-header">
           <div className="chat-title-ref-group">
             <span className="chat-title-bold">Party chat</span>

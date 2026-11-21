@@ -32,7 +32,7 @@ import {
 } from './core/navigationHistory.js';
 
 function MainApp() {
-  const { user, profile, preferences, isAuthenticated, restoreSession, isGuestExpired } = useAuth();
+  const { user, profile, preferences, isAuthenticated, restoreSession, logout, isGuestExpired } = useAuth();
   const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary } = useSocial();
 
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub' | 'coshop' | 'studyHub'

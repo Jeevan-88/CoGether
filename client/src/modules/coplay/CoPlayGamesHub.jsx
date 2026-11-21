@@ -298,7 +298,7 @@ const TILE_COLORS = {
 };
 
 export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
-  const { user, profile, isAuthenticated, accessToken } = useAuth();
+  const { user, profile, isAuthenticated, accessToken, logout } = useAuth();
   const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary } = useSocial();
 
   // Navigation State
@@ -319,6 +319,14 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
   });
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Dynamically sync playerState name with authenticated user
+  useEffect(() => {
+    if (user || profile) {
+      const canonicalName = profile?.displayName || profile?.display_name || profile?.username || user?.name || user?.email?.split('@')[0] || (user?.isGuest ? 'Guest' : 'Member');
+      setPlayerState((prev) => ({ ...prev, name: canonicalName }));
+    }
+  }, [user, profile]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState(new Set());
 
@@ -423,14 +431,8 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
   };
 
   // Friends List
-  const [friends, setFriends] = useState([
-    { n: 'Aarav', st: 'online' },
-    { n: 'Meera', st: 'in a game' },
-    { n: 'Ishaan', st: 'online' },
-    { n: 'Priya', st: 'offline' },
-    { n: 'Rohan', st: 'offline' }
-  ]);
-  const [friendRequests, setFriendRequests] = useState(['Kabir', 'Sana']);
+  const [friends, setFriends] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([]);
   const [newFriendInput, setNewFriendInput] = useState('');
 
   // ── 1. 2048 IN-SLIDE PLAYABLE ENGINE ──
@@ -562,7 +564,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
 
     setSlideTTTBoard(next);
 
-    // AI Bot Aarav response
+    // Computer opponent response
     setTimeout(() => {
       const empty = next.map((v, i) => (v ? -1 : i)).filter((i) => i >= 0);
       if (!empty.length) return;
@@ -837,9 +839,57 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
           <div className="coplay-user-info">
             <span className="coplay-user-name">{playerState.name}</span>
             <span className="coplay-user-sub">
-              {isAuthenticated ? `Level ${1 + Math.floor(playerState.xp / 200)} Member` : 'Tap to Sign In'}
+              {isAuthenticated && !user?.isGuest ? `Level ${1 + Math.floor(playerState.xp / 200)} Member` : 'Tap to Sign In'}
             </span>
           </div>
+          {isAuthenticated && !user?.isGuest ? (
+            <button
+              type="button"
+              title="Sign Out"
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (logout) await logout();
+                localStorage.removeItem('cogether_access_token');
+                localStorage.removeItem('cogether_refresh_token');
+                window.location.href = '/login';
+              }}
+              style={{
+                marginLeft: 'auto',
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#f87171',
+                borderRadius: '8px',
+                padding: '5px 8px',
+                fontSize: '11px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Sign Out
+            </button>
+          ) : (
+            <button
+              type="button"
+              title="Sign In"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = '/login';
+              }}
+              style={{
+                marginLeft: 'auto',
+                background: '#10b981',
+                border: 'none',
+                color: '#ffffff',
+                borderRadius: '8px',
+                padding: '5px 10px',
+                fontSize: '11px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </aside>
       )}
@@ -1063,7 +1113,7 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
                           ) : gId === 'ttt' ? (
                             <>
                               <div className="coplay-slide-play-header">
-                                <span>YOU ✕ &nbsp;vs&nbsp; AARAV ○</span>
+                                <span>YOU ✕ &nbsp;vs&nbsp; COMPUTER ○</span>
                               </div>
                               <div className="coplay-ttt-board">
                                 {slideTTTBoard.map((cell, cellIdx) => (
@@ -1371,6 +1421,52 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
                     />
                   </div>
                   <small style={{ color: '#707070' }}>{playerState.xp % 200} / 200 XP to Level {2 + Math.floor(playerState.xp / 200)}</small>
+
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                    {isAuthenticated && !user?.isGuest ? (
+                      <>
+                        <button
+                          type="button"
+                          className="btn-coplay-yellow btn-coplay-sm"
+                          onClick={() => { window.location.href = '/dashboard'; }}
+                        >
+                          Account Dashboard
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-coplay-sm"
+                          style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', cursor: 'pointer' }}
+                          onClick={async () => {
+                            if (logout) await logout();
+                            localStorage.removeItem('cogether_access_token');
+                            localStorage.removeItem('cogether_refresh_token');
+                            localStorage.removeItem('cogether_coplay_player');
+                            window.location.href = '/login';
+                          }}
+                        >
+                          Sign Out
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          className="btn-coplay-yellow btn-coplay-sm"
+                          onClick={() => { window.location.href = '/login'; }}
+                        >
+                          Log In
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-coplay-sm"
+                          style={{ background: '#10b981', color: '#ffffff', border: 'none', cursor: 'pointer' }}
+                          onClick={() => { window.location.href = '/signup'; }}
+                        >
+                          Sign Up
+                        </button>
+                      </>
+                    )}
+                  </div>
 
                   <div className="coplay-stats-quad">
                     <div className="coplay-stat-cell">

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../core/AuthContext.jsx';
 import './CoStudyLayout.css';
 import LearningCityMap from './components/LearningCityMap';
 import BuildingInteriorView from './components/BuildingInteriorView';
@@ -11,6 +12,8 @@ import MergedCameraView from './MergedCameraView';
  * Master container managing HUD, View States, and Learning Loops.
  */
 export default function CoStudyWorld({ onBackToHome, onSelectService } = {}) {
+  const { user, profile, logout } = useAuth();
+  const displayName = profile?.displayName || profile?.username || user?.name || (user?.isGuest ? 'Guest' : 'Scholar');
   // Current view state: 'CITY_MAP', 'BUILDING_INTERIOR', 'LESSON_STAGE', 'STUDY_ROOM'
   const [currentView, setCurrentView] = useState('CITY_MAP');
 
