@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Sparkles, Clock, Shield, LogOut, CheckCircle, AlertCircle, CreditCard, Palette } from 'lucide-react';
+import { X, User, Trash2, Sparkles, Clock, Shield, LogOut, CheckCircle, AlertCircle, CreditCard, Palette } from 'lucide-react';
 import { useAuth } from '../../core/AuthContext.jsx';
 import CogetherAvatarRenderer, { DEFAULT_AVATAR_CONFIG } from './CogetherAvatarRenderer.jsx';
 import CogetherAvatarStudio from './CogetherAvatarStudio.jsx';
@@ -8,7 +8,7 @@ import './ProfileModal.css';
 import './AuthModal.css';
 
 export default function ProfileModal({ onClose }) {
-  const { user, profile, preferences, updateProfile, updatePreferences, logout } = useAuth();
+  const { user, profile, preferences, updateProfile, updatePreferences, logout, deleteAccount } = useAuth();
 
   const [activeTab, setActiveTab] = useState('details'); // 'details' | 'avatar' | 'card'
   const [firstName, setFirstName] = useState(profile?.firstName || profile?.first_name || '');
@@ -26,6 +26,28 @@ export default function ProfileModal({ onClose }) {
 
   const [statusMessage, setStatusMessage] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await deleteAccount();
+      if (res && res.success) {
+        if (onClose) onClose();
+        window.location.href = '/';
+      } else {
+        setStatusMessage({ type: 'error', text: res?.message || 'Failed to delete account' });
+        setShowDeleteConfirm(false);
+      }
+    } catch (err) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error deleting account' });
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleSave = async (e) => {
     if (e) e.preventDefault();
@@ -360,6 +382,36 @@ export default function ProfileModal({ onClose }) {
                 <LogOut size={16} /> Logout
               </button>
             </div>
+          
+            {/* Danger Zone */}
+            <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid rgba(239, 68, 68, 0.25)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: '#ef4444' }}>Danger Zone</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>Permanently remove your account, profile, and data</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid #ef4444',
+                    color: '#f87171',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Trash2 size={13} /> Delete Account
+                </button>
+              </div>
+            </div>
+
           </form>
         )}
 
@@ -399,6 +451,89 @@ export default function ProfileModal({ onClose }) {
             />
           </div>
         )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px',
+            zIndex: 100
+          }}>
+            <div style={{
+              background: '#141416',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              borderRadius: '16px',
+              padding: '24px',
+              maxWidth: '380px',
+              textAlign: 'center',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.15)',
+                color: '#ef4444',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                <Trash2 size={24} />
+              </div>
+              <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: 800, color: '#fff' }}>
+                Delete Account?
+              </h3>
+              <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.5 }}>
+                This action is permanent and cannot be undone. All your custom avatars, game stats, and watch party records will be erased immediately.
+              </p>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: '8px',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: 'none',
+                    color: '#fff',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: '8px',
+                    background: '#dc2626',
+                    border: 'none',
+                    color: '#fff',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isDeleting ? 'Deleting...' : 'Yes, Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

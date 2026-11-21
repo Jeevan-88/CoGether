@@ -735,6 +735,34 @@ export function AuthProvider({ children }) {
     setPreferences(null);
   };
 
+  const deleteAccount = async () => {
+    const token = accessToken || localStorage.getItem('cogether_access_token');
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/account`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'DELETE_FAILED', message: data.message || 'Failed to delete account' };
+      }
+      localStorage.removeItem('cogether_access_token');
+      localStorage.removeItem('cogether_refresh_token');
+      sessionStorage.clear();
+      setAccessToken(null);
+      setUser(null);
+      setProfile(null);
+      setPreferences(null);
+      return { success: true, message: data.message };
+    } catch (err) {
+      return { success: false, error: 'NETWORK_ERROR', message: err.message };
+    }
+  };
+
   const value = {
     user,
     profile,
@@ -765,6 +793,7 @@ export function AuthProvider({ children }) {
     updatePreferences,
     createInvite,
     logout,
+    deleteAccount,
     restoreSession,
     startGuestSession,
     registerWithPassword,

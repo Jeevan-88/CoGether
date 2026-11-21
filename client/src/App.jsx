@@ -20,6 +20,12 @@ import LoginPage from './pages/LoginPage.jsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx';
+import TermsPage from './pages/TermsPage.jsx';
+import ErrorBoundary from './core/errorTracker.jsx';
+import analytics from './core/analytics.js';
+
 import { SocialProvider, useSocial } from './core/SocialContext.jsx';
 import FriendsModal from './modules/social/FriendsModal.jsx';
 import IncomingGameInviteBanner from './modules/social/IncomingGameInviteBanner.jsx';
@@ -38,12 +44,35 @@ function MainApp() {
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub' | 'coshop' | 'studyHub'
   const [activeRoom, setActiveRoom] = useState(null);
   const [activeInviteToken, setActiveInviteToken] = useState(null);
-  const [showAuth, setShowAuth] = useState(false);
+  const [showAuth, setShowAuth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname === '/login' || window.location.pathname === '/signup';
+    }
+    return false;
+  });
+  const [authModalMode, setAuthModalMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname === '/signup' ? 'signup' : 'signin';
+    }
+    return 'signin';
+  });
   const [showProfile, setShowProfile] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
   const [isCoshopActive, setIsCoshopActive] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [currentPath, setCurrentPath] = useState(() => (typeof window !== 'undefined' ? window.location.pathname : '/'));
+
+  
+  useEffect(() => {
+    if (currentPath === '/login') {
+      setAuthModalMode('signin');
+      setShowAuth(true);
+    } else if (currentPath === '/signup') {
+      setAuthModalMode('signup');
+      setShowAuth(true);
+    }
+    analytics.trackPageView(currentPath);
+  }, [currentPath]);
 
   const handleNavigate = (path) => {
     window.history.pushState({}, '', path);
@@ -224,20 +253,12 @@ function MainApp() {
 
   // Render active view content while keeping global modals (AuthModal, ProfileModal, PricingModal) mounted
   const renderMainContent = () => {
-    // ── DEDICATED AUTH & DASHBOARD PAGES ──
-    if (currentPath === '/signup') {
-      return <SignupPage onNavigate={handleNavigate} />;
+    // ── DEDICATED AUTH, LEGAL, & DASHBOARD PAGES ──
+    if (currentPath === '/privacy') {
+      return <PrivacyPolicyPage onNavigate={handleNavigate} />;
     }
-    if (currentPath === '/login') {
-      return (
-        <LoginPage
-          onNavigate={handleNavigate}
-          onLoginSuccess={() => {
-            restoreSession();
-            handleNavigate('/dashboard');
-          }}
-        />
-      );
+    if (currentPath === '/terms') {
+      return <TermsPage onNavigate={handleNavigate} />;
     }
     if (currentPath === '/forgot-password') {
       return <ForgotPasswordPage onNavigate={handleNavigate} />;
@@ -255,6 +276,15 @@ function MainApp() {
           }}
         />
       );
+    }
+    if (currentPath === '/404') {
+      return <NotFoundPage onNavigate={handleNavigate} onSelectService={handleSelectCogetherService} />;
+    }
+
+    // Unrecognized route fallback
+    const knownPaths = ['/', '/login', '/signup', '/dashboard', '/forgot-password', '/reset-password', '/privacy', '/terms', '/404'];
+    if (!knownPaths.includes(currentPath) && !currentPath.startsWith('/room/')) {
+      return <NotFoundPage onNavigate={handleNavigate} onSelectService={handleSelectCogetherService} />;
     }
     // ── INVITE LANDING SCREEN ──
     if (activeInviteToken) {
@@ -386,7 +416,16 @@ function MainApp() {
           }}
           user={user}
           profile={profile}
-          onOpenAuth={() => handleNavigate('/login')}
+          onOpenAuth={() => {
+            setAuthModalMode('signin');
+            setShowAuth(true);
+            handleNavigate('/login');
+          }}
+          onOpenSignup={() => {
+            setAuthModalMode('signup');
+            setShowAuth(true);
+            handleNavigate('/signup');
+          }}
           onOpenProfile={() => setShowProfile(true)}
           onOpenSocial={() => setIsSocialModalOpen(true)}
           unreadCount={unreadSummary?.totalUnread || 0}
@@ -419,10 +458,19 @@ function MainApp() {
 
       {showAuth && (
         <AuthModal
-          onClose={() => { if (!isGuestExpired) setShowAuth(false); }}
+          initialMode={authModalMode}
+          onClose={() => {
+            if (!isGuestExpired) setShowAuth(false);
+            if (currentPath === '/login' || currentPath === '/signup') {
+              handleNavigate('/');
+            }
+          }}
           onLoginSuccess={() => {
             setShowAuth(false);
-            if (activeTab === 'home' && !activeRoom && !activeInviteToken) {
+            restoreSession();
+            if (currentPath === '/login' || currentPath === '/signup') {
+              handleNavigate('/dashboard');
+            } else if (activeTab === 'home' && !activeRoom && !activeInviteToken) {
               setActiveTab('gamesHub');
             }
           }}
@@ -454,10 +502,12 @@ function MainApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <SocialProvider>
-        <MainApp />
-      </SocialProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <SocialProvider>
+          <MainApp />
+        </SocialProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

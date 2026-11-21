@@ -231,6 +231,16 @@ async function runTests() {
       const cookieStr = Array.isArray(setCookies) ? setCookies.join('; ') : String(setCookies);
       assert(cookieStr.includes('Max-Age=0'), 'Cookies should be cleared');
     });
+    // 11. Delete Account
+    await test('DELETE /account permanently purges user and sessions', async () => {
+      const res = await invokeRoute('DELETE', '/account', {}, {
+        authorization: `Bearer ${accessToken}`
+      });
+      assert.strictEqual(res.status, 200);
+      assert.strictEqual(res.body.success, true);
+      assert(res.body.message.includes('permanently deleted'));
+    });
+
 
   } finally {
     console.log(`\n========================================`);

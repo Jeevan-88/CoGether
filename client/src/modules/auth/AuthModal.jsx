@@ -112,6 +112,14 @@ export default function AuthModal({
   // Mode: 'signup' | 'signin' (Default: 'signin')
   const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'signin');
 
+  useEffect(() => {
+    if (initialMode) {
+      setMode(initialMode === 'signup' ? 'signup' : 'signin');
+      setStep(1);
+    }
+  }, [initialMode]);
+
+
   // Step index (1..7 for signup, 1..2 for signin)
   const [step, setStep] = useState(1);
   const [slideDir, setSlideDir] = useState('forward');
@@ -430,7 +438,13 @@ export default function AuthModal({
       setAvatarConfig(prof.avatarConfig || prof.avatar_config);
     }
 
-    // Direct entry into CoGether without blocking on multi-step avatar journey
+    // If user is completing signup onboarding, advance directly to Step 3 (Name & Password)
+    if (mode === 'signup') {
+      navigateToStep(3);
+      return;
+    }
+
+    // Direct entry into CoGether for sign in
     if (onLoginSuccess) {
       onLoginSuccess(result);
     }
@@ -798,7 +812,7 @@ export default function AuthModal({
           }}
           avatarConfig={avatarConfig || profile?.avatarConfig}
           onSelectService={handleServiceSelect}
-          onEnterCogether={onClose}
+          onEnterCogether={() => { if (onLoginSuccess) onLoginSuccess({ user, profile }); if (onClose) onClose(); }}
           onEditProfile={() => navigateToStep(3)}
         />
       </div>

@@ -626,4 +626,43 @@ router.get('/me', requireAuth, async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 9. DELETE ACCOUNT: DELETE /api/v1/auth/account
+// ─────────────────────────────────────────────────────────────────────────────
+router.delete('/account', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.sub || req.user.id;
+    const userEmail = req.user.email;
+
+    // Invalidate and delete all user sessions
+    await revokeAllUserSessions(userId).catch(() => {});
+    await db.query('DELETE FROM identity.sessions WHERE user_id = $1', [userId]).catch(() => {});
+
+    // Delete verification tokens
+    if (userEmail) {
+      await db.query('DELETE FROM identity.verification_tokens WHERE identifier = $1', [userEmail]).catch(() => {});
+    }
+
+    // Delete user profiles if separate table exists
+    await db.query('DELETE FROM identity.profiles WHERE user_id = $1', [userId]).catch(() => {});
+
+    // Delete user record
+    await db.query('DELETE FROM identity.users WHERE id = $1', [userId]);
+
+    // Clear authentication cookies
+    res.clearCookie('cogether_access', { path: '/' });
+    res.clearCookie('cogether_refresh', { path: '/' });
+    res.clearCookie('cogether_session', { path: '/' });
+
+    logger.info(`[Auth] Account permanently deleted for user: ${userId}`);
+    res.status(200).json({
+      success: true,
+      message: 'Your account and all associated data have been permanently deleted.'
+    });
+  } catch (err) {
+    logger.error('Delete account error', { error: err.message });
+    res.status(500).json({ success: false, error: 'DELETE_ACCOUNT_FAILED', message: 'Internal server error deleting account' });
+  }
+});
+
 module.exports = { authRouter: router, requireAuth };

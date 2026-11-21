@@ -169,6 +169,11 @@ class DatabaseClient {
           return { rows: [user], rowCount: 1 };
         }
       }
+      if (cleanSql.startsWith('DELETE FROM identity.users')) {
+        const id = params[0];
+        this._simulatedTables.users.delete(id);
+        return { rows: [], rowCount: 1 };
+      }
     }
 
     // ── VERIFICATION TOKENS TABLE ──

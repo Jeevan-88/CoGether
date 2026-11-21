@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
+  Trash2, 
   Tv, 
   Gamepad2, 
   ShoppingBag, 
@@ -20,6 +21,8 @@ export default function DashboardPage({ onNavigate, onSelectService }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const navigateTo = (path) => {
     if (onNavigate) {
@@ -78,6 +81,31 @@ export default function DashboardPage({ onNavigate, onSelectService }) {
       mounted = false;
     };
   }, []);
+
+  
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem('cogether_access_token');
+      const res = await fetch(`${API_URL}/api/v1/auth/account`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        credentials: 'include'
+      });
+      localStorage.removeItem('cogether_access_token');
+      localStorage.removeItem('cogether_refresh_token');
+      sessionStorage.clear();
+      navigateTo('/');
+    } catch (err) {
+      alert('Failed to delete account: ' + err.message);
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -314,6 +342,130 @@ export default function DashboardPage({ onNavigate, onSelectService }) {
               </div>
             </div>
           </div>
+        
+        {/* Account Danger Zone */}
+        <div style={{
+          marginTop: '40px',
+          padding: '24px',
+          background: 'rgba(239, 68, 68, 0.05)',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
+          borderRadius: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div>
+            <h4 style={{ margin: '0 0 4px', color: '#ef4444', fontSize: '15px', fontWeight: 700 }}>
+              Danger Zone
+            </h4>
+            <p style={{ margin: 0, fontSize: '13px', color: '#9ca3af' }}>
+              Permanently delete your account, member card, game progress, and all associated personal records.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirm(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 18px',
+              background: '#dc2626',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#fff',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            <Trash2 size={15} /> Delete Account
+          </button>
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            zIndex: 9999
+          }}>
+            <div style={{
+              background: '#16181d',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              borderRadius: '16px',
+              padding: '28px',
+              maxWidth: '420px',
+              textAlign: 'center',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+            }}>
+              <div style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.15)',
+                color: '#ef4444',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                <Trash2 size={26} />
+              </div>
+              <h3 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 800, color: '#fff' }}>
+                Permanently Delete Account?
+              </h3>
+              <p style={{ margin: '0 0 24px', fontSize: '14px', color: '#9ca3af', lineHeight: 1.5 }}>
+                This action is final and cannot be undone. All your custom avatars, synchronized watch lists, and game stats will be permanently erased.
+              </p>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  style={{
+                    flex: 1,
+                    padding: '11px',
+                    borderRadius: '8px',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: 'none',
+                    color: '#fff',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
+                  style={{
+                    flex: 1,
+                    padding: '11px',
+                    borderRadius: '8px',
+                    background: '#dc2626',
+                    border: 'none',
+                    color: '#fff',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isDeleting ? 'Deleting...' : 'Yes, Delete My Account'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         </div>
       </div>
     </div>
