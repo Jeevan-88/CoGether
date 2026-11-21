@@ -49,7 +49,7 @@ export default function CoShopHub({
   // Navigation & View Mode: 'discovery' | 'product' | 'cart' | 'room'
   const [activeView, setActiveView] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('view') || (initialRoomId ? 'room' : 'product');
+    return params.get('view') || (initialRoomId ? 'room' : 'discovery');
   });
   const [activeRoomId, setActiveRoomId] = useState(initialRoomId || null);
   const currentUsername = initialUsername || profile?.displayName || profile?.username || initialUser?.name || 'Shopper_' + Math.floor(100 + Math.random() * 900);
@@ -90,8 +90,8 @@ export default function CoShopHub({
   const [slideProgress, setSlideProgress] = useState(0);
 
   // Right Navigation Active State ('home' | 'categories' | 'cart' | 'deals' | 'bag' | 'wishlist')
-  const [activeNav, setActiveNav] = useState('cart'); // Default 'cart' matching Screenshot 2's active cart state!
-  const [activeCuratedCategory, setActiveCuratedCategory] = useState('men'); // Default 'men' matching reference screenshot 5!
+  const [activeNav, setActiveNav] = useState('home');
+  const [activeCuratedCategory, setActiveCuratedCategory] = useState('men');
 
   // Marquee scroll wrap handler for infinite loop
   const handleMarqueeScroll = () => {
@@ -921,10 +921,10 @@ export default function CoShopHub({
                 <Users size={12} /> Social Shopping
               </span>
               <h2 className="coshop-hero-heading">
-                CoShop draait helemaal om jou
+                CoShop is all about you
               </h2>
               <p className="coshop-hero-subtext">
-                Al je favoriete winkels. Al je bestellingen volgen. Live videogesprekken om samen met vrienden te winkelen.
+                All your favorite stores. Real-time order tracking. Live video calls to shop together with friends.
               </p>
               <div className="coshop-hero-cta-wrapper">
                 <button

@@ -42,7 +42,14 @@ function MainApp() {
   const { user, profile, preferences, isAuthenticated, restoreSession, logout, isGuestExpired } = useAuth();
   const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary } = useSocial();
 
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'cinemaHub' | 'gamesHub' | 'coshop' | 'studyHub'
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const r = parseCurrentRoute();
+      return r.tab || 'home';
+    } catch (e) {
+      return 'home';
+    }
+  }); // 'home' | 'cinemaHub' | 'gamesHub' | 'coshop' | 'studyHub'
   const [activeRoom, setActiveRoom] = useState(null);
   const [activeInviteToken, setActiveInviteToken] = useState(null);
   const [showAuth, setShowAuth] = useState(() => {
@@ -71,6 +78,14 @@ function MainApp() {
     } else if (currentPath === '/signup') {
       setAuthModalMode('signup');
       setShowAuth(true);
+    } else if (currentPath === '/coshop' || currentPath === '/shop') {
+      setActiveTab('coshop');
+    } else if (currentPath === '/coplay' || currentPath === '/games' || currentPath === '/play') {
+      setActiveTab('gamesHub');
+    } else if (currentPath === '/cowatch' || currentPath === '/watch' || currentPath === '/cinema') {
+      setActiveTab('cinemaHub');
+    } else if (currentPath === '/costudy' || currentPath === '/study') {
+      setActiveTab('studyHub');
     }
     analytics.trackPageView(currentPath);
   }, [currentPath]);
@@ -286,7 +301,10 @@ function MainApp() {
     }
 
     // Unrecognized route fallback
-    const knownPaths = ['/', '/login', '/signup', '/dashboard', '/forgot-password', '/reset-password', '/privacy', '/terms', '/admin', '/admin/coshop', '/404'];
+    const knownPaths = [
+      '/', '/coshop', '/shop', '/coplay', '/games', '/play', '/cowatch', '/watch', '/cinema', '/costudy', '/study',
+      '/login', '/signup', '/dashboard', '/forgot-password', '/reset-password', '/privacy', '/terms', '/admin', '/admin/coshop', '/404'
+    ];
     if (!knownPaths.includes(currentPath) && !currentPath.startsWith('/room/')) {
       return <NotFoundPage onNavigate={handleNavigate} onSelectService={handleSelectCogetherService} />;
     }
@@ -361,10 +379,13 @@ function MainApp() {
     }
 
     // ── CO-SHOP MASSIVE SOCIAL SHOPPING HUB ──
-    if (activeTab === 'coshop' || activeTab === 'shop') {
+    if (currentPath === '/coshop' || currentPath === '/shop' || activeTab === 'coshop' || activeTab === 'shop') {
       return (
         <CoShopHub
-          onBackToHome={() => navigateBackSafe({ tab: 'home' })}
+          onBackToHome={() => {
+            handleNavigate('/');
+            setActiveTab('home');
+          }}
           onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
@@ -372,21 +393,27 @@ function MainApp() {
     }
 
     // ── CO-WATCH OTT & CINEMA STREAMING HUB ──
-    if (activeTab === 'cinemaHub') {
+    if (currentPath === '/cowatch' || currentPath === '/watch' || currentPath === '/cinema' || activeTab === 'cinemaHub') {
       return (
         <CoWatchCinemaHub
-          onBackToHome={() => navigateBackSafe({ tab: 'home' })}
+          onBackToHome={() => {
+            handleNavigate('/');
+            setActiveTab('home');
+          }}
           onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
       );
     }
 
-    // ── CO-PLAY VERIFIED GAMES ARCADE HUB ──
-    if (activeTab === 'gamesHub') {
+    // ── CO-PLAY MULTIPLAYER GAMES ARCADE HUB ──
+    if (currentPath === '/coplay' || currentPath === '/games' || currentPath === '/play' || activeTab === 'gamesHub') {
       return (
         <CoPlayGamesHub
-          onBackToHome={() => navigateBackSafe({ tab: 'home' })}
+          onBackToHome={() => {
+            handleNavigate('/');
+            setActiveTab('home');
+          }}
           onSelectService={handleSelectCogetherService}
           initialUser={user}
         />
@@ -394,11 +421,16 @@ function MainApp() {
     }
 
     // ── CO-STUDY 2D LEARNING CITY & GAMIFIED CSE WORLD ──
-    if (activeTab === 'studyHub' || activeTab === 'costudy' || activeTab === 'study') {
-      return <CoStudyWorld
-          onBackToHome={() => navigateBackSafe({ tab: 'home' })}
+    if (currentPath === '/costudy' || currentPath === '/study' || activeTab === 'studyHub' || activeTab === 'costudy' || activeTab === 'study') {
+      return (
+        <CoStudyWorld
+          onBackToHome={() => {
+            handleNavigate('/');
+            setActiveTab('home');
+          }}
           onSelectService={handleSelectCogetherService}
-        />;
+        />
+      );
     }
 
     return (

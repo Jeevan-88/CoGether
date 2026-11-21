@@ -49,9 +49,19 @@ export function parseCurrentRoute() {
   }
 
   const params = new URLSearchParams(window.location.search);
-  const pathname = window.location.pathname;
+  const pathname = window.location.pathname.toLowerCase();
 
   let tab = 'home';
+  if (pathname === '/coshop' || pathname === '/shop') {
+    tab = 'coshop';
+  } else if (pathname === '/coplay' || pathname === '/games' || pathname === '/play') {
+    tab = 'gamesHub';
+  } else if (pathname === '/cowatch' || pathname === '/watch' || pathname === '/cinema') {
+    tab = 'cinemaHub';
+  } else if (pathname === '/costudy' || pathname === '/study') {
+    tab = 'studyHub';
+  }
+
   const modeParam = params.get('mode') || params.get('tab');
   if (modeParam && MODE_TO_TAB[modeParam.toLowerCase()]) {
     tab = MODE_TO_TAB[modeParam.toLowerCase()];
