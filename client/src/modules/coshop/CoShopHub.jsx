@@ -556,7 +556,7 @@ export default function CoShopHub({
                       </div>
                       {cat.id === 'Men' ? (
                         <div className="coshop-pill-artwork-video" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <HologramModelCanvas enableRays={false} interactive={false} />
+                          <HologramModelCanvas interactive={false} />
                         </div>
                       ) : cat.video ? (
                         <video
@@ -1108,7 +1108,7 @@ export default function CoShopHub({
                     />
                     {cat.id === 'men' ? (
                       <div className="coshop-cat-art-video" style={{ width: '100%', height: '100%' }}>
-                        <HologramModelCanvas enableRays={true} interactive={true} />
+                        <HologramModelCanvas interactive={true} />
                       </div>
                     ) : (
                       <video
@@ -1156,7 +1156,7 @@ export default function CoShopHub({
                       <div className="coshop-curation-3d-center-anchor">
                         {cat.id === 'men' ? (
                           <div style={{ width: '220px', height: '220px', position: 'relative' }}>
-                            <HologramModelCanvas enableRays={true} interactive={true} />
+                            <HologramModelCanvas interactive={true} />
                           </div>
                         ) : catData.video ? (
                           <video

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CoShop 3D Hologram Shirt Preview - Exact Tripo 3D Match</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "/node_modules/three/build/three.module.js",
+        "three/addons/": "/node_modules/three/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+    const container = document.getElementById('canvas-container');
+    const width = window.innerWidth || 800;
+    const height = window.innerHeight || 800;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const darkBg = urlParams.get('bg') === 'dark';
+
+    const scene = new THREE.Scene();
+    if (darkBg) {
+      scene.background = new THREE.Color(0x18191c);
+    }
+
+    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
+    camera.position.set(0, 0, 2.25);
+
+    const renderer = new THREE.WebGLRenderer({ alpha: !darkBg, antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 2, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
+
+    // Balanced PBR Studio Lighting preserving full contrast, dark navy & gold
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.75);
+    keyLight.position.set(1.5, 3.0, 2.5);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xeef4fc, 0.35);
+    fillLight.position.set(-2.0, 1.0, 2.0);
+    scene.add(fillLight);
+
+    const backRim = new THREE.DirectionalLight(0xffffff, 0.5);
+    backRim.position.set(0, 2.0, -2.5);
+    scene.add(backRim);
+
+    const shirtGroup = new THREE.Group();
+    scene.add(shirtGroup);
+
+    // Load shirt.glb with MeshoptDecoder
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
+    loader.load(
+      '/coshop/models/shirt.glb',
+      (gltf) => {
+        const model = gltf.scene;
+
+        // Auto-center and fit to unit bounds
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 1.05 / maxDim;
+
+        model.position.sub(center);
+        model.scale.setScalar(scale);
+
+        // Tripo 3D exact pose: 3/4 isometric perspective
+        model.rotation.y = -Math.PI / 2 - 0.32;
+        model.rotation.x = 0.08;
+        model.rotation.z = -0.02;
+
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+
+            const mat = child.material;
+            if (mat) {
+              if (mat.map) mat.map.colorSpace = THREE.SRGBColorSpace;
+              if (mat.emissiveMap) mat.emissiveMap.colorSpace = THREE.SRGBColorSpace;
+
+              mat.roughness = 0.65;
+              mat.metalness = 0.08;
+              mat.emissive = new THREE.Color(0x000000);
+              mat.emissiveIntensity = 0.0;
+
+              // Exact Tripo 3D Hologram Rim Shader
+              mat.onBeforeCompile = (shader) => {
+                shader.uniforms.time = { value: 0 };
+                mat.userData.shader = shader;
+
+                shader.fragmentShader = `
+                  uniform float time;
+                  ${shader.fragmentShader}
+                `;
+
+                shader.fragmentShader = shader.fragmentShader.replace(
+                  '#include <dithering_fragment>',
+                  `
+                  #include <dithering_fragment>
+
+                  // Exact Tripo 3D Hologram Fresnel Rim
+                  vec3 V = normalize(-vViewPosition);
+                  vec3 N = normalize(vNormal);
+                  float NdotV = abs(dot(N, V)); // Absolute dot for true grazing falloff
+                  
+                  // Tripo 3D Fresnel Edge Falloff: sharp contour glow along outer silhouette
+                  float fresnel = 1.0 - NdotV;
+                  float rim = pow(fresnel, 3.2) * 3.8;
+
+                  // High-tech subtle holographic scanlines hugging grazing edges
+                  float scan = smoothstep(0.85, 1.0, sin(gl_FragCoord.y * 0.35 - time * 2.5)) * 0.15 * pow(fresnel, 1.5);
+
+                  // Tripo 3D signature electric cyan (#00f5c4 / #00ffff)
+                  vec3 tripoCyan = vec3(0.0, 0.98, 0.88);
+                  gl_FragColor.rgb += tripoCyan * (rim + scan);
+                  `
+                );
+              };
+            }
+          }
+        });
+
+        shirtGroup.add(model);
+        console.log('Shirt loaded and exact Tripo 3D shader compiled!');
+        window.__MODEL_LOADED__ = true;
+      },
+      undefined,
+      (err) => console.error('Error loading shirt.glb:', err)
+    );
+
+    // Animation Loop
+    let lastTime = performance.now();
+    let totalTime = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      const now = performance.now();
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      totalTime += dt;
+
+      // Gentle floating hover motion
+      shirtGroup.position.y = Math.sin(totalTime * 1.5) * 0.022;
+
+      // Subtle breathing rotation
+      shirtGroup.rotation.y = Math.sin(totalTime * 0.8) * 0.05;
+
+      // Update shader uniforms
+      shirtGroup.traverse((child) => {
+        if (child.isMesh && child.material?.userData?.shader) {
+          child.material.userData.shader.uniforms.time.value = totalTime;
+        }
+      });
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    });
+  </script>
+</body>
+</html>
