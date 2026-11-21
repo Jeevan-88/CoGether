@@ -320,9 +320,49 @@ class SearchIndex {
       }
     ];
 
+    // Ingest persistent custom products from data/custom_products.json
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const customPath = path.join(__dirname, '..', '..', 'data', 'custom_products.json');
+      if (fs.existsSync(customPath)) {
+        const customData = JSON.parse(fs.readFileSync(customPath, 'utf8'));
+        if (Array.isArray(customData) && customData.length > 0) {
+          feedItems.unshift(...customData);
+        }
+      }
+    } catch (_e) {}
+
     // Normalize and deduplicate
+    this.rawCatalog = feedItems;
     const normalized = feedItems.map((item) => validateAndNormalizeProduct(item));
     this.indexedProducts = deduplicateAndGroupOffers(normalized);
+  }
+
+  addCustomProduct(product) {
+    const normalized = validateAndNormalizeProduct(product);
+    if (!this.rawCatalog) this.rawCatalog = [];
+    this.rawCatalog = [normalized, ...this.rawCatalog.filter(p => p.id !== normalized.id)];
+    this.indexedProducts = deduplicateAndGroupOffers(this.rawCatalog);
+    return normalized;
+  }
+
+  removeCustomProduct(id) {
+    if (!this.rawCatalog) this.rawCatalog = [];
+    this.rawCatalog = this.rawCatalog.filter(p => p.id !== id);
+    this.indexedProducts = deduplicateAndGroupOffers(this.rawCatalog);
+  }
+
+  getAllCustomProducts() {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const customPath = path.join(__dirname, '..', '..', 'data', 'custom_products.json');
+      if (fs.existsSync(customPath)) {
+        return JSON.parse(fs.readFileSync(customPath, 'utf8'));
+      }
+    } catch (_e) {}
+    return [];
   }
 
   /**

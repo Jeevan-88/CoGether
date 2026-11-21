@@ -773,6 +773,184 @@ app.post('/api/coshop/click', (req, res) => {
   res.json({ status: 'ok', destinationUrl: targetUrl });
 });
 
+// ── CoShop Admin & Automated Ingestion Pipeline ──────────────────────────────
+
+// Helper: Scrape product metadata from an external URL
+async function scrapeProductMetadata(targetUrl) {
+  try {
+    const parsedUrl = new URL(targetUrl);
+    const domain = parsedUrl.hostname.replace(/^www\./, '');
+    let brandGuess = domain.split('.')[0];
+    brandGuess = brandGuess.charAt(0).toUpperCase() + brandGuess.slice(1);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const res = await fetch(targetUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      },
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    const html = await res.text();
+
+    const getMeta = (prop) => {
+      const match = html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']+)["']`, 'i'))
+        || html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${prop}["']`, 'i'));
+      return match ? match[1].trim() : '';
+    };
+
+    const ogTitle = getMeta('og:title') || getMeta('twitter:title');
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const title = ogTitle || (titleMatch ? titleMatch[1].trim() : 'Curated Product');
+
+    const image = getMeta('og:image') || getMeta('twitter:image') || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80';
+    const siteName = getMeta('og:site_name') || brandGuess;
+    const description = getMeta('og:description') || getMeta('description') || 'Curated item from ' + siteName;
+
+    let price = 0;
+    const ogPrice = getMeta('product:price:amount') || getMeta('og:price:amount');
+    if (ogPrice && !isNaN(Number(ogPrice))) {
+      price = Math.round(Number(ogPrice));
+    } else {
+      const priceMatch = html.match(/(?:₹|Rs\.?|INR|\$)\s*([\d,]+(?:\.\d{2})?)/i);
+      if (priceMatch) {
+        price = Math.round(Number(priceMatch[1].replace(/,/g, '')));
+      }
+    }
+    if (!price || price <= 0) price = 1999;
+
+    const lower = (title + ' ' + targetUrl).toLowerCase();
+    let category = 'Lifestyle';
+    if (lower.includes('shoe') || lower.includes('sneaker') || lower.includes('heel') || lower.includes('boot')) category = 'Footwear';
+    else if (lower.includes('shirt') || lower.includes('dress') || lower.includes('jacket') || lower.includes('hoodie') || lower.includes('pant')) category = 'Fashion';
+    else if (lower.includes('phone') || lower.includes('watch') || lower.includes('laptop') || lower.includes('headphone') || lower.includes('earbud')) category = 'Electronics';
+    else if (lower.includes('serum') || lower.includes('cream') || lower.includes('perfume') || lower.includes('lipstick')) category = 'Beauty';
+
+    return {
+      title,
+      price,
+      originalPrice: Math.round(price * 1.2),
+      brand: siteName,
+      category,
+      images: [image],
+      thumbnail: image,
+      productUrl: targetUrl,
+      description,
+      retailerName: siteName
+    };
+  } catch (err) {
+    return {
+      title: 'Curated Item',
+      price: 1999,
+      originalPrice: 2499,
+      brand: 'Curated',
+      category: 'Lifestyle',
+      images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'],
+      thumbnail: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80',
+      productUrl: targetUrl,
+      description: 'Imported product link: ' + targetUrl,
+      retailerName: 'Web Store'
+    };
+  }
+}
+
+// 1. Scrape Endpoint: Preview metadata from link
+app.post('/api/coshop/admin/scrape', async (req, res) => {
+  const { url } = req.body || {};
+  if (!url) {
+    return res.status(400).json({ success: false, error: 'URL is required' });
+  }
+  const scraped = await scrapeProductMetadata(url);
+  res.json({ success: true, scraped });
+});
+
+// 2. Publish Endpoint: Ingest one or multiple products
+app.post('/api/coshop/admin/publish', async (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const customPath = path.join(__dirname, 'data', 'custom_products.json');
+
+    const body = req.body || {};
+    const itemsToPublish = Array.isArray(body) ? body : (body.products || [body]);
+    const addedProducts = [];
+
+    let existingCustom = [];
+    if (fs.existsSync(customPath)) {
+      try { existingCustom = JSON.parse(fs.readFileSync(customPath, 'utf8')) || []; } catch (_e) {}
+    }
+
+    for (const item of itemsToPublish) {
+      if (!item.title && item.url) {
+        const scraped = await scrapeProductMetadata(item.url);
+        Object.assign(item, scraped);
+      }
+      if (!item.id) {
+        item.id = 'custom_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+      }
+      if (!item.images || item.images.length === 0) {
+        item.images = [item.thumbnail || item.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'];
+      }
+      item.sourceTimestamp = Date.now();
+
+      const normalized = coshopIndex.addCustomProduct(item);
+      addedProducts.push(normalized);
+
+      existingCustom = [item, ...existingCustom.filter(p => p.id !== item.id)];
+    }
+
+    fs.writeFileSync(customPath, JSON.stringify(existingCustom, null, 2), 'utf8');
+
+    res.json({
+      success: true,
+      message: `Published ${addedProducts.length} product(s) successfully!`,
+      count: addedProducts.length,
+      products: addedProducts
+    });
+  } catch (err) {
+    console.error('CoShop publish error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 3. Get All Custom Products
+app.get('/api/coshop/admin/products', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  const customPath = path.join(__dirname, 'data', 'custom_products.json');
+  if (fs.existsSync(customPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(customPath, 'utf8'));
+      return res.json({ success: true, count: data.length, products: data });
+    } catch (_e) {}
+  }
+  res.json({ success: true, count: 0, products: [] });
+});
+
+// 4. Delete Custom Product
+app.delete('/api/coshop/admin/products/:id', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  const customPath = path.join(__dirname, 'data', 'custom_products.json');
+  const targetId = req.params.id;
+
+  coshopIndex.removeCustomProduct(targetId);
+
+  if (fs.existsSync(customPath)) {
+    try {
+      let data = JSON.parse(fs.readFileSync(customPath, 'utf8'));
+      data = data.filter(p => p.id !== targetId);
+      fs.writeFileSync(customPath, JSON.stringify(data, null, 2), 'utf8');
+    } catch (_e) {}
+  }
+
+  res.json({ success: true, message: `Product ${targetId} removed from catalog.` });
+});
+
 // ── System Health & Kubernetes Probes ────────────────────────────────────────
 
 // Legacy telemetry health check (backward compatible)

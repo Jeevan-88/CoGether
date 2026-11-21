@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Apple AirPods Pro (2nd Generation) with MagSafe Case (USB-C)",
+    "price": 20999,
+    "originalPrice": 24900,
+    "brand": "Apple",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=800&auto=format&fit=crop&q=80",
+    "productUrl": "https://www.apple.com/in/airpods-pro/",
+    "description": "Active Noise Cancellation reduces unwanted background noise. Adaptive Audio dynamically blends Transparency and Active Noise Cancellation."
+  },
+  {
+    "title": "Sony WH-1000XM5 Wireless Noise Cancelling Headphones",
+    "price": 26990,
+    "originalPrice": 34990,
+    "brand": "Sony",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80",
+    "productUrl": "https://www.sony.co.in/headphones/products/wh-1000xm5",
+    "description": "Industry-leading noise canceling with two processors and eight microphones for unprecedented sound quality and crystal-clear hands-free calling."
+  },
+  {
+    "title": "Minimalist Matte Black Ceramic Coffee Mug (Set of 2)",
+    "price": 899,
+    "originalPrice": 1499,
+    "brand": "CoHome",
+    "category": "Lifestyle",
+    "image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80",
+    "productUrl": "https://www.cogether.tech",
+    "description": "Premium handcrafted ceramic mugs with ergonomic grip and heat-retention walls, perfect for late-night co-study sessions."
+  }
+]

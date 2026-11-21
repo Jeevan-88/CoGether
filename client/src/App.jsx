@@ -23,6 +23,7 @@ import DashboardPage from './pages/DashboardPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx';
 import TermsPage from './pages/TermsPage.jsx';
+import AdminPublisherPage from './pages/AdminPublisherPage.jsx';
 import ErrorBoundary from './core/errorTracker.jsx';
 import analytics from './core/analytics.js';
 
@@ -254,6 +255,9 @@ function MainApp() {
   // Render active view content while keeping global modals (AuthModal, ProfileModal, PricingModal) mounted
   const renderMainContent = () => {
     // ── DEDICATED AUTH, LEGAL, & DASHBOARD PAGES ──
+    if (currentPath === '/admin' || currentPath === '/admin/coshop') {
+      return <AdminPublisherPage onNavigate={handleNavigate} />;
+    }
     if (currentPath === '/privacy') {
       return <PrivacyPolicyPage onNavigate={handleNavigate} />;
     }
@@ -282,7 +286,7 @@ function MainApp() {
     }
 
     // Unrecognized route fallback
-    const knownPaths = ['/', '/login', '/signup', '/dashboard', '/forgot-password', '/reset-password', '/privacy', '/terms', '/404'];
+    const knownPaths = ['/', '/login', '/signup', '/dashboard', '/forgot-password', '/reset-password', '/privacy', '/terms', '/admin', '/admin/coshop', '/404'];
     if (!knownPaths.includes(currentPath) && !currentPath.startsWith('/room/')) {
       return <NotFoundPage onNavigate={handleNavigate} onSelectService={handleSelectCogetherService} />;
     }

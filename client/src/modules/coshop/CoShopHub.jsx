@@ -485,7 +485,32 @@ export default function CoShopHub({
             </div>
 
             {/* Dummy space right to ensure exact center alignment */}
-            <div className="coshop-header-right-spacer" aria-hidden="true" />
+            <div className="coshop-header-right-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  window.history.pushState({}, '', '/admin');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
+                className="coshop-admin-publish-btn"
+                title="Admin Ingestor: Publish Products & Scrape Links"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(34, 197, 94, 0.12)',
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  borderRadius: '20px',
+                  padding: '6px 14px',
+                  color: '#22c55e',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                <PackagePlus size={14} /> Publish Items
+              </button>
+            </div>
           </div>
 
           {/* Category Navigation Horizontally Below Search Bar */}
