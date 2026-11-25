@@ -55,10 +55,14 @@ export function AuthProvider({ children }) {
 
           setUser({
             id: data.id,
+            name: data.name || data.profile?.displayName || null,
             email: data.primaryEmail,
             status: data.status,
             mfaEnabled: Boolean(data.mfaEnabled),
-            emailVerified: Boolean(data.emailVerified),
+            emailVerified: Boolean(data.emailVerified || data.isVerified),
+            isVerified: Boolean(data.emailVerified || data.isVerified),
+            hasPassword: Boolean(data.hasPassword),
+            onboardingCompleted: Boolean(data.onboardingCompleted),
             createdAt: data.createdAt || null,
             isGuest: isGuestUser,
             guestExpiresAt: guestExp,
@@ -95,7 +99,7 @@ export function AuthProvider({ children }) {
         setUser(refreshData.user);
         setProfile(refreshData.profile);
         setPreferences(refreshData.preferences);
-        setEntitlement({ tier: 'free' });
+        setEntitlement(refreshData.entitlement || { tier: 'free' });
       } else if (refreshRes.status === 401 || refreshRes.status === 400 || refreshRes.status === 404) {
         // Session invalid or expired on server
         localStorage.removeItem('cogether_access_token');
@@ -474,6 +478,9 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ newPassword, currentPassword })
       });
       const data = await res.json();
+      if (res.ok && data.success) {
+        setUser((prev) => (prev ? { ...prev, hasPassword: true } : prev));
+      }
       return data;
     } catch (err) {
       return { success: false, error: 'SET_PASSWORD_FAILED', message: err.message };
@@ -602,7 +609,22 @@ export function AuthProvider({ children }) {
       }
 
       setProfile(data.profile);
-      return { success: true, profile: data.profile };
+      if (data.onboardingCompleted !== undefined) {
+        setUser((prev) => (
+          prev
+            ? {
+                ...prev,
+                onboardingCompleted: Boolean(data.onboardingCompleted),
+                displayName: data.profile?.displayName || prev.displayName
+              }
+            : prev
+        ));
+      }
+      return {
+        success: true,
+        profile: data.profile,
+        ...(data.onboardingCompleted !== undefined ? { onboardingCompleted: data.onboardingCompleted } : {})
+      };
     } catch (err) {
       return { success: false, error: 'UPDATE_FAILED', message: err.message };
     }
@@ -731,6 +753,9 @@ export function AuthProvider({ children }) {
 
     localStorage.removeItem('cogether_access_token');
     localStorage.removeItem('cogether_refresh_token');
+    try {
+      sessionStorage.removeItem('cogether_signup_draft_v1');
+    } catch (_e) {}
     setAccessToken(null);
     setUser(null);
     setProfile(null);

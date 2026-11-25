@@ -1671,7 +1671,20 @@ app.patch('/api/v1/me/profile', authenticateToken, async (req, res) => {
 
   try {
     const profile = await profileService.updateProfile(userId, req.body || {});
-    res.json({ success: true, profile });
+    let onboardingCompleted = undefined;
+    if (req.body?.completeOnboarding === true) {
+      await db.query(
+        `UPDATE identity.users
+         SET onboarding_completed = TRUE,
+             is_verified = TRUE,
+             name = COALESCE(name, $1),
+             updated_at = NOW()
+         WHERE id = $2`,
+        [profile?.displayName || profile?.display_name || null, userId]
+      ).catch(() => {});
+      onboardingCompleted = true;
+    }
+    res.json({ success: true, profile, ...(onboardingCompleted !== undefined ? { onboardingCompleted } : {}) });
   } catch (err) {
     const status = err.message === 'USERNAME_ALREADY_TAKEN' ? 409 : 400;
     res.status(status).json({ success: false, error: err.message });

@@ -31,12 +31,33 @@ class UserService {
     const resendInterval = config.auth.otpResendIntervalSeconds || 60;
     const otpTtl = config.auth.otpExpiresInSeconds || 600; // 10 minutes
 
-    // 1. Determine accurate purpose & validate user existence for the purpose
-    const existingUser = await db.query(
-      `SELECT user_id FROM identity.emails WHERE email_normalized = $1`,
+    // 1. Determine accurate purpose & validate user existence / signup completion state
+    let existingUser = await db.query(
+      `SELECT e.user_id, u.onboarding_completed, p.first_name
+       FROM identity.emails e
+       JOIN identity.users u ON u.id = e.user_id
+       LEFT JOIN identity.profiles p ON u.id = p.user_id
+       WHERE e.email_normalized = $1
+       LIMIT 1`,
       [email]
     );
-    const hasAccount = existingUser.rows.length > 0;
+    if (existingUser.rows.length === 0) {
+      existingUser = await db.query(
+        `SELECT u.id AS user_id, u.onboarding_completed, p.first_name
+         FROM identity.users u
+         LEFT JOIN identity.profiles p ON u.id = p.user_id
+         WHERE u.email = $1
+         LIMIT 1`,
+        [email]
+      );
+    }
+
+    const existingAccount = existingUser.rows[0] || null;
+    const hasAccount = Boolean(existingAccount);
+    const hasCompletedSignup =
+      hasAccount &&
+      (Boolean(existingAccount.onboarding_completed) ||
+        Boolean(existingAccount.first_name && String(existingAccount.first_name).trim()));
 
     if (requestedPurpose === 'login' && !hasAccount) {
       return {
@@ -46,7 +67,7 @@ class UserService {
       };
     }
 
-    if (requestedPurpose === 'signup' && hasAccount) {
+    if (requestedPurpose === 'signup' && hasCompletedSignup) {
       return {
         success: false,
         error: 'EMAIL_ALREADY_EXISTS',
@@ -55,9 +76,12 @@ class UserService {
     }
 
     // A user must not be able to request a login OTP independently and use it to bypass password verification.
-    // If requesting login OTP, a valid server-side loginChallenge is strictly required.
+    // If requesting login OTP (or OTP for a completed account), a valid server-side loginChallenge is strictly required.
     let verifiedChallengeId = null;
-    if (requestedPurpose === 'login' || (hasAccount && requestedPurpose !== 'reset_password' && requestedPurpose !== 'email_verification')) {
+    const requiresLoginChallenge =
+      requestedPurpose === 'login' ||
+      (hasAccount && hasCompletedSignup && requestedPurpose !== 'reset_password' && requestedPurpose !== 'email_verification');
+    if (requiresLoginChallenge) {
       if (!loginChallenge) {
         return {
           success: false,
@@ -129,7 +153,7 @@ class UserService {
 
     const purpose = requestedPurpose === 'reset_password'
       ? 'reset_password'
-      : (hasAccount ? 'login' : 'signup');
+      : (requestedPurpose === 'signup' && !hasCompletedSignup ? 'signup' : (hasAccount ? 'login' : 'signup'));
 
     // 3. Generate cryptographic 6-digit OTP and compute HMAC hash
     const rawOtp = generateOtp();
@@ -315,11 +339,17 @@ class UserService {
         passwordHash = await hashPassword(userDetails.password);
       }
 
-      // 3. Resolve user identity
-      const emailLookup = await client.query(
+      // 3. Resolve user identity (check identity.emails first, then fallback to identity.users.email)
+      let emailLookup = await client.query(
         `SELECT user_id FROM identity.emails WHERE email_normalized = $1`,
         [email]
       );
+      if (emailLookup.rows.length === 0) {
+        emailLookup = await client.query(
+          `SELECT id AS user_id FROM identity.users WHERE email = $1 LIMIT 1`,
+          [email]
+        );
+      }
 
       // Enforce: login must only authenticate existing accounts, never auto-create
       if ((otpRow.purpose === 'login' || targetPurpose === 'login') && emailLookup.rows.length === 0) {
@@ -333,120 +363,168 @@ class UserService {
 
       let userId;
       let isNewUser = false;
+      let resumingSignup = false;
+      let resolvedOnboardingCompleted = false;
+      let resolvedHasPassword = Boolean(passwordHash);
 
       if (emailLookup.rows.length > 0) {
         userId = emailLookup.rows[0].user_id;
 
-        // Existing account authentication:
-        // A user must NOT be able to log in without a valid, unconsumed database-backed login challenge!
-        const challengeToken = userDetails.loginChallenge || userDetails.challengeToken;
-        if (!challengeToken) {
-          await client.query('ROLLBACK');
-          return {
-            success: false,
-            error: 'LOGIN_CHALLENGE_REQUIRED',
-            message: 'A valid password verification challenge is required to log in.'
-          };
-        }
-
-        const challengeRes = await client.query(
-          `SELECT id, user_id, email_normalized, otp_id, expires_at, consumed_at 
-           FROM identity.login_challenges 
-           WHERE challenge_token = $1 
-           FOR UPDATE`,
-          [challengeToken]
-        );
-
-        if (challengeRes.rows.length === 0) {
-          await client.query('ROLLBACK');
-          return {
-            success: false,
-            error: 'INVALID_CHALLENGE',
-            message: 'Invalid login challenge. Please sign in again.'
-          };
-        }
-
-        const challengeRow = challengeRes.rows[0];
-
-        if (challengeRow.consumed_at !== null) {
-          await client.query('ROLLBACK');
-          return {
-            success: false,
-            error: 'CHALLENGE_ALREADY_USED',
-            message: 'This login challenge has already been used. Please sign in again.'
-          };
-        }
-
-        if (new Date(challengeRow.expires_at) <= new Date()) {
-          await client.query('ROLLBACK');
-          return {
-            success: false,
-            error: 'CHALLENGE_EXPIRED',
-            message: 'Login challenge has expired. Please sign in again.'
-          };
-        }
-
-        if (challengeRow.email_normalized !== email || challengeRow.user_id !== userId) {
-          await client.query('ROLLBACK');
-          return {
-            success: false,
-            error: 'CHALLENGE_USER_MISMATCH',
-            message: 'Login challenge does not match this user account.'
-          };
-        }
-
-        // Atomically consume the login challenge
-        await client.query(
-          `UPDATE identity.login_challenges SET consumed_at = NOW() WHERE id = $1`,
-          [challengeRow.id]
-        );
-
-        // If a password was provided, update password_hash as well
-        if (passwordHash) {
-          await client.query(
-            `UPDATE identity.users 
-             SET password_hash = $1, failed_login_attempts = 0, lockout_until = NULL,
-                 last_login_at = NOW(), updated_at = NOW() 
-             WHERE id = $2`,
-            [passwordHash, userId]
-          );
-        } else {
-          await client.query(
-            `UPDATE identity.users 
-             SET failed_login_attempts = 0, lockout_until = NULL,
-                 last_login_at = NOW(), updated_at = NOW() 
-             WHERE id = $1`,
-            [userId]
-          );
-        }
-
-        // Check if MFA is enabled for this user
-        const userRow = await client.query(
-          `SELECT mfa_enabled FROM identity.users WHERE id = $1`,
+        const existingUserState = await client.query(
+          `SELECT u.id, u.onboarding_completed, u.password_hash, u.mfa_enabled, p.first_name
+           FROM identity.users u
+           LEFT JOIN identity.profiles p ON u.id = p.user_id
+           WHERE u.id = $1
+           FOR UPDATE OF u`,
           [userId]
         );
-        if (userRow.rows[0]?.mfa_enabled) {
-          await client.query('COMMIT');
-          const mfaTicket = signToken(
-            { sub: userId, email, type: 'mfa_challenge', emailVerified: true },
-            { expiresInSeconds: 300 }
+        const uState = existingUserState.rows[0] || {};
+        resolvedOnboardingCompleted = Boolean(uState.onboarding_completed);
+        resolvedHasPassword = Boolean(passwordHash || uState.password_hash);
+
+        const isIncompleteSignupResume =
+          targetPurpose === 'signup' &&
+          otpRow.purpose === 'signup' &&
+          !userDetails.loginChallenge &&
+          !userDetails.challengeToken &&
+          !uState.onboarding_completed &&
+          !(uState.first_name && String(uState.first_name).trim());
+
+        if (isIncompleteSignupResume) {
+          resumingSignup = true;
+          if (passwordHash) {
+            await client.query(
+              `UPDATE identity.users
+               SET password_hash = $1, is_verified = TRUE, failed_login_attempts = 0,
+                   lock_until = NULL, lockout_until = NULL, last_login_at = NOW(), updated_at = NOW()
+               WHERE id = $2`,
+              [passwordHash, userId]
+            );
+          } else {
+            await client.query(
+              `UPDATE identity.users
+               SET is_verified = TRUE, failed_login_attempts = 0,
+                   lock_until = NULL, lockout_until = NULL, last_login_at = NOW(), updated_at = NOW()
+               WHERE id = $1`,
+              [userId]
+            );
+          }
+          await client.query(
+            `INSERT INTO identity.emails (user_id, email_normalized, is_primary, verified_at)
+             VALUES ($1, $2, true, NOW())
+             ON CONFLICT (email_normalized) DO UPDATE SET verified_at = NOW()`,
+            [userId, email]
+          ).catch(() => {});
+        } else {
+          // Existing account authentication:
+          // A user must NOT be able to log in without a valid, unconsumed database-backed login challenge!
+          const challengeToken = userDetails.loginChallenge || userDetails.challengeToken;
+          if (!challengeToken) {
+            await client.query('ROLLBACK');
+            return {
+              success: false,
+              error: 'LOGIN_CHALLENGE_REQUIRED',
+              message: 'A valid password verification challenge is required to log in.'
+            };
+          }
+
+          const challengeRes = await client.query(
+            `SELECT id, user_id, email_normalized, otp_id, expires_at, consumed_at 
+             FROM identity.login_challenges 
+             WHERE challenge_token = $1 
+             FOR UPDATE`,
+            [challengeToken]
           );
-          return {
-            success: true,
-            mfaRequired: true,
-            mfaTicket,
-            message: 'Two-factor authentication code required.'
-          };
+
+          if (challengeRes.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return {
+              success: false,
+              error: 'INVALID_CHALLENGE',
+              message: 'Invalid login challenge. Please sign in again.'
+            };
+          }
+
+          const challengeRow = challengeRes.rows[0];
+
+          if (challengeRow.consumed_at !== null) {
+            await client.query('ROLLBACK');
+            return {
+              success: false,
+              error: 'CHALLENGE_ALREADY_USED',
+              message: 'This login challenge has already been used. Please sign in again.'
+            };
+          }
+
+          if (new Date(challengeRow.expires_at) <= new Date()) {
+            await client.query('ROLLBACK');
+            return {
+              success: false,
+              error: 'CHALLENGE_EXPIRED',
+              message: 'Login challenge has expired. Please sign in again.'
+            };
+          }
+
+          if (challengeRow.email_normalized !== email || challengeRow.user_id !== userId) {
+            await client.query('ROLLBACK');
+            return {
+              success: false,
+              error: 'CHALLENGE_USER_MISMATCH',
+              message: 'Login challenge does not match this user account.'
+            };
+          }
+
+          // Atomically consume the login challenge
+          await client.query(
+            `UPDATE identity.login_challenges SET consumed_at = NOW() WHERE id = $1`,
+            [challengeRow.id]
+          );
+
+          // If a password was provided, update password_hash as well
+          if (passwordHash) {
+            await client.query(
+              `UPDATE identity.users 
+               SET password_hash = $1, is_verified = TRUE, failed_login_attempts = 0,
+                   lock_until = NULL, lockout_until = NULL,
+                   last_login_at = NOW(), updated_at = NOW() 
+               WHERE id = $2`,
+              [passwordHash, userId]
+            );
+          } else {
+            await client.query(
+              `UPDATE identity.users 
+               SET is_verified = TRUE, failed_login_attempts = 0,
+                   lock_until = NULL, lockout_until = NULL,
+                   last_login_at = NOW(), updated_at = NOW() 
+               WHERE id = $1`,
+              [userId]
+            );
+          }
+
+          // Check if MFA is enabled for this user
+          if (uState.mfa_enabled) {
+            await client.query('COMMIT');
+            const mfaTicket = signToken(
+              { sub: userId, email, type: 'mfa_challenge', emailVerified: true },
+              { expiresInSeconds: 300 }
+            );
+            return {
+              success: true,
+              mfaRequired: true,
+              mfaTicket,
+              message: 'Two-factor authentication code required.'
+            };
+          }
         }
       } else {
         isNewUser = true;
 
-        // Create new user with optional Argon2id password hash
+        // Create new user with optional Argon2id password hash (already email-OTP verified)
         const displayName = userDetails.displayName || email.split('@')[0];
         const userRes = await client.query(
           `INSERT INTO identity.users 
-           (status, display_name, email, password_hash, last_login_at, created_at, updated_at)
-           VALUES ('active', $1, $2, $3, NOW(), NOW(), NOW())
+           (status, display_name, email, password_hash, is_verified, last_login_at, created_at, updated_at)
+           VALUES ('active', $1, $2, $3, TRUE, NOW(), NOW(), NOW())
            RETURNING id`,
           [displayName, email, passwordHash]
         );
@@ -537,7 +615,17 @@ class UserService {
       return {
         success: true,
         isNewUser,
-        user: { id: userId, email, emailVerified: true },
+        resumingSignup,
+        hasPassword: resolvedHasPassword,
+        onboardingCompleted: resolvedOnboardingCompleted,
+        user: {
+          id: userId,
+          email,
+          emailVerified: true,
+          isVerified: true,
+          hasPassword: resolvedHasPassword,
+          onboardingCompleted: resolvedOnboardingCompleted
+        },
         profile,
         preferences,
         accessToken,
@@ -739,10 +827,10 @@ class UserService {
 
     const email = normalizeEmail(rawEmail);
 
-    // Look up user by normalized email
-    const userRes = await db.query(
-      `SELECT u.id, u.status, u.password_hash, u.mfa_enabled, u.failed_login_attempts, u.lockout_until,
-              p.username, p.display_name, e.tier as entitlement_tier
+    // Look up user by normalized email (fallback to identity.users.email)
+    let userRes = await db.query(
+      `SELECT u.id, u.status, u.password_hash, u.mfa_enabled, u.failed_login_attempts, u.lockout_until, u.lock_until,
+              u.is_verified, u.onboarding_completed, p.username, p.display_name, e.tier as entitlement_tier
        FROM identity.emails em
        JOIN identity.users u ON u.id = em.user_id
        LEFT JOIN identity.profiles p ON u.id = p.user_id
@@ -751,6 +839,18 @@ class UserService {
        LIMIT 1`,
       [email]
     );
+    if (userRes.rows.length === 0) {
+      userRes = await db.query(
+        `SELECT u.id, u.status, u.password_hash, u.mfa_enabled, u.failed_login_attempts, u.lockout_until, u.lock_until,
+                u.is_verified, u.onboarding_completed, p.username, p.display_name, e.tier as entitlement_tier
+         FROM identity.users u
+         LEFT JOIN identity.profiles p ON u.id = p.user_id
+         LEFT JOIN identity.entitlements e ON u.id = e.user_id
+         WHERE u.email = $1
+         LIMIT 1`,
+        [email]
+      );
+    }
 
     // User not found: execute dummy Argon2id verification to prevent user enumeration via timing
     if (userRes.rows.length === 0) {
@@ -765,9 +865,10 @@ class UserService {
       return { success: false, error: 'ACCOUNT_SUSPENDED', message: 'This account has been deactivated.' };
     }
 
-    // Check progressive lockout
-    if (user.lockout_until && new Date(user.lockout_until) > new Date()) {
-      const remainingSeconds = Math.ceil((new Date(user.lockout_until).getTime() - Date.now()) / 1000);
+    // Check progressive lockout (supports both lockout_until and lock_until columns)
+    const activeLock = user.lockout_until || user.lock_until;
+    if (activeLock && new Date(activeLock) > new Date()) {
+      const remainingSeconds = Math.ceil((new Date(activeLock).getTime() - Date.now()) / 1000);
       return {
         success: false,
         error: 'ACCOUNT_TEMPORARILY_LOCKED',
@@ -801,7 +902,7 @@ class UserService {
       if (lockoutInterval) {
         await db.query(
           `UPDATE identity.users 
-           SET failed_login_attempts = $1, lockout_until = NOW() + ($2)::interval, updated_at = NOW() 
+           SET failed_login_attempts = $1, lockout_until = NOW() + ($2)::interval, lock_until = NOW() + ($2)::interval, updated_at = NOW() 
            WHERE id = $3`,
           [nextFailed, lockoutInterval, user.id]
         );
@@ -820,7 +921,7 @@ class UserService {
     // Password is valid: clear failed attempts
     await db.query(
       `UPDATE identity.users 
-       SET failed_login_attempts = 0, lockout_until = NULL, last_login_at = NOW(), updated_at = NOW() 
+       SET failed_login_attempts = 0, lockout_until = NULL, lock_until = NULL, last_login_at = NOW(), updated_at = NOW() 
        WHERE id = $1`,
       [user.id]
     );
@@ -956,10 +1057,16 @@ class UserService {
       };
     }
 
-    const userRes = await db.query(
+    let userRes = await db.query(
       `SELECT user_id FROM identity.emails WHERE email_normalized = $1 LIMIT 1`,
       [email]
     );
+    if (userRes.rows.length === 0) {
+      userRes = await db.query(
+        `SELECT id AS user_id FROM identity.users WHERE email = $1 LIMIT 1`,
+        [email]
+      );
+    }
 
     if (userRes.rows.length > 0) {
       // Invalidate existing reset OTPs
@@ -1051,11 +1158,17 @@ class UserService {
         [otpRow.id]
       );
 
-      // Find user
-      const userRes = await client.query(
+      // Find user (check identity.emails first, then identity.users fallback)
+      let userRes = await client.query(
         `SELECT user_id FROM identity.emails WHERE email_normalized = $1 LIMIT 1`,
         [email]
       );
+      if (userRes.rows.length === 0) {
+        userRes = await client.query(
+          `SELECT id AS user_id FROM identity.users WHERE email = $1 LIMIT 1`,
+          [email]
+        );
+      }
 
       if (userRes.rows.length === 0) {
         await client.query('COMMIT');
@@ -1068,7 +1181,7 @@ class UserService {
       // Update password and reset lockout
       await client.query(
         `UPDATE identity.users 
-         SET password_hash = $1, failed_login_attempts = 0, lockout_until = NULL, updated_at = NOW() 
+         SET password_hash = $1, failed_login_attempts = 0, lockout_until = NULL, lock_until = NULL, updated_at = NOW() 
          WHERE id = $2`,
         [newHash, userId]
       );
@@ -1532,7 +1645,9 @@ class UserService {
     if (!userId) return null;
 
     const userRes = await db.query(
-      `SELECT u.id, u.status, u.created_at, u.last_login_at, u.mfa_enabled,
+      `SELECT u.id, u.status, u.name, u.email, u.is_verified, u.onboarding_completed,
+              (u.password_hash IS NOT NULL) AS has_password,
+              u.created_at, u.last_login_at, u.mfa_enabled,
               p.username, p.display_name, p.first_name, p.last_name, p.avatar_url, p.avatar_config, p.bio,
               pref.primary_interest, pref.interests, pref.timezone, pref.language,
               e.tier as entitlement_tier
@@ -1556,15 +1671,20 @@ class UserService {
     );
 
     const primaryEmailRow = emailsRes.rows[0] || null;
+    const isEmailVerified = Boolean(primaryEmailRow?.verified_at || row.is_verified);
 
     return {
       id: row.id,
+      name: row.name || row.display_name || null,
       status: row.status,
       createdAt: row.created_at,
       lastLoginAt: row.last_login_at,
       mfaEnabled: Boolean(row.mfa_enabled),
-      primaryEmail: primaryEmailRow?.email_normalized || null,
-      emailVerified: Boolean(primaryEmailRow?.verified_at),
+      hasPassword: Boolean(row.has_password),
+      onboardingCompleted: Boolean(row.onboarding_completed),
+      primaryEmail: primaryEmailRow?.email_normalized || row.email || null,
+      emailVerified: isEmailVerified,
+      isVerified: isEmailVerified,
       emailVerifiedAt: primaryEmailRow?.verified_at || null,
       emails: emailsRes.rows,
       profile: {

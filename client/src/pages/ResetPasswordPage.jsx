@@ -23,14 +23,17 @@ export default function ResetPasswordPage({ onNavigate }) {
   }, []);
 
   const criteria = {
-    length: newPassword.length >= 8,
-    hasUpper: /[A-Z]/.test(newPassword),
+    length: newPassword.length >= 8 && newPassword.length <= 128,
+    hasUpperLower: /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword),
     hasNumber: /[0-9]/.test(newPassword),
     hasSpecial: /[^A-Za-z0-9]/.test(newPassword)
   };
 
   const metCount = Object.values(criteria).filter(Boolean).length;
-  const isPasswordValid = metCount === 4;
+  const isPasswordValid =
+    criteria.length &&
+    criteria.hasUpperLower &&
+    (criteria.hasNumber || criteria.hasSpecial);
   const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
 
   const navigateTo = (path) => {
@@ -185,8 +188,8 @@ export default function ResetPasswordPage({ onNavigate }) {
                     <span className={`pwd-criteria-item ${criteria.length ? 'is-met' : ''}`}>
                       {criteria.length ? <Check size={13} /> : <X size={13} />} 8+ characters
                     </span>
-                    <span className={`pwd-criteria-item ${criteria.hasUpper ? 'is-met' : ''}`}>
-                      {criteria.hasUpper ? <Check size={13} /> : <X size={13} />} 1 uppercase letter
+                    <span className={`pwd-criteria-item ${criteria.hasUpperLower ? 'is-met' : ''}`}>
+                      {criteria.hasUpperLower ? <Check size={13} /> : <X size={13} />} Upper & lowercase
                     </span>
                     <span className={`pwd-criteria-item ${criteria.hasNumber ? 'is-met' : ''}`}>
                       {criteria.hasNumber ? <Check size={13} /> : <X size={13} />} 1 number

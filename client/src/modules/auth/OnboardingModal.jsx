@@ -36,7 +36,7 @@ export default function OnboardingModal({ isOpen, onComplete, onSelectService })
       setUsernameStatus('');
       return;
     }
-    if (!/^[a-z0-9_]{3,20}$/.test(clean)) {
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(clean)) {
       setUsernameStatus('invalid');
       return;
     }
@@ -55,14 +55,18 @@ export default function OnboardingModal({ isOpen, onComplete, onSelectService })
 
   if (!isOpen) return null;
 
-  const handleFinish = async (launchRoom = false) => {
+  const handleFinish = async (launchRoom = false, allowFallbackName = false) => {
     setError('');
-    if (!displayName.trim()) {
+    const resolvedDisplayName =
+      displayName.trim() ||
+      (allowFallbackName ? (user?.email?.split('@')[0] || 'Member') : '');
+    if (!resolvedDisplayName) {
       setError('Please enter a display name.');
       return;
     }
-    if (username && !/^[a-z0-9_]{3,20}$/.test(username.trim().toLowerCase())) {
-      setError('Username must be 3-20 lowercase letters, numbers, or underscores.');
+    const cleanUser = username.trim().replace(/^@+/, '').toLowerCase();
+    if (cleanUser && !/^[a-z0-9_]{3,30}$/.test(cleanUser)) {
+      setError('Username must be 3-30 letters, numbers, or underscores.');
       return;
     }
 
@@ -76,8 +80,8 @@ export default function OnboardingModal({ isOpen, onComplete, onSelectService })
         headers,
         credentials: 'include',
         body: JSON.stringify({
-          displayName: displayName.trim(),
-          username: username.trim().toLowerCase() || undefined,
+          displayName: resolvedDisplayName,
+          username: cleanUser || undefined,
           primaryInterest,
           avatarConfig: { ...(profile?.avatarConfig || {}), accent }
         })
@@ -116,7 +120,7 @@ export default function OnboardingModal({ isOpen, onComplete, onSelectService })
       }}>
         <button
           type="button"
-          onClick={() => handleFinish(false)}
+          onClick={() => handleFinish(false, true)}
           aria-label="Skip onboarding"
           style={{
             position: 'absolute', top: '18px', right: '18px', background: 'rgba(255,255,255,0.06)',

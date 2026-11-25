@@ -15,16 +15,19 @@ export default function SignupPage({ onNavigate }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Password criteria verification
+  // Password criteria verification (aligned with backend validateStrongPassword)
   const criteria = {
-    length: password.length >= 8,
-    hasUpper: /[A-Z]/.test(password),
+    length: password.length >= 8 && password.length <= 128,
+    hasUpperLower: /[A-Z]/.test(password) && /[a-z]/.test(password),
     hasNumber: /[0-9]/.test(password),
     hasSpecial: /[^A-Za-z0-9]/.test(password)
   };
 
   const metCount = Object.values(criteria).filter(Boolean).length;
-  const isPasswordValid = metCount === 4;
+  const isPasswordValid =
+    criteria.length &&
+    criteria.hasUpperLower &&
+    (criteria.hasNumber || criteria.hasSpecial);
   const passwordsMatch = password.length > 0 && password === confirmPassword;
 
   const navigateTo = (path) => {
@@ -192,8 +195,8 @@ export default function SignupPage({ onNavigate }) {
                   <span className={`pwd-criteria-item ${criteria.length ? 'is-met' : ''}`}>
                     {criteria.length ? <Check size={13} /> : <X size={13} />} 8+ characters
                   </span>
-                  <span className={`pwd-criteria-item ${criteria.hasUpper ? 'is-met' : ''}`}>
-                    {criteria.hasUpper ? <Check size={13} /> : <X size={13} />} 1 uppercase letter
+                  <span className={`pwd-criteria-item ${criteria.hasUpperLower ? 'is-met' : ''}`}>
+                    {criteria.hasUpperLower ? <Check size={13} /> : <X size={13} />} Upper & lowercase
                   </span>
                   <span className={`pwd-criteria-item ${criteria.hasNumber ? 'is-met' : ''}`}>
                     {criteria.hasNumber ? <Check size={13} /> : <X size={13} />} 1 number

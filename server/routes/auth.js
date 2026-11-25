@@ -114,6 +114,7 @@ function sanitizeUser(row) {
     email: row.email || null,
     isVerified: Boolean(row.is_verified),
     onboardingCompleted: Boolean(row.onboarding_completed),
+    hasPassword: Boolean(row.password_hash),
     role: row.role || 'USER',
     avatarUrl: row.avatar_url || null,
     createdAt: row.created_at || null
@@ -446,7 +447,21 @@ async function verifyEmailTokenHandler(emailInput, tokenInput) {
   }
 
   await db.query(`UPDATE identity.users SET is_verified = TRUE, updated_at = NOW() WHERE email = $1`, [normalizedEmail]);
-  await db.query(`UPDATE identity.emails SET verified_at = NOW() WHERE email_normalized = $1`, [normalizedEmail]).catch(() => {});
+  try {
+    const userLookup = await db.query(`SELECT id FROM identity.users WHERE email = $1 LIMIT 1`, [normalizedEmail]);
+    if (userLookup.rows[0]?.id) {
+      await db.query(
+        `INSERT INTO identity.emails (user_id, email_normalized, is_primary, verified_at)
+         VALUES ($1, $2, TRUE, NOW())
+         ON CONFLICT (email_normalized) DO UPDATE SET verified_at = NOW()`,
+        [userLookup.rows[0].id, normalizedEmail]
+      );
+    } else {
+      await db.query(`UPDATE identity.emails SET verified_at = NOW() WHERE email_normalized = $1`, [normalizedEmail]);
+    }
+  } catch {
+    // Simulated store fallback
+  }
   await db.query(`DELETE FROM identity.verification_tokens WHERE id = $1`, [record.id]);
 
   return {
@@ -628,12 +643,35 @@ router.post('/login', async (req, res, next) => {
       });
     }
 
-    await db.query(
-      `UPDATE identity.users SET failed_login_attempts = 0, lock_until = NULL, last_login_at = NOW(), updated_at = NOW() WHERE email = $1`,
-      [normalizedEmail]
-    );
+    try {
+      await db.query(
+        `UPDATE identity.users SET failed_login_attempts = 0, lock_until = NULL, lockout_until = NULL, last_login_at = NOW(), updated_at = NOW() WHERE id = $1`,
+        [user.id]
+      );
+    } catch {
+      await db.query(
+        `UPDATE identity.users SET failed_login_attempts = 0, lock_until = NULL, last_login_at = NOW(), updated_at = NOW() WHERE email = $1`,
+        [normalizedEmail]
+      );
+    }
     user.failed_login_attempts = 0;
     user.lock_until = null;
+    user.lockout_until = null;
+
+    if (user.mfa_enabled) {
+      const mfaTicket = signToken({
+        sub: user.id,
+        email: normalizedEmail,
+        type: 'mfa_challenge',
+        emailVerified: Boolean(user.is_verified)
+      }, { expiresInSeconds: 300 });
+      return res.status(200).json({
+        success: true,
+        mfaRequired: true,
+        mfaTicket,
+        message: 'Two-factor authentication code required.'
+      });
+    }
 
     if (!user.email) user.email = normalizedEmail;
     const fullContext = await ensureAndLoadFullContext(user);
@@ -865,13 +903,24 @@ router.post('/reset-password', async (req, res) => {
     }
 
     const newHash = await hashPassword(finalPassword);
-    const updatedRes = await db.query(
-      `UPDATE identity.users
-       SET password_hash = $1, failed_login_attempts = 0, lock_until = NULL, updated_at = NOW()
-       WHERE email = $2
-       RETURNING id`,
-      [newHash, normalizedEmail]
-    );
+    let updatedRes;
+    try {
+      updatedRes = await db.query(
+        `UPDATE identity.users
+         SET password_hash = $1, failed_login_attempts = 0, lock_until = NULL, lockout_until = NULL, updated_at = NOW()
+         WHERE email = $2
+         RETURNING id`,
+        [newHash, normalizedEmail]
+      );
+    } catch {
+      updatedRes = await db.query(
+        `UPDATE identity.users
+         SET password_hash = $1, failed_login_attempts = 0, lock_until = NULL, updated_at = NOW()
+         WHERE email = $2
+         RETURNING id`,
+        [newHash, normalizedEmail]
+      );
+    }
 
     await db.query(`DELETE FROM identity.verification_tokens WHERE id = $1`, [tokenRecord.id]);
     if (updatedRes.rows[0]?.id) {

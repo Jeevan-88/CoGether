@@ -46,6 +46,8 @@ export default function AuthModal({
   const {
     user,
     profile,
+    isAuthenticated,
+    logout,
     requestOtp,
     verifyOtp,
     loginWithPassword,
@@ -102,10 +104,12 @@ export default function AuthModal({
   };
 
 
-  // Signup Password states (Step 3)
+  // Signup Password states
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
   const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [passwordAlreadySet, setPasswordAlreadySet] = useState(false);
+  const [emailAlreadyExistsPrompt, setEmailAlreadyExistsPrompt] = useState(false);
 
   const { manifest } = useAvatarManifest();
 
@@ -113,11 +117,33 @@ export default function AuthModal({
   const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'signin');
 
   useEffect(() => {
+    if (!isOpen) return;
+    if (isAuthenticated && user && !user.isGuest && user.onboardingCompleted === false && (initialMode === 'signup' || mode === 'signup')) {
+      setMode('signup');
+      setPasswordAlreadySet(Boolean(user.hasPassword));
+      if (user.email) setEmail(user.email);
+      if (profile?.firstName || profile?.first_name) setFirstName(profile.firstName || profile.first_name);
+      if (profile?.lastName || profile?.last_name) setLastName(profile.lastName || profile.last_name);
+      if (profile?.username && !profile.username.includes('_')) setUsername(profile.username);
+      if (profile?.avatarConfig || profile?.avatar_config) setAvatarConfig(profile.avatarConfig || profile.avatar_config);
+      let resumeStep = 3;
+      try {
+        const rawDraft = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+        if (rawDraft) {
+          const draft = JSON.parse(rawDraft);
+          if (draft.step >= 3 && draft.step <= 6) resumeStep = draft.step;
+        }
+      } catch (_e) {}
+      setStep((prev) => (prev >= 3 && prev <= 7 ? prev : resumeStep));
+      return;
+    }
     if (initialMode) {
       setMode(initialMode === 'signup' ? 'signup' : 'signin');
       setStep(1);
+      setPasswordAlreadySet(false);
+      setEmailAlreadyExistsPrompt(false);
     }
-  }, [initialMode]);
+  }, [initialMode, isOpen]);
 
 
   // Step index (1..7 for signup, 1..2 for signin)
@@ -182,13 +208,16 @@ export default function AuthModal({
         if (draft.lastName) setLastName(draft.lastName);
         if (draft.username) setUsername(draft.username);
         if (draft.avatarConfig) setAvatarConfig(draft.avatarConfig);
+        if (typeof draft.passwordAlreadySet === 'boolean' && isAuthenticated && user && !user.isGuest) {
+          setPasswordAlreadySet(draft.passwordAlreadySet || Boolean(user.hasPassword));
+        }
       }
     } catch (_e) {}
-  }, [isOpen]);
+  }, [isOpen, isAuthenticated, user]);
 
   // Save draft to sessionStorage when fields change during signup
   useEffect(() => {
-    if (!isOpen || step >= 7) return;
+    if (!isOpen || mode !== 'signup' || step >= 7) return;
     try {
       sessionStorage.setItem(
         DRAFT_STORAGE_KEY,
@@ -197,11 +226,13 @@ export default function AuthModal({
           firstName,
           lastName,
           username,
-          avatarConfig
+          avatarConfig,
+          step: step >= 3 && step <= 6 ? step : 1,
+          passwordAlreadySet
         })
       );
     } catch (_e) {}
-  }, [isOpen, step, email, firstName, lastName, username, avatarConfig]);
+  }, [isOpen, mode, step, email, firstName, lastName, username, avatarConfig, passwordAlreadySet]);
 
   // Reset modal transient state when opened
   useEffect(() => {
@@ -300,10 +331,42 @@ export default function AuthModal({
 
   const switchMode = (newMode) => {
     setMode(newMode);
+    setView('auth');
     setError('');
     setInfo('');
     setOtp('');
+    setEmailAlreadyExistsPrompt(false);
+    if (newMode === 'signup' && isAuthenticated && user && !user.isGuest && user.onboardingCompleted === false) {
+      setPasswordAlreadySet(Boolean(user.hasPassword));
+      if (user.email) setEmail(user.email);
+      setSlideDir('forward');
+      setStep((prev) => (prev >= 3 && prev <= 6 ? prev : 3));
+      return;
+    }
     setSlideDir('forward');
+    setStep(1);
+  };
+
+  const handleRestartWithDifferentEmail = async () => {
+    setError('');
+    setInfo('');
+    setOtp('');
+    setSignupPassword('');
+    setSignupConfirmPassword('');
+    setPasswordAlreadySet(false);
+    setEmailAlreadyExistsPrompt(false);
+    setFirstName('');
+    setLastName('');
+    setUsername('');
+    setUsernameTouched(false);
+    try {
+      sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch (_e) {}
+    if (isAuthenticated && user && !user.isGuest && !user.onboardingCompleted && logout) {
+      await logout().catch(() => {});
+    }
+    setEmail('');
+    setSlideDir('backward');
     setStep(1);
   };
 
@@ -354,9 +417,10 @@ export default function AuthModal({
     e.preventDefault();
     setError('');
     setInfo('');
+    setEmailAlreadyExistsPrompt(false);
 
     const cleanEmail = email.trim().toLowerCase();
-    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       setError('Please enter a valid email address.');
       return;
     }
@@ -383,9 +447,23 @@ export default function AuthModal({
     setLoading(false);
 
     if (!result.success) {
+      if (result.error === 'RESEND_TOO_FREQUENT') {
+        const waitSec = result.retryAfterSeconds || 60;
+        setResendCooldown(waitSec);
+        setOtp('');
+        navigateToStep(2);
+        setInfo(`A verification code was recently sent to ${cleanEmail}. Enter it below (new code in ${waitSec}s).`);
+        setTimeout(() => {
+          otpInputRef.current?.focus();
+        }, 120);
+        return;
+      }
       if (result.error === 'EMAIL_SERVICE_NOT_CONFIGURED') {
         setError('Email delivery is not configured on this environment.');
       } else {
+        if (result.error === 'EMAIL_ALREADY_EXISTS') {
+          setEmailAlreadyExistsPrompt(true);
+        }
         setError(result.message || 'Unable to send verification code. Please try again.');
       }
       if (result.retryAfterSeconds) {
@@ -429,18 +507,23 @@ export default function AuthModal({
       return;
     }
 
-    // Populate existing profile fields if returning user
+    setPasswordAlreadySet(Boolean(result.hasPassword || result.user?.hasPassword || signupPassword));
+
+    // Populate existing profile fields if returning/resuming user
     const prof = result.profile || {};
     if (prof.firstName || prof.first_name) setFirstName(prof.firstName || prof.first_name);
     if (prof.lastName || prof.last_name) setLastName(prof.lastName || prof.last_name);
-    if (prof.username) setUsername(prof.username);
+    if (prof.username && !prof.username.includes('_')) setUsername(prof.username);
     if (prof.avatarConfig || prof.avatar_config) {
       setAvatarConfig(prof.avatarConfig || prof.avatar_config);
     }
 
-    // If user is completing signup onboarding, advance directly to Step 3 (Name & Password)
+    // If user is completing signup onboarding, advance directly to Step 3 (Personal Details)
     if (mode === 'signup') {
       navigateToStep(3);
+      if (result.resumingSignup) {
+        setInfo("Welcome back! Your email is verified — finish setting up your profile below.");
+      }
       return;
     }
 
@@ -657,31 +740,40 @@ export default function AuthModal({
       return;
     }
 
-    if (signupPassword.length < 8) {
-      setError('Password must be at least 8 characters long.');
-      return;
-    }
-    if (signupPassword.length > 128) {
-      setError('Password cannot exceed 128 characters.');
-      return;
-    }
-    if (!/[a-zA-Z]/.test(signupPassword) || !/[0-9]/.test(signupPassword)) {
-      setError('Password must contain at least one letter and one number.');
-      return;
-    }
-    if (signupPassword !== signupConfirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
+    // Only set initial password on Step 3 if the account doesn't already have one from Step 1/2
+    if (!passwordAlreadySet) {
+      if (signupPassword.length < 8) {
+        setError('Password must be at least 8 characters long.');
+        return;
+      }
+      if (signupPassword.length > 128) {
+        setError('Password cannot exceed 128 characters.');
+        return;
+      }
+      if (!/[a-zA-Z]/.test(signupPassword) || !/[0-9]/.test(signupPassword)) {
+        setError('Password must contain at least one letter and one number.');
+        return;
+      }
+      if (signupPassword !== signupConfirmPassword) {
+        setError('Passwords do not match.');
+        return;
+      }
 
-    // Securely hash with Argon2id and store on user record
-    setLoading(true);
-    const passRes = await setPassword(signupPassword);
-    setLoading(false);
+      setLoading(true);
+      const passRes = await setPassword(signupPassword);
+      setLoading(false);
 
-    if (!passRes.success) {
-      setError(passRes.message || 'Failed to save password.');
-      return;
+      if (!passRes.success) {
+        if (passRes.error === 'CURRENT_PASSWORD_REQUIRED') {
+          // Password was already saved during Step 2 OTP verification
+          setPasswordAlreadySet(true);
+        } else {
+          setError(passRes.message || 'Failed to save password.');
+          return;
+        }
+      } else {
+        setPasswordAlreadySet(true);
+      }
     }
 
     // Suggest a clean default username if the user hasn't manually typed one yet
@@ -744,7 +836,8 @@ export default function AuthModal({
       lastName: cleanLast,
       displayName: combinedDisplay,
       username: cleanHandle,
-      avatarConfig: finalAvatarConfig
+      avatarConfig: finalAvatarConfig,
+      completeOnboarding: true
     });
 
     setLoading(false);
@@ -895,7 +988,17 @@ export default function AuthModal({
         <div className="flow-auth-right-panel">
           {/* Top Navigation & Minimal Step Progress Bar */}
           <div className="flow-top-switch-row">
-            {step > 1 && step < 7 ? (
+            {step === 3 && mode === 'signup' && (passwordAlreadySet || (isAuthenticated && !user?.isGuest)) ? (
+              <button
+                type="button"
+                className="flow-back-step-btn"
+                onClick={handleRestartWithDifferentEmail}
+                data-testid="signup-change-email-btn"
+              >
+                <ArrowLeft size={14} />
+                <span>Different email</span>
+              </button>
+            ) : step > 1 && step < 7 ? (
               <button
                 type="button"
                 className="flow-back-step-btn"
@@ -1221,9 +1324,20 @@ export default function AuthModal({
                 </div>
 
                 {error && (
-                  <div className="flow-alert flow-alert-error" role="alert">
-                    <AlertCircle size={15} />
-                    <span>{error}</span>
+                  <div className="flow-alert flow-alert-error" role="alert" style={{ flexWrap: 'wrap', gap: '8px' }}>
+                    <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                    <span style={{ flex: 1, minWidth: '180px' }}>{error}</span>
+                    {mode === 'signup' && emailAlreadyExistsPrompt && (
+                      <button
+                        type="button"
+                        className="flow-switch-action"
+                        onClick={() => switchMode('signin')}
+                        style={{ fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap' }}
+                        data-testid="switch-to-signin-inline"
+                      >
+                        Log in instead →
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -1310,7 +1424,10 @@ export default function AuthModal({
                         className="flow-input-control"
                         placeholder="Email Address"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (emailAlreadyExistsPrompt) setEmailAlreadyExistsPrompt(false);
+                        }}
                         autoComplete="email"
                         required
                         disabled={loading}
@@ -1434,11 +1551,11 @@ export default function AuthModal({
 
                 <p className="flow-legal-disclaimer">
                   By signing up, you agree to our{' '}
-                  <a href="#terms" onClick={(e) => e.preventDefault()}>
+                  <a href="/terms" target="_blank" rel="noopener noreferrer">
                     Terms of Service
                   </a>{' '}
                   and{' '}
-                  <a href="#privacy" onClick={(e) => e.preventDefault()}>
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer">
                     Privacy Policy
                   </a>
                 </p>
@@ -1522,14 +1639,18 @@ export default function AuthModal({
             )}
 
             {/* ════════════════════════════════════════════════════════════════
-                STEP 3: PERSONAL DETAILS & SECURE PASSWORD CREATION
+                STEP 3: PERSONAL DETAILS (AND PASSWORD ONLY IF NOT ALREADY SET)
                ════════════════════════════════════════════════════════════════ */}
             {step === 3 && (
               <>
                 <div className="flow-header-block">
-                  <h1 className="flow-title">Your Details & Password</h1>
+                  <h1 className="flow-title">
+                    {passwordAlreadySet ? 'Your Details' : 'Your Details & Password'}
+                  </h1>
                   <p className="flow-subtitle">
-                    Set your display name and choose a secure password for your CoGether account
+                    {passwordAlreadySet
+                      ? 'Set your first and last name so friends recognize your CoGether identity'
+                      : 'Set your display name and choose a secure password for your CoGether account'}
                   </p>
                 </div>
 
@@ -1537,6 +1658,13 @@ export default function AuthModal({
                   <div className="flow-alert flow-alert-error" role="alert">
                     <AlertCircle size={15} />
                     <span>{error}</span>
+                  </div>
+                )}
+
+                {info && (
+                  <div className="flow-alert flow-alert-info" role="status">
+                    <CheckCircle2 size={15} />
+                    <span>{info}</span>
                   </div>
                 )}
 
@@ -1580,60 +1708,68 @@ export default function AuthModal({
                     </span>
                   </div>
 
-                  {/* Password & Confirm Password */}
-                  <div className="flow-field-wrapper" style={{ marginTop: '12px' }}>
-                    <Lock className="flow-field-icon" size={18} />
-                    <input
-                      type={showSignupPassword ? 'text' : 'password'}
-                      className="flow-input-control"
-                      placeholder="Create Password (min. 8 characters)"
-                      value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
-                      maxLength={128}
-                      required
-                      data-testid="signup-password-input"
-                    />
-                    <button
-                      type="button"
-                      className="flow-password-toggle-btn"
-                      onClick={() => setShowSignupPassword(!showSignupPassword)}
-                      aria-label={showSignupPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showSignupPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
+                  {!passwordAlreadySet && (
+                    <>
+                      <div className="flow-field-wrapper" style={{ marginTop: '12px' }}>
+                        <Lock className="flow-field-icon" size={18} />
+                        <input
+                          type={showSignupPassword ? 'text' : 'password'}
+                          className="flow-input-control"
+                          placeholder="Create Password (min. 8 characters)"
+                          value={signupPassword}
+                          onChange={(e) => setSignupPassword(e.target.value)}
+                          maxLength={128}
+                          required
+                          data-testid="signup-password-input"
+                        />
+                        <button
+                          type="button"
+                          className="flow-password-toggle-btn"
+                          onClick={() => setShowSignupPassword(!showSignupPassword)}
+                          aria-label={showSignupPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showSignupPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
 
-                  <div className="flow-field-wrapper" style={{ marginTop: '10px' }}>
-                    <Lock className="flow-field-icon" size={18} />
-                    <input
-                      type={showSignupPassword ? 'text' : 'password'}
-                      className="flow-input-control"
-                      placeholder="Confirm Password"
-                      value={signupConfirmPassword}
-                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                      maxLength={128}
-                      required
-                      data-testid="signup-confirm-password-input"
-                    />
-                  </div>
+                      <div className="flow-field-wrapper" style={{ marginTop: '10px' }}>
+                        <Lock className="flow-field-icon" size={18} />
+                        <input
+                          type={showSignupPassword ? 'text' : 'password'}
+                          className="flow-input-control"
+                          placeholder="Confirm Password"
+                          value={signupConfirmPassword}
+                          onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                          maxLength={128}
+                          required
+                          data-testid="signup-confirm-password-input"
+                        />
+                      </div>
 
-                  {/* Password requirement hints */}
-                  <div className="flow-password-hints">
-                    <span className={`hint-item ${signupPassword.length >= 8 ? 'valid' : ''}`}>
-                      • At least 8 characters
-                    </span>
-                    <span className={`hint-item ${(/[a-zA-Z]/.test(signupPassword) && /[0-9]/.test(signupPassword)) ? 'valid' : ''}`}>
-                      • Letter & number
-                    </span>
-                    <span className={`hint-item ${signupPassword && signupPassword === signupConfirmPassword ? 'valid' : ''}`}>
-                      • Passwords match
-                    </span>
-                  </div>
+                      {/* Password requirement hints */}
+                      <div className="flow-password-hints">
+                        <span className={`hint-item ${signupPassword.length >= 8 ? 'valid' : ''}`}>
+                          • At least 8 characters
+                        </span>
+                        <span className={`hint-item ${(/[a-zA-Z]/.test(signupPassword) && /[0-9]/.test(signupPassword)) ? 'valid' : ''}`}>
+                          • Letter & number
+                        </span>
+                        <span className={`hint-item ${signupPassword && signupPassword === signupConfirmPassword ? 'valid' : ''}`}>
+                          • Passwords match
+                        </span>
+                      </div>
+                    </>
+                  )}
 
                   <button
                     type="submit"
                     className="flow-action-button"
-                    disabled={loading || !firstName.trim() || !lastName.trim() || signupPassword.length < 8 || signupPassword !== signupConfirmPassword}
+                    disabled={
+                      loading ||
+                      !firstName.trim() ||
+                      !lastName.trim() ||
+                      (!passwordAlreadySet && (signupPassword.length < 8 || signupPassword !== signupConfirmPassword))
+                    }
                     data-testid="details-continue-btn"
                   >
                     <span>{loading ? 'Saving Details...' : 'Continue'}</span>
