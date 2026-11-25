@@ -56,19 +56,31 @@ class DatabaseClient {
           this.isConnected = false;
         });
       } catch (err) {
-        if (config.env === 'production' || process.env.NODE_ENV === 'production') {
-          throw new Error(`FATAL: PostgreSQL pool creation failed in production: ${err.message}`);
+        if (config.env === 'production' || config.env === 'staging' || process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+          throw new Error(`FATAL: PostgreSQL pool creation failed in ${config.env}: ${err.message}`);
         }
         logger.warn('PostgreSQL pool creation failed; enabling simulated store for local dev', { error: err });
         this.isSimulated = true;
       }
     } else {
-      if (config.env === 'production' || process.env.NODE_ENV === 'production') {
-        throw new Error('FATAL: PostgreSQL connection string is required in production environment.');
+      if (config.env === 'production' || config.env === 'staging' || process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+        throw new Error('FATAL: PostgreSQL connection string is required in staging/production environment.');
       }
       this.isSimulated = true;
       logger.info('PostgreSQL driver or URL not active; operating in fallback dev simulation mode');
     }
+  }
+
+  _isConnectionError(err) {
+    if (!err) return false;
+    const msg = String(err.message || '');
+    const code = String(err.code || '');
+    return (
+      ['ECONNREFUSED', 'EACCES', 'ENOTFOUND', 'ETIMEDOUT', 'ECONNRESET', '57P01', '57P03'].includes(code) ||
+      msg.includes('Connection terminated') ||
+      msg.includes('connect E') ||
+      msg.includes('timeout expired')
+    );
   }
 
   async query(text, params = []) {
@@ -81,19 +93,25 @@ class DatabaseClient {
         logger.debug('Executed DB query', { text, duration, rows: res.rowCount });
         return res;
       } catch (err) {
-        if (config.env !== 'production' && process.env.NODE_ENV !== 'production' && !process.env.CI) {
-          logger.warn('PostgreSQL query connection failed; switching to simulated dev store', { error: err.message });
+        const isDevLike =
+          config.env !== 'production' &&
+          config.env !== 'staging' &&
+          process.env.NODE_ENV !== 'production' &&
+          process.env.NODE_ENV !== 'staging' &&
+          !process.env.CI;
+        if (isDevLike && this._isConnectionError(err)) {
+          logger.warn('PostgreSQL connection unreachable; switching to simulated dev store', { error: err.message });
           this.isSimulated = true;
           return this._handleSimulatedQuery(text, params);
         }
-        logger.error('DB query error', { text, error: err });
+        logger.error('DB query error', { text, error: err.message });
         throw err;
       }
     }
 
     // Fallback simulation mode
-    if (config.env === 'production' || process.env.NODE_ENV === 'production') {
-      throw new Error('FATAL: Database queries cannot run in simulated fallback mode in production environment.');
+    if (config.env === 'production' || config.env === 'staging' || process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+      throw new Error('FATAL: Database queries cannot run in simulated fallback mode in staging/production.');
     }
     return this._handleSimulatedQuery(text, params);
   }
