@@ -8,7 +8,15 @@
  * - Pre-hash length guard (max 128 bytes) to prevent resource exhaustion DoS
  */
 
-const argon2 = require('argon2');
+const path = require('path');
+let argon2;
+try {
+  argon2 = require('argon2');
+} catch {
+  argon2 = require(require.resolve('argon2', {
+    paths: [path.join(__dirname, '../../server'), path.join(__dirname, '../..')]
+  }));
+}
 const { getConfig } = require('../config');
 const { logger } = require('../observability');
 

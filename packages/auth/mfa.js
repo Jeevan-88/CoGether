@@ -8,8 +8,18 @@
  */
 
 const crypto = require('crypto');
-const { generateSecret, generateSync, verifySync, generateURI } = require('otplib');
-const QRCode = require('qrcode');
+const path = require('path');
+function resolveMfaDependency(pkg) {
+  try {
+    return require(pkg);
+  } catch {
+    return require(require.resolve(pkg, {
+      paths: [path.join(__dirname, '../../server'), path.join(__dirname, '../..')]
+    }));
+  }
+}
+const { generateSecret, generateSync, verifySync, generateURI } = resolveMfaDependency('otplib');
+const QRCode = resolveMfaDependency('qrcode');
 const { getConfig } = require('../config');
 const { logger } = require('../observability');
 
