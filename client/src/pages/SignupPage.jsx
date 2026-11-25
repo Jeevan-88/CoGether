@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, Eye, EyeOff, Check, X, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { API_URL } from '../config/api.js';
+import { API_URL, parseApiResponse, formatNetworkError } from '../config/api.js';
+import { analytics } from '../core/analytics.js';
 import './AuthStyles.css';
 
 export default function SignupPage({ onNavigate }) {
@@ -71,22 +72,24 @@ export default function SignupPage({ onNavigate }) {
         })
       });
 
-      const data = await response.json();
+      const data = await parseApiResponse(response);
 
       if (!response.ok || !data.success) {
         setErrorMessage(data.error?.message || data.message || 'Signup failed. Please try again.');
         return;
       }
 
+      analytics.trackEvent('signup_completed', { verificationEmailSent: Boolean(data.verificationEmailSent) });
       setSuccessMessage(
-        'Account created successfully! Check your email (or server log in development) for your verification link.'
+        data.message ||
+          'Account created successfully! Check your email for your verification link.'
       );
       setName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setErrorMessage('Network connection error. Please verify the server is running.');
+      setErrorMessage(formatNetworkError(err));
     } finally {
       setLoading(false);
     }

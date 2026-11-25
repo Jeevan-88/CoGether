@@ -1,20 +1,115 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { X, ShieldCheck, CheckCircle2, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../core/AuthContext.jsx';
+import { API_URL, parseApiResponse, formatNetworkError } from '../../config/api.js';
+import { analytics } from '../../core/analytics.js';
 import './PricingModal.css';
 
 export default function PricingModal({ onClose, onSuccess }) {
+  const { isAuthenticated, user, accessToken, restoreSession } = useAuth();
   const [step, setStep] = useState('summary'); // summary | checkout | success
   const [upiId, setUpiId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handlePay = (e) => {
+  const handlePay = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
+
+    if (!isAuthenticated || user?.isGuest) {
+      setErrorMessage('Please sign in with your CoGether account before unlocking Keypass.');
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      analytics.trackEvent('keypass_checkout_started');
+      const headers = { 'Content-Type': 'application/json' };
+      if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+
+      const orderRes = await fetch(`${API_URL}/api/v1/billing/keypass/create-order`, {
+        method: 'POST',
+        headers,
+        credentials: 'include'
+      });
+      const orderData = await parseApiResponse(orderRes);
+
+      if (!orderRes.ok || !orderData.success) {
+        setErrorMessage(
+          orderData.message || 'Live payment gateway is not configured on this server yet.'
+        );
+        return;
+      }
+
+      if (orderData.provider === 'razorpay' && window.Razorpay) {
+        await new Promise((resolve, reject) => {
+          const rzp = new window.Razorpay({
+            key: orderData.keyId,
+            amount: orderData.amountPaise,
+            currency: orderData.currency || 'INR',
+            name: 'CoGether',
+            description: 'Master Keypass Monthly Membership',
+            order_id: orderData.orderId,
+            prefill: { email: user?.email || '', name: user?.displayName || '' },
+            handler: async (paymentResp) => {
+              try {
+                const verifyRes = await fetch(`${API_URL}/api/v1/billing/keypass/activate`, {
+                  method: 'POST',
+                  headers,
+                  credentials: 'include',
+                  body: JSON.stringify({
+                    provider: 'razorpay',
+                    orderId: paymentResp.razorpay_order_id,
+                    paymentId: paymentResp.razorpay_payment_id,
+                    signature: paymentResp.razorpay_signature
+                  })
+                });
+                const verifyData = await parseApiResponse(verifyRes);
+                if (!verifyRes.ok || !verifyData.success) {
+                  reject(new Error(verifyData.message || 'Payment verification failed.'));
+                  return;
+                }
+                resolve(verifyData);
+              } catch (err) {
+                reject(err);
+              }
+            },
+            modal: {
+              ondismiss: () => reject(new Error('Checkout cancelled before completion.'))
+            }
+          });
+          rzp.open();
+        });
+      } else if (orderData.provider === 'sandbox_preview') {
+        const activateRes = await fetch(`${API_URL}/api/v1/billing/keypass/activate`, {
+          method: 'POST',
+          headers,
+          credentials: 'include',
+          body: JSON.stringify({
+            provider: 'sandbox_preview',
+            orderId: orderData.orderId,
+            upiId: upiId.trim()
+          })
+        });
+        const activateData = await parseApiResponse(activateRes);
+        if (!activateRes.ok || !activateData.success) {
+          setErrorMessage(activateData.message || 'Activation failed.');
+          return;
+        }
+      } else {
+        setErrorMessage('Razorpay checkout script is unavailable right now. Please try again later.');
+        return;
+      }
+
+      analytics.trackEvent('keypass_activated');
+      await restoreSession?.().catch(() => {});
       setStep('success');
       if (onSuccess) onSuccess();
-    }, 1200);
+    } catch (err) {
+      setErrorMessage(formatNetworkError(err, 'Checkout failed. Please try again.'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,6 +173,17 @@ export default function PricingModal({ onClose, onSuccess }) {
                 required
                 className="upi-input"
               />
+
+              {errorMessage && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  background: 'rgba(239, 68, 68, 0.14)', border: '1px solid rgba(239, 68, 68, 0.4)',
+                  color: '#fca5a5', padding: '10px 12px', borderRadius: '10px', fontSize: '12px', marginBottom: '10px'
+                }}>
+                  <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
 
               <button type="submit" className="btn-confirm-pay" disabled={loading}>
                 {loading ? 'Activating Keypass...' : 'Pay ₹49 & Unlock Access'}

@@ -22,6 +22,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx';
+import VerifyEmailPage from './pages/VerifyEmailPage.jsx';
+import OnboardingModal from './modules/auth/OnboardingModal.jsx';
 import TermsPage from './pages/TermsPage.jsx';
 import AdminPublisherPage from './pages/AdminPublisherPage.jsx';
 import ErrorBoundary from './core/errorTracker.jsx';
@@ -92,7 +94,9 @@ function MainApp() {
 
   const handleNavigate = (path) => {
     window.history.pushState({}, '', path);
-    setCurrentPath(path.split('?')[0]);
+    const cleanPath = path.split('?')[0];
+    setCurrentPath(cleanPath);
+    analytics.trackPageView(cleanPath);
     try {
       const r = parseCurrentRoute();
       setActiveTab(r.tab || 'home');
@@ -301,9 +305,13 @@ function MainApp() {
     }
 
     // Unrecognized route fallback
+    if (currentPath === '/verify-email') {
+      return <VerifyEmailPage onNavigate={handleNavigate} />;
+    }
+
     const knownPaths = [
       '/', '/coshop', '/shop', '/coplay', '/games', '/play', '/cowatch', '/watch', '/cinema', '/costudy', '/study',
-      '/login', '/signup', '/dashboard', '/forgot-password', '/reset-password', '/privacy', '/terms', '/admin', '/admin/coshop', '/404'
+      '/login', '/signup', '/verify-email', '/dashboard', '/forgot-password', '/reset-password', '/privacy', '/terms', '/admin', '/admin/coshop', '/404'
     ];
     if (!knownPaths.includes(currentPath) && !currentPath.startsWith('/room/')) {
       return <NotFoundPage onNavigate={handleNavigate} onSelectService={handleSelectCogetherService} />;
@@ -464,6 +472,11 @@ function MainApp() {
           }}
           onOpenProfile={() => setShowProfile(true)}
           onOpenSocial={() => setIsSocialModalOpen(true)}
+          onOpenDashboard={() => handleNavigate('/dashboard')}
+          onLogout={async () => {
+            await logout?.();
+            handleNavigate('/');
+          }}
           unreadCount={unreadSummary?.totalUnread || 0}
           isScrolled={scrollProgress > 0.3}
           scrollProgress={scrollProgress}
@@ -481,6 +494,7 @@ function MainApp() {
           onOpenSocial={() => setIsSocialModalOpen(true)}
           unreadCount={unreadSummary?.totalUnread || 0}
           onOpenGamesHub={() => handleSelectCogetherService('coplay')}
+          onNavigate={handleNavigate}
           onOpenCinemaHub={() => handleSelectCogetherService('cowatch')}
         />
       </div>
@@ -519,9 +533,21 @@ function MainApp() {
       {showPricing && (
         <PricingModal
           onClose={() => setShowPricing(false)}
-          onSuccess={() => {}}
+          onSuccess={() => restoreSession()}
         />
       )}
+
+      <OnboardingModal
+        isOpen={Boolean(
+          user &&
+          !user.isGuest &&
+          user.onboardingCompleted === false &&
+          !showAuth &&
+          !['/verify-email', '/reset-password', '/forgot-password', '/privacy', '/terms', '/admin', '/admin/coshop'].includes(currentPath)
+        )}
+        onComplete={() => restoreSession()}
+        onSelectService={(svc) => handleSelectCogetherService(svc)}
+      />
 
       {isSocialModalOpen && (
         <FriendsModal

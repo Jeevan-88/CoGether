@@ -178,9 +178,15 @@ export default function GameSocialRail({
           </div>
         </div>
 
-        {/* Chat Messages Body with Pre-loaded squad messages & Live sync */}
+        {/* Chat Messages Body with Empty State & Live sync */}
         <div className="chat-messages-container" tabIndex={0} aria-label="Party Messages">
-          {allDisplayMessages.map((msg, idx) => {
+          {allDisplayMessages.length === 0 ? (
+            <div style={{
+              padding: '24px 12px', textAlign: 'center', color: '#6b7280', fontSize: '12px', lineHeight: 1.5
+            }}>
+              No messages yet. Invite a friend with your room code or say hello!
+            </div>
+          ) : allDisplayMessages.map((msg, idx) => {
             const isOutgoing = msg.isLocal || msg.sender === currentUsername || msg.sender === displayName;
             return (
               <div 

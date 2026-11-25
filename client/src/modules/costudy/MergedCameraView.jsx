@@ -13,7 +13,8 @@ import { FaceDetection } from '@mediapipe/face_detection';
 import { SelfieSegmentation } from '@mediapipe/selfie_segmentation';
 import './MergedCameraView.css';
 
-const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
+import { getSignalingUrl } from '../../core/signalingConfig.js';
+const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || getSignalingUrl();
 
 // Vibrant, High-Resolution Virtual Shared Rooms
 const SHARED_ROOMS = [

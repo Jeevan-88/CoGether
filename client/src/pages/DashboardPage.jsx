@@ -13,15 +13,19 @@ import {
   Sparkles,
   Lock
 } from 'lucide-react';
-import { API_URL } from '../config/api.js';
+import { API_URL, parseApiResponse, formatNetworkError } from '../config/api.js';
+import { useAuth } from '../core/AuthContext.jsx';
 import './AuthStyles.css';
 
 export default function DashboardPage({ onNavigate, onSelectService }) {
+  const { logout: contextLogout, accessToken } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [resendingVerify, setResendingVerify] = useState(false);
+  const [resendFeedback, setResendFeedback] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const navigateTo = (path) => {
@@ -60,13 +64,13 @@ export default function DashboardPage({ onNavigate, onSelectService }) {
           return;
         }
 
-        const data = await res.json();
+        const data = await parseApiResponse(res);
         if (mounted) {
           setUserData(data.user);
         }
       } catch (err) {
         if (mounted) {
-          setError('Failed to load profile. Please verify your connection.');
+          setError(formatNetworkError(err, 'Failed to load profile. Please check your connection.'));
         }
       } finally {
         if (mounted) {
@@ -110,19 +114,20 @@ export default function DashboardPage({ onNavigate, onSelectService }) {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
-      const token = localStorage.getItem('cogether_access_token');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (contextLogout) {
+        await contextLogout();
+      } else {
+        const token = localStorage.getItem('cogether_access_token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        await fetch(`${API_URL}/api/v1/auth/logout`, {
+          method: 'POST',
+          headers,
+          credentials: 'include'
+        });
       }
-
-      await fetch(`${API_URL}/api/v1/auth/logout`, {
-        method: 'POST',
-        headers,
-        credentials: 'include'
-      });
     } catch (err) {
-      console.warn('Logout network error:', err);
+      console.warn('Logout error:', err);
     } finally {
       localStorage.removeItem('cogether_access_token');
       localStorage.removeItem('cogether_refresh_token');
@@ -192,11 +197,44 @@ export default function DashboardPage({ onNavigate, onSelectService }) {
                 <span className={`dashboard-badge-pill ${userData.isVerified ? 'badge-verified' : 'badge-pending'}`}>
                   {userData.isVerified ? 'Verified' : 'Pending Verification'}
                 </span>
+                {!userData.isVerified && userData.email && (
+                  <button
+                    type="button"
+                    className="auth-resend-btn"
+                    disabled={resendingVerify}
+                    onClick={async () => {
+                      setResendingVerify(true);
+                      setResendFeedback('');
+                      try {
+                        const headers = { 'Content-Type': 'application/json' };
+                        const tok = accessToken || localStorage.getItem('cogether_access_token');
+                        if (tok) headers.Authorization = `Bearer ${tok}`;
+                        const r = await fetch(`${API_URL}/api/v1/auth/resend-verification`, {
+                          method: 'POST',
+                          headers,
+                          credentials: 'include',
+                          body: JSON.stringify({ email: userData.email })
+                        });
+                        const d = await parseApiResponse(r);
+                        setResendFeedback(d.message || (r.ok ? 'Verification link sent!' : 'Could not send email.'));
+                      } catch (err) {
+                        setResendFeedback(formatNetworkError(err));
+                      } finally {
+                        setResendingVerify(false);
+                      }
+                    }}
+                  >
+                    {resendingVerify ? 'Sending...' : 'Resend Verification'}
+                  </button>
+                )}
                 <span className="dashboard-badge-pill badge-role">
                   {userData.role || 'USER'}
                 </span>
               </h1>
               <p>{userData.email}</p>
+              {resendFeedback && (
+                <p style={{ color: '#34d399', fontSize: '12px', marginTop: '6px' }}>{resendFeedback}</p>
+              )}
             </div>
           </div>
 

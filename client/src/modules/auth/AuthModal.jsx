@@ -634,7 +634,6 @@ export default function AuthModal({
 
     setView('auth');
     setMode('signin');
-    setSignInMethod('password');
     setEmail(forgotEmail.trim().toLowerCase());
     setSignInPassword('');
     setInfo('Password reset successfully! Please sign in with your new password.');

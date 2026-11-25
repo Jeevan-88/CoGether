@@ -6,7 +6,8 @@ import ControlBar from '../videoroom/ControlBar.jsx';
 import { Tv, Play, Pause, RotateCcw, Link, Copy, Check, Users, MessageSquare, Sparkles } from 'lucide-react';
 import './WatchPartyRoom.css';
 
-const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
+import { getSignalingUrl } from '../../core/signalingConfig.js';
+const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || getSignalingUrl();
 
 export default function WatchPartyRoom({ roomId, username, onLeave }) {
   const {
@@ -20,7 +21,9 @@ export default function WatchPartyRoom({ roomId, username, onLeave }) {
     toggleMic,
     toggleCamera,
     toggleScreenShare,
-    sendChatMessage
+    sendChatMessage,
+    videoState,
+    sendVideoSync
   } = useWebRTC(roomId, username, SIGNALING_URL);
 
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1');
@@ -28,6 +31,15 @@ export default function WatchPartyRoom({ roomId, username, onLeave }) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+
+  useEffect(() => {
+    if (videoState?.url && videoState.url !== videoUrl) {
+      setVideoUrl(videoState.url);
+    }
+    if (typeof videoState?.isPlaying === 'boolean') {
+      setIsPlaying(videoState.isPlaying);
+    }
+  }, [videoState]);
 
   const remoteEntries = Object.entries(remoteStreams);
   const totalParticipants = remoteEntries.length + 1;
@@ -54,6 +66,7 @@ export default function WatchPartyRoom({ roomId, username, onLeave }) {
 
     setVideoUrl(target);
     setInputUrl('');
+    sendVideoSync?.({ action: 'load', url: target, currentTime: 0, isPlaying: true });
   };
 
   return (

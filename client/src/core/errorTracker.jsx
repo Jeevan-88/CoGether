@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { API_URL } from '../config/api.js';
 
 /**
  * CoGether Global Error Boundary & Crash Telemetry
@@ -27,14 +28,20 @@ export class ErrorBoundary extends React.Component {
 
     try {
       const crashReport = {
+        name: error?.name || 'Error',
         message: error?.message || 'Unknown error',
         stack: error?.stack,
         componentStack: errorInfo?.componentStack,
         url: window.location.href,
         timestamp: new Date().toISOString()
       };
-      // Can be dispatched to telemetry endpoint
       sessionStorage.setItem('cogether_last_crash', JSON.stringify(crashReport));
+      fetch(`${API_URL}/api/v1/telemetry/error`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(crashReport),
+        keepalive: true
+      }).catch(() => {});
     } catch (_e) {}
   }
 

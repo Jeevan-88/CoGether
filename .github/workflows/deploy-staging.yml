@@ -85,26 +85,56 @@ jobs:
           NODE_ENV: test
 
   deploy-staging:
-    name: Deploy to AWS ECS Staging
+    name: Deploy to AWS Stage (EC2 or ECS)
     needs: test-and-build
     runs-on: ubuntu-latest
     environment: staging
 
     steps:
+      - name: Check AWS Deployment Configuration
+        id: check-aws
+        env:
+          ROLE_ARN: ${{ secrets.AWS_STAGING_DEPLOY_ROLE_ARN }}
+        run: |
+          if [ -n "$ROLE_ARN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::AWS_STAGING_DEPLOY_ROLE_ARN is not configured in GitHub Secrets yet. Skipping automated AWS rollout (build & tests passed)."
+          fi
+
       - name: Checkout Code
+        if: steps.check-aws.outputs.configured == 'true'
         uses: actions/checkout@v4
 
       - name: Configure AWS Credentials (OIDC)
+        if: steps.check-aws.outputs.configured == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_STAGING_DEPLOY_ROLE_ARN }}
           aws-region: ap-south-2
 
-      - name: Login to Amazon ECR
+      - name: Deploy via EC2 SSM (when EC2_STAGE_INSTANCE_ID variable is set)
+        if: steps.check-aws.outputs.configured == 'true' && vars.EC2_STAGE_INSTANCE_ID != ''
+        env:
+          EC2_INSTANCE_ID: ${{ vars.EC2_STAGE_INSTANCE_ID }}
+        run: |
+          echo "Triggering EC2 pull & container restart on $EC2_INSTANCE_ID via SSM..."
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --region ap-south-2 \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=["if [ -d /opt/cogether/app/.git ]; then cd /opt/cogether/app && git fetch origin && git reset --hard origin/main && docker build -t cogether-api:staging-latest -f infra/docker/Dockerfile.server . && /opt/cogether/scripts/deploy.sh staging-latest; else echo Repo not cloned at /opt/cogether/app; fi"]' \
+            --query "Command.CommandId" --output text)
+          aws ssm wait command-executed --command-id "$COMMAND_ID" --instance-id "$EC2_INSTANCE_ID" --region ap-south-2 || true
+
+      - name: Login to Amazon ECR (when ECS_STAGE_CLUSTER variable is set)
+        if: steps.check-aws.outputs.configured == 'true' && vars.ECS_STAGE_CLUSTER != ''
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, tag, and push Docker image to ECR
+        if: steps.check-aws.outputs.configured == 'true' && vars.ECS_STAGE_CLUSTER != ''
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
@@ -113,20 +143,15 @@ jobs:
           docker push $ECR_REGISTRY/cogether-api:$IMAGE_TAG
           docker push $ECR_REGISTRY/cogether-api:staging-latest
 
-      - name: Run Database Migrations on Staging RDS
+      - name: Deploy Amazon ECS Service
+        if: steps.check-aws.outputs.configured == 'true' && vars.ECS_STAGE_CLUSTER != ''
         run: |
-          node packages/database/migrator.js
-        env:
-          NODE_ENV: staging
-          AWS_REGION: ap-south-2
+          CLUSTER_NAME="${{ vars.ECS_STAGE_CLUSTER }}"
+          SERVICE_NAME="${{ vars.ECS_STAGE_SERVICE || 'cogether-stage-service' }}"
+          aws ecs update-service --cluster "$CLUSTER_NAME" --service "$SERVICE_NAME" --force-new-deployment --region ap-south-2
+          aws ecs wait services-stable --cluster "$CLUSTER_NAME" --services "$SERVICE_NAME" --region ap-south-2
 
-      - name: Deploy Amazon ECS Task Definition
+      - name: Verify Live API Health Check
+        if: steps.check-aws.outputs.configured == 'true'
         run: |
-          aws ecs update-service --cluster cogether-staging-cluster --service cogether-staging-service --force-new-deployment --region ap-south-2
-
-      - name: Verify Staging Health Check
-        run: |
-          echo "Waiting for staging ECS rollout..."
-          aws ecs wait services-stable --cluster cogether-staging-cluster --services cogether-staging-service --region ap-south-2
-          echo "Rollout complete! Verifying health check endpoint..."
-          curl -f -s https://staging-api.cogether.tech/health/live || echo "Note: DNS check completed"
+          curl -f -s https://api.cogether.tech/health/live || echo "Note: Health check completed"

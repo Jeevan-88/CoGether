@@ -158,3 +158,33 @@
     opacity: 0.6 !important;
   }
 }
+
+@media (max-width: 768px) {
+  .cowatch-app-shell {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .cowatch-main-viewport {
+    height: auto;
+    min-height: calc(100vh - 64px);
+  }
+
+  .cowatch-content-canvas {
+    padding: 16px 14px 48px 14px;
+  }
+
+  .cowatch-category-header-banner {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .cowatch-grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+}

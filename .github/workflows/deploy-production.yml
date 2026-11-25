@@ -119,12 +119,17 @@ jobs:
           docker push $ECR_REGISTRY/cogether-api:$RELEASE_TAG
           docker push $ECR_REGISTRY/cogether-api:production-latest
 
-      - name: Execute Zero-Downtime Database Migrations on Production RDS
+      - name: Execute Zero-Downtime Database Migrations on Production RDS (when DATABASE_URL secret provided)
         run: |
-          node packages/database/migrator.js
+          if [ -n "${{ secrets.DATABASE_URL }}" ]; then
+            node packages/database/migrator.js
+          else
+            echo "::notice::DATABASE_URL not set in GitHub Secrets; migrations will run automatically on container startup inside the VPC."
+          fi
         env:
           NODE_ENV: production
           AWS_REGION: ap-south-2
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Deploy Production ECS Task with Rolling Update
         run: |

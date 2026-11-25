@@ -12,7 +12,8 @@ import SharedCartDrawer from './SharedCartDrawer.jsx';
 import { API_URL } from '../../../config/api.js';
 import './CoShopRoom.css';
 
-const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
+import { getSignalingUrl } from '../../../core/signalingConfig.js';
+const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || getSignalingUrl();
 
 export default function CoShopRoom({
   roomId,

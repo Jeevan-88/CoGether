@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Lock, Eye, EyeOff, Check, X, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { API_URL } from '../config/api.js';
+import { API_URL, parseApiResponse, formatNetworkError } from '../config/api.js';
 import './AuthStyles.css';
 
 export default function ResetPasswordPage({ onNavigate }) {
@@ -76,7 +76,7 @@ export default function ResetPasswordPage({ onNavigate }) {
         })
       });
 
-      const data = await response.json();
+      const data = await parseApiResponse(response);
 
       if (!response.ok || !data.success) {
         setErrorMessage(data.error?.message || data.message || 'Password reset failed. The link may have expired.');
@@ -85,7 +85,7 @@ export default function ResetPasswordPage({ onNavigate }) {
 
       setSuccess(true);
     } catch (err) {
-      setErrorMessage('Network connection error. Please verify the server is running.');
+      setErrorMessage(formatNetworkError(err));
     } finally {
       setLoading(false);
     }

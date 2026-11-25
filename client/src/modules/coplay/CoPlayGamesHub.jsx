@@ -299,7 +299,15 @@ const TILE_COLORS = {
 
 export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
   const { user, profile, isAuthenticated, accessToken, logout } = useAuth();
-  const { isSocialModalOpen, setIsSocialModalOpen, unreadSummary } = useSocial();
+  const {
+    friends: socialFriends = [],
+    pendingRequests = { incoming: [], outgoing: [] },
+    sendFriendRequest,
+    respondFriendRequest,
+    isSocialModalOpen,
+    setIsSocialModalOpen,
+    unreadSummary
+  } = useSocial();
 
   // Navigation State
   const [activeView, setActiveView] = useState(() => {
@@ -405,15 +413,11 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
       const saved = JSON.parse(localStorage.getItem('cogether_coplay_player') || '{}');
       return {
         name: (saved.name && saved.name !== 'Jeevan') ? saved.name : fallbackName,
-        xp: saved.xp || 140,
-        games: saved.games || 12,
-        wins: saved.wins || 7,
-        best: saved.best || 2048,
-        hist: saved.hist || [
-          ['2048', 2048, 'Solo'],
-          ['Tic Tac Duel', 1, 'Won'],
-          ['Clumsy Bird', 34, 'Solo']
-        ]
+        xp: Number(saved.xp) || 0,
+        games: Number(saved.games) || 0,
+        wins: Number(saved.wins) || 0,
+        best: Number(saved.best) || 0,
+        hist: Array.isArray(saved.hist) ? saved.hist : []
       };
     } catch (e) {
       return { name: fallbackName, xp: 140, games: 12, wins: 7, best: 2048, hist: [] };
@@ -430,10 +434,35 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
     });
   };
 
-  // Friends List
-  const [friends, setFriends] = useState([]);
-  const [friendRequests, setFriendRequests] = useState([]);
+  // Friends List (hydrated from SocialContext PostgreSQL APIs)
+  const friends = (socialFriends || []).map((f) => ({
+    id: f.userId || f.id,
+    n: f.displayName || f.username || f.name || 'Friend',
+    st: f.isOnline ? 'online' : 'offline'
+  }));
+  const friendRequests = pendingRequests?.incoming || [];
   const [newFriendInput, setNewFriendInput] = useState('');
+
+  const handleSendFriendRequest = async () => {
+    const target = newFriendInput.trim();
+    if (!target) return;
+    if (!isAuthenticated || user?.isGuest) {
+      showToast('Please log in to add friends across devices');
+      setShowAuthModal(true);
+      return;
+    }
+    try {
+      const res = await sendFriendRequest?.(target);
+      if (res && res.success) {
+        showToast(`Friend request sent to ${target}`);
+        setNewFriendInput('');
+      } else {
+        showToast(res?.message || `Could not find user "${target}"`);
+      }
+    } catch {
+      showToast('Failed to send friend request right now');
+    }
+  };
 
   // ── 1. 2048 IN-SLIDE PLAYABLE ENGINE ──
   const [slide2048Board, setSlide2048Board] = useState(Array(16).fill(0));
@@ -1296,21 +1325,14 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
                 onChange={(e) => setNewFriendInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && newFriendInput.trim()) {
-                    setFriends([...friends, { n: newFriendInput.trim(), st: 'request sent' }]);
-                    showToast(`Request sent to ${newFriendInput.trim()}`);
-                    setNewFriendInput('');
+                    handleSendFriendRequest();
                   }
                 }}
               />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn-coplay-yellow"
-                onClick={() => {
-                  if (!newFriendInput.trim()) return;
-                  setFriends([...friends, { n: newFriendInput.trim(), st: 'request sent' }]);
-                  showToast(`Request sent to ${newFriendInput.trim()}`);
-                  setNewFriendInput('');
-                }}
+                onClick={handleSendFriendRequest}
               >
                 Add friend
               </button>
@@ -1320,32 +1342,47 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
               <div style={{ marginBottom: '32px' }}>
                 <h3 className="coplay-sec-hdr" style={{ padding: '0 0 12px' }}>PENDING REQUESTS</h3>
                 <div className="coplay-friends-grid">
-                  {friendRequests.map((req, i) => (
-                    <div key={i} className="coplay-friend-card">
-                      <div className="coplay-user-av">{req[0]}</div>
+                  {friendRequests.map((req, i) => {
+                    const reqName = typeof req === 'string' ? req : (req.displayName || req.username || 'Player');
+                    const reqId = typeof req === 'string' ? req : (req.requesterId || req.userId || req.id);
+                    return (
+                    <div key={reqId || i} className="coplay-friend-card">
+                      <div className="coplay-user-av">{reqName[0]?.toUpperCase() || 'P'}</div>
                       <div>
-                        <b>{req}</b>
+                        <b>{reqName}</b>
                         <small className="status-dot">wants to connect</small>
                       </div>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="btn-coplay-yellow btn-coplay-sm"
                         style={{ marginLeft: 'auto' }}
-                        onClick={() => {
-                          setFriends([...friends, { n: req, st: 'online' }]);
-                          setFriendRequests(friendRequests.filter((r) => r !== req));
-                          showToast(`${req} is now a friend`);
+                        onClick={async () => {
+                          try {
+                            await respondFriendRequest?.(reqId, 'accept');
+                            showToast(`${reqName} is now a friend`);
+                          } catch {
+                            showToast('Could not accept friend request right now');
+                          }
                         }}
                       >
                         Accept
                       </button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             <h3 className="coplay-sec-hdr" style={{ padding: '0 0 12px' }}>ALL FRIENDS · {friends.length}</h3>
+            {friends.length === 0 ? (
+              <div style={{
+                padding: '28px 20px', borderRadius: '16px', background: '#f9fafb',
+                border: '1px dashed #d1d5db', textAlign: 'center', color: '#6b7280', fontSize: '14px'
+              }}>
+                No friends connected yet. Enter a friend&apos;s CoGether username above to send a real invite.
+              </div>
+            ) : null}
             <div className="coplay-friends-grid">
               {friends.map((f, i) => (
                 <div key={i} className="coplay-friend-card">
@@ -1455,14 +1492,6 @@ export default function CoPlayGamesHub({ onBackToHome, onSelectService }) {
                           onClick={() => { window.location.href = '/login'; }}
                         >
                           Log In
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-coplay-sm"
-                          style={{ background: '#10b981', color: '#ffffff', border: 'none', cursor: 'pointer' }}
-                          onClick={() => { window.location.href = '/signup'; }}
-                        >
-                          Sign Up
                         </button>
                       </>
                     )}

@@ -128,7 +128,7 @@ function AutomaticDiagonal3DRubiksCube() {
   );
 }
 
-export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing, onOpenGamesHub, onOpenCinemaHub }) {
+export default function LandingPage({ onStartWatchParty, onStartGames, onStartMergedCam, onOpenPricing, onOpenGamesHub, onOpenCinemaHub, onNavigate }) {
   const { profile } = useAuth();
   const [roomCode, setRoomCode] = useState('');
   const [username, setUsername] = useState(profile?.displayName || profile?.username || '');
@@ -199,9 +199,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
   const [showTuner, setShowTuner] = useState(false);
 
   const TUTORIAL_MESSAGES = [
-    { sender: 'Alex', text: 'CoGether makes Co-Watch & Co-Play feel like real life! 🍿', color: '#a855f7' },
-    { sender: 'Sam', text: 'Yooo! We are sitting in the same room! 🔥', color: '#3b82f6' },
-    { sender: 'Alex', text: 'Let\'s start Co-Play Online Games next!', color: '#a855f7' }
+    { sender: profile?.displayName || 'Host Preview', text: 'CoGether brings Co-Watch & Co-Play rooms into live sync! 🍿', color: '#a855f7' },
+    { sender: 'Room Peer', text: 'Shared controls + merged camera stage active! 🔥', color: '#3b82f6' },
+    { sender: profile?.displayName || 'Host Preview', text: 'Launch Co-Play Arcade next or paste any stream URL.', color: '#a855f7' }
   ];
 
   const [activeMsgIdx, setActiveMsgIdx] = useState(0);
@@ -375,6 +375,14 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
     else if (mode === 'games') {
       if (onOpenGamesHub) onOpenGamesHub();
       else onStartGames(finalRoom, finalName);
+    }
+    else if (mode === 'shop') {
+      if (onNavigate) onNavigate('/coshop');
+      else window.location.href = '/coshop';
+    }
+    else if (mode === 'study') {
+      if (onNavigate) onNavigate('/costudy');
+      else window.location.href = '/costudy';
     }
     else if (mode === 'merged') onStartMergedCam(finalRoom, finalName);
   };
@@ -628,12 +636,12 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                     </div>
                     <div className="merged-shared-room-stage zero-line-stage">
                       <div className="guy-merged-side">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Alex" />
-                        <span className="guy-tag-badge"><span className="dot-green" /> Alex</span>
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt={profile?.displayName || 'Host Preview'} />
+                        <span className="guy-tag-badge"><span className="dot-green" /> {profile?.displayName || 'You (Preview)'}</span>
                       </div>
                       <div className="guy-merged-side">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" alt="Sam" />
-                        <span className="guy-tag-badge"><span className="dot-blue" /> Sam</span>
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" alt="Friend Preview" />
+                        <span className="guy-tag-badge"><span className="dot-blue" /> Friend Preview</span>
                       </div>
                     </div>
                   </div>
@@ -1204,16 +1212,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                           {/* TWO FRIENDS LIVE VIDEO CALL OVERLAYS */}
                           <div className="friend-video-avatar avatar-left">
                             <div className="avatar-video-box">
-                              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Jeevan (You)" />
-                              <span className="live-cam-badge">You</span>
+                              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Your Camera Preview" />
+                              <span className="live-cam-badge">{profile?.displayName || 'You'}</span>
                             </div>
                             <div className="reaction-bubble-pop">😍 "Love the brass finish!"</div>
                           </div>
 
                           <div className="friend-video-avatar avatar-right">
                             <div className="avatar-video-box">
-                              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" alt="Maya (Friend)" />
-                              <span className="live-cam-badge">Maya (Friend)</span>
+                              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" alt="Friend Preview" />
+                              <span className="live-cam-badge">Friend Preview</span>
                             </div>
                             <div className="reaction-bubble-pop">🛒 "Added to shared cart!"</div>
                           </div>
@@ -1224,7 +1232,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                               <span className="prod-title">🪴 Brass Jade Plant Pot — Premium</span>
                               <span className="prod-price">₹1,299 <s className="old-price">₹2,499</s></span>
                             </div>
-                            <button className="btn-buy-together-now" onClick={() => handleLaunch('watch')}>
+                            <button className="btn-buy-together-now" onClick={() => handleLaunch('shop')}>
                               Checkout Together →
                             </button>
                           </div>
@@ -1358,7 +1366,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                         LO-FI RAIN BEATS.<br />
                         ZERO DISTRACTION.
                       </div>
-                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
+                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('study')}>
                         Join Study Desk <ArrowRight size={16} />
                       </button>
                     </div>
@@ -1369,7 +1377,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                       <div className="nodeck-card-body">
                         WE FIND WHAT'S KILLING YOUR FOCUS AND HELP YOU CRUSH IT WITH MULTIPLAYER QUIZ BATTLES.
                       </div>
-                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
+                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('study')}>
                         Play Quiz Battles <ArrowRight size={16} />
                       </button>
                     </div>
@@ -1382,7 +1390,7 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
                         FEWER DERAILS.<br />
                         TOP MARKS.
                       </div>
-                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('watch')}>
+                      <button className="nodeck-card-action-btn" onClick={() => handleLaunch('study')}>
                         Open Shared Desk <ArrowRight size={16} />
                       </button>
                     </div>
@@ -1443,11 +1451,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           </div>
 
           <br />
-          <button 
-            className="btn-triangle-key-buy" 
+          <button
+            className="btn-triangle-key-buy"
             onClick={onOpenPricing}
-            onMouseEnter={() => setIsCursorHovering(true)}
-            onMouseLeave={() => setIsCursorHovering(false)}
           >
             ACQUIRE KEYPASS - ₹49 →
           </button>
@@ -1456,10 +1462,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         {/* EDITORIAL REALITY CHECK CARDS (OBSIDIAN CHARCOAL & WARM CREAM) */}
         <div className="triangle-side-cards-wrapper">
           {/* LEFT CHARCOAL MATTE CARD */}
-          <div 
+          <div
             className="side-psych-card left-card-red"
-            onMouseEnter={() => setIsCursorHovering(true)}
-            onMouseLeave={() => setIsCursorHovering(false)}
           >
             <span className="side-card-badge">[ 01 // PSYCHOLOGICAL REALITY ]</span>
             <p className="side-card-body">
@@ -1468,10 +1472,8 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
           </div>
 
           {/* RIGHT EDITORIAL CREAM CARD */}
-          <div 
+          <div
             className="side-psych-card right-card-pink"
-            onMouseEnter={() => setIsCursorHovering(true)}
-            onMouseLeave={() => setIsCursorHovering(false)}
           >
             <span className="side-card-badge">[ 02 // PERFORMANCE METRIC ]</span>
             <p className="side-card-body">
@@ -1481,20 +1483,16 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
         </div>
 
         {/* BOTTOM FULL-WIDTH EDITORIAL BANNER */}
-        <div 
+        <div
           className="bottom-gold-truth-card"
-          onMouseEnter={() => setIsCursorHovering(true)}
-          onMouseLeave={() => setIsCursorHovering(false)}
         >
           <span className="truth-mono-tag">[ 03 // THE VERDICT ]</span>
           <p className="truth-quote-text">
             "I READ THE REALITY CHECK. THE ARCHITECTURE IS UNDENIABLE. TAKE THE ₹49 AND UNLOCK EVERYTHING."
           </p>
-          <button 
-            className="btn-truth-claim-key" 
+          <button
+            className="btn-truth-claim-key"
             onClick={onOpenPricing}
-            onMouseEnter={() => setIsCursorHovering(true)}
-            onMouseLeave={() => setIsCursorHovering(false)}
           >
             CLAIM UNLIMITED ACCESS →
           </button>
@@ -1506,7 +1504,9 @@ export default function LandingPage({ onStartWatchParty, onStartGames, onStartMe
             <span className="creator-tag">COGETHER // DIRECTED BY JEEVAN YADAV</span>
             <div className="footer-links">
               <a href="mailto:jeevan@cogether.app">EMAIL</a>
-              <a href="#privacy">TERMS & PRIVACY</a>
+              <a href="/privacy" onClick={(e) => { if (onNavigate) { e.preventDefault(); onNavigate('/privacy'); } }}>PRIVACY</a>
+              <a href="/terms" onClick={(e) => { if (onNavigate) { e.preventDefault(); onNavigate('/terms'); } }}>TERMS</a>
+              <a href="https://github.com/Jeevan-88/CoGether" target="_blank" rel="noopener noreferrer">GITHUB</a>
             </div>
           </div>
           <p className="copyright-text">

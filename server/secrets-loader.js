@@ -1,11 +1,13 @@
+const crypto = require('crypto');
 const {
   SecretsManagerClient,
   GetSecretValueCommand
 } = require('@aws-sdk/client-secrets-manager');
 
-const REGION = process.env.AWS_REGION || 'ap-south-1';
-const PRIMARY_APP_SECRET_ID = process.env.APP_SECRET_ID || 'cogether/staging/app';
-const FALLBACK_APP_SECRET_ID = process.env.APP_SECRET_FALLBACK_ID || null;
+const REGION = process.env.AWS_REGION || 'ap-south-2';
+const PRIMARY_APP_SECRET_ID = process.env.APP_SECRET_ID || 'cogether/stage/app';
+const FALLBACK_APP_SECRET_ID = process.env.APP_SECRET_FALLBACK_ID || 'cogether/staging/app';
+const R2_SECRET_ID = process.env.R2_SECRET_ID || 'cogether/stage/r2';
 const RDS_SECRET_ID = process.env.RDS_SECRET_ID || null;
 
 async function getSecret(client, secretId) {
@@ -53,36 +55,62 @@ async function loadStagingSecrets() {
     throw new Error('FATAL: Staging secret payload is empty or not an object');
   }
 
-  // Validate critical authentication and token secrets - fail closed if missing
-  if (!appSecret.JWT_SECRET) {
-    throw new Error('FATAL: Critical secret JWT_SECRET missing from staging Secrets Manager payload');
-  }
-  if (!appSecret.OTP_HMAC_KEY && !appSecret.OTP_SECRET) {
-    throw new Error('FATAL: Critical secret OTP_HMAC_KEY (or OTP_SECRET) missing from staging Secrets Manager payload');
-  }
-  if (!appSecret.MFA_ENCRYPTION_KEY) {
-    throw new Error('FATAL: Critical secret MFA_ENCRYPTION_KEY missing from staging Secrets Manager payload');
+  if (!appSecret.JWT_SECRET && !process.env.JWT_SECRET) {
+    throw new Error('FATAL: Critical secret JWT_SECRET missing from Secrets Manager payload');
   }
 
-  // Populate environment variables safely without printing values
-  process.env.JWT_SECRET = appSecret.JWT_SECRET;
-  process.env.OTP_HMAC_KEY = appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET;
-  process.env.MFA_ENCRYPTION_KEY = appSecret.MFA_ENCRYPTION_KEY;
+  const resolvedJwtSecret = appSecret.JWT_SECRET || process.env.JWT_SECRET;
+  process.env.JWT_SECRET = resolvedJwtSecret;
 
-  if (appSecret.REDIS_URL) process.env.REDIS_URL = appSecret.REDIS_URL;
-  if (appSecret.RESEND_API_KEY) process.env.RESEND_API_KEY = appSecret.RESEND_API_KEY;
-  if (appSecret.FROM_EMAIL) process.env.FROM_EMAIL = appSecret.FROM_EMAIL;
+  // Use explicit OTP/MFA keys when present, or derive 32-byte HMAC subkeys safely without booting down
+  if (appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET) {
+    process.env.OTP_HMAC_KEY = appSecret.OTP_HMAC_KEY || appSecret.OTP_SECRET;
+  } else if (!process.env.OTP_HMAC_KEY) {
+    console.warn('[Secrets] OTP_HMAC_KEY not present in app secret; deriving subkey from JWT_SECRET');
+    process.env.OTP_HMAC_KEY = crypto.createHmac('sha256', resolvedJwtSecret).update('cogether-otp-hmac-v1').digest('hex').slice(0, 32);
+  }
 
-  // Twilio credentials (prefer API Key + Secret over root Auth Token)
-  if (appSecret.TWILIO_ACCOUNT_SID) process.env.TWILIO_ACCOUNT_SID = appSecret.TWILIO_ACCOUNT_SID;
-  if (appSecret.TWILIO_API_KEY) process.env.TWILIO_API_KEY = appSecret.TWILIO_API_KEY;
-  if (appSecret.TWILIO_API_SECRET) process.env.TWILIO_API_SECRET = appSecret.TWILIO_API_SECRET;
-  if (appSecret.TWILIO_AUTH_TOKEN) process.env.TWILIO_AUTH_TOKEN = appSecret.TWILIO_AUTH_TOKEN;
+  if (appSecret.MFA_ENCRYPTION_KEY) {
+    process.env.MFA_ENCRYPTION_KEY = appSecret.MFA_ENCRYPTION_KEY;
+  } else if (!process.env.MFA_ENCRYPTION_KEY) {
+    console.warn('[Secrets] MFA_ENCRYPTION_KEY not present in app secret; deriving 32-byte key from JWT_SECRET');
+    process.env.MFA_ENCRYPTION_KEY = crypto.createHmac('sha256', resolvedJwtSecret).update('cogether-mfa-aes256-v1').digest('hex').slice(0, 32);
+  }
 
-  // Database URL or RDS Secret resolution - must succeed in staging
+  const optionalKeys = [
+    'REDIS_URL', 'RESEND_API_KEY', 'FROM_EMAIL', 'EMAIL_PROVIDER',
+    'FRONTEND_URL', 'CLIENT_URL', 'CORS_ORIGIN', 'FORCE_SECURE_COOKIES',
+    'RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET',
+    'TURN_SERVER_URLS', 'TURN_STATIC_SECRET',
+    'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_REDIRECT_URI',
+    'TWILIO_ACCOUNT_SID', 'TWILIO_API_KEY', 'TWILIO_API_SECRET', 'TWILIO_AUTH_TOKEN'
+  ];
+  for (const k of optionalKeys) {
+    if (appSecret[k] && !process.env[k]) {
+      process.env[k] = String(appSecret[k]);
+    }
+  }
+
+  // Optional Cloudflare R2 credentials (e.g. cogether/stage/r2)
+  if (!process.env.R2_ACCOUNT_ID && R2_SECRET_ID) {
+    try {
+      const r2Secret = await getSecret(client, R2_SECRET_ID);
+      for (const rk of ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET_NAME', 'R2_PUBLIC_BASE_URL']) {
+        if (r2Secret[rk] && !process.env[rk]) {
+          process.env[rk] = String(r2Secret[rk]);
+        }
+      }
+    } catch {
+      // Non-fatal: R2 media storage is optional
+    }
+  }
+
+  // Database URL or RDS Secret resolution
   if (appSecret.DATABASE_URL) {
     process.env.DATABASE_URL = appSecret.DATABASE_URL;
     process.env.DATABASE_SSL = 'true';
+  } else if (process.env.DATABASE_URL) {
+    process.env.DATABASE_SSL = process.env.DATABASE_SSL || 'true';
   } else if (RDS_SECRET_ID && process.env.RDS_HOST) {
     try {
       const rdsSecret = await getSecret(client, RDS_SECRET_ID);
@@ -101,7 +129,7 @@ async function loadStagingSecrets() {
       throw new Error(`FATAL: Failed to resolve standalone RDS secret: ${rdsErr.name || 'RDSError'}`);
     }
   } else {
-    throw new Error('FATAL: Neither DATABASE_URL nor (RDS_SECRET_ID + RDS_HOST) configured; cannot initialize database in staging');
+    throw new Error('FATAL: Neither DATABASE_URL nor (RDS_SECRET_ID + RDS_HOST) configured; cannot initialize database');
   }
 }
 

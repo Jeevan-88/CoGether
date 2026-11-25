@@ -6,7 +6,8 @@ import ControlBar from './ControlBar.jsx';
 import { Copy, Check, Users, Shield, Sparkles } from 'lucide-react';
 import './VideoRoom.css';
 
-const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
+import { getSignalingUrl } from '../../core/signalingConfig.js';
+const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || getSignalingUrl();
 
 export default function VideoRoom({ roomId, username, onLeave }) {
   const {

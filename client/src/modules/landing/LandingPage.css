@@ -4854,4 +4854,38 @@
   box-shadow: 6px 6px 0px #000000;
 }
 
+@media (max-width: 768px) {
+  .landing-container,
+  .landing-wrapper,
+  section {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .nodeck-slide3-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .nodeck-3d-eraser {
+    display: none;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nodeck-huge-headline {
+    font-size: clamp(1.7rem, 8vw, 2.5rem);
+  }
+
+  .cogame-bottom-cta {
+    padding: 20px 16px;
+  }
+}
+
 

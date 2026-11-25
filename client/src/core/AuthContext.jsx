@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { API_URL } from '../config/api.js';
+import { API_URL, parseApiResponse, formatNetworkError } from '../config/api.js';
 
 const AuthContext = createContext(null);
 
@@ -339,17 +339,17 @@ export function AuthProvider({ children }) {
   };
 
   // Email & Password Login
-  const loginWithPassword = async (email, password) => {
+  const loginWithPassword = async (email, password, rememberMe = false) => {
     setAuthError(null);
     try {
       const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, rememberMe, directLogin: true })
       });
 
-      const data = await res.json();
+      const data = await parseApiResponse(res);
       if (!res.ok || !data.success) {
         setAuthError(data.message || 'Invalid email or password');
         return { success: false, ...data };
@@ -369,7 +369,9 @@ export function AuthProvider({ children }) {
         };
       }
 
-      localStorage.setItem('cogether_access_token', data.accessToken);
+      if (data.accessToken) {
+        localStorage.setItem('cogether_access_token', data.accessToken);
+      }
       if (data.refreshToken) {
         localStorage.setItem('cogether_refresh_token', data.refreshToken);
       }
@@ -381,7 +383,7 @@ export function AuthProvider({ children }) {
 
       return { success: true, ...data };
     } catch (err) {
-      const msg = 'Network error during login';
+      const msg = formatNetworkError(err, 'Unable to reach login service.');
       setAuthError(msg);
       return { success: false, error: 'NETWORK_ERROR', message: msg };
     }

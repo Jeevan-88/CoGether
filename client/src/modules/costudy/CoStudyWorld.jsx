@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../core/AuthContext.jsx';
+import { API_URL } from '../../config/api.js';
 import './CoStudyLayout.css';
 import LearningCityMap from './components/LearningCityMap';
 import BuildingInteriorView from './components/BuildingInteriorView';
@@ -12,7 +13,7 @@ import MergedCameraView from './MergedCameraView';
  * Master container managing HUD, View States, and Learning Loops.
  */
 export default function CoStudyWorld({ onBackToHome, onSelectService } = {}) {
-  const { user, profile, logout } = useAuth();
+  const { user, profile, accessToken, logout } = useAuth();
   const displayName = profile?.displayName || profile?.username || user?.name || (user?.isGuest ? 'Guest' : 'Scholar');
   // Current view state: 'CITY_MAP', 'BUILDING_INTERIOR', 'LESSON_STAGE', 'STUDY_ROOM'
   const [currentView, setCurrentView] = useState('CITY_MAP');
@@ -31,13 +32,35 @@ export default function CoStudyWorld({ onBackToHome, onSelectService } = {}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCampusModal, setShowCampusModal] = useState(false);
 
-  // Gamification Player Stats
+  // Gamification Player Stats (hydrated from /api/v1/costudy/progress when authenticated)
   const [playerStats, setPlayerStats] = useState({
     level: 1,
-    xp: 150,
-    streakDays: 3,
+    xp: 0,
+    streakDays: 0,
     activeMission: 'HTML Building • Document Anatomy'
   });
+
+  React.useEffect(() => {
+    if (!accessToken || user?.isGuest) return;
+    let cancelled = false;
+    fetch(`${API_URL}/api/v1/costudy/progress`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: 'include'
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.success && data?.progress) {
+          setPlayerStats((prev) => ({
+            ...prev,
+            xp: Number(data.progress.xp) || 0,
+            streakDays: Number(data.progress.streakDays || data.progress.streak_days) || 0,
+            level: Number(data.progress.level) || 1
+          }));
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [accessToken, user?.isGuest]);
 
   // Navigate to Building Interior
   const handleSelectBuilding = (building) => {
@@ -219,7 +242,11 @@ export default function CoStudyWorld({ onBackToHome, onSelectService } = {}) {
         {/* 4. Duo Camera Study Room */}
         {currentView === 'STUDY_ROOM' && (
           <div style={{ flex: 1, width: '100%', height: '100%', overflow: 'hidden' }}>
-            <MergedCameraView />
+            <MergedCameraView
+              roomId={selectedBuilding?.slug ? `study-${selectedBuilding.slug}` : 'study-room-live'}
+              username={displayName}
+              onLeave={() => setCurrentView('CITY_MAP')}
+            />
           </div>
         )}
       </main>

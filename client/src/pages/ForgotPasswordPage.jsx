@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, AlertCircle, ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { API_URL } from '../config/api.js';
+import { API_URL, parseApiResponse, formatNetworkError } from '../config/api.js';
 import './AuthStyles.css';
 
 export default function ForgotPasswordPage({ onNavigate }) {
@@ -36,7 +36,7 @@ export default function ForgotPasswordPage({ onNavigate }) {
         body: JSON.stringify({ email: email.trim().toLowerCase() })
       });
 
-      const data = await response.json();
+      const data = await parseApiResponse(response);
 
       if (!response.ok || !data.success) {
         setErrorMessage(data.error?.message || data.message || 'Unable to process request.');
@@ -45,7 +45,7 @@ export default function ForgotPasswordPage({ onNavigate }) {
 
       setSubmitted(true);
     } catch (err) {
-      setErrorMessage('Network connection error. Please verify the server is running.');
+      setErrorMessage(formatNetworkError(err));
     } finally {
       setLoading(false);
     }

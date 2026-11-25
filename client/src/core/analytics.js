@@ -6,6 +6,8 @@
  * - Session-level aggregation without cross-site tracking
  */
 
+import { API_URL } from '../config/api.js';
+
 const IS_BROWSER = typeof window !== 'undefined';
 
 class AnalyticsTracker {
@@ -54,15 +56,34 @@ class AnalyticsTracker {
   }
 
   _dispatch(eventPayload) {
-    // In local/production, keep event queue and optionally report to /api/v1/telemetry
     this.queue.push(eventPayload);
     if (this.queue.length > 50) {
       this.queue.shift(); // keep memory bounded
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      // Clean silent telemetry in dev
-    }
+    if (!IS_BROWSER) return;
+    try {
+      const payload = JSON.stringify({
+        event: eventPayload.type === 'pageview' ? 'page_view' : eventPayload.name,
+        properties: {
+          ...eventPayload.properties,
+          path: eventPayload.path || window.location.pathname,
+          sessionId: eventPayload.sessionId
+        }
+      });
+
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon(`${API_URL}/api/v1/telemetry/analytics`, blob);
+      } else {
+        fetch(`${API_URL}/api/v1/telemetry/analytics`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true
+        }).catch(() => {});
+      }
+    } catch (_e) {}
   }
 }
 

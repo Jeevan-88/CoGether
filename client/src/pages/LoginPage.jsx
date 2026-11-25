@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { API_URL } from '../config/api.js';
+import { API_URL, parseApiResponse, formatNetworkError } from '../config/api.js';
+import { useAuth } from '../core/AuthContext.jsx';
+import { analytics } from '../core/analytics.js';
 import './AuthStyles.css';
 
 export default function LoginPage({ onNavigate, onLoginSuccess }) {
+  const { restoreSession } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -44,11 +47,13 @@ export default function LoginPage({ onNavigate, onLoginSuccess }) {
         credentials: 'include',
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
-          password
+          password,
+          rememberMe,
+          directLogin: true
         })
       });
 
-      const data = await response.json();
+      const data = await parseApiResponse(response);
 
       if (!response.ok || !data.success) {
         if (response.status === 429 || data.error?.code === 'ACCOUNT_LOCKED') {
@@ -68,6 +73,9 @@ export default function LoginPage({ onNavigate, onLoginSuccess }) {
         localStorage.setItem('cogether_refresh_token', data.refreshToken);
       }
 
+      analytics.trackEvent('login_completed', { method: 'password' });
+      await restoreSession?.().catch(() => {});
+
       setSuccessMessage('Logged in successfully! Redirecting...');
 
       if (onLoginSuccess) {
@@ -78,7 +86,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }) {
         navigateTo('/dashboard');
       }, 600);
     } catch (err) {
-      setErrorMessage('Network connection error. Please verify the server is running.');
+      setErrorMessage(formatNetworkError(err));
     } finally {
       setLoading(false);
     }

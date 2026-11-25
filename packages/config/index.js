@@ -117,9 +117,9 @@ function loadConfig(env = process.env) {
         redirectUri: env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/v1/auth/google/callback'
       },
       email: {
-        provider: env.EMAIL_PROVIDER || 'console_test',
+        provider: env.EMAIL_PROVIDER || (env.RESEND_API_KEY ? 'resend' : 'console_test'),
         apiKey: env.RESEND_API_KEY || env.SENDGRID_API_KEY || null,
-        fromEmail: env.FROM_EMAIL || 'auth@cogether.app',
+        fromEmail: env.FROM_EMAIL || env.EMAIL_FROM || 'CoGether <noreply@cogether.tech>',
         smtpHost: env.SMTP_HOST || null,
         smtpPort: parseInt(env.SMTP_PORT || '587', 10),
         smtpUser: env.SMTP_USER || null,

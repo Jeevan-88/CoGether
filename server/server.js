@@ -113,7 +113,24 @@ app.use((req, res, next) => {
 app.use(correlationMiddleware);
 
 const { authRouter } = require('./routes/auth');
+const { billingRouter } = require('./routes/billing');
+const { telemetryRouter } = require('./routes/telemetry');
+
+// Malformed JSON request payload guard
+app.use((err, req, res, next) => {
+  if (err && err.type === 'entity.parse.failed') {
+    return res.status(400).json({
+      success: false,
+      error: 'INVALID_JSON',
+      message: 'Request body must be valid JSON.'
+    });
+  }
+  return next(err);
+});
+
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/billing', billingRouter);
+app.use('/api/v1/telemetry', telemetryRouter);
 
 
 // CoPlay Game Catalog Synchronizer (Seeds PostgreSQL coplay.games table)
@@ -2232,7 +2249,14 @@ app.get('/api/v1/social/messages/unread/summary', authenticateToken, async (req,
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: '*', methods: ['GET', 'POST'] }
+  cors: {
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) return callback(null, true);
+      return callback(new Error('Origin not allowed by Socket.IO CORS policy'));
+    },
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
 });
 
 // Socket.IO Handshake Authentication Middleware
@@ -2835,6 +2859,36 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3001;
+// Always return structured JSON on unmatched API routes instead of Express HTML 404
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'NOT_FOUND',
+    message: `API endpoint ${req.method} ${req.originalUrl} does not exist.`
+  });
+});
+
+// Global error-handling middleware (always returns JSON, never stack traces in prod)
+app.use((err, req, res, _next) => {
+  logger.error('Unhandled backend exception', { error: err?.message, path: req.originalUrl });
+  const isProd = process.env.NODE_ENV === 'production';
+  res.status(err?.status || 500).json({
+    success: false,
+    error: 'INTERNAL_SERVER_ERROR',
+    message: isProd ? 'An unexpected server error occurred.' : (err?.message || 'Internal Server Error')
+  });
+});
+
 server.listen(PORT, () => {
+  logger.info(`CoGether Platform listening on port ${PORT}`, { env: process.env.NODE_ENV || 'development' });
+  // Idempotently apply any pending SQL migrations (e.g. 018) on live startup inside VPC
+  if (process.env.AUTO_MIGRATE !== 'false' && !db.isSimulated) {
+    try {
+      const { runMigrations } = require('../packages/database/migrator');
+      runMigrations().catch((err) => {
+        logger.warn('Auto-migration on boot skipped or deferred', { error: err?.message });
+      });
+    } catch (_e) {}
+  }
   console.log(`⚡ WebRTC Signaling & Games Server listening on http://localhost:${PORT}`);
 });

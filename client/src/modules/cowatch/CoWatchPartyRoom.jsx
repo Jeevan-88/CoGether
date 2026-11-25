@@ -13,7 +13,8 @@ import ScreenShareStage from './components/ScreenShareStage.jsx';
 import CoWatchCameraTile from './components/CoWatchCameraTile.jsx';
 import './CoWatchLayout.css';
 
-const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || 'http://localhost:3001';
+import { getSignalingUrl } from '../../core/signalingConfig.js';
+const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL || getSignalingUrl();
 
 export default function CoWatchPartyRoom({
   content,
@@ -40,9 +41,7 @@ export default function CoWatchPartyRoom({
   const [isSocialRailOpen, setIsSocialRailOpen] = useState(true);
   const [copiedCode, setCopiedCode] = useState(false);
   const [controlPolicy, setControlPolicy] = useState('HOST_ONLY'); // 'HOST_ONLY' | 'EVERYONE'
-  const [chatMessages, setChatMessages] = useState([
-    { id: 'sys-1', senderName: 'CoWatch', text: 'Room connected. Controls synced.', timestamp: 'Now' }
-  ]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const [reactionsList, setReactionsList] = useState([]);
   const [remoteSyncState, setRemoteSyncState] = useState(null);

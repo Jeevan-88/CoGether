@@ -80,7 +80,7 @@ export const YOU_MIGHT_ALSO_LIKE_ITEMS = [
 ];
 
 export default function FullCartPage({
-  cartGroups = INITIAL_CART_GROUPS,
+  cartGroups = [],
   onUpdateQuantity,
   onCheckoutGroup,
   onAddRecommendation
@@ -124,7 +124,17 @@ export default function FullCartPage({
       <div className="coshop-cart-grid-layout">
         {/* Left Column: Multi-Store Carts */}
         <div className="coshop-cart-stores-col">
-          {groups.map((group) => {
+          {groups.length === 0 ? (
+            <div className="coshop-empty-cart-card" style={{
+              background: '#ffffff', border: '1px solid #ececef', borderRadius: '18px',
+              padding: '48px 28px', textAlign: 'center', color: '#4b5563'
+            }}>
+              <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: '#111827' }}>Your CoShop bag is empty</h3>
+              <p style={{ margin: 0, fontSize: '14px', color: '#6b7280' }}>
+                Add items from any curated brand or live room to compare offers and check out together.
+              </p>
+            </div>
+          ) : groups.map((group) => {
             const groupTotal = group.items.reduce((sum, it) => sum + it.price * it.quantity, 0);
             const totalCount = group.items.reduce((sum, it) => sum + it.quantity, 0);
             const currency = group.items[0]?.currency || '$';
@@ -205,7 +215,7 @@ export default function FullCartPage({
                     className="coshop-store-checkout-btn"
                     onClick={() => {
                       if (onCheckoutGroup) onCheckoutGroup(group);
-                      else alert(`Proceeding to secure checkout for ${group.storeName} (${currency}${groupTotal.toFixed(2)})`);
+                      else if (group.checkoutUrl) window.open(group.checkoutUrl, '_blank', 'noopener,noreferrer');
                     }}
                   >
                     Continue to checkout

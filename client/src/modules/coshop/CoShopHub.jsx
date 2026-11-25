@@ -57,8 +57,8 @@ export default function CoShopHub({
 
   // Active viewing product for PDP
   const [viewingProduct, setViewingProduct] = useState(LSKD_LEGGINGS_PRODUCT);
-  const [latestCartThumbnail, setLatestCartThumbnail] = useState('/coshop/products/cart_lskd_item.png');
-  const [cartCount, setCartCount] = useState(3);
+  const [latestCartThumbnail, setLatestCartThumbnail] = useState('');
+  const [cartCount, setCartCount] = useState(0);
   const [isCartBouncing, setIsCartBouncing] = useState(false);
 
   // Marquee drag-to-scroll & infinite loop refs
@@ -147,32 +147,7 @@ export default function CoShopHub({
 
   // Cart & Wishlist State
   // Default to 2 items so the cart indicator matches Screenshot 2's '2' badge immediately!
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 'k_beauty_centella_serum',
-      retailerId: 'amazon',
-      retailerName: 'Amazon India',
-      title: 'Madagascar Centella Hyalu-Cica Water-Fit Sun Serum SPF50+ PA++++',
-      brand: 'SKIN1004',
-      price: 1450,
-      originalPrice: 1999,
-      discount: 27,
-      rating: 4.8,
-      thumbnail: 'https://images.unsplash.com/photo-1608248597359-5f21d3f9b2fa?w=800&auto=format&fit=crop&q=80'
-    },
-    {
-      id: 'nike_air_max_excee',
-      retailerId: 'myntra',
-      retailerName: 'Myntra',
-      title: 'Nike Air Max Excee Running & Lifestyle Shoes',
-      brand: 'Nike',
-      price: 6899,
-      originalPrice: 7995,
-      discount: 14,
-      rating: 4.6,
-      thumbnail: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop&q=80'
-    }
-  ]);
+  const [cartItems, setCartItems] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isBagModalOpen, setIsBagModalOpen] = useState(false);
@@ -869,8 +844,14 @@ export default function CoShopHub({
           />
         ) : activeView === 'cart' ? (
           <FullCartPage
-            onCheckoutGroup={(storeId) => {
-              alert(`Proceeding to checkout for ${storeId.toUpperCase()}`);
+            cartGroups={[]}
+            onCheckoutGroup={(groupOrStore) => {
+              const targetUrl = groupOrStore?.checkoutUrl || groupOrStore?.items?.[0]?.productUrl;
+              if (targetUrl) {
+                window.open(targetUrl, '_blank', 'noopener,noreferrer');
+              } else {
+                setActiveView('hub');
+              }
             }}
             onAddRecommendation={(rec) => {
               setCartCount((c) => c + 1);
@@ -1311,10 +1292,10 @@ export default function CoShopHub({
 
               <div className="coshop-footer-col">
                 <span className="coshop-footer-col-title">Trust & Legal</span>
-                <span className="coshop-footer-link">Privacy Policy</span>
-                <span className="coshop-footer-link">Terms of Service</span>
-                <span className="coshop-footer-link">Cookie Preferences</span>
-                <span className="coshop-footer-link">Trademark Notices</span>
+                <a className="coshop-footer-link" href="/privacy" onClick={(e) => { e.preventDefault(); window.history.pushState({}, '', '/privacy'); window.dispatchEvent(new PopStateEvent('popstate')); }}>Privacy Policy</a>
+                <a className="coshop-footer-link" href="/terms" onClick={(e) => { e.preventDefault(); window.history.pushState({}, '', '/terms'); window.dispatchEvent(new PopStateEvent('popstate')); }}>Terms of Service</a>
+                <a className="coshop-footer-link" href="/dashboard" onClick={(e) => { e.preventDefault(); window.history.pushState({}, '', '/dashboard'); window.dispatchEvent(new PopStateEvent('popstate')); }}>Account & Security</a>
+                <a className="coshop-footer-link" href="https://github.com/Jeevan-88/CoGether" target="_blank" rel="noopener noreferrer">Open Architecture</a>
               </div>
             </div>
           </div>
