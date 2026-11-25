@@ -686,8 +686,9 @@ app.post('/api/v1/costudy/nodes/:id/complete', async (req, res) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
-        const decoded = verifyToken(authHeader.split(' ')[1]);
-        if (decoded?.id || decoded?.sub) userId = decoded?.id || decoded?.sub;
+        const verified = verifyToken(authHeader.split(' ')[1]);
+        const claims = verified?.valid ? verified.claims : verified;
+        if (claims?.userId || claims?.id || claims?.sub) userId = claims.userId || claims.id || claims.sub;
       } catch (e) {}
     }
     const { status = 'COMPLETED', score = 100, masteryPct = 100 } = req.body;
@@ -710,15 +711,24 @@ app.get('/api/v1/costudy/progress', async (req, res) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
-        const decoded = verifyToken(authHeader.split(' ')[1]);
-        userId = decoded?.id || decoded?.sub;
+        const verified = verifyToken(authHeader.split(' ')[1]);
+        const claims = verified?.valid ? verified.claims : verified;
+        userId = claims?.userId || claims?.id || claims?.sub;
       } catch (e) {}
     }
     if (!userId) {
       return res.json({ success: true, completedNodes: [], unlocks: [], totalScore: 0 });
     }
     const progress = await learningRepository.getUserCityProgress(userId);
-    res.json({ success: true, ...progress });
+    res.json({
+      success: true,
+      ...progress,
+      progress: {
+        xp: Number(progress?.totalScore) || 0,
+        level: 1 + Math.floor((Number(progress?.totalScore) || 0) / 200),
+        streakDays: Number(progress?.streakDays) || 0
+      }
+    });
   } catch (err) {
     logger.error('Failed to get user city progress:', { error: err.message });
     res.status(500).json({ success: false, error: 'Failed to retrieve progress' });
